@@ -14,26 +14,26 @@ def f(n: Int4) -> bool:
     return False
 ```
 
-And then use it like:
-```
+And then use it inside a circuit:
+```python
 qc = QuantumCircuit(f.num_qubits)
 ...
 qc.append(f.gate, f.qubits_list(0))
 ```
 
-Or,
+Or, you can define a function with parameters:
 ```python
 @qlassf
-def f(n: Int4, n_it: Param<int>) -> Int8:
+def f(n: Int4, n_it: Param[int]) -> Int8:
   v = 0
   for x in range(n_it):
     v += n
   return n     
 ```
 
-And then:
+And then, you can bind it with a value:
 ```python
-f4 = f.with(n_it=4)
+f4 = f.bind(n_it=4)
 qc = QuantumCircuit(f4.num_qubits)
 ...
 qc.append(f4.gate, f4.qubits_list(0))
