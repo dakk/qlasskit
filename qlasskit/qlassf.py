@@ -6,16 +6,17 @@ from .exceptions import NoReturnTypeException
 
 class QlassF:
     """Class representing a quantum classical circuit"""
-    def __init__(self, name, original_f, args, exps):
+    def __init__(self, name, original_f, args, ret_type, exps):
         self.name = name
         self.original_f = original_f # TODO: this should be always a callable (not a str)
         self.args = args
+        self.ret_type = ret_type
         self.expressions = exps
     
     def __repr__(self):
         arg_str = ", ".join(map(lambda arg: f'{arg[0]}:{arg[1]}',self.args))
         exp_str = "\n\t".join(map(lambda exp: f'{exp[0]} = {exp[1]}', self.expressions))
-        return f'QlassF<{self.name}>({arg_str}):\n\t{exp_str}'
+        return f'QlassF<{self.name}>({arg_str}) -> {self.ret_type}:\n\t{exp_str}'
     
     def from_function(f):
         """ Create a QlassF from a function """
@@ -43,7 +44,7 @@ class QlassF:
             
         exps = flatten (exps)
         
-        qf = QlassF(fun_name, f, args, exps)    
+        qf = QlassF(fun_name, f, args, fun_ret, exps)    
         print(qf)
         return qf
 

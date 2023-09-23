@@ -1,7 +1,7 @@
 import ast 
 
 from sympy import Symbol
-from sympy.logic import And, Not, Or, false, true, simplify_logic
+from sympy.logic import ITE, Implies, And, Not, Or, false, true, simplify_logic
 
 from . import exceptions
 
@@ -54,8 +54,6 @@ def parse_expression(expr, env):
                     return unfold(v_exps, And)
                 case ast.Or():
                     return unfold(v_exps, Or)
-                case _:
-                    raise ExpressionNotHandledException(expr)
 
         case ast.UnaryOp():
             match expr.op:
@@ -64,9 +62,15 @@ def parse_expression(expr, env):
                 case _:
                     raise ExpressionNotHandledException(expr)
 
-        # (condition) and (true_value) or (not condition) and (false_value)
         case ast.IfExp():
-            raise exceptions.ExpressionNotHandledException(expr)
+            # (condition) and (true_value) or (not condition) and (false_value)
+            # return Or(
+            #     And(parse_expression(expr.test, env), parse_expression(expr.body, env)),
+            #     And(Not(parse_expression(expr.test, env)), parse_expression(expr.orelse, env))
+            # )
+            return ITE(parse_expression(expr.test, env), 
+                       parse_expression(expr.body, env), 
+                       parse_expression(expr.orelse, env))
             
         case ast.Constant():
             match expr.value:
@@ -81,7 +85,15 @@ def parse_expression(expr, env):
             raise exceptions.ExpressionNotHandledException(expr)
         
         case ast.Compare():
+            # Eq | NotEq | Lt | LtE | Gt | GtE | Is | IsNot | In | NotIn
             raise exceptions.ExpressionNotHandledException(expr)
+        
+        # Lambda
+        # Dict
+        # Set
+        # Call
+        # List
+        # op Add | Sub | Mult | MatMult | Div | Mod | Pow | LShift | RShift | BitOr | BitXor | BitAnd | FloorDiv
  
         case _:
             raise ExpressionNotHandledException(expr)
@@ -99,6 +111,16 @@ def parse_statement(stmt, env):
         case ast.Return():
             vexp = parse_expression(stmt.value, env)
             return [('_ret', vexp)], env
+        
+        # FunctionDef
+        # For 
+        # While
+        # With
+        # Expr
+        # Pass
+        # Break
+        # Continue
+        # Match
         
         case _:
             raise exceptions.StatementNotHandledException(stmt)
