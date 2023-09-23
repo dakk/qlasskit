@@ -1,8 +1,9 @@
 # Qlasskit
 
-Qlasskit is a python library that allow to write classical algorithms in python, and transform them to unitary operators (gates) so they can be used in a quantum circuit.
+Qlasskit is a Python library that allows quantum developers to write classical algorithms in pure Python and translate them into unitary operators (gates) for use in quantum circuits.
 
-This should be useful in every algorithm that rely on a 'blackbox' function like Simon, Groover, Deutsch and so on, or in general to descrive classical parts of a quantum algorithm.
+This tool will be useful for any algorithm that relies on a 'blackbox' function and for describing the classical components of a quantum algorithm.
+
 
 
 ```python
