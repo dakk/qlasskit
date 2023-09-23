@@ -1,5 +1,8 @@
 import ast 
 
+from sympy import Symbol
+from sympy.logic import And, Not, Or, false, true, simplify_logic
+
 from . import exceptions
 
 flatten = lambda m: [item for row in m for item in row]
@@ -40,14 +43,30 @@ def parse_expression(expr, env):
             return Symbol(sn)
 
         case ast.BoolOp():
-            raise exceptions.ExpressionNotHandledException(e)
+            def unfold(l, op):
+                c_exp = lambda l: op(l[0], c_exp(l[1::])) if len(l) > 1 else l[0]
+                return c_exp(v_exps)
+                
+            v_exps = [parse_expression(e_in, env) for e_in in expr.values]
+            
+            match expr.op:
+                case ast.And():
+                    return unfold(v_exps, And)
+                case ast.Or():
+                    return unfold(v_exps, Or)
+                case _:
+                    raise ExpressionNotHandledException(expr)
 
         case ast.UnaryOp():
-            raise exceptions.ExpressionNotHandledException(e)
+            match expr.op:
+                case ast.Not():
+                    return Not(parse_expression(expr.operand, env))
+                case _:
+                    raise ExpressionNotHandledException(expr)
 
         # (condition) and (true_value) or (not condition) and (false_value)
         case ast.IfExp():
-            raise exceptions.ExpressionNotHandledException(e)
+            raise exceptions.ExpressionNotHandledException(expr)
             
         case ast.Constant():
             match expr.value:
@@ -56,16 +75,16 @@ def parse_expression(expr, env):
                 case False:
                     return false
                 case _:
-                    raise exceptions.ExpressionNotHandledException(e)
+                    raise exceptions.ExpressionNotHandledException(expr)
                 
         case ast.Tuple():
-            raise exceptions.ExpressionNotHandledException(e)
+            raise exceptions.ExpressionNotHandledException(expr)
         
         case ast.Compare():
-            raise exceptions.ExpressionNotHandledException(e)
+            raise exceptions.ExpressionNotHandledException(expr)
  
         case _:
-            raise ExpressionNotHandledException(e)
+            raise ExpressionNotHandledException(expr)
 
 
 def parse_statement(stmt, env):
@@ -78,7 +97,8 @@ def parse_statement(stmt, env):
             raise exceptions.StatementNotHandledException(stmt) 
 
         case ast.Return():
-            raise exceptions.StatementNotHandledException(stmt) 
+            vexp = parse_expression(stmt.value, env)
+            return [('_ret', vexp)], env
         
         case _:
             raise exceptions.StatementNotHandledException(stmt)
