@@ -1,6 +1,8 @@
 import ast
 import inspect 
 
+from sympy.logic import simplify_logic
+
 from .ast_parser import parse_arguments, parse_expression, parse_statement, flatten
 from .exceptions import NoReturnTypeException
 
@@ -43,6 +45,7 @@ class QlassF:
             exps.append(s_exps)
             
         exps = flatten (exps)
+        exps = list(map (lambda e: simplify_logic(e, form='cnf'), exps))
         
         qf = QlassF(fun_name, f, args, fun_ret, exps)    
         print(qf)
