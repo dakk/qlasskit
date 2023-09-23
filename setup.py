@@ -13,10 +13,8 @@ setup(
         "qlasskit",
     ],
     entry_points={
-        "console_scripts": [
-        ],
+        "console_scripts": [],
     },
     zip_safe=False,
-    install_requires=[
-    ],
+    install_requires=["sympy==1.12"],
 )

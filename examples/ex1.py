@@ -1,12 +1,14 @@
 from qiskit import QuantumCircuit
-from qlasskit import qlassf, Int4
+
+from qlasskit import Int4, qlassf
+
 
 @qlassf
 def f(n: Int4) -> bool:
-  if n == 3:
-    return True
-  else:
-    return False
+    if n == 3:
+        return True
+    else:
+        return False
 
 
 qc = QuantumCircuit(f.num_qubits)
