@@ -13,11 +13,16 @@ author = 'Davide Gessa (dakk)'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+extensions = [
+    'sphinx.ext.autodoc'
+]
 
 templates_path = ['_templates']
 exclude_patterns = []
 
+autodoc_source_dir = [
+    '../qlasskit',
+]
 
 
 # -- Options for HTML output -------------------------------------------------

@@ -1,30 +1,30 @@
 
-""" Class representing a quantum classical circuit """
 class QlassF:
+    """ Class representing a quantum classical circuit """
     def __init__(self):
         pass 
 
-    """ The gate """
     @property
     def gate(self, framework='qiskit'):
+        """ The gate """
         return None 
 
-    """ List of qubits of the gate """
     @property
     def qubits(self, index=0):
+        """ List of qubits of the gate """
         return []
 
-    """ Return a new QlassF with defined params """
     def bind(self, **kwargs):
+        """ Return a new QlassF with defined params """
         pass 
 
-    """ Return the classical python function """
     def f(self):
+        """ Return the classical python function """
         pass 
 
     
-""" Decorator creating a QlassF object """
 def qlassf(f):
+    """ Decorator creating a QlassF object """
     return QlassF()
 
 
