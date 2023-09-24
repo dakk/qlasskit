@@ -10,6 +10,7 @@ def test(a: bool) -> bool:
 def test(a: bool) -> bool:
     return not a 
 
+@qlassf
 def test(a: bool, b: bool) -> bool:
     return not a and b
 
@@ -22,7 +23,6 @@ def test(a: bool, b: bool, c: bool) -> bool:
 def test2(a: bool, b: bool, c: bool) -> bool:
     return True if a and (not b) and c else False
 
-@qlassf
 def test2(a: bool, b: bool, c: bool) -> bool:
     return (c and not b) if a and (not b) and c else (a and not c)
 

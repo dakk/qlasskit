@@ -5,6 +5,7 @@ from sympy.logic import simplify_logic
 
 from .ast_parser import parse_arguments, parse_expression, parse_statement, flatten
 from .exceptions import NoReturnTypeException
+from . import synth
 
 class QlassF:
     """Class representing a quantum classical circuit"""
@@ -48,7 +49,9 @@ class QlassF:
         exps = list(map (lambda e: simplify_logic(e, form='cnf'), exps))
         
         qf = QlassF(fun_name, f, args, fun_ret, exps)    
+        
         print(qf)
+        synth.to_quantum(exps[0][1])
         return qf
 
     @property
