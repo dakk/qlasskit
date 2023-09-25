@@ -40,6 +40,23 @@ qc = QuantumCircuit(f4.num_qubits)
 qc.append(f4.gate, f4.qubits_list(0))
 ```
 
+Qlasskit (will) supports complex data types, like tuples and fixed size lists:
+
+```python
+@qlassf
+def f(a: Tuple[Int8, Int8]) -> Tuple[bool, bool]:
+  return a[0] == 42, a[1] == 0
+```
+
+```python
+@qlassf
+def search(alist: List4[Int2], to_search: Int2):
+  for x in alist:
+    if x == to_search:
+      return True
+  return False
+```
+
 
 ## License
 
