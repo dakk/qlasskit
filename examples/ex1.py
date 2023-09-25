@@ -12,4 +12,4 @@ def f(n: Int4) -> bool:
 
 
 qc = QuantumCircuit(f.num_qubits)
-qc.append(f.gate, f.qubits_list(0))
+qc.append(f.gate, f.qubits(0))

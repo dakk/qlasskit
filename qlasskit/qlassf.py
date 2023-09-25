@@ -1,5 +1,6 @@
 import ast
 import inspect 
+from typing import List
 
 from sympy.logic import simplify_logic
 
@@ -15,6 +16,12 @@ class QlassF:
         self.args = args
         self.ret_type = ret_type
         self.expressions = exps
+        
+        self._synthetized_gate = None
+        
+    def synth(self):
+        # TODO: synthetize all expression and create a one gate only
+        self._synthetized_gate = synth.to_quantum(self.expressions[0][-1])
     
     def __repr__(self):
         arg_str = ", ".join(map(lambda arg: f'{arg[0]}:{arg[1]}',self.args))
@@ -50,19 +57,39 @@ class QlassF:
         
         qf = QlassF(fun_name, f, args, fun_ret, exps)    
         
-        print(qf)
-        synth.to_quantum(exps[0][1])
+        # print(qf)
+        qf.synth()
         return qf
 
     @property
     def gate(self, framework="qiskit"):
         """Returns the gate for a specific framework"""
-        return None
+        if self._synthetized_gate is None:
+            raise Exception ("Not yet synthetized")
+        
+        match framework:
+            case 'qiskit':
+                g = self._synthetized_gate.to_qiskit()
+                g.name = self.name
+                return g
+            case _:
+                raise Exception(f'Framework {framework} not supported')
 
-    @property
     def qubits(self, index=0):
         """List of qubits of the gate"""
-        return []
+        if self._synthetized_gate is None:
+            raise Exception ("Not yet synthetized")
+        return self._synthetized_gate.qubit_map.values()
+    
+    @property
+    def res_qubits(self) -> List[int]:
+        """ Return the qubits holding the result """
+        return [self._synthetized_gate.res_qubit]
+
+    @property
+    def num_qubits(self) -> int:
+        """ Return the number of qubits"""
+        return len(self.qubits())
 
     def bind(self, **kwargs):
         """Returns a new QlassF with defined params"""

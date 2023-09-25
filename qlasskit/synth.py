@@ -1,40 +1,37 @@
 """ Algorithm and functions able to synthetize a boolean function to a quantum circuit """
+# TODO: synthetizer should translate the boolexp to an intermediate form
+# with invertible boolean gates; then we can apply simplifications and ancilla optimizations
+# After that, we do another compilation pass that decompose invertible logic to quantum gates
+
 from sympy import Symbol
 from sympy.logic import ITE, Implies, And, Not, Or, false, true, simplify_logic
 
-def to_qiskit(gl, resbit, qmap):
-    from qiskit import QuantumCircuit
-    from qiskit import Aer, transpile, execute
+class SynthResult:
+    def __init__(self, res_qubit, gate_list, qubit_map):
+        self.res_qubit = res_qubit
+        self.gate_list = gate_list
+        self.qubit_map = qubit_map
     
-    qc = QuantumCircuit(len(qmap), 0)
-    
-    # qc.x(1)
-    # qc.barrier()
-    for g in gl:
-        match g[0]:
-            case 'x':
-                qc.x(g[1])
-            case 'cx':
-                qc.cx(g[1], g[2])
-            case 'ccx':
-                qc.ccx(g[1], g[2], g[3])
-    # qc.barrier()
-    # qc.measure(resbit, 0)
-    print(qc.draw())
-    
-    # simulator = Aer.get_backend('aer_simulator')
-    # circ = transpile(qc, simulator)
-    # result = simulator.run(circ).result()
-    # counts = result.get_counts(circ)
-    # print(counts)
-    
-    print (qc.to_gate())
-    
-    
-    # qc.save_unitary()
-    simulator = Aer.get_backend('unitary_simulator')
-    result = execute(qc, simulator).result().get_unitary(qc)
-    print(result)
+    @property
+    def num_qubits(self):
+        return len(self.qubit_map)
+        
+    def to_qiskit(self):
+        from qiskit import QuantumCircuit
+        from qiskit import Aer, transpile, execute
+        
+        qc = QuantumCircuit(len(self.qubit_map), 0)
+        
+        for g in self.gate_list:
+            match g[0]:
+                case 'x':
+                    qc.x(g[1])
+                case 'cx':
+                    qc.cx(g[1], g[2])
+                case 'ccx':
+                    qc.ccx(g[1], g[2], g[3])
+        
+        return qc.to_gate()
     
 
 class Synthetizer:
@@ -93,6 +90,6 @@ class Synthetizer_0(Synthetizer):
 
 def to_quantum(bexp):
     s = Synthetizer_0()
-    c = s.synth(bexp)
-    print('res',c, s.qmap)
-    to_qiskit(c[1], c[0], s.qmap)
+    res_qubit, gate_list = s.synth(bexp)
+    # print('res',c, s.qmap)
+    return SynthResult(res_qubit, gate_list, s.qmap)
