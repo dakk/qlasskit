@@ -1,7 +1,8 @@
 # Qlasskit
 
-[![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](https://unitary.fund)
+[![Unitary Fund](https://img.shields.io/badge/supported_by-Unitary_Fund-yellow.svg)](https://unitary.fund)
 ![CI Status](https://github.com/dakk/qlasskit/actions/workflows/ci.yaml/badge.svg)
+![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-blue)
 
 
 Qlasskit is a Python library that allows quantum developers to write classical algorithms in pure Python and translate them into unitary operators (gates) for use in quantum circuits.
@@ -64,4 +65,4 @@ def search(alist: List4[Int2], to_search: Int2):
 
 ## License
 
-Read [LICENSE](LICENSE).
+Read [Apache License 2.0](LICENSE).

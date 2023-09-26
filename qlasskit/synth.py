@@ -1,10 +1,25 @@
+# Copyright 2023 Davide Gessa
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+# http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 """ Algorithm and functions able to synthetize a boolean function to a quantum circuit """
 # TODO: synthetizer should translate the boolexp to an intermediate form
 # with invertible boolean gates; then we can apply simplifications and ancilla optimizations
 # After that, we do another compilation pass that decompose invertible logic to quantum gates
 
 from sympy import Symbol
-from sympy.logic import ITE, And, Implies, Not, Or, false, simplify_logic, true
+from sympy.logic import And, Not, Or
 
 
 class SynthResult:
@@ -18,7 +33,7 @@ class SynthResult:
         return len(self.qubit_map)
 
     def to_qiskit(self):
-        from qiskit import Aer, QuantumCircuit, execute, transpile
+        from qiskit import QuantumCircuit
 
         qc = QuantumCircuit(len(self.qubit_map), 0)
 
