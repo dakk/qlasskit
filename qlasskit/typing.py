@@ -1,24 +1,10 @@
-from typing import Tuple
+from typing import NewType
 
-Int2 = Tuple[bool, bool]
-Int4 = Tuple[bool, bool, bool, bool]
-Int8 = Tuple[bool, bool, bool, bool, bool, bool, bool, bool]
-Int12 = Tuple[bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool]
-Int16 = Tuple[
-    bool,
-    bool,
-    bool,
-    bool,
-    bool,
-    bool,
-    bool,
-    bool,
-    bool,
-    bool,
-    bool,
-    bool,
-    bool,
-    bool,
-    bool,
-    bool,
-]
+Bool = NewType("Bool", bool)
+Int1 = NewType("Int1", bool)
+Int2 = NewType("Int2", int)
+Int4 = NewType("Int4", int)
+Int8 = NewType("Int8", int)
+Int12 = NewType("Int12", int)
+Int16 = NewType("Int16", int)
+Int32 = NewType("Int32", int)
