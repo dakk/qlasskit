@@ -63,10 +63,21 @@ def search(alist: List4[Int2], to_search: Int2):
 ```
 
 
+## Roadmap
+
+Read [TODO](TODO.md) for details about the roadmap and TODOs.
+
 ## Contributing
 
-Read [CONTRIBUTING](CONTRIBUTING.md).
+Read [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ## License
 
-Read [Apache License 2.0](LICENSE).
+This software is licensed with [Apache License 2.0](LICENSE).
+
+## About the author
+
+Davide Gessa (dakk)
+- twitter.com/dagide
+- https://dakk.github.io/
+- https://medium.com/@dakk
