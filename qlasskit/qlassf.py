@@ -25,9 +25,7 @@ class QlassF:
 
     def __init__(self, name, original_f, args, ret_type, exps):
         self.name = name
-        self.original_f = (
-            original_f  # TODO: this should be always a callable (not a str)
-        )
+        self.original_f = original_f
         self.args = args
         self.ret_type = ret_type
         self.expressions: BoolExpList = exps
@@ -91,11 +89,16 @@ class QlassF:
         fun_ast = (
             ast.parse(f) if isinstance(f, str) else ast.parse(inspect.getsource(f))
         )
+
+        if isinstance(f, str):
+            exec(f)
+
         fun = fun_ast.body[0]
 
         fun_name, args, fun_ret, exps = ast_to_logic.translate_ast(fun)
+        original_f = eval(fun_name) if isinstance(f, str) else f
 
-        qf = QlassF(fun_name, f, args, fun_ret, exps)
+        qf = QlassF(fun_name, original_f, args, fun_ret, exps)
         if to_compile:
             qf.compile()
         return qf
