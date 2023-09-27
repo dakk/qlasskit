@@ -126,6 +126,20 @@ def translate_statement(stmt, env: Env) -> Tuple[List[Tuple[str, BoolExp]], Env]
     """Parse a statement"""
     # match stmt:
     if isinstance(stmt, ast.If):
+        # Translate test expression, body & orelse statements
+        # test = translate_expression(stmt.test, env)
+
+        # body = []
+        # for st_inner in stmt.body:
+        #     exps, env = translate_statement(st_inner, env)
+        #     body.extend(exps)
+
+        # orelse = []
+        # for st_inner in stmt.orelse:
+        #     exps, env = translate_statement(st_inner, env)
+        #     orelse.extend(exps)
+
+        # print(ast.dump(stmt))
         raise exceptions.StatementNotHandledException(stmt)
 
     elif isinstance(stmt, ast.Assign):
@@ -140,6 +154,10 @@ def translate_statement(stmt, env: Env) -> Tuple[List[Tuple[str, BoolExp]], Env]
             )
 
         target = Symbol(stmt.targets[0].id)
+
+        if target in env:
+            raise exceptions.SymbolReassingedException(target)
+
         val = translate_expression(stmt.value, env)
         env[target] = "bool"  # TODO: handle all types
         return [(target, val)], env

@@ -22,6 +22,7 @@ class TestQlassfInt(unittest.TestCase):
     # def test9(a: Int8) -> bool:
     #     return a == 42
 
+    # Raise costant return
     # def test10() -> Int8:
     #     return 42
 

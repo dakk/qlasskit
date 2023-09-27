@@ -38,3 +38,8 @@ class UnboundException(Exception):
 class ConstantReturnException(Exception):
     def __init__(self, name, val):
         super().__init__(f"{name} is costant = {val}")
+
+
+class SymbolReassingedException(Exception):
+    def __init__(self, name):
+        super().__init__(f"{name} cannot be reassinged")
