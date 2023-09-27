@@ -16,10 +16,7 @@ import ast
 import inspect
 from typing import List
 
-from sympy.logic import simplify_logic
-
-from . import ast_to_logic, synth, utils
-from .exceptions import NoReturnTypeException
+from . import ast_to_logic, compiler
 
 
 class QlassF:
@@ -32,13 +29,13 @@ class QlassF:
         )
         self.args = args
         self.ret_type = ret_type
-        self.expressions = exps
+        self.expressions: BoolExpList = exps
 
-        self._synthetized_gate = None
+        self._compiled_gate = None
 
-    def synth(self):
-        # TODO: synthetize all expression and create a one gate only
-        self._synthetized_gate = synth.to_quantum(self.expressions[0][-1])
+    def compile(self):
+        # TODO: compile all expression and create a one gate only
+        self._compiled_gate = compiler.to_quantum(self.expressions[0][-1])
 
     def __repr__(self):
         arg_str = ", ".join(map(lambda arg: f"{arg[0]}:{arg[1]}", self.args))
@@ -51,43 +48,21 @@ class QlassF:
             ast.parse(f) if isinstance(f, str) else ast.parse(inspect.getsource(f))
         )
         fun = fun_ast.body[0]
-        fun_name = fun.name
 
-        # env contains names visible from the current scope
-        env = {}
-
-        args = ast_to_logic.translate_arguments(fun.args.args)
-        # TODO: types are string; maybe a translate_type?
-        for a_name, a_type in args:
-            env[a_name] = a_type
-
-        if not fun.returns:
-            raise NoReturnTypeException()
-        fun_ret = fun.returns.id
-        # TODO: handle complex-type returns
-
-        exps = []
-        for stmt in fun.body:
-            s_exps, env = ast_to_logic.translate_statement(stmt, env)
-            exps.append(s_exps)
-
-        exps = utils.flatten(exps)
-        exps = list(map(lambda e: simplify_logic(e, form="cnf"), exps))
+        fun_name, args, fun_ret, exps = ast_to_logic.translate_ast(fun)
 
         qf = QlassF(fun_name, f, args, fun_ret, exps)
-
-        # print(qf)
-        qf.synth()
+        qf.compile()
         return qf
 
     @property
     def gate(self, framework="qiskit"):
         """Returns the gate for a specific framework"""
-        if self._synthetized_gate is None:
-            raise Exception("Not yet synthetized")
+        if self._compiled_gate is None:
+            raise Exception("Not yet compiled")
 
         if framework == "qiskit":
-            g = self._synthetized_gate.to_qiskit()
+            g = self._compiled_gate.to_qiskit()
             g.name = self.name
             return g
         else:
@@ -95,14 +70,16 @@ class QlassF:
 
     def qubits(self, index=0):
         """List of qubits of the gate"""
-        if self._synthetized_gate is None:
-            raise Exception("Not yet synthetized")
-        return self._synthetized_gate.qubit_map.values()
+        if self._compiled_gate is None:
+            raise Exception("Not yet compiled")
+        return self._compiled_gate.qubit_map.values()
 
     @property
     def res_qubits(self) -> List[int]:
         """Return the qubits holding the result"""
-        return [self._synthetized_gate.res_qubit]
+        if self._compiled_gate is None:
+            raise Exception("Not yet compiled")
+        return [self._compiled_gate.res_qubit]
 
     @property
     def num_qubits(self) -> int:

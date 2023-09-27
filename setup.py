@@ -10,7 +10,7 @@ setup(
     author="Davide Gessa",
     setup_requires="setuptools",
     author_email="gessadavide@gmail.com",
-    packages=["qlasskit", "qlasskit.passes"],
+    packages=["qlasskit", "qlasskit.compiler"],
     zip_safe=False,
     install_requires=[
         "sympy==1.12",

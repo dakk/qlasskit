@@ -12,17 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-""" Algorithm and functions able to synthetize a boolean function to a quantum circuit """
-# TODO: synthetizer should translate the boolexp to an intermediate form
-# with invertible boolean gates; then we can apply simplifications and ancilla optimizations
-# After that, we do another compilation pass that decompose invertible logic to quantum gates
-
 from sympy import Symbol
 from sympy.logic import And, Not, Or
 
 
-class SynthResult:
+class CompilerResult:
     def __init__(self, res_qubit, gate_list, qubit_map):
         self.res_qubit = res_qubit
         self.gate_list = gate_list
@@ -49,34 +43,40 @@ class SynthResult:
         return qc.to_gate()
 
 
-class Synthetizer:
+class Compiler:
     def __init__(self):
         self.qmap = {}
 
-    def synth(self, expr):
+    def compile(self, expr):
         raise Exception("abstract")
 
 
-class Synthetizer_0(Synthetizer):
-    def synth(self, expr):
+class MultipassCompiler(Compiler):
+    pass
+
+
+class POCCompiler(Compiler):
+    """POC compiler translating an expr to quantum circuit"""
+
+    def compile(self, expr):  # noqa: C901
         # match expr:
-        if expr == Symbol():
+        if isinstance(expr, Symbol):
             # print('sym', expr.name)
             if expr.name not in self.qmap:
                 self.qmap[expr.name] = len(self.qmap)
             return self.qmap[expr.name], []
 
-        elif expr == Not():
+        elif isinstance(expr, Not):
             # print('NOT', expr.args)
-            i, g = self.synth(expr.args[0])
+            i, g = self.compile(expr.args[0])
             return i, g + [("x", i)]
 
-        elif expr == And():
+        elif isinstance(expr, And):
             il = []
             gl = []
 
             for x in expr.args:
-                ii, gg = self.synth(x)
+                ii, gg = self.compile(x)
                 il.append(ii)
                 gl.extend(gg)
 
@@ -89,12 +89,12 @@ class Synthetizer_0(Synthetizer):
 
             return inew, gl
 
-        elif expr == Or():
+        elif isinstance(expr, Or):
             if len(expr.args) > 2:
                 raise Exception("too many clause")
 
-            i1, g1 = self.synth(expr.args[0])
-            i2, g2 = self.synth(expr.args[1])
+            i1, g1 = self.compile(expr.args[0])
+            i2, g2 = self.compile(expr.args[1])
             i3 = len(self.qmap)
             self.qmap[f"anc_{len(self.qmap)}"] = i3
 
@@ -105,12 +105,27 @@ class Synthetizer_0(Synthetizer):
                 ("cx", i2, i3),
             ]
 
+        # TODO: this should never happen
+        # elif isinstance(expr, boolalg.BooleanFalse):
+        #     i3 = len(self.qmap)
+        #     self.qmap[f"anc_{len(self.qmap)}"] = i3
+        #     return []
+
+        # elif isinstance(expr, boolalg.BooleanTrue):
+        #     i3 = len(self.qmap)
+        #     self.qmap[f"anc_{len(self.qmap)}"] = i3
+        #     return [("x", i3)]
+
         else:
-            print("notrec", expr)
+            print(type(expr))
+            raise Exception(expr)
 
 
-def to_quantum(bexp):
-    s = Synthetizer_0()
-    res_qubit, gate_list = s.synth(bexp)
-    # print('res',c, s.qmap)
-    return SynthResult(res_qubit, gate_list, s.qmap)
+def to_quantum(bexp, compiler="poc"):
+    if compiler == "multipass":
+        s = MultipassCompiler()
+    elif compiler == "poc":
+        s = POCCompiler()
+
+    res_qubit, gate_list = s.compile(bexp)
+    return CompilerResult(res_qubit, gate_list, s.qmap)

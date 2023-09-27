@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, List
+from . import ILogic
 
 
-def flatten(m: List[List[Any]]) -> List[Any]:
-    return [item for row in m for item in row]
+def optimize(icircuit: ILogic) -> ILogic:
+    return icircuit

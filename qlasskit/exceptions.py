@@ -16,7 +16,7 @@ import ast
 
 
 class NoReturnTypeException(Exception):
-    def __init__(self, message):
+    def __init__(self):
         super().__init__("Return type is mandatory")
 
 
@@ -33,3 +33,8 @@ class ExpressionNotHandledException(Exception):
 class UnboundException(Exception):
     def __init__(self, message):
         super().__init__(message)
+
+
+class ConstantReturnException(Exception):
+    def __init__(self, name, val):
+        super().__init__(f"{name} is costant = {val}")

@@ -13,18 +13,19 @@
 # limitations under the License.
 
 import ast
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple
 
 from sympy import Symbol
-from sympy.logic import ITE, And, Not, Or, false, true
+from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
 
 from . import exceptions, utils
+from .typing import Args, BoolExp, BoolExpList
 
-BoolExp = Union[Symbol, And, Or, Not, ITE, bool]
 Env = Dict[str, str]
+LogicFun = Tuple[str, Args, str, BoolExpList]
 
 
-def translate_arguments(args) -> List[Tuple[str, str]]:
+def translate_arguments(args) -> Args:
     """Parse an argument list"""
 
     def map_arg(arg):
@@ -49,18 +50,23 @@ def translate_arguments(args) -> List[Tuple[str, str]]:
 
 def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
     """Translate an expression"""
-    if expr == ast.Name():
+    if isinstance(expr, ast.Name):
         if expr.id not in env:
             raise exceptions.UnboundException(expr.id)
         return Symbol(expr.id)
 
-    elif expr == ast.Subscript():
+    elif isinstance(expr, ast.Subscript):
+        if not isinstance(expr.value, ast.Name):
+            raise exceptions.ExpressionNotHandledException(expr)
+        elif not isinstance(expr.slice, ast.Constant):
+            raise exceptions.ExpressionNotHandledException(expr)
+
         sn = f"{expr.value.id}.{expr.slice.value}"
         if sn not in env:
             raise exceptions.UnboundException(sn)
         return Symbol(sn)
 
-    elif expr == ast.BoolOp():
+    elif isinstance(expr, ast.BoolOp):
 
         def unfold(v_exps, op):
             return (
@@ -69,15 +75,15 @@ def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
 
         v_exps = [translate_expression(e_in, env) for e_in in expr.values]
 
-        return unfold(v_exps, And if expr.op == ast.And() else Or)
+        return unfold(v_exps, And if isinstance(expr.op, ast.And) else Or)
 
-    elif expr == ast.UnaryOp():
-        if expr.op == Not():
+    elif isinstance(expr, ast.UnaryOp):
+        if isinstance(expr.op, ast.Not):
             return Not(translate_expression(expr.operand, env))
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
-    elif expr == ast.IfExp():
+    elif isinstance(expr, ast.IfExp):
         # (condition) and (true_value) or (not condition) and (false_value)
         # return Or(
         #     And(translate_expression(expr.test, env), translate_expression(expr.body, env)),
@@ -89,7 +95,7 @@ def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
             translate_expression(expr.orelse, env),
         )
 
-    elif expr == ast.Constant():
+    elif isinstance(expr, ast.Constant):
         if expr.value is True:
             return true
         elif expr.value is False:
@@ -97,10 +103,10 @@ def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
-    elif expr == ast.Tuple():
+    elif isinstance(expr, ast.Tuple):
         raise exceptions.ExpressionNotHandledException(expr)
 
-    elif expr == ast.Compare():
+    elif isinstance(expr, ast.Compare):
         # Eq | NotEq | Lt | LtE | Gt | GtE | Is | IsNot | In | NotIn
         raise exceptions.ExpressionNotHandledException(expr)
 
@@ -119,13 +125,13 @@ def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
 def translate_statement(stmt, env: Env) -> Tuple[List[Tuple[str, BoolExp]], Env]:
     """Parse a statement"""
     # match stmt:
-    if stmt == ast.If():
+    if isinstance(stmt, ast.If):
         raise exceptions.StatementNotHandledException(stmt)
 
-    elif stmt == ast.Assign():
+    elif isinstance(stmt, ast.Assign):
         raise exceptions.StatementNotHandledException(stmt)
 
-    elif stmt == ast.Return():
+    elif isinstance(stmt, ast.Return):
         vexp = translate_expression(stmt.value, env)
         return [("_ret", vexp)], env
 
@@ -141,3 +147,34 @@ def translate_statement(stmt, env: Env) -> Tuple[List[Tuple[str, BoolExp]], Env]
 
     else:
         raise exceptions.StatementNotHandledException(stmt)
+
+
+def translate_ast(fun) -> LogicFun:
+    fun_name: str = fun.name
+
+    # env contains names visible from the current scope
+    env = {}
+
+    args = translate_arguments(fun.args.args)
+    # TODO: types are string; maybe a translate_type?
+    for a_name, a_type in args:
+        env[a_name] = a_type
+
+    if not fun.returns:
+        raise exceptions.NoReturnTypeException()
+    fun_ret: str = fun.returns.id
+    # TODO: handle complex-type returns
+
+    exps = []
+    for stmt in fun.body:
+        s_exps, env = translate_statement(stmt, env)
+        exps.append(s_exps)
+
+    exps_flat = utils.flatten(exps)
+    exps_simpl = list(map(lambda e: simplify_logic(e, form="cnf"), exps_flat))
+
+    for n, e in exps_simpl:
+        if e == true or e == false:
+            raise exceptions.ConstantReturnException(n, e)
+
+    return fun_name, args, fun_ret, exps_simpl
