@@ -2,10 +2,13 @@
 #
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join("..", "..")))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
 project = "qlasskit"
 copyright = "2023, Davide Gessa (dakk)"
 author = "Davide Gessa (dakk)"
@@ -13,11 +16,10 @@ author = "Davide Gessa (dakk)"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.autodoc"]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.coverage", "sphinx.ext.napoleon"]
 
 templates_path = ["_templates"]
 exclude_patterns = []
-
 autodoc_source_dir = [
     "../qlasskit",
 ]

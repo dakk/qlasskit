@@ -13,3 +13,12 @@ pip install tox
 ```
 tox
 ```
+
+
+## Make docs
+
+```
+pip install sphinx
+cd docs
+make html
+```
