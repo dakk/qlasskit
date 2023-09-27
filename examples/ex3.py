@@ -13,7 +13,7 @@ print(f"\n{f}\n")
 qc = QuantumCircuit(f.num_qubits, 1)
 qc.x(0)  # a = true
 qc.barrier()
-qc.append(f.gate, f.qubits(0))
+qc.append(f.gate(), f.qubits(0))
 qc.barrier()
 qc.measure(f.res_qubits[0], 0)
 

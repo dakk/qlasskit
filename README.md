@@ -24,7 +24,7 @@ And then use it inside a circuit:
 ```python
 qc = QuantumCircuit(f.num_qubits)
 ...
-qc.append(f.gate, f.qubits_list(0))
+qc.append(f.gate(), f.qubits_list(0))
 ```
 
 Or, you can define a function with parameters:
@@ -42,7 +42,7 @@ And then, you can bind it with a value:
 f4 = f.bind(n_it=4)
 qc = QuantumCircuit(f4.num_qubits)
 ...
-qc.append(f4.gate, f4.qubits_list(0))
+qc.append(f4.gate(), f4.qubits_list(0))
 ```
 
 Qlasskit (will) supports complex data types, like tuples and fixed size lists:

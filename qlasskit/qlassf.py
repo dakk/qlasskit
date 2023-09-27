@@ -14,9 +14,10 @@
 
 import ast
 import inspect
-from typing import List
+from typing import Callable, List, Union
 
 from . import ast_to_logic, compiler
+from .typing import BoolExpList
 
 
 class QlassF:
@@ -33,29 +34,19 @@ class QlassF:
 
         self._compiled_gate = None
 
-    def compile(self):
-        # TODO: compile all expression and create a one gate only
-        self._compiled_gate = compiler.to_quantum(self.expressions[0][-1])
-
     def __repr__(self):
         arg_str = ", ".join(map(lambda arg: f"{arg[0]}:{arg[1]}", self.args))
         exp_str = "\n\t".join(map(lambda exp: f"{exp[0]} = {exp[1]}", self.expressions))
         return f"QlassF<{self.name}>({arg_str}) -> {self.ret_type}:\n\t{exp_str}"
 
-    def from_function(f):
-        """Create a QlassF from a function"""
-        fun_ast = (
-            ast.parse(f) if isinstance(f, str) else ast.parse(inspect.getsource(f))
-        )
-        fun = fun_ast.body[0]
+    def __add__(self, qf2) -> "QlassF":
+        """Adds two qlassf and return the combination"""
+        raise Exception("not implemented")
 
-        fun_name, args, fun_ret, exps = ast_to_logic.translate_ast(fun)
+    def compile(self):
+        # TODO: compile all expression and create a one gate only
+        self._compiled_gate = compiler.to_quantum(self.expressions[0][-1])
 
-        qf = QlassF(fun_name, f, args, fun_ret, exps)
-        qf.compile()
-        return qf
-
-    @property
     def gate(self, framework="qiskit"):
         """Returns the gate for a specific framework"""
         if self._compiled_gate is None:
@@ -86,15 +77,33 @@ class QlassF:
         """Return the number of qubits"""
         return len(self.qubits())
 
-    def bind(self, **kwargs):
+    def bind(self, **kwargs) -> "QlassF":
         """Returns a new QlassF with defined params"""
-        pass
+        raise Exception("not implemented")
 
-    def f(self):
+    def f(self) -> Callable:
         """Returns the classical python function"""
         return self.original_f
 
+    @staticmethod
+    def from_function(f: Union[str, Callable]) -> "QlassF":
+        """Create a QlassF from a function or a string containing a function"""
+        fun_ast = (
+            ast.parse(f) if isinstance(f, str) else ast.parse(inspect.getsource(f))
+        )
+        fun = fun_ast.body[0]
 
-def qlassf(f):
-    """Decorator / function creating a QlassF object"""
+        fun_name, args, fun_ret, exps = ast_to_logic.translate_ast(fun)
+
+        qf = QlassF(fun_name, f, args, fun_ret, exps)
+        qf.compile()
+        return qf
+
+
+def qlassf(f: Union[str, Callable]) -> QlassF:
+    """Decorator / function creating a QlassF object
+
+    Args:
+        f: String or function
+    """
     return QlassF.from_function(f)
