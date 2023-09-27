@@ -45,7 +45,7 @@ class QlassF:
 
     def compile(self):
         # TODO: compile all expression and create a one gate only
-        self._compiled_gate = compiler.to_quantum(self.expressions[0][-1])
+        self._compiled_gate = compiler.to_quantum(self.expressions)
 
     def gate(self, framework="qiskit"):
         """Returns the gate for a specific framework"""
@@ -86,7 +86,7 @@ class QlassF:
         return self.original_f
 
     @staticmethod
-    def from_function(f: Union[str, Callable]) -> "QlassF":
+    def from_function(f: Union[str, Callable], to_compile=True) -> "QlassF":
         """Create a QlassF from a function or a string containing a function"""
         fun_ast = (
             ast.parse(f) if isinstance(f, str) else ast.parse(inspect.getsource(f))
@@ -96,14 +96,15 @@ class QlassF:
         fun_name, args, fun_ret, exps = ast_to_logic.translate_ast(fun)
 
         qf = QlassF(fun_name, f, args, fun_ret, exps)
-        qf.compile()
+        if to_compile:
+            qf.compile()
         return qf
 
 
-def qlassf(f: Union[str, Callable]) -> QlassF:
+def qlassf(f: Union[str, Callable], to_compile=True) -> QlassF:
     """Decorator / function creating a QlassF object
 
     Args:
         f: String or function
     """
-    return QlassF.from_function(f)
+    return QlassF.from_function(f, to_compile)

@@ -12,8 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from sympy import Symbol
-from sympy.logic import And, Not, Or
+from sympy import Symbol, simplify, symbols
+from sympy.logic import ITE, And, Implies, Not, Or, boolalg
+
+from ..typing import BoolExp, BoolExpList
+
+
+class CompilerException(Exception):
+    pass
 
 
 class CompilerResult:
@@ -47,6 +53,19 @@ class Compiler:
     def __init__(self):
         self.qmap = {}
 
+    def _symplify_exp(self, exp):
+        A, B, C = symbols("A, B, C")
+        # Convert Implies to Or
+        exp = exp.subs(Implies(A, B), Or(Not(A), B))
+
+        # Convert ITE to And and Or
+        exp = exp.subs(ITE(A, B, C), Or(And(A, B), And(Not(A), C)))
+
+        # Simplify the expression
+        exp = simplify(exp)
+        exp = boolalg.to_cnf(exp)
+        return exp
+
     def compile(self, expr):
         raise Exception("abstract")
 
@@ -56,9 +75,20 @@ class MultipassCompiler(Compiler):
 
 
 class POCCompiler(Compiler):
-    """POC compiler translating an expr to quantum circuit"""
+    """POC compiler translating an expression list to quantum circuit"""
 
-    def compile(self, expr):  # noqa: C901
+    def compile(self, exprs: BoolExpList):
+        self.qmap = {}
+        gl = []
+
+        for sym, exp in exprs:
+            iret, gates = self.compile_expr(self._symplify_exp(exp))
+            gl.extend(gates)
+            self.qmap[sym] = iret
+            if sym == Symbol("_ret"):  # TODO: this won't work with multiple res
+                return iret, gl
+
+    def compile_expr(self, expr: BoolExp):  # noqa: C901
         # match expr:
         if isinstance(expr, Symbol):
             # print('sym', expr.name)
@@ -68,7 +98,7 @@ class POCCompiler(Compiler):
 
         elif isinstance(expr, Not):
             # print('NOT', expr.args)
-            i, g = self.compile(expr.args[0])
+            i, g = self.compile_expr(expr.args[0])
             return i, g + [("x", i)]
 
         elif isinstance(expr, And):
@@ -76,7 +106,7 @@ class POCCompiler(Compiler):
             gl = []
 
             for x in expr.args:
-                ii, gg = self.compile(x)
+                ii, gg = self.compile_expr(x)
                 il.append(ii)
                 gl.extend(gg)
 
@@ -93,8 +123,8 @@ class POCCompiler(Compiler):
             if len(expr.args) > 2:
                 raise Exception("too many clause")
 
-            i1, g1 = self.compile(expr.args[0])
-            i2, g2 = self.compile(expr.args[1])
+            i1, g1 = self.compile_expr(expr.args[0])
+            i2, g2 = self.compile_expr(expr.args[1])
             i3 = len(self.qmap)
             self.qmap[f"anc_{len(self.qmap)}"] = i3
 
@@ -105,27 +135,20 @@ class POCCompiler(Compiler):
                 ("cx", i2, i3),
             ]
 
-        # TODO: this should never happen
-        # elif isinstance(expr, boolalg.BooleanFalse):
-        #     i3 = len(self.qmap)
-        #     self.qmap[f"anc_{len(self.qmap)}"] = i3
-        #     return []
-
-        # elif isinstance(expr, boolalg.BooleanTrue):
-        #     i3 = len(self.qmap)
-        #     self.qmap[f"anc_{len(self.qmap)}"] = i3
-        #     return [("x", i3)]
+        elif isinstance(expr, boolalg.BooleanFalse) or isinstance(
+            expr, boolalg.BooleanTrue
+        ):
+            raise CompilerException("Constant in expression is not allowed")
 
         else:
-            print(type(expr))
             raise Exception(expr)
 
 
-def to_quantum(bexp, compiler="poc"):
+def to_quantum(exprs, compiler="poc"):
     if compiler == "multipass":
         s = MultipassCompiler()
     elif compiler == "poc":
         s = POCCompiler()
 
-    res_qubit, gate_list = s.compile(bexp)
+    res_qubit, gate_list = s.compile(exprs)
     return CompilerResult(res_qubit, gate_list, s.qmap)

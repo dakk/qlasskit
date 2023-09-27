@@ -7,5 +7,5 @@ from . import utils
 
 class TestQlassfDecorator(unittest.TestCase):
     def test_decorator(self):
-        c = qlassf(utils.test_not)
+        c = qlassf(utils.test_not, to_compile=False)
         self.assertTrue(isinstance(c, QlassF))

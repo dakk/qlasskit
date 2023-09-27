@@ -21,13 +21,13 @@ class NoReturnTypeException(Exception):
 
 
 class StatementNotHandledException(Exception):
-    def __init__(self, message):
-        super().__init__(ast.dump(message))
+    def __init__(self, ob, message=None):
+        super().__init__(ast.dump(ob) + f": {message}" if message else "")
 
 
 class ExpressionNotHandledException(Exception):
-    def __init__(self, message):
-        super().__init__(ast.dump(message))
+    def __init__(self, ob, message=None):
+        super().__init__(ast.dump(ob) + f": {message}" if message else "")
 
 
 class UnboundException(Exception):

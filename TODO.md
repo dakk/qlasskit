@@ -11,9 +11,10 @@
 - [x] Ast_to_logic: base structure and boolean expression
 - [x] Dummy compiler from expressions to quantum
 - [x] Example code
+- [x] Ast_to_logic: assign
 
 ### Week 2: (2 Oct 23)
-- [ ] Ast_to_logic: assign
+- [ ] Extend testing to compilation
 - [ ] Ast_to_logic: if-then-else
 - [ ] Ast_to_logic: tuple
 - [ ] Ast_to_logic: handle multiple result

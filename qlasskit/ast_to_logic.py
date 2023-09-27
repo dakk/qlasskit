@@ -21,8 +21,8 @@ from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
 from . import exceptions, utils
 from .typing import Args, BoolExp, BoolExpList
 
-Env = Dict[str, str]
-LogicFun = Tuple[str, Args, str, BoolExpList]
+Env = Dict[Symbol, str]
+LogicFun = Tuple[str, Args, Symbol, BoolExpList]
 
 
 def translate_arguments(args) -> Args:
@@ -51,7 +51,7 @@ def translate_arguments(args) -> Args:
 def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
     """Translate an expression"""
     if isinstance(expr, ast.Name):
-        if expr.id not in env:
+        if Symbol(expr.id) not in env:
             raise exceptions.UnboundException(expr.id)
         return Symbol(expr.id)
 
@@ -62,7 +62,7 @@ def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
             raise exceptions.ExpressionNotHandledException(expr)
 
         sn = f"{expr.value.id}.{expr.slice.value}"
-        if sn not in env:
+        if Symbol(sn) not in env:
             raise exceptions.UnboundException(sn)
         return Symbol(sn)
 
@@ -129,11 +129,24 @@ def translate_statement(stmt, env: Env) -> Tuple[List[Tuple[str, BoolExp]], Env]
         raise exceptions.StatementNotHandledException(stmt)
 
     elif isinstance(stmt, ast.Assign):
-        raise exceptions.StatementNotHandledException(stmt)
+        if len(stmt.targets) > 1:
+            raise exceptions.StatementNotHandledException(
+                stmt, f"too many targets {len(stmt.targets)}"
+            )
+
+        if not isinstance(stmt.targets[0], ast.Name):
+            raise exceptions.StatementNotHandledException(
+                stmt, "only name target supported"
+            )
+
+        target = Symbol(stmt.targets[0].id)
+        val = translate_expression(stmt.value, env)
+        env[target] = "bool"  # TODO: handle all types
+        return [(target, val)], env
 
     elif isinstance(stmt, ast.Return):
         vexp = translate_expression(stmt.value, env)
-        return [("_ret", vexp)], env
+        return [(Symbol("_ret"), vexp)], env
 
         # FunctionDef
         # For
@@ -158,11 +171,11 @@ def translate_ast(fun) -> LogicFun:
     args = translate_arguments(fun.args.args)
     # TODO: types are string; maybe a translate_type?
     for a_name, a_type in args:
-        env[a_name] = a_type
+        env[Symbol(a_name)] = a_type
 
     if not fun.returns:
         raise exceptions.NoReturnTypeException()
-    fun_ret: str = fun.returns.id
+    fun_ret: str = Symbol(fun.returns.id)
     # TODO: handle complex-type returns
 
     exps = []
