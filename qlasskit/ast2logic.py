@@ -200,6 +200,7 @@ def translate_statement(stmt, env: Env) -> Tuple[List[Tuple[str, BoolExp]], Env]
 
         val = translate_expression(stmt.value, env)
 
+        # TODO: use translate argument here (or do a type inference)
         if isinstance(val, list):
             i = 0
             res = []

@@ -8,15 +8,18 @@
 - [x] POC
 - [x] Test suite setup
 - [x] Integrate tox with linters, unit-tests, typecheck, coverage
-- [x] Ast_to_logic: base structure and boolean expression
+- [x] Ast2logic: base structure and boolean expression
 - [x] Dummy compiler from expressions to quantum
 - [x] Example code
-- [x] Ast_to_logic: assign
+- [x] Ast2logic: assign
 - [x] Dummy compiler: compile ite
-- [x] Ast_to_logic: tuple
+- [x] Ast2logic: tuple
 
 ### Week 2: (2 Oct 23)
-- [ ] Ast_to_logic: handle multiple result
+- [ ] Split ast2logic into a directory
+- [ ] Ast2logic: write a type inference function
+- [ ] Ast2logic: fix type inference on assign
+- [ ] Ast2logic: handle multiple result
 - [ ] Extend testing to compilation
 - [ ] Type system and type abstraction
 - [ ] Compiler: prepare invertible abstraction
@@ -62,7 +65,7 @@
 
 ### Language support
 
-- [ ] Ast_to_logic: if-then-else statement
+- [ ] Ast2logic: if-then-else statement
 - [ ] Datatype: Integer
 - [ ] Integer comparators
 - [ ] Integer constant

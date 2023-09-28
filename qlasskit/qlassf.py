@@ -16,7 +16,7 @@ import ast
 import inspect
 from typing import Callable, List, Tuple, Union  # noqa: F401
 
-from . import ast_to_logic, compiler
+from . import ast2logic, compiler
 from .typing import *  # noqa: F403, F401
 from .typing import BoolExpList
 
@@ -93,7 +93,7 @@ class QlassF:
         fun_ast = ast.parse(f if isinstance(f, str) else inspect.getsource(f))
         fun = fun_ast.body[0]
 
-        fun_name, args, fun_ret, exps = ast_to_logic.translate_ast(fun)
+        fun_name, args, fun_ret, exps = ast2logic.translate_ast(fun)
         original_f = eval(fun_name) if isinstance(f, str) else f
 
         qf = QlassF(fun_name, original_f, args, fun_ret, exps)
