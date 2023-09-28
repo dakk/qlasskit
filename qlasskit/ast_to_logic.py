@@ -25,47 +25,81 @@ Env = Dict[Symbol, str]
 LogicFun = Tuple[str, Args, Symbol, BoolExpList]
 
 
+def translate_argument(ann, base="") -> List[Tuple[str, str]]:
+    def to_name(a):
+        return a.attr if isinstance(a, ast.Attribute) else a.id
+
+    # Tuple
+    if isinstance(ann, ast.Subscript) and ann.value.id == "Tuple":  # type: ignore
+        al = []
+        ind = 0
+        for i in ann.slice.value.elts:  # type: ignore
+            if isinstance(i, ast.Name) and to_name(i) == "bool":
+                al.append((f"{base}.{ind}", to_name(i)))
+            else:
+                inner_list = translate_argument(i, base=f"{base}.{ind}")
+                al.extend(inner_list)
+            ind += 1
+        return al
+
+    # QintX
+    elif to_name(ann)[0:4] == "Qint":
+        n = int(to_name(ann)[4::])
+        arg_list = [(f"{base}.{i}", "bool") for i in range(n)]
+        # arg_list.append((f"{base}{arg.arg}", n))
+        return arg_list
+
+    # Bool
+    elif to_name(ann) == "bool":
+        return [(f"{base}", "bool")]
+
+    else:
+        raise exceptions.UnknownTypeException(ann)
+
+
 def translate_arguments(args) -> Args:
     """Parse an argument list"""
-
-    def map_arg(arg):
-        def to_name(a):
-            return a.attr if isinstance(a, ast.Attribute) else a.id
-
-        if isinstance(arg.annotation, ast.Subscript):
-            al = []
-            for i in arg.annotation.slice.elts:
-                al.append((f"{arg.arg}.{len(al)}", to_name(i)))
-            return al
-        elif to_name(arg.annotation)[0:3] == "Int":
-            n = int(to_name(arg.annotation)[3::])
-            arg_list = [(f"{arg.arg}.{i}", "bool") for i in range(n)]
-            arg_list.append((f"{arg.arg}", n))
-            return arg_list
-        else:
-            return [(arg.arg, to_name(arg.annotation))]
-
-    return utils.flatten(list(map(map_arg, args)))
+    args_unrolled = map(
+        lambda arg: translate_argument(arg.annotation, base=arg.arg), args
+    )
+    return utils.flatten(list(args_unrolled))
 
 
 def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
     """Translate an expression"""
+
+    # Name reference
     if isinstance(expr, ast.Name):
         if Symbol(expr.id) not in env:
-            raise exceptions.UnboundException(expr.id)
+            raise exceptions.UnboundException(expr.id, env)
         return Symbol(expr.id)
 
+    # Subscript: a[0][1]
     elif isinstance(expr, ast.Subscript):
-        if not isinstance(expr.value, ast.Name):
+
+        def unroll_subscripts(sub, st):
+            if isinstance(sub.value, ast.Subscript):
+                st = f"{sub.slice.value.value}{'.' if st else ''}{st}"
+                return unroll_subscripts(sub.value, st)
+            elif isinstance(sub.value, ast.Name):
+                return f"{sub.value.id}.{sub.slice.value.value}.{st}"
+
+        if not isinstance(expr.slice, ast.Index):
             raise exceptions.ExpressionNotHandledException(expr)
-        elif not isinstance(expr.slice, ast.Constant):
+        elif not isinstance(expr.slice.value, ast.Constant):
             raise exceptions.ExpressionNotHandledException(expr)
 
-        sn = f"{expr.value.id}.{expr.slice.value}"
+        if isinstance(expr.value, ast.Name):
+            sn = f"{expr.value.id}.{expr.slice.value.value}"
+        else:
+            sn = unroll_subscripts(expr, "")
+
+        print(sn, ast.dump(expr))
         if Symbol(sn) not in env:
-            raise exceptions.UnboundException(sn)
+            raise exceptions.UnboundException(sn, env)
         return Symbol(sn)
 
+    # Boolop: and, or
     elif isinstance(expr, ast.BoolOp):
 
         def unfold(v_exps, op):
@@ -77,12 +111,14 @@ def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
 
         return unfold(v_exps, And if isinstance(expr.op, ast.And) else Or)
 
+    # Unary: not
     elif isinstance(expr, ast.UnaryOp):
         if isinstance(expr.op, ast.Not):
             return Not(translate_expression(expr.operand, env))
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
+    # If expression
     elif isinstance(expr, ast.IfExp):
         # (condition) and (true_value) or (not condition) and (false_value)
         # return Or(
@@ -95,6 +131,7 @@ def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
             translate_expression(expr.orelse, env),
         )
 
+    # Constant
     elif isinstance(expr, ast.Constant):
         if expr.value is True:
             return true
@@ -103,9 +140,12 @@ def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
+    # Tuple
     elif isinstance(expr, ast.Tuple):
-        raise exceptions.ExpressionNotHandledException(expr)
+        elts = [translate_expression(elt, env) for elt in expr.elts]
+        return elts
 
+    # Compare operator
     elif isinstance(expr, ast.Compare):
         # Eq | NotEq | Lt | LtE | Gt | GtE | Is | IsNot | In | NotIn
         raise exceptions.ExpressionNotHandledException(expr)
@@ -159,8 +199,18 @@ def translate_statement(stmt, env: Env) -> Tuple[List[Tuple[str, BoolExp]], Env]
             raise exceptions.SymbolReassingedException(target)
 
         val = translate_expression(stmt.value, env)
-        env[target] = "bool"  # TODO: handle all types
-        return [(target, val)], env
+
+        if isinstance(val, list):
+            i = 0
+            res = []
+            for x in val:
+                res.append((Symbol(f"{target}.{i}"), x))
+                env[res[-1][0]] = "bool"
+                i += 1
+            return res, env
+        else:
+            env[target] = "bool"
+            return [(target, val)], env
 
     elif isinstance(stmt, ast.Return):
         vexp = translate_expression(stmt.value, env)

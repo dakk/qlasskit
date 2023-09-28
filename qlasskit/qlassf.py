@@ -14,9 +14,10 @@
 
 import ast
 import inspect
-from typing import Callable, List, Union
+from typing import Callable, List, Tuple, Union  # noqa: F401
 
 from . import ast_to_logic, compiler
+from .typing import *  # noqa: F403, F401
 from .typing import BoolExpList
 
 
@@ -86,13 +87,10 @@ class QlassF:
     @staticmethod
     def from_function(f: Union[str, Callable], to_compile=True) -> "QlassF":
         """Create a QlassF from a function or a string containing a function"""
-        fun_ast = (
-            ast.parse(f) if isinstance(f, str) else ast.parse(inspect.getsource(f))
-        )
-
         if isinstance(f, str):
             exec(f)
 
+        fun_ast = ast.parse(f if isinstance(f, str) else inspect.getsource(f))
         fun = fun_ast.body[0]
 
         fun_name, args, fun_ret, exps = ast_to_logic.translate_ast(fun)

@@ -12,14 +12,14 @@
 - [x] Dummy compiler from expressions to quantum
 - [x] Example code
 - [x] Ast_to_logic: assign
+- [x] Dummy compiler: compile ite
+- [x] Ast_to_logic: tuple
 
 ### Week 2: (2 Oct 23)
-- [ ] Extend testing to compilation
-- [ ] Ast_to_logic: if-then-else
-- [ ] Ast_to_logic: tuple
 - [ ] Ast_to_logic: handle multiple result
+- [ ] Extend testing to compilation
+- [ ] Type system and type abstraction
 - [ ] Compiler: prepare invertible abstraction
-- [ ] Dummy compiler: compile ite
 
 ### Week 3: (9 Oct 23)
 - [ ] Properly render documentation
@@ -62,6 +62,7 @@
 
 ### Language support
 
+- [ ] Ast_to_logic: if-then-else statement
 - [ ] Datatype: Integer
 - [ ] Integer comparators
 - [ ] Integer constant

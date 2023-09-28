@@ -1,23 +1,51 @@
 import unittest
 
-# from sympy import Symbol, symbols
-# from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
+from sympy import Symbol, symbols
+from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
 
-# from qlasskit import QlassF, exceptions, qlassf
+from qlasskit import QlassF, exceptions, qlassf
 
-# a, b, c, d = symbols("a,b,c,d")
-# _ret = Symbol("_ret")
+a, b, c, d = symbols("a,b,c,d")
+_ret = Symbol("_ret")
 
 
 class TestQlassfInt(unittest.TestCase):
-    # def test6(a: Int2, b: bool) -> Int2:
-    #     return True if a[0] and b else False
+    def test_int_arg(self):
+        f = "def test(a: Qint2) -> bool:\n\treturn a[0]"
+        qf = qlassf(f, to_compile=False)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], Symbol("a.0"))
 
-    # def test7(a: Int2, b: bool) -> bool:
-    #     return True if a[5] and b else False
+    def test_int_arg2(self):
+        f = "def test(a: Qint2, b: bool) -> bool:\n\treturn True if a[0] and b else a[1]"
+        qf = qlassf(f, to_compile=False)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(
+            qf.expressions[0][1], ITE(And(Symbol("a.0"), b), True, Symbol("a.1"))
+        )
 
-    # def test8(a: Int2) -> bool:
-    #     return a == 1
+    def test_int_arg_unbound_index(self):
+        f = "def test(a: Qint2) -> bool:\n\treturn a[5]"
+        self.assertRaises(
+            exceptions.UnboundException, lambda f: qlassf(f, to_compile=False), f
+        )
+
+    def test_int_tuple(self):
+        f = "def test(a: Tuple[Qint2, Qint2]) -> bool:\n\treturn a[0][0] and a[1][1]"
+        qf = qlassf(f, to_compile=False)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], And(Symbol("a.0.0"), Symbol("a.1.1")))
+
+    # TODO: need comparators
+    # def test_int_compare(self):
+    #     f = "def test(a: Qint2) -> bool:\n\treturn a == 1"
+    #     qf = qlassf(f, to_compile=False)
+    #     self.assertEqual(len(qf.expressions), 1)
+    #     self.assertEqual(qf.expressions[0][0], _ret)
+    #     self.assertEqual(qf.expressions[0][1], a)
 
     # def test9(a: Int8) -> bool:
     #     return a == 42

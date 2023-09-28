@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, NewType, Tuple, Union
+from typing import List, Tuple, Union
 
 from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or
@@ -20,15 +20,6 @@ from sympy.logic import ITE, And, Not, Or
 BoolExp = Union[Symbol, And, Or, Not, ITE, bool]
 Args = List[Tuple[str, str]]
 BoolExpList = List[Tuple[Symbol, BoolExp]]
-
-Bool = NewType("Bool", bool)
-Int1 = NewType("Int1", bool)
-Int2 = NewType("Int2", int)
-Int4 = NewType("Int4", int)
-Int8 = NewType("Int8", int)
-Int12 = NewType("Int12", int)
-Int16 = NewType("Int16", int)
-Int32 = NewType("Int32", int)
 
 
 class Qtype:

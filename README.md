@@ -75,9 +75,21 @@ Read [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 This software is licensed with [Apache License 2.0](LICENSE).
 
+
+## Cite
+
+```
+@software{qlasskit2023,
+  author = {Davide Gessa},
+  title = {qlasskit: a python-to-quantum circuit compiler},
+  url = {https://github.com/dakk/qlasskit},
+  year = {2023},
+}
+```
+
 ## About the author
 
 Davide Gessa (dakk)
-- twitter.com/dagide
+- https://twitter.com/dagide
 - https://dakk.github.io/
 - https://medium.com/@dakk

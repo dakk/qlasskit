@@ -30,9 +30,14 @@ class ExpressionNotHandledException(Exception):
         super().__init__(ast.dump(ob) + f": {message}" if message else "")
 
 
+class UnknownTypeException(Exception):
+    def __init__(self, ob, message=None):
+        super().__init__(ast.dump(ob) + f": {message}" if message else "")
+
+
 class UnboundException(Exception):
-    def __init__(self, message):
-        super().__init__(message)
+    def __init__(self, symbol, env):
+        super().__init__(f"{symbol} in {env}")
 
 
 class ConstantReturnException(Exception):
