@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ast
-from typing import List, Tuple
+from typing import List
 
 from .. import exceptions, utils
 from ..typing import Args
 
 
-def translate_argument(ann, base="") -> List[Tuple[str, str]]:
+def translate_argument(ann, base="") -> List[str]:
     def to_name(a):
         return a.attr if isinstance(a, ast.Attribute) else a.id
 
@@ -28,7 +28,7 @@ def translate_argument(ann, base="") -> List[Tuple[str, str]]:
         ind = 0
         for i in ann.slice.value.elts:  # type: ignore
             if isinstance(i, ast.Name) and to_name(i) == "bool":
-                al.append((f"{base}.{ind}", to_name(i)))
+                al.append(f"{base}.{ind}")
             else:
                 inner_list = translate_argument(i, base=f"{base}.{ind}")
                 al.extend(inner_list)
@@ -38,13 +38,13 @@ def translate_argument(ann, base="") -> List[Tuple[str, str]]:
     # QintX
     elif to_name(ann)[0:4] == "Qint":
         n = int(to_name(ann)[4::])
-        arg_list = [(f"{base}.{i}", "bool") for i in range(n)]
+        arg_list = [f"{base}.{i}" for i in range(n)]
         # arg_list.append((f"{base}{arg.arg}", n))
         return arg_list
 
     # Bool
     elif to_name(ann) == "bool":
-        return [(f"{base}", "bool")]
+        return [f"{base}"]
 
     else:
         raise exceptions.UnknownTypeException(ann)

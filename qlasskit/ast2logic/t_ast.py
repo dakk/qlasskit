@@ -11,29 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from sympy import Symbol
 from sympy.logic import false, simplify_logic, true
 
 from .. import exceptions, utils
 from ..typing import Args, Env, LogicFun
-from . import translate_arguments, translate_statement
+from . import translate_argument, translate_arguments, translate_statement
 
 
 def translate_ast(fun) -> LogicFun:
     fun_name: str = fun.name
 
     # env contains names visible from the current scope
-    env: Env = {}
+    env: Env = []
 
     args: Args = translate_arguments(fun.args.args)
     # TODO: types are string; maybe a translate_type?
-    for a_name, a_type in args:
-        env[Symbol(a_name)] = a_type
+    for a_name in args:
+        env.append(a_name)
 
     if not fun.returns:
         raise exceptions.NoReturnTypeException()
-    fun_ret: str = "bool"  # Symbol(fun.returns.id)
-    # TODO: handle complex-type returns
+
+    ret_size = len(translate_argument(fun.returns))
 
     exps = []
     for stmt in fun.body:
@@ -47,4 +46,4 @@ def translate_ast(fun) -> LogicFun:
         if e == true or e == false:
             raise exceptions.ConstantReturnException(n, e)
 
-    return fun_name, args, fun_ret, exps_simpl
+    return fun_name, args, ret_size, exps_simpl

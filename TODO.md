@@ -16,13 +16,13 @@
 - [x] Ast2logic: tuple
 
 ### Week 2: (2 Oct 23)
-- [ ] Split ast2logic into a directory
+- [x] Split ast2logic into a directory
 - [x] Ast2logic: write a type inference function
 - [x] Ast2logic: fix type inference on assign
 - [x] Ast2logic: handle multiple result
-- [ ] Ast2logic: fix ret_type for multiple results
+- [x] Ast2logic: fix ret_type for multiple results
 - [ ] Extend testing to compilation
-- [ ] Type system and type abstraction
+- [ ] Int arithmetic expressions
 - [ ] Compiler: prepare invertible abstraction
 
 ### Week 3: (9 Oct 23)

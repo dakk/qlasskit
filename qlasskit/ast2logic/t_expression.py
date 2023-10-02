@@ -20,17 +20,36 @@ from .. import exceptions
 from ..typing import BoolExp, Env
 
 
+def type_of_exp(vlist, base, env, res=[]):
+    """Type inference for expressions: iterate over val, and decompose to bool"""
+    if isinstance(vlist, list):
+        i = 0
+        res = []
+        for in_val in vlist:
+            r_new, env = type_of_exp(in_val, f"{base}.{i}", env, res)
+            if isinstance(r_new, list):
+                res.extend(r_new)
+            else:
+                res.append(r_new)
+            i += 1
+        return res, env
+    else:
+        new_symb = (f"{base}", vlist)
+        env.append(new_symb[0])
+        return [new_symb], env
+
+
 def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
     """Translate an expression"""
 
     # Name reference
     if isinstance(expr, ast.Name):
-        if Symbol(expr.id) not in env:
+        if expr.id not in env:
             # Handle complex types
             rl = []
             for sym in env:
-                if sym.name[0 : (len(expr.id) + 1)] == f"{expr.id}.":
-                    rl.append(sym)
+                if sym[0 : (len(expr.id) + 1)] == f"{expr.id}.":
+                    rl.append(Symbol(sym))
 
             if len(rl) == 0:
                 raise exceptions.UnboundException(expr.id, env)
@@ -58,8 +77,9 @@ def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
         else:
             sn = unroll_subscripts(expr, "")
 
-        if Symbol(sn) not in env:
+        if sn not in env:
             raise exceptions.UnboundException(sn, env)
+
         return Symbol(sn)
 
     # Boolop: and, or
@@ -123,22 +143,3 @@ def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
 
     else:
         raise exceptions.ExpressionNotHandledException(expr)
-
-
-# Type inference for expressions: iterate over val, and decompose to bool
-def type_of_exp(vlist, base, env, res):
-    if isinstance(vlist, list):
-        i = 0
-        res = []
-        for in_val in vlist:
-            r_new, env = type_of_exp(in_val, f"{base}.{i}", env, res)
-            if isinstance(r_new, list):
-                res.extend(r_new)
-            else:
-                res.append(r_new)
-            i += 1
-        return res, env
-    else:
-        new_symb = (Symbol(f"{base}"), vlist)
-        env[new_symb[0]] = "bool"
-        return [new_symb], env

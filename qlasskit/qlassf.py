@@ -18,25 +18,38 @@ from typing import Callable, List, Tuple, Union  # noqa: F401
 
 from . import ast2logic, compiler
 from .typing import *  # noqa: F403, F401
-from .typing import BoolExpList
+from .typing import Args, BoolExpList
 
 
 class QlassF:
     """Class representing a quantum classical circuit"""
 
-    def __init__(self, name, original_f, args, ret_type, exps):
+    name: str
+    original_f: Callable
+    args: Args
+    ret_size: int
+    expressions: BoolExpList
+
+    def __init__(
+        self,
+        name: str,
+        original_f: Callable,
+        args: Args,
+        ret_size: int,
+        exps: BoolExpList,
+    ):
         self.name = name
         self.original_f = original_f
         self.args = args
-        self.ret_type = ret_type
-        self.expressions: BoolExpList = exps
+        self.ret_size = ret_size
+        self.expressions = exps
 
         self._compiled_gate = None
 
     def __repr__(self):
         arg_str = ", ".join(map(lambda arg: f"{arg[0]}:{arg[1]}", self.args))
         exp_str = "\n\t".join(map(lambda exp: f"{exp[0]} = {exp[1]}", self.expressions))
-        return f"QlassF<{self.name}>({arg_str}) -> {self.ret_type}:\n\t{exp_str}"
+        return f"QlassF<{self.name}>({arg_str}) -> bool[{self.ret_size}]:\n\t{exp_str}"
 
     def __add__(self, qf2) -> "QlassF":
         """Adds two qlassf and return the combination"""

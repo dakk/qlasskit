@@ -53,24 +53,26 @@ def translate_statement(  # noqa: C901
                 stmt, "only name target supported"
             )
 
-        target = Symbol(stmt.targets[0].id)
+        target = stmt.targets[0].id
 
         if target in env:
             raise exceptions.SymbolReassingedException(target)
 
         val = translate_expression(stmt.value, env)
-        res, env = type_of_exp(val, f"{target}", env, [])
+        res, env = type_of_exp(val, f"{target}", env)
+        res = list(map(lambda x: (Symbol(x[0]), x[1]), res))
         return res, env
 
     elif isinstance(stmt, ast.Return):
         vexp = translate_expression(stmt.value, env)
-        res, env = type_of_exp(vexp, "_ret", env, [])
+        res, env = type_of_exp(vexp, "_ret", env)
+        res = list(map(lambda x: (Symbol(x[0]), x[1]), res))
+        print(res)
         return res, env
 
         # FunctionDef
         # For
         # While
-        # With
         # Expr
         # Pass
         # Break

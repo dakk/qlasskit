@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, List, Tuple, Union
+from typing import List, Tuple, Union
 
 from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or
 
+Args = List[str]
+Env = List[str]
 BoolExp = Union[Symbol, And, Or, Not, ITE, bool]
-Args = List[Tuple[str, str]]
 BoolExpList = List[Tuple[Symbol, BoolExp]]
-Env = Dict[Symbol, str]
-LogicFun = Tuple[str, Args, Symbol, BoolExpList]
+LogicFun = Tuple[str, Args, int, BoolExpList]
 
 
 class Qtype:
