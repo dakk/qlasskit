@@ -91,13 +91,11 @@ class POCCompiler(Compiler):
     def compile_expr(self, expr: BoolExp):  # noqa: C901
         # match expr:
         if isinstance(expr, Symbol):
-            # print('sym', expr.name)
             if expr.name not in self.qmap:
                 self.qmap[expr.name] = len(self.qmap)
             return self.qmap[expr.name], []
 
         elif isinstance(expr, Not):
-            # print('NOT', expr.args)
             i, g = self.compile_expr(expr.args[0])
             return i, g + [("x", i)]
 

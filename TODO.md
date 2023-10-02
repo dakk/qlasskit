@@ -17,9 +17,10 @@
 
 ### Week 2: (2 Oct 23)
 - [ ] Split ast2logic into a directory
-- [ ] Ast2logic: write a type inference function
-- [ ] Ast2logic: fix type inference on assign
-- [ ] Ast2logic: handle multiple result
+- [x] Ast2logic: write a type inference function
+- [x] Ast2logic: fix type inference on assign
+- [x] Ast2logic: handle multiple result
+- [ ] Ast2logic: fix ret_type for multiple results
 - [ ] Extend testing to compilation
 - [ ] Type system and type abstraction
 - [ ] Compiler: prepare invertible abstraction

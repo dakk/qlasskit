@@ -74,14 +74,24 @@ class TestQlassfTuple(unittest.TestCase):
         self.assertEqual(qf.expressions[-1][0], _ret)
         self.assertEqual(qf.expressions[-1][1], And(b_0, And(b_1, Symbol("b.2"))))
 
-    # TODO: qlasskit.exceptions.UnboundException: b.1.0 in {a.0.0: 'bool', a.0.1: 'bool', a.1: 'bool', b.0: 'bool', b.1: 'bool'}
-    # def test_tuple_assign3(self):
-    #     f = (
-    #         "def test(a: Tuple[Tuple[bool, bool], bool]) -> bool:\n"
-    #         + "\tb = (a[0][1],(a[0][0],a[1]))\n"
-    #         + "\treturn b[0] and b[1][0] and b[1][1]"
-    #     )
-    #     qf = qlassf(f, to_compile=False)
-    #     self.assertEqual(len(qf.expressions), 4)
-    #     self.assertEqual(qf.expressions[-1][0], _ret)
-    #     self.assertEqual(qf.expressions[-1][1], And(b_0, And(b_1, Symbol("b.2"))))
+    def test_tuple_assign3(self):
+        f = (
+            "def test(a: Tuple[Tuple[bool, bool], bool]) -> bool:\n"
+            + "\tb = (a[0][1],(a[0][0],a[1]))\n"
+            + "\treturn b[0] and b[1][0] and b[1][1]"
+        )
+        qf = qlassf(f, to_compile=False)
+        self.assertEqual(len(qf.expressions), 4)
+        self.assertEqual(qf.expressions[-1][0], _ret)
+        self.assertEqual(
+            qf.expressions[-1][1], And(b_0, And(Symbol("b.1.0"), Symbol("b.1.1")))
+        )
+
+    def test_tuple_result(self):
+        f = "def test(a: bool, b: bool) -> Tuple[bool,bool]:\n\treturn a,b"
+        qf = qlassf(f, to_compile=False)
+        self.assertEqual(len(qf.expressions), 2)
+        self.assertEqual(qf.expressions[0][0], Symbol("_ret.0"))
+        self.assertEqual(qf.expressions[0][1], a)
+        self.assertEqual(qf.expressions[1][0], Symbol("_ret.1"))
+        self.assertEqual(qf.expressions[1][1], b)

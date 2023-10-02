@@ -71,7 +71,16 @@ def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
     # Name reference
     if isinstance(expr, ast.Name):
         if Symbol(expr.id) not in env:
-            raise exceptions.UnboundException(expr.id, env)
+            # Handle complex types
+            rl = []
+            for sym in env:
+                if sym.name[0 : (len(expr.id) + 1)] == f"{expr.id}.":
+                    rl.append(sym)
+
+            if len(rl) == 0:
+                raise exceptions.UnboundException(expr.id, env)
+
+            return rl
         return Symbol(expr.id)
 
     # Subscript: a[0][1]
@@ -94,7 +103,6 @@ def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
         else:
             sn = unroll_subscripts(expr, "")
 
-        print(sn, ast.dump(expr))
         if Symbol(sn) not in env:
             raise exceptions.UnboundException(sn, env)
         return Symbol(sn)
@@ -162,7 +170,28 @@ def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
         raise exceptions.ExpressionNotHandledException(expr)
 
 
-def translate_statement(stmt, env: Env) -> Tuple[List[Tuple[str, BoolExp]], Env]:
+# Type inference for values: iterate over val, and decompose to bool
+def types_of_val(vlist, base, env, res):
+    if isinstance(vlist, list):
+        i = 0
+        res = []
+        for in_val in vlist:
+            r_new, env = types_of_val(in_val, f"{base}.{i}", env, res)
+            if isinstance(r_new, list):
+                res.extend(r_new)
+            else:
+                res.append(r_new)
+            i += 1
+        return res, env
+    else:
+        new_symb = (Symbol(f"{base}"), vlist)
+        env[new_symb[0]] = "bool"
+        return [new_symb], env
+
+
+def translate_statement(  # noqa: C901
+    stmt, env: Env
+) -> Tuple[List[Tuple[str, BoolExp]], Env]:
     """Parse a statement"""
     # match stmt:
     if isinstance(stmt, ast.If):
@@ -179,7 +208,6 @@ def translate_statement(stmt, env: Env) -> Tuple[List[Tuple[str, BoolExp]], Env]
         #     exps, env = translate_statement(st_inner, env)
         #     orelse.extend(exps)
 
-        # print(ast.dump(stmt))
         raise exceptions.StatementNotHandledException(stmt)
 
     elif isinstance(stmt, ast.Assign):
@@ -199,23 +227,13 @@ def translate_statement(stmt, env: Env) -> Tuple[List[Tuple[str, BoolExp]], Env]
             raise exceptions.SymbolReassingedException(target)
 
         val = translate_expression(stmt.value, env)
-
-        # TODO: use translate argument here (or do a type inference)
-        if isinstance(val, list):
-            i = 0
-            res = []
-            for x in val:
-                res.append((Symbol(f"{target}.{i}"), x))
-                env[res[-1][0]] = "bool"
-                i += 1
-            return res, env
-        else:
-            env[target] = "bool"
-            return [(target, val)], env
+        res, env = types_of_val(val, f"{target}", env, [])
+        return res, env
 
     elif isinstance(stmt, ast.Return):
         vexp = translate_expression(stmt.value, env)
-        return [(Symbol("_ret"), vexp)], env
+        res, env = types_of_val(vexp, "_ret", env, [])
+        return res, env
 
         # FunctionDef
         # For
@@ -244,7 +262,7 @@ def translate_ast(fun) -> LogicFun:
 
     if not fun.returns:
         raise exceptions.NoReturnTypeException()
-    fun_ret: str = Symbol(fun.returns.id)
+    fun_ret: str = "bool"  # Symbol(fun.returns.id)
     # TODO: handle complex-type returns
 
     exps = []

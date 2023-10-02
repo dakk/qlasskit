@@ -39,6 +39,15 @@ class TestQlassfInt(unittest.TestCase):
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], And(Symbol("a.0.0"), Symbol("a.1.1")))
 
+    def test_int_identity(self):
+        f = "def test(a: Qint2) -> Qint2:\n\treturn a"
+        qf = qlassf(f, to_compile=False)
+        self.assertEqual(len(qf.expressions), 2)
+        self.assertEqual(qf.expressions[0][0], Symbol("_ret.0"))
+        self.assertEqual(qf.expressions[0][1], Symbol("a.0"))
+        self.assertEqual(qf.expressions[1][0], Symbol("_ret.1"))
+        self.assertEqual(qf.expressions[1][1], Symbol("a.1"))
+
     # TODO: need comparators
     # def test_int_compare(self):
     #     f = "def test(a: Qint2) -> bool:\n\treturn a == 1"
