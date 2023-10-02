@@ -11,58 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import ast
-from typing import Dict, List, Tuple
 
 from sympy import Symbol
-from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
+from sympy.logic import ITE, And, Not, Or, false, true
 
-from . import exceptions, utils
-from .typing import Args, BoolExp, BoolExpList
-
-Env = Dict[Symbol, str]
-LogicFun = Tuple[str, Args, Symbol, BoolExpList]
-
-
-def translate_argument(ann, base="") -> List[Tuple[str, str]]:
-    def to_name(a):
-        return a.attr if isinstance(a, ast.Attribute) else a.id
-
-    # Tuple
-    if isinstance(ann, ast.Subscript) and ann.value.id == "Tuple":  # type: ignore
-        al = []
-        ind = 0
-        for i in ann.slice.value.elts:  # type: ignore
-            if isinstance(i, ast.Name) and to_name(i) == "bool":
-                al.append((f"{base}.{ind}", to_name(i)))
-            else:
-                inner_list = translate_argument(i, base=f"{base}.{ind}")
-                al.extend(inner_list)
-            ind += 1
-        return al
-
-    # QintX
-    elif to_name(ann)[0:4] == "Qint":
-        n = int(to_name(ann)[4::])
-        arg_list = [(f"{base}.{i}", "bool") for i in range(n)]
-        # arg_list.append((f"{base}{arg.arg}", n))
-        return arg_list
-
-    # Bool
-    elif to_name(ann) == "bool":
-        return [(f"{base}", "bool")]
-
-    else:
-        raise exceptions.UnknownTypeException(ann)
-
-
-def translate_arguments(args) -> Args:
-    """Parse an argument list"""
-    args_unrolled = map(
-        lambda arg: translate_argument(arg.annotation, base=arg.arg), args
-    )
-    return utils.flatten(list(args_unrolled))
+from .. import exceptions
+from ..typing import BoolExp, Env
 
 
 def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
@@ -170,13 +125,13 @@ def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
         raise exceptions.ExpressionNotHandledException(expr)
 
 
-# Type inference for values: iterate over val, and decompose to bool
-def types_of_val(vlist, base, env, res):
+# Type inference for expressions: iterate over val, and decompose to bool
+def type_of_exp(vlist, base, env, res):
     if isinstance(vlist, list):
         i = 0
         res = []
         for in_val in vlist:
-            r_new, env = types_of_val(in_val, f"{base}.{i}", env, res)
+            r_new, env = type_of_exp(in_val, f"{base}.{i}", env, res)
             if isinstance(r_new, list):
                 res.extend(r_new)
             else:
@@ -187,94 +142,3 @@ def types_of_val(vlist, base, env, res):
         new_symb = (Symbol(f"{base}"), vlist)
         env[new_symb[0]] = "bool"
         return [new_symb], env
-
-
-def translate_statement(  # noqa: C901
-    stmt, env: Env
-) -> Tuple[List[Tuple[str, BoolExp]], Env]:
-    """Parse a statement"""
-    # match stmt:
-    if isinstance(stmt, ast.If):
-        # Translate test expression, body & orelse statements
-        # test = translate_expression(stmt.test, env)
-
-        # body = []
-        # for st_inner in stmt.body:
-        #     exps, env = translate_statement(st_inner, env)
-        #     body.extend(exps)
-
-        # orelse = []
-        # for st_inner in stmt.orelse:
-        #     exps, env = translate_statement(st_inner, env)
-        #     orelse.extend(exps)
-
-        raise exceptions.StatementNotHandledException(stmt)
-
-    elif isinstance(stmt, ast.Assign):
-        if len(stmt.targets) > 1:
-            raise exceptions.StatementNotHandledException(
-                stmt, f"too many targets {len(stmt.targets)}"
-            )
-
-        if not isinstance(stmt.targets[0], ast.Name):
-            raise exceptions.StatementNotHandledException(
-                stmt, "only name target supported"
-            )
-
-        target = Symbol(stmt.targets[0].id)
-
-        if target in env:
-            raise exceptions.SymbolReassingedException(target)
-
-        val = translate_expression(stmt.value, env)
-        res, env = types_of_val(val, f"{target}", env, [])
-        return res, env
-
-    elif isinstance(stmt, ast.Return):
-        vexp = translate_expression(stmt.value, env)
-        res, env = types_of_val(vexp, "_ret", env, [])
-        return res, env
-
-        # FunctionDef
-        # For
-        # While
-        # With
-        # Expr
-        # Pass
-        # Break
-        # Continue
-        # Match
-
-    else:
-        raise exceptions.StatementNotHandledException(stmt)
-
-
-def translate_ast(fun) -> LogicFun:
-    fun_name: str = fun.name
-
-    # env contains names visible from the current scope
-    env = {}
-
-    args = translate_arguments(fun.args.args)
-    # TODO: types are string; maybe a translate_type?
-    for a_name, a_type in args:
-        env[Symbol(a_name)] = a_type
-
-    if not fun.returns:
-        raise exceptions.NoReturnTypeException()
-    fun_ret: str = "bool"  # Symbol(fun.returns.id)
-    # TODO: handle complex-type returns
-
-    exps = []
-    for stmt in fun.body:
-        s_exps, env = translate_statement(stmt, env)
-        exps.append(s_exps)
-
-    exps_flat = utils.flatten(exps)
-    exps_simpl = list(map(lambda e: simplify_logic(e, form="cnf"), exps_flat))
-
-    for n, e in exps_simpl:
-        if e == true or e == false:
-            raise exceptions.ConstantReturnException(n, e)
-
-    return fun_name, args, fun_ret, exps_simpl

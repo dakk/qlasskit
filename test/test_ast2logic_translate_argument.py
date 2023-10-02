@@ -1,10 +1,19 @@
 import ast
 import unittest
 
-from qlasskit import ast2logic
+from qlasskit import ast2logic, exceptions
 
 
 class TestAst2Logic_translate_argument(unittest.TestCase):
+    def test_unknown_type(self):
+        f = "a: UnknownType"
+        ann_ast = ast.parse(f).body[0].annotation
+        self.assertRaises(
+            exceptions.UnknownTypeException,
+            lambda ann_ast: ast2logic.translate_argument(ann_ast, "a"),
+            ann_ast,
+        )
+
     def test_bool(self):
         f = "a: bool"
         ann_ast = ast.parse(f).body[0].annotation
