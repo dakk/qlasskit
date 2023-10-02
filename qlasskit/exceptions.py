@@ -45,6 +45,6 @@ class ConstantReturnException(Exception):
         super().__init__(f"{name} is costant = {val}")
 
 
-class SymbolReassingedException(Exception):
+class SymbolReassignedException(Exception):
     def __init__(self, name):
         super().__init__(f"{name} cannot be reassinged")

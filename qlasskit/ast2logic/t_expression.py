@@ -15,9 +15,10 @@ import ast
 
 from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, false, true
+from sympy.logic.boolalg import Boolean
 
 from .. import exceptions
-from ..typing import BoolExp, Env
+from ..typing import Env
 
 
 def type_of_exp(vlist, base, env, res=[]):
@@ -39,7 +40,7 @@ def type_of_exp(vlist, base, env, res=[]):
         return [new_symb], env
 
 
-def translate_expression(expr, env: Env) -> BoolExp:  # noqa: C901
+def translate_expression(expr, env: Env) -> Boolean:  # noqa: C901
     """Translate an expression"""
 
     # Name reference

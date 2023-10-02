@@ -145,7 +145,7 @@ class TestQlassfBoolean(unittest.TestCase):
     def test_reassign_exception(self):
         f = "def test(a: bool) -> bool:\n\ta = not a\n\treturn a"
         self.assertRaises(
-            exceptions.SymbolReassingedException,
+            exceptions.SymbolReassignedException,
             lambda f: qlassf(f, to_compile=False),
             f,
         )

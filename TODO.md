@@ -21,6 +21,7 @@
 - [x] Ast2logic: fix type inference on assign
 - [x] Ast2logic: handle multiple result
 - [x] Ast2logic: fix ret_type for multiple results
+- [x] QlassF: truth table creation
 - [ ] Extend testing to compilation
 - [ ] Int arithmetic expressions
 - [ ] Compiler: prepare invertible abstraction
@@ -31,12 +32,15 @@
 - [ ] Compiler: base invertible to qcircuit translator
 
 ### Week 4: (16 Oct 23)
+- [ ] Ast2logic: fixed size loops unrolling
 - [ ] Invertible representation simplification (to reduce number of garbage wires)
 - [ ] Garbage uncomputing and recycling
 
 ## Month 2: 
 
 ### Week 1: (23 Oct 23)
+- [ ] Parametrized qlassf
+
 ### Week 2: (30 Oct 23)
 ### Week 3: (6 Nov 23)
 

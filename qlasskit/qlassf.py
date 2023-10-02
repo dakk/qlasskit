@@ -20,6 +20,8 @@ from . import ast2logic, compiler
 from .typing import *  # noqa: F403, F401
 from .typing import Args, BoolExpList
 
+MAX_TRUTH_TABLE_SIZE = 20
+
 
 class QlassF:
     """Class representing a quantum classical circuit"""
@@ -54,6 +56,38 @@ class QlassF:
     def __add__(self, qf2) -> "QlassF":
         """Adds two qlassf and return the combination"""
         raise Exception("not implemented")
+
+    def truth_table_header(self) -> List[str]:
+        """Returns the list of string containing the truth table header"""
+        header = [x for x in self.args]
+        header.extend([sym.name for (sym, retex) in self.expressions[-self.ret_size :]])
+        return header
+
+    def truth_table(self) -> List[List[bool]]:
+        """Returns the truth table for the function using the sympy boolean for computing"""
+        truth = []
+        bits = len(self.args)
+
+        if (bits + self.ret_size) > MAX_TRUTH_TABLE_SIZE:
+            raise Exception(
+                f"Max truth table size reached: {bits + self.ret_size} > {MAX_TRUTH_TABLE_SIZE}"
+            )
+
+        for i in range(2**bits):
+            bin_str = bin(i)[2:]
+            bin_str = "0" * (bits - len(bin_str)) + bin_str
+            bin_arr = list(map(lambda c: c == "1", bin_str))
+            known = list(zip(self.args, bin_arr))
+
+            for ename, exp in self.expressions:
+                exp_sub = exp.subs(known)
+                known.append((ename, exp_sub))
+
+            res = known[0 : len(self.args)] + known[-self.ret_size :]
+            res_clean = list(map(lambda y: y[1], res))
+            truth.append(res_clean)
+
+        return truth
 
     def compile(self):
         # TODO: compile all expression and create a one gate only

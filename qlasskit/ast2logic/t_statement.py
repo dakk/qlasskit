@@ -15,15 +15,16 @@ import ast
 from typing import List, Tuple
 
 from sympy import Symbol
+from sympy.logic.boolalg import Boolean
 
 from .. import exceptions
-from ..typing import BoolExp, Env
+from ..typing import Env
 from . import translate_expression, type_of_exp
 
 
 def translate_statement(  # noqa: C901
     stmt, env: Env
-) -> Tuple[List[Tuple[str, BoolExp]], Env]:
+) -> Tuple[List[Tuple[str, Boolean]], Env]:
     """Parse a statement"""
     # match stmt:
     if isinstance(stmt, ast.If):
@@ -56,7 +57,7 @@ def translate_statement(  # noqa: C901
         target = stmt.targets[0].id
 
         if target in env:
-            raise exceptions.SymbolReassingedException(target)
+            raise exceptions.SymbolReassignedException(target)
 
         val = translate_expression(stmt.value, env)
         res, env = type_of_exp(val, f"{target}", env)

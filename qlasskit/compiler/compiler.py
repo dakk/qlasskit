@@ -14,8 +14,9 @@
 
 from sympy import Symbol, simplify, symbols
 from sympy.logic import ITE, And, Implies, Not, Or, boolalg
+from sympy.logic.boolalg import Boolean
 
-from ..typing import BoolExp, BoolExpList
+from ..typing import BoolExpList
 
 
 class CompilerException(Exception):
@@ -88,7 +89,7 @@ class POCCompiler(Compiler):
             if sym == Symbol("_ret"):  # TODO: this won't work with multiple res
                 return iret, gl
 
-    def compile_expr(self, expr: BoolExp):  # noqa: C901
+    def compile_expr(self, expr: Boolean):  # noqa: C901
         # match expr:
         if isinstance(expr, Symbol):
             if expr.name not in self.qmap:

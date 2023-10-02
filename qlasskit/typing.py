@@ -12,15 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 from sympy import Symbol
-from sympy.logic import ITE, And, Not, Or
+from sympy.logic.boolalg import Boolean
 
 Args = List[str]
 Env = List[str]
-BoolExp = Union[Symbol, And, Or, Not, ITE, bool]
-BoolExpList = List[Tuple[Symbol, BoolExp]]
+BoolExpList = List[Tuple[Symbol, Boolean]]
 LogicFun = Tuple[str, Args, int, BoolExpList]
 
 
