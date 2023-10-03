@@ -106,18 +106,23 @@ class QlassF:
         else:
             raise Exception(f"Framework {framework} not supported")
 
-    def qubits(self, index=0):
-        """List of qubits of the gate"""
-        if self._compiled_gate is None:
-            raise Exception("Not yet compiled")
-        return self._compiled_gate.qubit_map.values()
+    # def qubits(self, index=0):
+    #     """List of qubits of the gate"""
+    #     if self._compiled_gate is None:
+    #         raise Exception("Not yet compiled")
+    #     return self._compiled_gate.qubit_map.values()
+
+    # @property
+    # def res_qubits(self) -> List[int]:
+    #     """Return the qubits holding the result"""
+    #     if self._compiled_gate is None:
+    #         raise Exception("Not yet compiled")
+    #     return [self._compiled_gate.res_qubit]
 
     @property
-    def res_qubits(self) -> List[int]:
-        """Return the qubits holding the result"""
-        if self._compiled_gate is None:
-            raise Exception("Not yet compiled")
-        return [self._compiled_gate.res_qubit]
+    def input_size(self) -> int:
+        """Return the size of the inputs (in bits)"""
+        return len(self.args)
 
     @property
     def num_qubits(self) -> int:
@@ -125,11 +130,6 @@ class QlassF:
         if self._compiled_gate is None:
             raise Exception("Not yet compiled")
         return self._compiled_gate.num_qubits
-
-    @property
-    def input_size(self) -> int:
-        """Return the size of the inputs"""
-        return len(self.args)
 
     def bind(self, **kwargs) -> "QlassF":
         """Returns a new QlassF with defined params"""

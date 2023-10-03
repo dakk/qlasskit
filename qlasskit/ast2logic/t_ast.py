@@ -14,8 +14,8 @@
 from sympy.logic import false, simplify_logic, true
 
 from .. import exceptions, utils
-from ..typing import Args, Env, LogicFun
-from . import translate_argument, translate_arguments, translate_statement
+from ..typing import Args, LogicFun
+from . import Env, translate_argument, translate_arguments, translate_statement
 
 
 def translate_ast(fun) -> LogicFun:

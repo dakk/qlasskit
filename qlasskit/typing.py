@@ -18,7 +18,6 @@ from sympy import Symbol
 from sympy.logic.boolalg import Boolean
 
 Args = List[str]
-Env = List[str]
 BoolExpList = List[Tuple[Symbol, Boolean]]
 LogicFun = Tuple[str, Args, int, BoolExpList]
 

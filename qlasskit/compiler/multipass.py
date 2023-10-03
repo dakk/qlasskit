@@ -11,21 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# isort:skip_file
+
+from . import Compiler
 
 
-from .compiler import Compiler, CompilerException  # noqa: F401
-from .invertible import ILogic  # noqa: F401
-
-from .multipass import MultipassCompiler
-from .poccompiler import POCCompiler
-
-
-def to_quantum(args, ret_size, exprs, compiler="poc"):
-    if compiler == "multipass":
-        s = MultipassCompiler()
-    elif compiler == "poc":
-        s = POCCompiler()
-
-    circ = s.compile(args, ret_size, exprs)
-    return circ
+class MultipassCompiler(Compiler):
+    pass

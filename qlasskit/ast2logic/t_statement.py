@@ -18,8 +18,7 @@ from sympy import Symbol
 from sympy.logic.boolalg import Boolean
 
 from .. import exceptions
-from ..typing import Env
-from . import translate_expression, type_of_exp
+from . import Env, translate_expression, type_of_exp
 
 
 def translate_statement(  # noqa: C901
