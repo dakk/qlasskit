@@ -55,9 +55,11 @@ def compare_circuit_truth_table(cls, qf):
             qc.initialize(1 if truth_line[i] else 0, i)
 
         qc.append(gate, list(range(qf.num_qubits)))
-
-        # print(qc.draw("text"))
         counts = qiskit_measure_and_count(qc)
+
+        print(qc.decompose().draw("text"))
+        print(counts)
+
         truth_str = "".join(
             map(lambda x: "1" if x else "0", truth_line[-qf.ret_size :])
         )

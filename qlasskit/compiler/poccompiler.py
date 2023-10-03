@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License..
 
-from typing import Tuple
-
 from sympy import Symbol
 from sympy.logic import And, Not, Or, boolalg
 from sympy.logic.boolalg import Boolean
@@ -31,31 +29,28 @@ class POCCompiler(Compiler):
         self.qmap = {}
 
         for sym, exp in exprs:
-            iret, qc = self.compile_expr(qc, self._symplify_exp(exp))
+            iret = self.compile_expr(qc, self._symplify_exp(exp))
             self.qmap[sym] = iret
 
         return qc
 
-    def compile_expr(
-        self, qc: QCircuit, expr: Boolean
-    ) -> Tuple[int, QCircuit]:  # noqa: C901
-        # match expr:
+    def compile_expr(self, qc: QCircuit, expr: Boolean) -> int:  # noqa: C901
         if isinstance(expr, Symbol):
             if expr.name not in self.qmap:
                 self.qmap[expr.name] = len(self.qmap)
                 qc.add_qubit()
-            return self.qmap[expr.name], qc
+            return self.qmap[expr.name]
 
         elif isinstance(expr, Not):
-            i, qc = self.compile_expr(qc, expr.args[0])
+            i = self.compile_expr(qc, expr.args[0])
             qc.x(i)
-            return i, qc
+            return i
 
         elif isinstance(expr, And):
             il = []
 
             for x in expr.args:
-                ii, qc = self.compile_expr(qc, x)
+                ii = self.compile_expr(qc, x)
                 il.append(ii)
 
             iold = il[0]
@@ -66,14 +61,14 @@ class POCCompiler(Compiler):
                 qc.ccx(iold, il[x], inew)
                 iold = inew
 
-            return inew, qc
+            return inew
 
         elif isinstance(expr, Or):
             if len(expr.args) > 2:
                 raise Exception("too many clause")
 
-            i1, qc = self.compile_expr(qc, expr.args[0])
-            i2, qc = self.compile_expr(qc, expr.args[1])
+            i1 = self.compile_expr(qc, expr.args[0])
+            i2 = self.compile_expr(qc, expr.args[1])
             i3 = len(self.qmap)
             qc.add_qubit()
             self.qmap[f"anc_{len(self.qmap)}"] = i3
@@ -82,7 +77,7 @@ class POCCompiler(Compiler):
             qc.ccx(i1, i2, i3)
             qc.x(i2)
             qc.cx(i2, i3)
-            return i3, qc
+            return i3
 
         elif isinstance(expr, boolalg.BooleanFalse) or isinstance(
             expr, boolalg.BooleanTrue

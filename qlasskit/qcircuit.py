@@ -89,6 +89,24 @@ class QCircuit:
         w = self[w]
         raise Exception("Not yet implemented")
 
+    def map_qubit(self, name, index, promote=False):
+        """Map a name to a qubit
+
+        Args:
+            promote (bool, optional): if True and if the qubit is an ancilla,
+                remove from the ancilla set
+        """
+        if isinstance(name, Symbol):
+            name = name.name
+
+        # if name in self.qubit_map:
+        #     raise Exception(f'Name "{name}" already mapped (to {self.qubit_map[name]})')
+
+        if promote and index in self.ancillas:
+            self.ancillas.remove(index)
+
+        self.qubit_map[name] = index
+
     def add_qubit(self, name=None):
         """Add a qubit to the circuit.
 
@@ -144,6 +162,12 @@ class QCircuit:
         w1, w2, w3 = self[w1], self[w2], self[w3]
         self.append("ccx", [w1, w2, w3])
 
+    def mcx(self, wl: List[int], target):
+        """Multi CX gate"""
+        target = self[target]
+        wl = list(map(lambda w: self[w], wl))
+        self.append("mcx", wl + [target])
+
     def fredkin(self, w1, w2, w3):
         """Fredkin (cswap) gate"""
         w1, w2, w3 = self[w1], self[w2], self[w3]
@@ -184,6 +208,8 @@ class QCircuit:
                 raise Exception("Not implemented yet")
             elif g == "fredkin":
                 raise Exception("Not implemented yet")
+            elif g == "mcx":
+                raise Exception("Not implemented yet")
             if ga:
                 qstate = ga * qstate
 
@@ -202,6 +228,8 @@ class QCircuit:
                 qc.cx(w[0], w[1])
             elif g == "ccx":
                 qc.ccx(w[0], w[1], w[2])
+            elif g == "mcx":
+                qc.mcx(w[0:-1], w[-1])
             elif g == "bar":
                 qc.barrier()
             elif g == "fredkin":

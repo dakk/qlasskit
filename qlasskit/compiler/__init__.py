@@ -19,13 +19,16 @@ from .invertible import ILogic  # noqa: F401
 
 from .multipass import MultipassCompiler
 from .poccompiler import POCCompiler
+from .poccompiler2 import POCCompiler2
 
 
-def to_quantum(args, ret_size, exprs, compiler="poc"):
+def to_quantum(args, ret_size, exprs, compiler="poc2"):
     if compiler == "multipass":
         s = MultipassCompiler()
     elif compiler == "poc":
         s = POCCompiler()
+    elif compiler == "poc2":
+        s = POCCompiler2()
 
     circ = s.compile(args, ret_size, exprs)
     return circ

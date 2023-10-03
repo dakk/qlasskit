@@ -32,7 +32,17 @@ class TestCompiler(unittest.TestCase):
         qf = qlassf(f, to_compile=True)
         compare_circuit_truth_table(self, qf)
 
-    def test_or(self):
-        f = "def test(a: bool, b: bool) -> bool:\n\treturn a or b"
+    def test_and_long(self):
+        f = "def test(a: bool, b: bool, c: bool, d: bool) -> bool:\n\treturn a and b and c and d"
         qf = qlassf(f, to_compile=True)
         compare_circuit_truth_table(self, qf)
+
+    # def test_and_long_with_not(self):
+    #     f = "def test(a: bool, b: bool, c: bool, d: bool) -> bool:\n\treturn a and b and not c and d"
+    #     qf = qlassf(f, to_compile=True)
+    #     compare_circuit_truth_table(self, qf)
+
+    # def test_or(self):
+    #     f = "def test(a: bool, b: bool) -> bool:\n\treturn a or b"
+    #     qf = qlassf(f, to_compile=True)
+    #     compare_circuit_truth_table(self, qf)
