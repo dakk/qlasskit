@@ -23,7 +23,7 @@
 - [x] Ast2logic: fix ret_type for multiple results
 - [x] QlassF: truth table creation
 - [x] Quantum circuit abstraction
-- [ ] Extend testing to compilation
+- [x] Extend testing to compilation
 - [ ] Int arithmetic expressions
 - [ ] Compiler: prepare invertible abstraction
 

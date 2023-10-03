@@ -41,3 +41,26 @@ def qiskit_measure_and_count(circ):
     result = simulator.run(circ).result()
     counts = result.get_counts(circ)
     return counts
+
+
+def compare_circuit_truth_table(cls, qf):
+    truth_table = qf.truth_table()
+    gate = qf.gate()
+
+    for truth_line in truth_table:
+        qc = QuantumCircuit(gate.num_qubits)
+
+        # Prepare inputs
+        for i in range(qf.input_size):
+            qc.initialize(1 if truth_line[i] else 0, i)
+
+        qc.append(gate, list(range(qf.num_qubits)))
+
+        # print(qc.draw("text"))
+        counts = qiskit_measure_and_count(qc)
+        truth_str = "".join(
+            map(lambda x: "1" if x else "0", truth_line[-qf.ret_size :])
+        )
+
+        cls.assertEqual(len(counts), 1)
+        cls.assertEqual(truth_str, list(counts.keys())[0][0 : len(truth_str)])

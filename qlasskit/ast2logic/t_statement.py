@@ -68,7 +68,6 @@ def translate_statement(  # noqa: C901
         vexp = translate_expression(stmt.value, env)
         res, env = type_of_exp(vexp, "_ret", env)
         res = list(map(lambda x: (Symbol(x[0]), x[1]), res))
-        print(res)
         return res, env
 
         # FunctionDef

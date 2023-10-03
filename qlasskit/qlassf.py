@@ -100,7 +100,7 @@ class QlassF:
             raise Exception("Not yet compiled")
 
         if framework == "qiskit":
-            g = self._compiled_gate.to_qiskit()
+            g = self._compiled_gate.export(mode="gate", framework=framework)
             g.name = self.name
             return g
         else:
@@ -122,7 +122,14 @@ class QlassF:
     @property
     def num_qubits(self) -> int:
         """Return the number of qubits"""
-        return len(self.qubits())
+        if self._compiled_gate is None:
+            raise Exception("Not yet compiled")
+        return self._compiled_gate.num_qubits
+
+    @property
+    def input_size(self) -> int:
+        """Return the size of the inputs"""
+        return len(self.args)
 
     def bind(self, **kwargs) -> "QlassF":
         """Returns a new QlassF with defined params"""

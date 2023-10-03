@@ -13,6 +13,31 @@
 # limitations under the License.
 from typing import Any, List
 
+from sympy.logic.boolalg import And, BooleanFunction, Xor
+
+
+class BToffoli(BooleanFunction):
+    """
+    Logical Toffoli function; invert the third argument, if the first two are True.
+
+    c XOR (a AND b)
+
+    Examples
+    ========
+
+    >>> BToffoli(False, False, True)
+    True
+    >>> BToffoli(True, True, True)
+    False
+    >>> BToffoli(True, True, False)
+    True
+
+    """
+
+    @classmethod
+    def eval(cls, a, b, c):
+        return Xor(c, And(a, b))
+
 
 def flatten(m: List[List[Any]]) -> List[Any]:
     return [item for row in m for item in row]
