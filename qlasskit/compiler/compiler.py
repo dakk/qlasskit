@@ -12,42 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Tuple
+
 from sympy import Symbol, simplify, symbols
 from sympy.logic import ITE, And, Implies, Not, Or, boolalg
 from sympy.logic.boolalg import Boolean
 
-from ..typing import BoolExpList
+from .. import QCircuit
+from ..typing import Args, BoolExpList
 
 
 class CompilerException(Exception):
     pass
-
-
-class CompilerResult:
-    def __init__(self, res_qubit, gate_list, qubit_map):
-        self.res_qubit = res_qubit
-        self.gate_list = gate_list
-        self.qubit_map = qubit_map
-
-    @property
-    def num_qubits(self):
-        return len(self.qubit_map)
-
-    def to_qiskit(self):
-        from qiskit import QuantumCircuit
-
-        qc = QuantumCircuit(len(self.qubit_map), 0)
-
-        for g in self.gate_list:
-            # match g[0]:
-            if g[0] == "x":
-                qc.x(g[1])
-            elif g[0] == "cx":
-                qc.cx(g[1], g[2])
-            elif g[0] == "ccx":
-                qc.ccx(g[1], g[2], g[3])
-
-        return qc.to_gate()
 
 
 class Compiler:
@@ -67,7 +43,7 @@ class Compiler:
         exp = boolalg.to_cnf(exp)
         return exp
 
-    def compile(self, expr):
+    def compile(self, args: Args, ret_size: int, expr: BoolExpList) -> QCircuit:
         raise Exception("abstract")
 
 
@@ -78,61 +54,63 @@ class MultipassCompiler(Compiler):
 class POCCompiler(Compiler):
     """POC compiler translating an expression list to quantum circuit"""
 
-    def compile(self, exprs: BoolExpList):
+    def compile(self, args: Args, ret_size: int, exprs: BoolExpList) -> QCircuit:
+        qc = QCircuit()
         self.qmap = {}
-        gl = []
 
         for sym, exp in exprs:
-            iret, gates = self.compile_expr(self._symplify_exp(exp))
-            gl.extend(gates)
+            iret, qc = self.compile_expr(qc, self._symplify_exp(exp))
             self.qmap[sym] = iret
-            if sym == Symbol("_ret"):  # TODO: this won't work with multiple res
-                return iret, gl
 
-    def compile_expr(self, expr: Boolean):  # noqa: C901
+        return qc
+
+    def compile_expr(
+        self, qc: QCircuit, expr: Boolean
+    ) -> Tuple[int, QCircuit]:  # noqa: C901
         # match expr:
         if isinstance(expr, Symbol):
             if expr.name not in self.qmap:
                 self.qmap[expr.name] = len(self.qmap)
-            return self.qmap[expr.name], []
+                qc.add_qubit()
+            return self.qmap[expr.name], qc
 
         elif isinstance(expr, Not):
-            i, g = self.compile_expr(expr.args[0])
-            return i, g + [("x", i)]
+            i, qc = self.compile_expr(qc, expr.args[0])
+            qc.x(i)
+            return i, qc
 
         elif isinstance(expr, And):
             il = []
-            gl = []
 
             for x in expr.args:
-                ii, gg = self.compile_expr(x)
+                ii, qc = self.compile_expr(qc, x)
                 il.append(ii)
-                gl.extend(gg)
 
             iold = il[0]
             for x in range(1, len(il)):
                 inew = len(self.qmap)
+                qc.add_qubit()
                 self.qmap[f"anc_{len(self.qmap)}"] = inew
-                gl.append(("ccx", iold, il[x], inew))
+                qc.ccx(iold, il[x], inew)
                 iold = inew
 
-            return inew, gl
+            return inew, qc
 
         elif isinstance(expr, Or):
             if len(expr.args) > 2:
                 raise Exception("too many clause")
 
-            i1, g1 = self.compile_expr(expr.args[0])
-            i2, g2 = self.compile_expr(expr.args[1])
+            i1, qc = self.compile_expr(qc, expr.args[0])
+            i2, qc = self.compile_expr(qc, expr.args[1])
             i3 = len(self.qmap)
+            qc.add_qubit()
             self.qmap[f"anc_{len(self.qmap)}"] = i3
 
-            return i3, g1 + g2 + [
-                ("x", i2),
-                ("ccx", i1, i2, i3),
-                ("x", i2),
-                ("cx", i2, i3),
-            ]
+            qc.x(i2)
+            qc.ccx(i1, i2, i3)
+            qc.x(i2)
+            qc.cx(i2, i3)
+            return i3, qc
 
         elif isinstance(expr, boolalg.BooleanFalse) or isinstance(
             expr, boolalg.BooleanTrue
@@ -143,11 +121,11 @@ class POCCompiler(Compiler):
             raise Exception(expr)
 
 
-def to_quantum(exprs, compiler="poc"):
+def to_quantum(args, ret_size, exprs, compiler="poc"):
     if compiler == "multipass":
         s = MultipassCompiler()
     elif compiler == "poc":
         s = POCCompiler()
 
-    res_qubit, gate_list = s.compile(exprs)
-    return CompilerResult(res_qubit, gate_list, s.qmap)
+    circ = s.compile(args, ret_size, exprs)
+    return circ

@@ -90,8 +90,9 @@ class QlassF:
         return truth
 
     def compile(self):
-        # TODO: compile all expression and create a one gate only
-        self._compiled_gate = compiler.to_quantum(self.expressions)
+        self._compiled_gate = compiler.to_quantum(
+            self.args, self.ret_size, self.expressions
+        )
 
     def gate(self, framework="qiskit"):
         """Returns the gate for a specific framework"""
