@@ -66,8 +66,8 @@ class TestQCircuitExport(unittest.TestCase):
         qc.x(a)
         qc.cx(a, b)
         circ = qc.export("circuit", "qiskit")
-        counts = qiskit_measure_and_count(circ)
-        self.assertDictEqual(counts, {"11": 1024})
+        counts = qiskit_measure_and_count(circ, shots=1)
+        self.assertDictEqual(counts, {"11": 1})
 
     def test_export_qiskit_toffoli(self):
         qc = QCircuit()
@@ -76,8 +76,8 @@ class TestQCircuitExport(unittest.TestCase):
         qc.x(b)
         qc.ccx(a, b, c)
         circ = qc.export("circuit", "qiskit")
-        counts = qiskit_measure_and_count(circ)
-        self.assertDictEqual(counts, {"111": 1024})
+        counts = qiskit_measure_and_count(circ, shots=1)
+        self.assertDictEqual(counts, {"111": 1})
 
     def test_export_qiskit_fredkin(self):
         qc = QCircuit()
@@ -86,5 +86,5 @@ class TestQCircuitExport(unittest.TestCase):
         qc.x(b)
         qc.fredkin(a, b, c)
         circ = qc.export("circuit", "qiskit")
-        counts = qiskit_measure_and_count(circ)
-        self.assertDictEqual(counts, {"101": 1024})
+        counts = qiskit_measure_and_count(circ, shots=1)
+        self.assertDictEqual(counts, {"101": 1})

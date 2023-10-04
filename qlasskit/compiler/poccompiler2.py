@@ -55,7 +55,20 @@ class POCCompiler2(Compiler):
             return fa
 
         elif isinstance(expr, Or):
-            raise CompilerException(expr)
+            nclau = len(expr.args)
+            iclau = list(map(lambda e: self.compile_expr(qc, e), expr.args))
+            fa = qc.get_free_ancilla()
+
+            for i in range(nclau):
+                for j in range(i + 1, nclau - i):
+                    qc.x(iclau[j])
+
+                qc.mcx(iclau[i:], fa)
+
+                for j in range(i + 1, nclau - i):
+                    qc.x(iclau[j])
+
+            return fa
 
         elif isinstance(expr, BooleanFalse) or isinstance(expr, BooleanTrue):
             raise CompilerException("Constant in expression is not allowed")

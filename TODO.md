@@ -24,18 +24,16 @@
 - [x] QlassF: truth table creation
 - [x] Quantum circuit abstraction
 - [x] Extend testing to compilation
-- [ ] Int arithmetic expressions
-- [ ] Compiler: prepare invertible abstraction
+- [ ] Poc compiler 2 using qcircuit abstraction
 
 ### Week 3: (9 Oct 23)
+- [ ] Qubit garbage uncomputing and recycling
+- [ ] Add qubit usage check on tests
+- [ ] Int arithmetic expressions
 - [ ] Properly render documentation
-- [ ] Compiler: logic to invertible translator
-- [ ] Compiler: base invertible to qcircuit translator
 
 ### Week 4: (16 Oct 23)
 - [ ] Ast2logic: fixed size loops unrolling
-- [ ] Invertible representation simplification (to reduce number of garbage wires)
-- [ ] Garbage uncomputing and recycling
 
 ## Month 2: 
 

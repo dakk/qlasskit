@@ -19,6 +19,8 @@ from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
 
 from qlasskit import QlassF, exceptions, qlassf
 
+from .utils import compare_circuit_truth_table
+
 a, b, c, d, e, g, h = symbols("a,b,c,d,e,g,h")
 _ret = Symbol("_ret")
 
@@ -45,66 +47,74 @@ class TestQlassfBoolean(unittest.TestCase):
     def test_arg(self):
         ex = a
         f = "def test(a: bool) -> bool:\n\treturn a"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
+        compare_circuit_truth_table(self, qf)
 
     def test_not_arg(self):
         ex = Not(a)
         f = "def test(a: bool) -> bool:\n\treturn not a"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
+        compare_circuit_truth_table(self, qf)
 
     def test_and(self):
         ex = And(Not(a), b)
         f = "def test(a: bool, b: bool) -> bool:\n\treturn not a and b"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
+        compare_circuit_truth_table(self, qf)
 
     def test_or(self):
         ex = Or(Not(a), b)
         f = "def test(a: bool, b: bool) -> bool:\n\treturn not a or b"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
+        compare_circuit_truth_table(self, qf)
 
     def test_multiple_arg(self):
         ex = And(a, And(Not(b), c))
         f = "def test(a: bool, b: bool, c: bool) -> bool:\n\treturn a and (not b) and c"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
+        compare_circuit_truth_table(self, qf)
 
     def test_multiple_arg2(self):
         ex = And(a, And(Not(b), Or(a, c)))
         f = "def test(a: bool, b: bool, c: bool) -> bool:\n\treturn a and (not b) and (a or c)"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
+        compare_circuit_truth_table(self, qf)
 
     def test_ifexp(self):
         ex = ITE(a, true, false)
         f = "def test(a: bool) -> bool:\n\treturn True if a else False"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
+        compare_circuit_truth_table(self, qf)
 
     def test_ifexp2(self):
         ex = ITE(And(a, And(Not(b), c)), true, false)
         f = "def test(a: bool, b: bool, c: bool) -> bool:\n\treturn True if a and (not b) and c else False"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
+        compare_circuit_truth_table(self, qf)
 
     def test_ifexp3(self):
         exp = ITE(
@@ -116,19 +126,21 @@ class TestQlassfBoolean(unittest.TestCase):
             "def test(a: bool, b: bool, c: bool) -> bool:\n"
             + "\treturn (c and not b) if a and ((not b) and c) else (a and not c)"
         )
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], exp)
+        compare_circuit_truth_table(self, qf)
 
     def test_assign(self):
         f = "def test(a: bool, b: bool) -> bool:\n\tc = a and b\n\treturn c"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 2)
         self.assertEqual(qf.expressions[0][0], c)
         self.assertEqual(qf.expressions[0][1], And(a, b))
         self.assertEqual(qf.expressions[1][0], _ret)
         self.assertEqual(qf.expressions[1][1], c)
+        compare_circuit_truth_table(self, qf)
 
     def test_assign2(self):
         f = (
@@ -136,12 +148,13 @@ class TestQlassfBoolean(unittest.TestCase):
             + "\td = a and (not b) and c\n"
             + "\treturn True if d else False"
         )
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 2)
         self.assertEqual(qf.expressions[0][0], d)
         self.assertEqual(qf.expressions[0][1], And(a, And(Not(b), c)))
         self.assertEqual(qf.expressions[1][0], _ret)
         self.assertEqual(qf.expressions[1][1], d)
+        compare_circuit_truth_table(self, qf)
 
     def test_assign3(self):
         f = (
@@ -155,6 +168,8 @@ class TestQlassfBoolean(unittest.TestCase):
         qf = qlassf(f, to_compile=False)
         self.assertEqual(len(qf.expressions), 5)
         self.assertEqual(qf.expressions[-1][1], ITE(d & e, g, h))
+        # TODO: this is not simulable without recycling registers
+        # compare_circuit_truth_table(self, qf)
 
     def test_reassign_exception(self):
         f = "def test(a: bool) -> bool:\n\ta = not a\n\treturn a"

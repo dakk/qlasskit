@@ -20,6 +20,8 @@ from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
 
 from qlasskit import QlassF, exceptions, qlassf
 
+from .utils import compare_circuit_truth_table
+
 a, b, c, d = symbols("a,b,c,d")
 _ret = Symbol("_ret")
 a_0 = Symbol("a.0")
@@ -31,10 +33,11 @@ b_1 = Symbol("b.1")
 class TestQlassfTuple(unittest.TestCase):
     def test_tuple_arg(self):
         f = "def test(a: Tuple[bool, bool]) -> bool:\n\treturn a[0] and a[1]"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], And(a_0, a_1))
+        compare_circuit_truth_table(self, qf)
 
     def test_tuple_arg_assign(self):
         f = (
@@ -43,39 +46,43 @@ class TestQlassfTuple(unittest.TestCase):
             + "\tc = a[1]\n"
             + "\treturn b and c"
         )
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 3)
         self.assertEqual(qf.expressions[-1][0], _ret)
         self.assertEqual(qf.expressions[-1][1], And(b, c))
+        compare_circuit_truth_table(self, qf)
 
     def test_tuple_of_tuple_arg(self):
         f = "def test(a: Tuple[Tuple[bool, bool], bool]) -> bool:\n\treturn a[0][0] and a[0][1] and a[1]"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
             qf.expressions[0][1], And(Symbol("a.0.0"), And(Symbol("a.0.1"), a_1))
         )
+        compare_circuit_truth_table(self, qf)
 
     def test_tuple_of_tuple_of_tuple_arg(self):
         f = (
             "def test(a: Tuple[Tuple[Tuple[bool, bool], bool], bool]) -> bool:\n"
             + "\treturn a[0][0][0] and a[0][0][1] and a[0][1] and a[1]"
         )
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
             qf.expressions[0][1],
             And(Symbol("a.0.0.0"), And(Symbol("a.0.0.1"), And(Symbol("a.0.1"), a_1))),
         )
+        compare_circuit_truth_table(self, qf)
 
     def test_tuple_assign(self):
         f = "def test(a: Tuple[bool, bool]) -> bool:\n\tb = (a[1],a[0])\n\treturn b[0] and b[1]"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 3)
         self.assertEqual(qf.expressions[-1][0], _ret)
         self.assertEqual(qf.expressions[-1][1], And(b_0, b_1))
+        compare_circuit_truth_table(self, qf)
 
     def test_tuple_assign2(self):
         f = (
@@ -83,10 +90,11 @@ class TestQlassfTuple(unittest.TestCase):
             + "\tb = (a[0][1],a[0][0],a[1])\n"
             + "\treturn b[0] and b[1] and b[2]"
         )
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 4)
         self.assertEqual(qf.expressions[-1][0], _ret)
         self.assertEqual(qf.expressions[-1][1], And(b_0, And(b_1, Symbol("b.2"))))
+        compare_circuit_truth_table(self, qf)
 
     def test_tuple_assign3(self):
         f = (
@@ -94,18 +102,20 @@ class TestQlassfTuple(unittest.TestCase):
             + "\tb = (a[0][1],(a[0][0],a[1]))\n"
             + "\treturn b[0] and b[1][0] and b[1][1]"
         )
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 4)
         self.assertEqual(qf.expressions[-1][0], _ret)
         self.assertEqual(
             qf.expressions[-1][1], And(b_0, And(Symbol("b.1.0"), Symbol("b.1.1")))
         )
+        compare_circuit_truth_table(self, qf)
 
     def test_tuple_result(self):
         f = "def test(a: bool, b: bool) -> Tuple[bool,bool]:\n\treturn a,b"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=True)
         self.assertEqual(len(qf.expressions), 2)
         self.assertEqual(qf.expressions[0][0], Symbol("_ret.0"))
         self.assertEqual(qf.expressions[0][1], a)
         self.assertEqual(qf.expressions[1][0], Symbol("_ret.1"))
         self.assertEqual(qf.expressions[1][1], b)
+        # compare_circuit_truth_table(self, qf)

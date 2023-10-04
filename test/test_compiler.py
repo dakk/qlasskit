@@ -18,7 +18,7 @@ from qiskit import QuantumCircuit
 
 from qlasskit import exceptions, qlassf
 
-from .utils import compare_circuit_truth_table, qiskit_measure_and_count
+from .utils import compare_circuit_truth_table
 
 
 class TestCompiler(unittest.TestCase):
@@ -37,12 +37,17 @@ class TestCompiler(unittest.TestCase):
         qf = qlassf(f, to_compile=True)
         compare_circuit_truth_table(self, qf)
 
-    # def test_and_long_with_not(self):
-    #     f = "def test(a: bool, b: bool, c: bool, d: bool) -> bool:\n\treturn a and b and not c and d"
-    #     qf = qlassf(f, to_compile=True)
-    #     compare_circuit_truth_table(self, qf)
+    def test_and_long_with_not(self):
+        f = "def test(a: bool, b: bool, c: bool, d: bool) -> bool:\n\treturn a and b and not c and d"
+        qf = qlassf(f, to_compile=True)
+        compare_circuit_truth_table(self, qf)
 
-    # def test_or(self):
-    #     f = "def test(a: bool, b: bool) -> bool:\n\treturn a or b"
-    #     qf = qlassf(f, to_compile=True)
-    #     compare_circuit_truth_table(self, qf)
+    def test_or(self):
+        f = "def test(a: bool, b: bool) -> bool:\n\treturn a or b"
+        qf = qlassf(f, to_compile=True)
+        compare_circuit_truth_table(self, qf)
+
+    def test_or_not(self):
+        f = "def test(a: bool, b: bool) -> bool:\n\treturn a or not b"
+        qf = qlassf(f, to_compile=True)
+        compare_circuit_truth_table(self, qf)

@@ -55,11 +55,12 @@ class QCircuit:
         else:
             return key
 
-    def add_ancilla(self, name=None):
+    def add_ancilla(self, name=None, is_free=True):
         """Add an ancilla qubit"""
         i = self.add_qubit(name if name else f"anc_{len(self.ancillas)}")
         self.ancillas.add(i)
-        self.free_ancillas.add(i)
+        if is_free:
+            self.free_ancillas.add(i)
         return i
 
     def free_ancilla(self, w):
@@ -77,7 +78,7 @@ class QCircuit:
     def get_free_ancilla(self):
         """Get the first free ancilla available"""
         if len(self.free_ancillas) == 0:
-            return self.add_ancilla()
+            return self.add_ancilla(is_free=False)
         return self.free_ancillas.pop()
 
     def uncompute(self, w):

@@ -33,12 +33,13 @@ def test_not(a: bool) -> bool:
 # def compute_originalf_results(qf: QlassF) -> List[List[bool]]:
 #     pass
 
+aer_simulator = Aer.get_backend("aer_simulator")
 
-def qiskit_measure_and_count(circ):
+
+def qiskit_measure_and_count(circ, shots=1):
     circ.measure_all()
-    simulator = Aer.get_backend("aer_simulator")
-    circ = transpile(circ, simulator)
-    result = simulator.run(circ).result()
+    circ = transpile(circ, aer_simulator)
+    result = aer_simulator.run(circ, shots=shots).result()
     counts = result.get_counts(circ)
     return counts
 
@@ -55,9 +56,9 @@ def compare_circuit_truth_table(cls, qf):
             qc.initialize(1 if truth_line[i] else 0, i)
 
         qc.append(gate, list(range(qf.num_qubits)))
-        counts = qiskit_measure_and_count(qc)
-
         print(qc.decompose().draw("text"))
+
+        counts = qiskit_measure_and_count(qc)
         print(counts)
 
         truth_str = "".join(
