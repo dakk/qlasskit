@@ -17,10 +17,12 @@ from typing import List
 
 Env = List[str]
 
+from .utils import flatten  # noqa: F401, E402
 from .t_arguments import translate_argument, translate_arguments  # noqa: F401, E402
 from .t_expression import translate_expression, type_of_exp  # noqa: F401, E402
 from .t_statement import translate_statement  # noqa: F401, E402
 from .t_ast import translate_ast  # noqa: F401, E402
+from . import exceptions  # noqa: F401, E402
 
 
 # class NewEnv:

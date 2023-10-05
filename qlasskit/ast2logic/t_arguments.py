@@ -14,8 +14,8 @@
 import ast
 from typing import List
 
-from .. import exceptions, utils
 from ..typing import Args
+from . import exceptions, flatten
 
 
 def translate_argument(ann, base="") -> List[str]:
@@ -55,4 +55,4 @@ def translate_arguments(args) -> Args:
     args_unrolled = map(
         lambda arg: translate_argument(arg.annotation, base=arg.arg), args
     )
-    return utils.flatten(list(args_unrolled))
+    return flatten(list(args_unrolled))

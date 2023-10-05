@@ -28,7 +28,8 @@
 
 ### Week 3: (9 Oct 23)
 - [ ] Qubit garbage uncomputing and recycling
-- [ ] Add qubit usage check on tests
+- [ ] Test: add qubit usage check
+- [ ] Compiler: remove consecutive X gates
 - [ ] Int arithmetic expressions
 - [ ] Properly render documentation
 
@@ -73,6 +74,7 @@
 - [ ] Datatype: Integer
 - [ ] Integer comparators
 - [ ] Integer constant
+- [ ] Integer operations
 - [ ] Datatype: List
 - [ ] Datatype: Dict
 - [ ] Datatype: Fixed
@@ -84,12 +86,12 @@
 
 ### Abstraction support
 
-- [ ] Add two QlassF
-
+- [ ] Combine two QlassF (__add__)
+- [ ] Extract boolean expressions from quantum circuits
 
 ### Framwork support
 
-- [ ] Qiskit
+- [x] Qiskit
 - [ ] QuTip
 - [ ] Pennylane
 - [ ] Cirq

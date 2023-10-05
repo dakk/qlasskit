@@ -17,8 +17,7 @@ from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, false, true
 from sympy.logic.boolalg import Boolean
 
-from .. import exceptions
-from . import Env
+from . import Env, exceptions
 
 
 def type_of_exp(vlist, base, env, res=[]):

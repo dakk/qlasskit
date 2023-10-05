@@ -13,9 +13,15 @@
 # limitations under the License.
 from sympy.logic import false, simplify_logic, true
 
-from .. import exceptions, utils
 from ..typing import Args, LogicFun
-from . import Env, translate_argument, translate_arguments, translate_statement
+from . import (
+    Env,
+    exceptions,
+    flatten,
+    translate_argument,
+    translate_arguments,
+    translate_statement,
+)
 
 
 def translate_ast(fun) -> LogicFun:
@@ -39,7 +45,7 @@ def translate_ast(fun) -> LogicFun:
         s_exps, env = translate_statement(stmt, env)
         exps.append(s_exps)
 
-    exps_flat = utils.flatten(exps)
+    exps_flat = flatten(exps)
     exps_simpl = list(map(lambda e: simplify_logic(e, form="cnf"), exps_flat))
 
     for n, e in exps_simpl:

@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, List
-
 from sympy.logic.boolalg import And, BooleanFunction, Xor
 
 
@@ -37,7 +35,3 @@ class BToffoli(BooleanFunction):
     @classmethod
     def eval(cls, a, b, c):
         return Xor(c, And(a, b))
-
-
-def flatten(m: List[List[Any]]) -> List[Any]:
-    return [item for row in m for item in row]

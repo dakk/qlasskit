@@ -15,7 +15,6 @@
 
 
 from .compiler import Compiler, CompilerException  # noqa: F401
-from .invertible import ILogic  # noqa: F401
 
 from .multipass import MultipassCompiler
 from .poccompiler import POCCompiler
