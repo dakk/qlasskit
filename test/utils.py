@@ -66,4 +66,4 @@ def compare_circuit_truth_table(cls, qf):
         )
 
         cls.assertEqual(len(counts), 1)
-        cls.assertEqual(truth_str, list(counts.keys())[0][0 : len(truth_str)])
+        cls.assertEqual(truth_str, list(counts.keys())[0][0 : len(truth_str)][::-1])

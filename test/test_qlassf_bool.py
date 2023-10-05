@@ -44,7 +44,7 @@ class TestQlassfBoolean(unittest.TestCase):
             exceptions.NoReturnTypeException, lambda f: qlassf(f, to_compile=False), f
         )
 
-    def test_arg(self):
+    def test_arg_identity(self):
         ex = a
         f = "def test(a: bool) -> bool:\n\treturn a"
         qf = qlassf(f, to_compile=True)

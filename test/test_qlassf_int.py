@@ -66,7 +66,12 @@ class TestQlassfInt(unittest.TestCase):
         self.assertEqual(qf.expressions[0][1], Symbol("a.0"))
         self.assertEqual(qf.expressions[1][0], Symbol("_ret.1"))
         self.assertEqual(qf.expressions[1][1], Symbol("a.1"))
-        # compare_circuit_truth_table(self, qf)
+        compare_circuit_truth_table(self, qf)
+
+    # TODO: need consts
+    # def test_int_const(self):
+    #     f = "def test(a: Qint2) -> Qint2:\n\tc=1\n\treturn a"
+    #     qf = qlassf(f, to_compile=True)
 
     # TODO: need comparators
     # def test_int_compare(self):
@@ -88,4 +93,3 @@ class TestQlassfInt(unittest.TestCase):
 
     # def test12(a: bool) -> Int8:
     #     return 42 if a else 38
-    pass
