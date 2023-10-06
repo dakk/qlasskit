@@ -14,7 +14,7 @@
 import ast
 from typing import List, Tuple
 
-from ..typing import Arg, Args, Qint, Qint2, Qint4, Qint8, Qint12, Qint16 # noqa: F
+from ..typing import Arg, Args, Qint, Qint2, Qint4, Qint8, Qint12, Qint16  # noqa: F
 from . import exceptions
 from .t_expression import TType
 

@@ -61,10 +61,9 @@ class Qtype:
 #         return self.value
 
 
-
 class Qint(int, Qtype):
     BIT_SIZE = 8
-    
+
     def __init__(self, value):
         super().__init__()
         self.value = value
@@ -72,32 +71,35 @@ class Qint(int, Qtype):
 
 class Qint2(Qint):
     BIT_SIZE = 2
-    
+
     def __init__(self, value):
         super().__init__(value)
 
 
 class Qint4(Qint):
     BIT_SIZE = 4
-    
+
     def __init__(self, value):
         super().__init__(value)
 
 
 class Qint8(Qint):
     BIT_SIZE = 8
+
     def __init__(self, value):
         super().__init__(value)
 
 
 class Qint12(Qint):
     BIT_SIZE = 12
+
     def __init__(self, value):
         super().__init__(value)
 
 
 class Qint16(Qint):
     BIT_SIZE = 16
+
     def __init__(self, value):
         super().__init__(value)
 

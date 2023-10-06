@@ -18,7 +18,7 @@ from functools import reduce
 from typing import Callable, List, Tuple, Union  # noqa: F401
 
 from . import compiler
-from .ast2logic import translate_ast, flatten
+from .ast2logic import flatten, translate_ast
 from .typing import *  # noqa: F403, F401
 from .typing import Args, BoolExpList
 
@@ -61,14 +61,14 @@ class QlassF:
 
     def truth_table_header(self) -> List[str]:
         """Returns the list of string containing the truth table header"""
-        header = flatten(map(lambda a: a.bitvec, self.args))
+        header = flatten(list(map(lambda a: a.bitvec, self.args)))
         header.extend([sym.name for (sym, retex) in self.expressions[-self.ret_size :]])
         return header
 
     def truth_table(self) -> List[List[bool]]:
         """Returns the truth table for the function using the sympy boolean for computing"""
         truth = []
-        arg_bits = flatten(map(lambda a: a.bitvec, self.args))
+        arg_bits = flatten(list(map(lambda a: a.bitvec, self.args)))
         bits = len(arg_bits)
 
         if (bits + self.ret_size) > MAX_TRUTH_TABLE_SIZE:
@@ -123,7 +123,7 @@ class QlassF:
     @property
     def input_size(self) -> int:
         """Return the size of the inputs (in bits)"""
-        return reduce(lambda a, b: a+len(b), self.args, 0)
+        return reduce(lambda a, b: a + len(b), self.args, 0)
 
     @property
     def num_qubits(self) -> int:

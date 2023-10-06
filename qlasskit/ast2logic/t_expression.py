@@ -20,7 +20,6 @@ from sympy.logic.boolalg import Boolean
 from typing_extensions import TypeAlias
 
 from . import Env, exceptions
-from ..typing import Qtype
 
 TType: TypeAlias = object
 
@@ -123,12 +122,12 @@ def translate_expression(expr, env: Env) -> Tuple[TType, Boolean]:  # noqa: C901
         te_test = translate_expression(expr.test, env)
         te_true = translate_expression(expr.body, env)
         te_false = translate_expression(expr.orelse, env)
-        
+
         if te_test[0] != bool:
             raise exceptions.TypeErrorException(te_test[0], bool)
-        
+
         if te_true[0] != te_false[0]:
-            raise exceptions.TypeErrorException(te_false[0], te_true[0])     
+            raise exceptions.TypeErrorException(te_false[0], te_true[0])
 
         return (
             te_true[0],

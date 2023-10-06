@@ -19,7 +19,7 @@ from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
 
 from qlasskit import QlassF, exceptions, qlassf
 
-from .utils import compare_circuit_truth_table, COMPILATION_ENABLED
+from .utils import COMPILATION_ENABLED, compare_circuit_truth_table
 
 a, b, c, d = symbols("a,b,c,d")
 _ret = Symbol("_ret")

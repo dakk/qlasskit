@@ -43,7 +43,8 @@ class UnknownTypeException(Exception):
 class OutOfBoundException(Exception):
     def __init__(self, size, i):
         super().__init__(f"size is {size}: {i} accessed")
-        
+
+
 class UnboundException(Exception):
     def __init__(self, symbol, env):
         super().__init__(f"{symbol} in {env}")
