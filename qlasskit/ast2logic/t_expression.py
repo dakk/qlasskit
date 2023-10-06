@@ -12,15 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ast
+from typing import Any, List, Tuple
 
 from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, false, true
 from sympy.logic.boolalg import Boolean
+from typing_extensions import TypeAlias
 
 from . import Env, exceptions
 
+TType: TypeAlias = object
 
-def type_of_exp(vlist, base, env, res=[]):
+
+def type_of_exp(vlist, base, env, res=[]) -> Tuple[List[Symbol], Env]:
     """Type inference for expressions: iterate over val, and decompose to bool"""
     if isinstance(vlist, list):
         i = 0
@@ -39,7 +43,7 @@ def type_of_exp(vlist, base, env, res=[]):
         return [new_symb], env
 
 
-def translate_expression(expr, env: Env) -> Boolean:  # noqa: C901
+def translate_expression(expr, env: Env) -> Tuple[TType, Boolean]:  # noqa: C901
     """Translate an expression"""
 
     # Name reference
@@ -54,8 +58,8 @@ def translate_expression(expr, env: Env) -> Boolean:  # noqa: C901
             if len(rl) == 0:
                 raise exceptions.UnboundException(expr.id, env)
 
-            return rl
-        return Symbol(expr.id)
+            return (Any, rl)  # TODO: typecheck
+        return (Any, Symbol(expr.id))  # TODO: typecheck
 
     # Subscript: a[0][1]
     elif isinstance(expr, ast.Subscript):
@@ -80,7 +84,7 @@ def translate_expression(expr, env: Env) -> Boolean:  # noqa: C901
         if sn not in env:
             raise exceptions.UnboundException(sn, env)
 
-        return Symbol(sn)
+        return (Any, Symbol(sn))
 
     # Boolop: and, or
     elif isinstance(expr, ast.BoolOp):
@@ -90,43 +94,48 @@ def translate_expression(expr, env: Env) -> Boolean:  # noqa: C901
                 op(v_exps[0], unfold(v_exps[1::], op)) if len(v_exps) > 1 else v_exps[0]
             )
 
-        v_exps = [translate_expression(e_in, env) for e_in in expr.values]
+        v_exps = [
+            translate_expression(e_in, env)[1] for e_in in expr.values
+        ]  # TODO: typecheck
 
-        return unfold(v_exps, And if isinstance(expr.op, ast.And) else Or)
+        return (bool, unfold(v_exps, And if isinstance(expr.op, ast.And) else Or))
 
     # Unary: not
     elif isinstance(expr, ast.UnaryOp):
         if isinstance(expr.op, ast.Not):
-            return Not(translate_expression(expr.operand, env))
+            return (
+                bool,
+                Not(translate_expression(expr.operand, env)[1]),
+            )  # TODO: typecheck
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
     # If expression
     elif isinstance(expr, ast.IfExp):
-        # (condition) and (true_value) or (not condition) and (false_value)
-        # return Or(
-        #     And(translate_expression(expr.test, env), translate_expression(expr.body, env)),
-        #     And(Not(translate_expression(expr.test, env)), translate_expression(expr.orelse, env))
-        # )
-        return ITE(
-            translate_expression(expr.test, env),
-            translate_expression(expr.body, env),
-            translate_expression(expr.orelse, env),
+        return (
+            bool,
+            ITE(
+                translate_expression(expr.test, env)[1],  # TODO: typecheck
+                translate_expression(expr.body, env)[1],  # TODO: typecheck
+                translate_expression(expr.orelse, env)[1],  # TODO: typecheck
+            ),
         )
 
     # Constant
     elif isinstance(expr, ast.Constant):
         if expr.value is True:
-            return true
+            return (bool, true)
         elif expr.value is False:
-            return false
+            return (bool, false)
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
     # Tuple
     elif isinstance(expr, ast.Tuple):
-        elts = [translate_expression(elt, env) for elt in expr.elts]
-        return elts
+        elts = [
+            translate_expression(elt, env)[1] for elt in expr.elts
+        ]  # TODO: typecheck
+        return (Any, elts)  # TODO: typecheck
 
     # Compare operator
     elif isinstance(expr, ast.Compare):

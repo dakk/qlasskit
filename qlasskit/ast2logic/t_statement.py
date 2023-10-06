@@ -57,13 +57,13 @@ def translate_statement(  # noqa: C901
         if target in env:
             raise exceptions.SymbolReassignedException(target)
 
-        val = translate_expression(stmt.value, env)
+        tval, val = translate_expression(stmt.value, env)  # TODO: typecheck
         res, env = type_of_exp(val, f"{target}", env)
         res = list(map(lambda x: (Symbol(x[0]), x[1]), res))
         return res, env
 
     elif isinstance(stmt, ast.Return):
-        vexp = translate_expression(stmt.value, env)
+        texp, vexp = translate_expression(stmt.value, env)  # TODO: typecheck
         res, env = type_of_exp(vexp, "_ret", env)
         res = list(map(lambda x: (Symbol(x[0]), x[1]), res))
         return res, env
