@@ -26,11 +26,16 @@ class Arg:
         self.ttype = ttype
         self.bitvec = bitvec
 
+    def __repr__(self):
+        return f"{self.name} - {self.ttype} - {', '.join(self.bitvec)}"
+
     def __len__(self) -> int:
         return len(self.bitvec)
 
     def to_exp(self) -> List[Symbol]:
-        return list(map(Symbol, self.bitvec))
+        if len(self) > 1:
+            return list(map(Symbol, self.bitvec))
+        return Symbol(self.bitvec[0])
 
 
 Args = List[Arg]
@@ -56,36 +61,45 @@ class Qtype:
 #         return self.value
 
 
+
 class Qint(int, Qtype):
-    def __init__(self, value, bit_size=8):
+    BIT_SIZE = 8
+    
+    def __init__(self, value):
         super().__init__()
         self.value = value
-        self.bit_size = bit_size
 
 
 class Qint2(Qint):
+    BIT_SIZE = 2
+    
     def __init__(self, value):
-        super().__init__(value, bit_size=2)
+        super().__init__(value)
 
 
 class Qint4(Qint):
+    BIT_SIZE = 4
+    
     def __init__(self, value):
-        super().__init__(value, bit_size=4)
+        super().__init__(value)
 
 
 class Qint8(Qint):
+    BIT_SIZE = 8
     def __init__(self, value):
-        super().__init__(value, bit_size=8)
+        super().__init__(value)
 
 
 class Qint12(Qint):
+    BIT_SIZE = 12
     def __init__(self, value):
-        super().__init__(value, bit_size=12)
+        super().__init__(value)
 
 
 class Qint16(Qint):
+    BIT_SIZE = 16
     def __init__(self, value):
-        super().__init__(value, bit_size=16)
+        super().__init__(value)
 
 
 # class Qpair

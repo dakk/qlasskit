@@ -30,8 +30,8 @@
 #### Typechecker branch
 - [x] Translate_expr should returns ttype*expr
 - [x] Args should also hold the original type
-- [ ] Transform Env to a class holding also the original types
-- [ ] Typecheck all the expressions
+- [x] Transform Env to a class holding also the original types
+- [x] Typecheck all the expressions
 
 ### Week 3: (9 Oct 23)
 - [ ] Int: comparison - eq

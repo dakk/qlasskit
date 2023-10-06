@@ -17,7 +17,7 @@ from typing import List, Tuple
 from sympy import Symbol
 from sympy.logic.boolalg import Boolean
 
-from . import Env, exceptions, translate_expression, type_of_exp
+from . import Binding, Env, exceptions, translate_expression, type_of_exp
 
 
 def translate_statement(  # noqa: C901
@@ -58,13 +58,15 @@ def translate_statement(  # noqa: C901
             raise exceptions.SymbolReassignedException(target)
 
         tval, val = translate_expression(stmt.value, env)  # TODO: typecheck
-        res, env = type_of_exp(val, f"{target}", env)
+        res = type_of_exp(val, f"{target}")
+        env.bind(Binding(target, tval, [x[0] for x in res]))
         res = list(map(lambda x: (Symbol(x[0]), x[1]), res))
         return res, env
 
     elif isinstance(stmt, ast.Return):
         texp, vexp = translate_expression(stmt.value, env)  # TODO: typecheck
-        res, env = type_of_exp(vexp, "_ret", env)
+        res = type_of_exp(vexp, "_ret")
+        env.bind(Binding("_ret", texp, [x[0] for x in res]))
         res = list(map(lambda x: (Symbol(x[0]), x[1]), res))
         return res, env
 

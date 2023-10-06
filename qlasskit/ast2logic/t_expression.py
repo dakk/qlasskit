@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ast
-from typing import Any, List, Tuple
+from typing import List, Tuple, get_args
 
 from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, false, true
@@ -20,27 +20,27 @@ from sympy.logic.boolalg import Boolean
 from typing_extensions import TypeAlias
 
 from . import Env, exceptions
+from ..typing import Qtype
 
 TType: TypeAlias = object
 
 
-def type_of_exp(vlist, base, env, res=[]) -> Tuple[List[Symbol], Env]:
+def type_of_exp(vlist, base, res=[]) -> List[Symbol]:
     """Type inference for expressions: iterate over val, and decompose to bool"""
     if isinstance(vlist, list):
         i = 0
         res = []
         for in_val in vlist:
-            r_new, env = type_of_exp(in_val, f"{base}.{i}", env, res)
+            r_new = type_of_exp(in_val, f"{base}.{i}", res)
             if isinstance(r_new, list):
                 res.extend(r_new)
             else:
                 res.append(r_new)
             i += 1
-        return res, env
+        return res
     else:
         new_symb = (f"{base}", vlist)
-        env.append(new_symb[0])
-        return [new_symb], env
+        return [new_symb]
 
 
 def translate_expression(expr, env: Env) -> Tuple[TType, Boolean]:  # noqa: C901
@@ -48,18 +48,8 @@ def translate_expression(expr, env: Env) -> Tuple[TType, Boolean]:  # noqa: C901
 
     # Name reference
     if isinstance(expr, ast.Name):
-        if expr.id not in env:
-            # Handle complex types
-            rl = []
-            for sym in env:
-                if sym[0 : (len(expr.id) + 1)] == f"{expr.id}.":
-                    rl.append(Symbol(sym))
-
-            if len(rl) == 0:
-                raise exceptions.UnboundException(expr.id, env)
-
-            return (Any, rl)  # TODO: typecheck
-        return (Any, Symbol(expr.id))  # TODO: typecheck
+        binding = env[expr.id]
+        return (binding.ttype, binding.to_exp())
 
     # Subscript: a[0][1]
     elif isinstance(expr, ast.Subscript):
@@ -81,10 +71,24 @@ def translate_expression(expr, env: Env) -> Tuple[TType, Boolean]:  # noqa: C901
         else:
             sn = unroll_subscripts(expr, "")
 
-        if sn not in env:
+        if sn.split(".")[0] not in env:
             raise exceptions.UnboundException(sn, env)
 
-        return (Any, Symbol(sn))
+        # Get the inner type
+        inner_type = env[sn.split(".")[0]].ttype
+        for i in sn.split(".")[1:]:
+            if hasattr(inner_type, "BIT_SIZE"):
+                if int(i) < inner_type.BIT_SIZE:
+                    inner_type = bool
+                else:
+                    raise exceptions.OutOfBoundException(inner_type.BIT_SIZE, i)
+            else:
+                if int(i) < len(get_args(inner_type)):
+                    inner_type = get_args(inner_type)[int(i)]
+                else:
+                    raise exceptions.OutOfBoundException(len(get_args(inner_type)), i)
+
+        return (inner_type, Symbol(sn))
 
     # Boolop: and, or
     elif isinstance(expr, ast.BoolOp):
@@ -94,31 +98,41 @@ def translate_expression(expr, env: Env) -> Tuple[TType, Boolean]:  # noqa: C901
                 op(v_exps[0], unfold(v_exps[1::], op)) if len(v_exps) > 1 else v_exps[0]
             )
 
-        v_exps = [
-            translate_expression(e_in, env)[1] for e_in in expr.values
-        ]  # TODO: typecheck
+        vt_exps = [translate_expression(e_in, env) for e_in in expr.values]
+        v_exps = [x[1] for x in vt_exps]
+        for x in vt_exps:
+            if x[0] != bool:
+                raise exceptions.TypeErrorException(x[0], bool)
 
         return (bool, unfold(v_exps, And if isinstance(expr.op, ast.And) else Or))
 
     # Unary: not
     elif isinstance(expr, ast.UnaryOp):
         if isinstance(expr.op, ast.Not):
-            return (
-                bool,
-                Not(translate_expression(expr.operand, env)[1]),
-            )  # TODO: typecheck
+            texp, exp = translate_expression(expr.operand, env)
+
+            if texp != bool:
+                raise exceptions.TypeErrorException(texp, bool)
+
+            return (bool, Not(exp))
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
     # If expression
     elif isinstance(expr, ast.IfExp):
+        te_test = translate_expression(expr.test, env)
+        te_true = translate_expression(expr.body, env)
+        te_false = translate_expression(expr.orelse, env)
+        
+        if te_test[0] != bool:
+            raise exceptions.TypeErrorException(te_test[0], bool)
+        
+        if te_true[0] != te_false[0]:
+            raise exceptions.TypeErrorException(te_false[0], te_true[0])     
+
         return (
-            bool,
-            ITE(
-                translate_expression(expr.test, env)[1],  # TODO: typecheck
-                translate_expression(expr.body, env)[1],  # TODO: typecheck
-                translate_expression(expr.orelse, env)[1],  # TODO: typecheck
-            ),
+            te_true[0],
+            ITE(te_test[1], te_true[1], te_false[1]),
         )
 
     # Constant
@@ -132,10 +146,11 @@ def translate_expression(expr, env: Env) -> Tuple[TType, Boolean]:  # noqa: C901
 
     # Tuple
     elif isinstance(expr, ast.Tuple):
-        elts = [
-            translate_expression(elt, env)[1] for elt in expr.elts
-        ]  # TODO: typecheck
-        return (Any, elts)  # TODO: typecheck
+        telts = [translate_expression(elt, env) for elt in expr.elts]
+        elts = [x[1] for x in telts]
+        tlts = [x[0] for x in telts]
+
+        return (Tuple[tuple(tlts)], elts)
 
     # Compare operator
     elif isinstance(expr, ast.Compare):

@@ -15,6 +15,11 @@
 import ast
 
 
+class TypeErrorException(Exception):
+    def __init__(self, got, excepted):
+        super().__init__(f"Got '{got}' excepted '{excepted}'")
+
+
 class NoReturnTypeException(Exception):
     def __init__(self):
         super().__init__("Return type is mandatory")
@@ -35,6 +40,10 @@ class UnknownTypeException(Exception):
         super().__init__(ast.dump(ob) + f": {message}" if message else "")
 
 
+class OutOfBoundException(Exception):
+    def __init__(self, size, i):
+        super().__init__(f"size is {size}: {i} accessed")
+        
 class UnboundException(Exception):
     def __init__(self, symbol, env):
         super().__init__(f"{symbol} in {env}")

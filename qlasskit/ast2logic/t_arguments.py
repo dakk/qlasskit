@@ -14,7 +14,7 @@
 import ast
 from typing import List, Tuple
 
-from ..typing import Arg, Args, Qint
+from ..typing import Arg, Args, Qint, Qint2, Qint4, Qint8, Qint12, Qint16 # noqa: F
 from . import exceptions
 from .t_expression import TType
 
@@ -45,7 +45,7 @@ def translate_argument(ann, base="") -> Arg:
         n = int(to_name(ann)[4::])
         arg_list = [f"{base}.{i}" for i in range(n)]
         # arg_list.append((f"{base}{arg.arg}", n))
-        return Arg(base, Qint, arg_list)
+        return Arg(base, eval(to_name(ann)), arg_list)
 
     # Bool
     elif to_name(ann) == "bool":

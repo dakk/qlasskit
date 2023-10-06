@@ -28,7 +28,8 @@ class POCCompiler2(Compiler):
         qc = QCircuit(name=name)
 
         for arg in args:
-            qc.add_qubit(arg)
+            for arg_b in arg.bitvec:
+                qc.add_qubit(arg_b)
 
         for sym, exp in exprs:
             iret = self.compile_expr(qc, self._symplify_exp(exp))

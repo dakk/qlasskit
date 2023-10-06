@@ -16,7 +16,7 @@ import ast
 import unittest
 from typing import Tuple
 
-from qlasskit import Qint, ast2logic, exceptions
+from qlasskit import Qint2, Qint4, ast2logic, exceptions
 
 
 class TestAst2Logic_translate_argument(unittest.TestCase):
@@ -42,7 +42,7 @@ class TestAst2Logic_translate_argument(unittest.TestCase):
         ann_ast = ast.parse(f).body[0].annotation
         c = ast2logic.translate_argument(ann_ast, "a")
         self.assertEqual(c.name, "a")
-        self.assertEqual(c.ttype, Qint)
+        self.assertEqual(c.ttype, Qint2)
         self.assertEqual(c.bitvec, ["a.0", "a.1"])
 
     def test_qint4(self):
@@ -50,7 +50,7 @@ class TestAst2Logic_translate_argument(unittest.TestCase):
         ann_ast = ast.parse(f).body[0].annotation
         c = ast2logic.translate_argument(ann_ast, "a")
         self.assertEqual(c.name, "a")
-        self.assertEqual(c.ttype, Qint)
+        self.assertEqual(c.ttype, Qint4)
         self.assertEqual(c.bitvec, ["a.0", "a.1", "a.2", "a.3"])
 
     def test_tuple(self):
@@ -82,7 +82,7 @@ class TestAst2Logic_translate_argument(unittest.TestCase):
         ann_ast = ast.parse(f).body[0].annotation
         c = ast2logic.translate_argument(ann_ast, "a")
         self.assertEqual(c.name, "a")
-        self.assertEqual(c.ttype, Tuple[Qint, Qint])
+        self.assertEqual(c.ttype, Tuple[Qint2, Qint2])
         self.assertEqual(
             c.bitvec,
             [

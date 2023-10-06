@@ -28,17 +28,17 @@ def translate_ast(fun) -> LogicFun:
     fun_name: str = fun.name
 
     # env contains names visible from the current scope
-    env: Env = []
+    env = Env()
 
     args: Args = translate_arguments(fun.args.args)
-    # TODO: types are string; maybe a translate_type?
-    for a_name in args:
-        env.append(a_name)
+
+    [env.bind(arg) for arg in args]
 
     if not fun.returns:
         raise exceptions.NoReturnTypeException()
 
-    ret_size = len(translate_argument(fun.returns))
+    ret_ = translate_argument(fun.returns)  # TODO: we need to preserve this
+    ret_size = len(ret_)
 
     exps = []
     for stmt in fun.body:

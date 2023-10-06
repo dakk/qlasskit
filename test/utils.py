@@ -17,6 +17,8 @@ from qiskit_aer import Aer
 
 from qlasskit import QlassF
 
+COMPILATION_ENABLED = True
+
 
 def test_not(a: bool) -> bool:
     return not a
@@ -45,6 +47,8 @@ def qiskit_measure_and_count(circ, shots=1):
 
 
 def compare_circuit_truth_table(cls, qf):
+    if not COMPILATION_ENABLED:
+        return
     truth_table = qf.truth_table()
     gate = qf.gate()
 
