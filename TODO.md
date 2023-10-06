@@ -24,7 +24,8 @@
 - [x] QlassF: truth table creation
 - [x] Quantum circuit abstraction
 - [x] Extend testing to compilation
-- [ ] Poc compiler 2 using qcircuit abstraction
+- [x] Poc compiler 2 using qcircuit abstraction
+- [x] OpenQASM3 exporter
 
 ### Week 3: (9 Oct 23)
 - [ ] Qubit garbage uncomputing and recycling
@@ -92,6 +93,7 @@
 ### Framwork support
 
 - [x] Qiskit
+- [ ] QASM
 - [ ] QuTip
 - [ ] Pennylane
 - [ ] Cirq

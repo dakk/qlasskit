@@ -92,7 +92,10 @@ class QlassF:
 
     def compile(self):
         self._compiled_gate = compiler.to_quantum(
-            self.args, self.ret_size, self.expressions
+            name=self.name,
+            args=self.args,
+            ret_size=self.ret_size,
+            exprs=self.expressions,
         )
 
     def gate(self, framework="qiskit"):
@@ -100,12 +103,7 @@ class QlassF:
         if self._compiled_gate is None:
             raise Exception("Not yet compiled")
 
-        if framework == "qiskit":
-            g = self._compiled_gate.export(mode="gate", framework=framework)
-            g.name = self.name
-            return g
-        else:
-            raise Exception(f"Framework {framework} not supported")
+        return self._compiled_gate.export(mode="gate", framework=framework)
 
     # def qubits(self, index=0):
     #     """List of qubits of the gate"""

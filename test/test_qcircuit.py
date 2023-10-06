@@ -39,6 +39,23 @@ class TestQCircuit(unittest.TestCase):
 
 
 class TestQCircuitExport(unittest.TestCase):
+    def test_export_qasm(self):
+        qc = QCircuit()
+        a, b = qc.add_qubit(), qc.add_qubit()
+        qc.x(a)
+        qc.cx(a, b)
+        qasm_c = qc.export("gate", "qasm")
+        self.assertEqual(qasm_c, "gate qc q0 q1 {\n\tx q0\n\tcx q0 q1\n}\n\n")
+
+    def test_export_qasm_toffoli(self):
+        qc = QCircuit()
+        a, b, c = qc.add_qubit("a"), qc.add_qubit("b"), qc.add_qubit("c")
+        qc.x(a)
+        qc.x(b)
+        qc.ccx(a, b, c)
+        qasm_c = qc.export("gate", "qasm")
+        self.assertEqual(qasm_c, "gate qc a b c {\n\tx a\n\tx b\n\tccx a b c\n}\n\n")
+
     def test_export_sympy(self):
         qc = QCircuit()
         a, b = qc.add_qubit(), qc.add_qubit()

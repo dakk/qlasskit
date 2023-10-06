@@ -11,23 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# isort:skip_file
+
+import ast
+import unittest
+
+from qlasskit import ast2logic, exceptions
 
 
-from .compiler import Compiler, CompilerException  # noqa: F401
+class TestAst2Logic_translate_statement(unittest.TestCase):
+    def test_statement_not_handled(self):
+        f = "continue"
+        e = ast.parse(f)
 
-from .multipass import MultipassCompiler
-from .poccompiler import POCCompiler
-from .poccompiler2 import POCCompiler2
-
-
-def to_quantum(name, args, ret_size, exprs, compiler="poc2"):
-    if compiler == "multipass":
-        s = MultipassCompiler()
-    elif compiler == "poc":
-        s = POCCompiler()
-    elif compiler == "poc2":
-        s = POCCompiler2()
-
-    circ = s.compile(name, args, ret_size, exprs)
-    return circ
+        self.assertRaises(
+            exceptions.StatementNotHandledException,
+            lambda e: ast2logic.translate_statement(e, {}),
+            e,
+        )

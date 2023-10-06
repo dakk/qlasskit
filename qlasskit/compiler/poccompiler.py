@@ -24,8 +24,8 @@ from . import Compiler, CompilerException
 class POCCompiler(Compiler):
     """POC compiler translating an expression list to quantum circuit"""
 
-    def compile(self, args: Args, ret_size: int, exprs: BoolExpList) -> QCircuit:
-        qc = QCircuit()
+    def compile(self, name, args: Args, ret_size: int, exprs: BoolExpList) -> QCircuit:
+        qc = QCircuit(name=name)
         self.qmap = {}
 
         for sym, exp in exprs:

@@ -41,5 +41,7 @@ class Compiler:
         exp = boolalg.to_cnf(exp)
         return exp
 
-    def compile(self, args: Args, ret_size: int, expr: BoolExpList) -> QCircuit:
+    def compile(
+        self, name: str, args: Args, ret_size: int, expr: BoolExpList
+    ) -> QCircuit:
         raise Exception("abstract")

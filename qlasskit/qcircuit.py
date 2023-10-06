@@ -19,13 +19,14 @@ from sympy.physics.quantum.qubit import Qubit
 
 
 class QCircuit:
-    def __init__(self, num_qubits=0):
+    def __init__(self, num_qubits=0, name="qc"):
         """Initialize a quantum circuit.
 
         Args:
             num_qubits (int, optional): The number of qubits in the circuit. Defaults to 0.
 
         """
+        self.name = name
         self.num_qubits = num_qubits
         self.gates = []
         self.qubit_map = {}
@@ -45,6 +46,13 @@ class QCircuit:
         """
         self.num_qubits = max(self.num_qubits, other.num_qubits)
         self.gates.extend(other.gates)
+
+    def get_key_by_index(self, i: int):
+        """Return the qubit name given its index"""
+        for key in self.qubit_map:
+            if self.qubit_map[key] == i:
+                return key
+        raise Exception(f"Qubit with index {i} not found")
 
     def __getitem__(self, key: Union[str, Symbol, int]):
         """Return the qubit index given its name or index"""
@@ -237,11 +245,30 @@ class QCircuit:
                 qc.fredkin(w[0], w[1], w[2])
 
         if mode == "gate":
-            return qc.to_gate()
+            gate = qc.to_gate()
+            gate.name = self.name
+            return gate
         elif mode == "circuit":
             return qc
         else:
             raise Exception(f"Uknown export mode: {mode}")
+
+    def __qasm_export(self, mode: Literal["circuit", "gate"]):
+        gate_qasm = f"gate {self.name} "
+        gate_qasm += " ".join(self.qubit_map.keys())
+        gate_qasm += " {\n"
+        for x in self.gates:
+            qbs = list(map(lambda gq: self.get_key_by_index(gq), x[1]))
+            gate_qasm += f'\t{x[0]} {" ".join(qbs)}\n'
+        gate_qasm += "}\n\n"
+
+        if mode == "gate":
+            return gate_qasm
+
+        qasm = "OPENQASM 3.0;\n\n"
+        qasm += gate_qasm
+
+        return qasm
 
     def export(self, mode: Literal["circuit", "gate"] = "circuit", framework="qiskit"):
         """Exports the circuit to another framework.
@@ -264,5 +291,7 @@ class QCircuit:
             return self.__qiskit_export(mode)
         elif framework == "sympy":
             return self.__sympy_export()
+        elif framework == "qasm":
+            return self.__qasm_export(mode)
         else:
             raise Exception(f"Framework {framework} not supported")
