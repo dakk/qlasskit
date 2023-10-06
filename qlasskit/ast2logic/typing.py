@@ -45,7 +45,7 @@ LogicFun = Tuple[str, Args, int, BoolExpList]
 
 class Qtype:
     def __init__(self):
-        self.bit_size
+        pass
 
     def to_bool(self):
         raise Exception("abstract")

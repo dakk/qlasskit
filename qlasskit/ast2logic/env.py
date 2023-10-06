@@ -16,8 +16,8 @@ from typing import List
 
 from typing_extensions import TypeAlias
 
-from ..typing import Arg, Qint  # noqa: F401, E402
 from . import exceptions
+from .typing import Arg, Qint  # noqa: F401, E402
 
 Binding: TypeAlias = Arg
 

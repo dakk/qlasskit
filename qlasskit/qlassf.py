@@ -19,8 +19,8 @@ from typing import Callable, List, Tuple, Union  # noqa: F401
 
 from . import compiler
 from .ast2logic import flatten, translate_ast
-from .typing import *  # noqa: F403, F401
-from .typing import Args, BoolExpList
+from .ast2logic.typing import *  # noqa: F403, F401
+from .ast2logic.typing import Args, BoolExpList
 
 MAX_TRUTH_TABLE_SIZE = 20
 

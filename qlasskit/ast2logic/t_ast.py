@@ -13,7 +13,6 @@
 # limitations under the License.
 from sympy.logic import false, simplify_logic, true
 
-from ..typing import Args, LogicFun
 from . import (
     Env,
     exceptions,
@@ -22,6 +21,7 @@ from . import (
     translate_arguments,
     translate_statement,
 )
+from .typing import Args, LogicFun
 
 
 def translate_ast(fun) -> LogicFun:

@@ -14,9 +14,9 @@
 import ast
 from typing import List, Tuple
 
-from ..typing import Arg, Args, Qint, Qint2, Qint4, Qint8, Qint12, Qint16  # noqa: F
 from . import exceptions
 from .t_expression import TType
+from .typing import Arg, Args, Qint, Qint2, Qint4, Qint8, Qint12, Qint16  # noqa: F
 
 
 def translate_argument(ann, base="") -> Arg:

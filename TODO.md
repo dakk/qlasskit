@@ -26,6 +26,7 @@
 - [x] Extend testing to compilation
 - [x] Poc compiler 2 using qcircuit abstraction
 - [x] OpenQASM3 exporter
+- [x] Int: comparison - eq
 
 #### Typechecker branch
 - [x] Translate_expr should returns ttype*expr
@@ -34,7 +35,7 @@
 - [x] Typecheck all the expressions
 
 ### Week 3: (9 Oct 23)
-- [ ] Int: comparison - eq
+- [ ] Int: comparison - >, <, <=, >=, !=
 - [ ] Qubit garbage uncomputing and recycling
 - [ ] Test: add qubit usage check
 - [ ] Compiler: remove consecutive X gates

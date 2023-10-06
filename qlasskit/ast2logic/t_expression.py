@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ast
-from typing import List, Tuple, get_args
+from typing import List, Tuple, Type, get_args
 
 from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, false, true
@@ -20,8 +20,13 @@ from sympy.logic.boolalg import Boolean
 from typing_extensions import TypeAlias
 
 from . import Env, exceptions
+from .typing import Qint, Qint2, Qint4, Qint8, Qint12, Qint16
 
 TType: TypeAlias = object
+
+
+def xnor(a, b):
+    return Or(And(a, b), And(Not(a), Not(b)))
 
 
 def type_of_exp(vlist, base, res=[]) -> List[Symbol]:
@@ -140,6 +145,29 @@ def translate_expression(expr, env: Env) -> Tuple[TType, Boolean]:  # noqa: C901
             return (bool, true)
         elif expr.value is False:
             return (bool, false)
+        elif isinstance(expr.value, int):
+            v = expr.value
+            vb = map(lambda c: True if c == "1" else False, bin(v)[2:])
+            v_ret: Tuple[Type[Qint], List[bool]]
+            if v < 2**2:
+                v_ret = (Qint2, list(vb))
+            elif v < 2**4:
+                v_ret = (Qint4, list(vb))
+            elif v < 2**8:
+                v_ret = (Qint8, list(vb))
+            elif v < 2**12:
+                v_ret = (Qint12, list(vb))
+            elif v < 2**16:
+                v_ret = (Qint16, list(vb))
+            else:
+                raise Exception("Constant value is too big")
+
+            if len(v_ret[1]) < v_ret[0].BIT_SIZE:
+                v_ret = (
+                    v_ret[0],
+                    [False] * (v_ret[0].BIT_SIZE - len(v_ret[1])) + v_ret[1],
+                )
+            return v_ret
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
@@ -153,8 +181,34 @@ def translate_expression(expr, env: Env) -> Tuple[TType, Boolean]:  # noqa: C901
 
     # Compare operator
     elif isinstance(expr, ast.Compare):
-        # Eq | NotEq | Lt | LtE | Gt | GtE | Is | IsNot | In | NotIn
-        raise exceptions.ExpressionNotHandledException(expr)
+        if len(expr.ops) != 1 or len(expr.comparators) != 1:
+            raise exceptions.ExpressionNotHandledException(expr)
+
+        tleft = translate_expression(expr.left, env)
+        tcomp = translate_expression(expr.comparators[0], env)
+
+        if tleft[0] != tcomp[0] and tleft[0].__bases__ != tcomp[0].__bases__:  # type: ignore
+            raise exceptions.TypeErrorException(tcomp[0], tleft[0])
+
+        # Eq
+        if isinstance(expr.ops[0], ast.Eq):
+            ex = true
+            for x in zip(tleft[1], tcomp[1]):
+                ex = And(ex, xnor(x[0], x[1]))
+
+            if len(tleft[1]) > len(tcomp[1]):
+                for x in tleft[1][len(tcomp[1]) :]:
+                    ex = And(ex, Not(x))
+
+            if len(tleft[1]) < len(tcomp[1]):
+                for x in tcomp[1][len(tleft[1]) :]:
+                    ex = And(ex, Not(x))
+
+            return (bool, ex)
+
+        # NotEq | Lt | LtE | Gt | GtE | Is | IsNot | In | NotIn
+        else:
+            raise exceptions.ExpressionNotHandledException(expr)
 
     # Lambda
     # Dict
