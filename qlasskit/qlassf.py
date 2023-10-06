@@ -51,7 +51,7 @@ class QlassF:
         self._compiled_gate = None
 
     def __repr__(self):
-        arg_str = ", ".join(map(lambda arg: f"{arg[0]}:{arg[1]}", self.args))
+        arg_str = ", ".join(map(lambda arg: f"{arg.name}:{arg.ttype}", self.args))
         exp_str = "\n\t".join(map(lambda exp: f"{exp[0]} = {exp[1]}", self.expressions))
         return f"QlassF<{self.name}>({arg_str}) -> bool[{self.ret_size}]:\n\t{exp_str}"
 
