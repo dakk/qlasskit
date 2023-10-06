@@ -17,7 +17,28 @@ from typing import List, Tuple
 from sympy import Symbol
 from sympy.logic.boolalg import Boolean
 
-Args = List[str]
+# from .ast2logic.t_expression import TType
+
+
+class Arg:
+    def __init__(self, name: str, ttype: object, bitvec: List[str]):
+        self.name = name
+        self.ttype = ttype
+        self.bitvec = bitvec
+
+    def __repr__(self):
+        return f"{self.name} - {self.ttype} - {', '.join(self.bitvec)}"
+
+    def __len__(self) -> int:
+        return len(self.bitvec)
+
+    def to_exp(self) -> List[Symbol]:
+        if len(self) > 1:
+            return list(map(Symbol, self.bitvec))
+        return Symbol(self.bitvec[0])
+
+
+Args = List[Arg]
 BoolExpList = List[Tuple[Symbol, Boolean]]
 LogicFun = Tuple[str, Args, int, BoolExpList]
 
@@ -41,35 +62,46 @@ class Qtype:
 
 
 class Qint(int, Qtype):
-    def __init__(self, value, bit_size=8):
+    BIT_SIZE = 8
+
+    def __init__(self, value):
         super().__init__()
         self.value = value
-        self.bit_size = bit_size
 
 
 class Qint2(Qint):
+    BIT_SIZE = 2
+
     def __init__(self, value):
-        super().__init__(value, bit_size=2)
+        super().__init__(value)
 
 
 class Qint4(Qint):
+    BIT_SIZE = 4
+
     def __init__(self, value):
-        super().__init__(value, bit_size=4)
+        super().__init__(value)
 
 
 class Qint8(Qint):
+    BIT_SIZE = 8
+
     def __init__(self, value):
-        super().__init__(value, bit_size=8)
+        super().__init__(value)
 
 
 class Qint12(Qint):
+    BIT_SIZE = 12
+
     def __init__(self, value):
-        super().__init__(value, bit_size=12)
+        super().__init__(value)
 
 
 class Qint16(Qint):
+    BIT_SIZE = 16
+
     def __init__(self, value):
-        super().__init__(value, bit_size=16)
+        super().__init__(value)
 
 
 # class Qpair
