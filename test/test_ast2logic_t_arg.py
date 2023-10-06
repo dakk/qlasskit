@@ -14,8 +14,9 @@
 
 import ast
 import unittest
+from typing import Tuple
 
-from qlasskit import ast2logic, exceptions
+from qlasskit import Qint, ast2logic, exceptions
 
 
 class TestAst2Logic_translate_argument(unittest.TestCase):
@@ -32,44 +33,58 @@ class TestAst2Logic_translate_argument(unittest.TestCase):
         f = "a: bool"
         ann_ast = ast.parse(f).body[0].annotation
         c = ast2logic.translate_argument(ann_ast, "a")
-        self.assertEqual(c, ["a"])
+        self.assertEqual(c.name, "a")
+        self.assertEqual(c.ttype, bool)
+        self.assertEqual(c.bitvec, ["a"])
 
     def test_qint2(self):
         f = "a: Qint2"
         ann_ast = ast.parse(f).body[0].annotation
         c = ast2logic.translate_argument(ann_ast, "a")
-        self.assertEqual(c, ["a.0", "a.1"])
+        self.assertEqual(c.name, "a")
+        self.assertEqual(c.ttype, Qint)
+        self.assertEqual(c.bitvec, ["a.0", "a.1"])
 
     def test_qint4(self):
         f = "a: Qint4"
         ann_ast = ast.parse(f).body[0].annotation
         c = ast2logic.translate_argument(ann_ast, "a")
-        self.assertEqual(c, ["a.0", "a.1", "a.2", "a.3"])
+        self.assertEqual(c.name, "a")
+        self.assertEqual(c.ttype, Qint)
+        self.assertEqual(c.bitvec, ["a.0", "a.1", "a.2", "a.3"])
 
     def test_tuple(self):
         f = "a: Tuple[bool, bool]"
         ann_ast = ast.parse(f).body[0].annotation
         c = ast2logic.translate_argument(ann_ast, "a")
-        self.assertEqual(c, ["a.0", "a.1"])
+        self.assertEqual(c.name, "a")
+        self.assertEqual(c.ttype, Tuple[bool, bool])
+        self.assertEqual(c.bitvec, ["a.0", "a.1"])
 
     def test_tuple_of_tuple(self):
         f = "a: Tuple[Tuple[bool, bool], bool]"
         ann_ast = ast.parse(f).body[0].annotation
         c = ast2logic.translate_argument(ann_ast, "a")
-        self.assertEqual(c, ["a.0.0", "a.0.1", "a.1"])
+        self.assertEqual(c.name, "a")
+        self.assertEqual(c.ttype, Tuple[Tuple[bool, bool], bool])
+        self.assertEqual(c.bitvec, ["a.0.0", "a.0.1", "a.1"])
 
     def test_tuple_of_tuple2(self):
         f = "a: Tuple[bool, Tuple[bool, bool]]"
         ann_ast = ast.parse(f).body[0].annotation
         c = ast2logic.translate_argument(ann_ast, "a")
-        self.assertEqual(c, ["a.0", "a.1.0", "a.1.1"])
+        self.assertEqual(c.name, "a")
+        self.assertEqual(c.ttype, Tuple[bool, Tuple[bool, bool]])
+        self.assertEqual(c.bitvec, ["a.0", "a.1.0", "a.1.1"])
 
     def test_tuple_of_int2(self):
         f = "a: Tuple[Qint2, Qint2]"
         ann_ast = ast.parse(f).body[0].annotation
         c = ast2logic.translate_argument(ann_ast, "a")
+        self.assertEqual(c.name, "a")
+        self.assertEqual(c.ttype, Tuple[Qint, Qint])
         self.assertEqual(
-            c,
+            c.bitvec,
             [
                 "a.0.0",
                 "a.0.1",

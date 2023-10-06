@@ -60,7 +60,7 @@ class QlassF:
 
     def truth_table_header(self) -> List[str]:
         """Returns the list of string containing the truth table header"""
-        header = [x for x in self.args]
+        header = [x.name for x in self.args]
         header.extend([sym.name for (sym, retex) in self.expressions[-self.ret_size :]])
         return header
 

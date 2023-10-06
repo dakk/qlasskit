@@ -27,7 +27,14 @@
 - [x] Poc compiler 2 using qcircuit abstraction
 - [x] OpenQASM3 exporter
 
+#### Typechecker branch
+- [x] Translate_expr should returns ttype*expr
+- [x] Args should also hold the original type
+- [ ] Transform Env to a class holding also the original types
+- [ ] Typecheck all the expressions
+
 ### Week 3: (9 Oct 23)
+- [ ] Int: comparison - eq
 - [ ] Qubit garbage uncomputing and recycling
 - [ ] Test: add qubit usage check
 - [ ] Compiler: remove consecutive X gates
@@ -98,3 +105,7 @@
 - [ ] Pennylane
 - [ ] Cirq
 - [ ] Sympy quantum computing expressions
+
+### Tools
+
+- [ ] py2qasm tools

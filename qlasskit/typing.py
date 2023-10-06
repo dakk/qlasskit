@@ -17,7 +17,23 @@ from typing import List, Tuple
 from sympy import Symbol
 from sympy.logic.boolalg import Boolean
 
-Args = List[str]
+# from .ast2logic.t_expression import TType
+
+
+class Arg:
+    def __init__(self, name: str, ttype: object, bitvec: List[str]):
+        self.name = name
+        self.ttype = ttype
+        self.bitvec = bitvec
+
+    def __len__(self) -> int:
+        return len(self.bitvec)
+
+    def to_exp(self) -> List[Symbol]:
+        return list(map(Symbol, self.bitvec))
+
+
+Args = List[Arg]
 BoolExpList = List[Tuple[Symbol, Boolean]]
 LogicFun = Tuple[str, Args, int, BoolExpList]
 
