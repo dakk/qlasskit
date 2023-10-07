@@ -44,6 +44,12 @@ class TestQlassfInt(unittest.TestCase):
         )
         compare_circuit_truth_table(self, qf)
 
+    def test_const_return(self):
+        f = "def test(a: Qint2) -> Qint2:\n\treturn 1"
+        self.assertRaises(
+            exceptions.ConstantReturnException, lambda f: qlassf(f, to_compile=False), f
+        )
+
     def test_int_arg_unbound_index(self):
         f = "def test(a: Qint2) -> bool:\n\treturn a[5]"
         self.assertRaises(
@@ -75,14 +81,15 @@ class TestQlassfInt(unittest.TestCase):
 
     def test_int_const_compare_eq(self):
         f = "def test(a: Qint2) -> bool:\n\treturn a == 2"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], And(Symbol("a.0"), Not(Symbol("a.1"))))
+        compare_circuit_truth_table(self, qf)
 
     def test_int_const_compare_eq_different_type(self):
         f = "def test(a: Qint4) -> bool:\n\treturn a == 2"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
@@ -94,10 +101,11 @@ class TestQlassfInt(unittest.TestCase):
                 Not(Symbol("a.3")),
             ),
         )
+        compare_circuit_truth_table(self, qf)
 
     def test_const_int_compare_eq_different_type(self):
         f = "def test(a: Qint4) -> bool:\n\treturn 2 == a"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
@@ -109,10 +117,11 @@ class TestQlassfInt(unittest.TestCase):
                 Not(Symbol("a.3")),
             ),
         )
+        compare_circuit_truth_table(self, qf)
 
     def test_const_int_compare_neq_different_type(self):
         f = "def test(a: Qint4) -> bool:\n\treturn 2 != a"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=False)  # TODO: fix COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
@@ -126,10 +135,11 @@ class TestQlassfInt(unittest.TestCase):
                 )
             ),
         )
+        # compare_circuit_truth_table(self, qf)
 
     def test_int_int_compare_eq(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a == b"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
@@ -157,10 +167,11 @@ class TestQlassfInt(unittest.TestCase):
                 ),
             ),
         )
+        compare_circuit_truth_table(self, qf)
 
     def test_int_int_compare_neq(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a != b"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=False)  # TODO: fix
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
@@ -190,13 +201,47 @@ class TestQlassfInt(unittest.TestCase):
                 )
             ),
         )
+        # compare_circuit_truth_table(self, qf)
 
-    # Raise costant return
-    # def test10() -> Int8:
-    #     return 42
+    def test_const_int_compare_gt(self):
+        f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a > b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        compare_circuit_truth_table(self, qf)
 
-    # def test11(a: Int2) -> Int2:
+    def test_const_int_compare_lt(self):
+        f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a < b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        compare_circuit_truth_table(self, qf)
+
+    # def test_const_int_compare_gte(self):
+    #     f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a >= b"
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+    #     self.assertEqual(len(qf.expressions), 1)
+    #     self.assertEqual(qf.expressions[0][0], _ret)
+    #     compare_circuit_truth_table(self, qf)
+
+    # def test_const_int_compare_lte(self):
+    #     f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a <= b"
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+    #     self.assertEqual(len(qf.expressions), 1)
+    #     self.assertEqual(qf.expressions[0][0], _ret)
+    #     compare_circuit_truth_table(self, qf)
+
+    def test_ite_return_qint(self):
+        f = "def test(a: bool, b: Qint2, c: Qint2) -> Qint2:\n\treturn b if a else c"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        self.assertEqual(len(qf.expressions), 2)
+        self.assertEqual(qf.expressions[0][0], Symbol("_ret.0"))
+        self.assertEqual(qf.expressions[0][1], ITE(a, Symbol("b.0"), Symbol("c.0")))
+        self.assertEqual(qf.expressions[1][0], Symbol("_ret.1"))
+        self.assertEqual(qf.expressions[1][1], ITE(a, Symbol("b.1"), Symbol("c.1")))
+        # compare_circuit_truth_table(self, qf) TODO: fix
+
+    # def test(a: Qint2) -> Qint2:
     #     return a + 1
-
-    # def test12(a: bool) -> Int8:
-    #     return 42 if a else 38
+    # def test(a: Qint2, b: Qint2) -> Qint2:
+    #     return a + b

@@ -126,10 +126,16 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         if te_true[0] != te_false[0]:
             raise exceptions.TypeErrorException(te_false[0], te_true[0])
 
-        return (
-            te_true[0],
-            ITE(te_test[1], te_true[1], te_false[1]),
-        )
+        if te_true[0] == bool:
+            return (
+                te_true[0],
+                ITE(te_test[1], te_true[1], te_false[1]),
+            )
+        else:
+            return (
+                te_true[0],
+                [ITE(te_test[1], t, f) for t, f in zip(te_true[1], te_false[1])],
+            )
 
     # Constant
     elif isinstance(expr, ast.Constant):
@@ -220,18 +226,16 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
-
     elif isinstance(expr, ast.BinOp):
         # Add | Sub | Mult | MatMult | Div | Mod | Pow | LShift | RShift
         # | BitOr | BitXor | BitAnd | FloorDiv
         raise exceptions.ExpressionNotHandledException(expr)
 
-    
     # Lambda
     # Dict
     # Set
     # Call
     # List
-    
+
     else:
         raise exceptions.ExpressionNotHandledException(expr)

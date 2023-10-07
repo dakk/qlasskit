@@ -39,6 +39,14 @@ class TestQlassfTuple(unittest.TestCase):
         self.assertEqual(qf.expressions[0][1], And(a_0, a_1))
         compare_circuit_truth_table(self, qf)
 
+    def test_tuple_ite(self):
+        f = "def test(b: bool, a: Tuple[bool, bool]) -> Tuple[bool,bool]:\n\treturn (a[1],a[0]) if b else a"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        self.assertEqual(len(qf.expressions), 2)
+        self.assertEqual(qf.expressions[0][1], ITE(b, a_1, a_0))
+        self.assertEqual(qf.expressions[1][1], ITE(b, a_0, a_1))
+        # compare_circuit_truth_table(self, qf) # TODO: fix
+
     def test_tuple_arg_assign(self):
         f = (
             "def test(a: Tuple[bool, bool]) -> bool:\n"

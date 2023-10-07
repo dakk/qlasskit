@@ -26,7 +26,7 @@
 - [x] Extend testing to compilation
 - [x] Poc compiler 2 using qcircuit abstraction
 - [x] OpenQASM3 exporter
-- [x] Int: comparison - eq
+- [x] Int: comparison - eq, noteq
 
 #### Typechecker branch
 - [x] Translate_expr should returns ttype*expr
@@ -35,11 +35,13 @@
 - [x] Typecheck all the expressions
 
 ### Week 3: (9 Oct 23)
-- [ ] Int: comparison - >, <, <=, >=, !=
+- [ ] Test circuit and boolexp using the python code as reference
+- [ ] Fix structure and typing location
+- [x] Int: comparison - lt, gt, gte, lte
 - [ ] Qubit garbage uncomputing and recycling
 - [ ] Test: add qubit usage check
 - [ ] Compiler: remove consecutive X gates
-- [ ] Int arithmetic expressions
+- [ ] Int arithmetic expressions (+, -, *, /)
 - [ ] Properly render documentation
 
 ### Week 4: (16 Oct 23)

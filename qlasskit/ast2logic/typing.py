@@ -15,7 +15,7 @@
 from typing import List, Tuple
 
 from sympy import Symbol
-from sympy.logic import And, Not, Or, true  # false
+from sympy.logic import And, Not, Or, false, true
 from sympy.logic.boolalg import Boolean
 from typing_extensions import TypeAlias
 
@@ -103,7 +103,12 @@ class Qint(int, Qtype):
     @staticmethod
     def gt(tleft: TExp, tcomp: TExp) -> TExp:
         """Compare two Qint for greater than"""
-        raise Exception("not implemented")
+        ex = false
+
+        for x in list(zip(tleft[1], tcomp[1]))[::-1]:
+            ex = Or(ex, And(Not(ex), And(Not(x[1]), x[0])))
+
+        return (bool, ex)
 
     @staticmethod
     def lt(tleft: TExp, tcomp: TExp) -> TExp:
