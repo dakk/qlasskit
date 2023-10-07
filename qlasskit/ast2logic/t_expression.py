@@ -12,21 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ast
-from typing import List, Tuple, Type, get_args
+from typing import List, Tuple, get_args
 
 from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, false, true
 from sympy.logic.boolalg import Boolean
-from typing_extensions import TypeAlias
 
 from . import Env, exceptions
-from .typing import Qint, Qint2, Qint4, Qint8, Qint12, Qint16
-
-TType: TypeAlias = object
-
-
-def xnor(a, b):
-    return Or(And(a, b), And(Not(a), Not(b)))
+from .typing import Qint, Qint2, Qint4, Qint8, Qint12, Qint16, TType
 
 
 def type_of_exp(vlist, base, res=[]) -> List[Symbol]:
@@ -147,27 +140,12 @@ def translate_expression(expr, env: Env) -> Tuple[TType, Boolean]:  # noqa: C901
             return (bool, false)
         elif isinstance(expr.value, int):
             v = expr.value
-            vb = map(lambda c: True if c == "1" else False, bin(v)[2:])
-            v_ret: Tuple[Type[Qint], List[bool]]
-            if v < 2**2:
-                v_ret = (Qint2, list(vb))
-            elif v < 2**4:
-                v_ret = (Qint4, list(vb))
-            elif v < 2**8:
-                v_ret = (Qint8, list(vb))
-            elif v < 2**12:
-                v_ret = (Qint12, list(vb))
-            elif v < 2**16:
-                v_ret = (Qint16, list(vb))
-            else:
-                raise Exception("Constant value is too big")
 
-            if len(v_ret[1]) < v_ret[0].BIT_SIZE:
-                v_ret = (
-                    v_ret[0],
-                    [False] * (v_ret[0].BIT_SIZE - len(v_ret[1])) + v_ret[1],
-                )
-            return v_ret
+            for t in [Qint2, Qint4, Qint8, Qint12, Qint16]:
+                if v < 2**t.BIT_SIZE:
+                    return Qint.fill((t, Qint.const(v)))
+
+            raise Exception(f"Constant value is too big: {v}")
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
@@ -187,24 +165,12 @@ def translate_expression(expr, env: Env) -> Tuple[TType, Boolean]:  # noqa: C901
         tleft = translate_expression(expr.left, env)
         tcomp = translate_expression(expr.comparators[0], env)
 
-        if tleft[0] != tcomp[0] and tleft[0].__bases__ != tcomp[0].__bases__:  # type: ignore
-            raise exceptions.TypeErrorException(tcomp[0], tleft[0])
-
         # Eq
         if isinstance(expr.ops[0], ast.Eq):
-            ex = true
-            for x in zip(tleft[1], tcomp[1]):
-                ex = And(ex, xnor(x[0], x[1]))
+            if issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
+                return Qint.eq(tleft, tcomp)
 
-            if len(tleft[1]) > len(tcomp[1]):
-                for x in tleft[1][len(tcomp[1]) :]:
-                    ex = And(ex, Not(x))
-
-            if len(tleft[1]) < len(tcomp[1]):
-                for x in tcomp[1][len(tleft[1]) :]:
-                    ex = And(ex, Not(x))
-
-            return (bool, ex)
+            raise exceptions.TypeErrorException(tcomp[0], tleft[0])
 
         # NotEq | Lt | LtE | Gt | GtE | Is | IsNot | In | NotIn
         else:

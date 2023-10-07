@@ -15,9 +15,17 @@
 from typing import List, Tuple
 
 from sympy import Symbol
+from sympy.logic import And, Not, Or, true  # false
 from sympy.logic.boolalg import Boolean
+from typing_extensions import TypeAlias
 
 # from .ast2logic.t_expression import TType
+
+TType: TypeAlias = object
+
+
+def xnor(a, b):
+    return Or(And(a, b), And(Not(a), Not(b)))
 
 
 class Arg:
@@ -44,6 +52,8 @@ LogicFun = Tuple[str, Args, int, BoolExpList]
 
 
 class Qtype:
+    BIT_SIZE = 8
+
     def __init__(self):
         pass
 
@@ -61,12 +71,44 @@ class Qtype:
 #         return self.value
 
 
+# TODO: use generics for bitsize
 class Qint(int, Qtype):
     BIT_SIZE = 8
 
     def __init__(self, value):
         super().__init__()
         self.value = value
+
+    @staticmethod
+    def const(v: int) -> List[bool]:
+        return list(map(lambda c: True if c == "1" else False, bin(v)[2:]))
+
+    @staticmethod
+    def fill(v: Tuple[TType, List[bool]]) -> Tuple[TType, List[bool]]:
+        if len(v[1]) < v[0].BIT_SIZE:  # type: ignore
+            v = (
+                v[0],
+                [False] * (v[0].BIT_SIZE - len(v[1])) + v[1],  # type: ignore
+            )
+        return v
+
+    @staticmethod
+    def eq(
+        tleft: Tuple[TType, Boolean], tcomp: Tuple[TType, Boolean]
+    ) -> Tuple[TType, Boolean]:
+        ex = true
+        for x in zip(tleft[1], tcomp[1]):
+            ex = And(ex, xnor(x[0], x[1]))
+
+        if len(tleft[1]) > len(tcomp[1]):
+            for x in tleft[1][len(tcomp[1]) :]:
+                ex = And(ex, Not(x))
+
+        if len(tleft[1]) < len(tcomp[1]):
+            for x in tcomp[1][len(tleft[1]) :]:
+                ex = And(ex, Not(x))
+
+        return (bool, ex)
 
 
 class Qint2(Qint):

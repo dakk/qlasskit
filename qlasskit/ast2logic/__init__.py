@@ -21,4 +21,3 @@ from .t_statement import translate_statement  # noqa: F401, E402
 from .t_ast import translate_ast  # noqa: F401, E402
 from .typing import Qint, Qint2, Qint4, Qint8, Qint12, Qint16, Qtype  # noqa: F401
 from . import exceptions  # noqa: F401, E402
-
