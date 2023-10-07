@@ -22,6 +22,7 @@ from typing_extensions import TypeAlias
 # from .ast2logic.t_expression import TType
 
 TType: TypeAlias = object
+TExp: TypeAlias = Tuple[TType, Boolean]
 
 
 def xnor(a, b):
@@ -52,26 +53,9 @@ LogicFun = Tuple[str, Args, int, BoolExpList]
 
 
 class Qtype:
-    BIT_SIZE = 8
-
-    def __init__(self):
-        pass
-
-    def to_bool(self):
-        raise Exception("abstract")
+    BIT_SIZE = 0
 
 
-# class Qbool(bool, Qtype):
-#     def __init__(self, value):
-#         super().__init__()
-#         self.value = value
-#         self.bit_size = 1
-
-#     def to_bool(self):
-#         return self.value
-
-
-# TODO: use generics for bitsize
 class Qint(int, Qtype):
     BIT_SIZE = 8
 
@@ -81,10 +65,12 @@ class Qint(int, Qtype):
 
     @staticmethod
     def const(v: int) -> List[bool]:
+        """Return the list of bool representing an int"""
         return list(map(lambda c: True if c == "1" else False, bin(v)[2:]))
 
     @staticmethod
     def fill(v: Tuple[TType, List[bool]]) -> Tuple[TType, List[bool]]:
+        """Fill a Qint to reach its bit_size"""
         if len(v[1]) < v[0].BIT_SIZE:  # type: ignore
             v = (
                 v[0],
@@ -93,9 +79,8 @@ class Qint(int, Qtype):
         return v
 
     @staticmethod
-    def eq(
-        tleft: Tuple[TType, Boolean], tcomp: Tuple[TType, Boolean]
-    ) -> Tuple[TType, Boolean]:
+    def eq(tleft: TExp, tcomp: TExp) -> TExp:
+        """Compare two Qint for equality"""
         ex = true
         for x in zip(tleft[1], tcomp[1]):
             ex = And(ex, xnor(x[0], x[1]))
@@ -110,42 +95,55 @@ class Qint(int, Qtype):
 
         return (bool, ex)
 
+    @staticmethod
+    def not_eq(tleft: TExp, tcomp: TExp) -> TExp:
+        """Compare two Qint for inequality"""
+        return (bool, Not(Qint.eq(tleft, tcomp)[1]))
+
+    @staticmethod
+    def gt(tleft: TExp, tcomp: TExp) -> TExp:
+        """Compare two Qint for greater than"""
+        raise Exception("not implemented")
+
+    @staticmethod
+    def lt(tleft: TExp, tcomp: TExp) -> TExp:
+        """Compare two Qint for lower than"""
+        return (bool, And(Not(Qint.gt(tleft, tcomp)[1]), Not(Qint.eq(tleft, tcomp)[1])))
+
+    @staticmethod
+    def lte(tleft: TExp, tcomp: TExp) -> TExp:
+        """Compare two Qint for lower than - equal"""
+        return (bool, Not(Qint.gt(tleft, tcomp)[1]))
+
+    @staticmethod
+    def gte(tleft: TExp, tcomp: TExp) -> TExp:
+        """Compare two Qint for greater than - equal"""
+        return (bool, Not(Qint.lt(tleft, tcomp)[1]))
+
+    # @staticmethod
+    # def add(tleft: TExp, tright: TExp) -> TExp:
+    #     """Add two Qint"""
+
 
 class Qint2(Qint):
     BIT_SIZE = 2
-
-    def __init__(self, value):
-        super().__init__(value)
 
 
 class Qint4(Qint):
     BIT_SIZE = 4
 
-    def __init__(self, value):
-        super().__init__(value)
-
 
 class Qint8(Qint):
     BIT_SIZE = 8
-
-    def __init__(self, value):
-        super().__init__(value)
 
 
 class Qint12(Qint):
     BIT_SIZE = 12
 
-    def __init__(self, value):
-        super().__init__(value)
-
 
 class Qint16(Qint):
     BIT_SIZE = 16
 
-    def __init__(self, value):
-        super().__init__(value)
 
-
-# class Qpair
 # class Qlist
 # class Qfixed

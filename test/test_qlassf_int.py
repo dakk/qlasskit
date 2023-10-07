@@ -110,6 +110,23 @@ class TestQlassfInt(unittest.TestCase):
             ),
         )
 
+    def test_const_int_compare_neq_different_type(self):
+        f = "def test(a: Qint4) -> bool:\n\treturn 2 != a"
+        qf = qlassf(f, to_compile=False)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(
+            qf.expressions[0][1],
+            Not(
+                And(
+                    Symbol("a.0"),
+                    Not(Symbol("a.1")),
+                    Not(Symbol("a.2")),
+                    Not(Symbol("a.3")),
+                )
+            ),
+        )
+
     def test_int_int_compare_eq(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a == b"
         qf = qlassf(f, to_compile=False)
@@ -141,8 +158,38 @@ class TestQlassfInt(unittest.TestCase):
             ),
         )
 
-    # def test9(a: Int8) -> bool:
-    #     return a == 42
+    def test_int_int_compare_neq(self):
+        f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a != b"
+        qf = qlassf(f, to_compile=False)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(
+            qf.expressions[0][1],
+            Not(
+                And(
+                    Or(
+                        And(
+                            Symbol("a.0"),
+                            Symbol("b.0"),
+                        ),
+                        And(
+                            Not(Symbol("a.0")),
+                            Not(Symbol("b.0")),
+                        ),
+                    ),
+                    Or(
+                        And(
+                            Symbol("a.1"),
+                            Symbol("b.1"),
+                        ),
+                        And(
+                            Not(Symbol("a.1")),
+                            Not(Symbol("b.1")),
+                        ),
+                    ),
+                )
+            ),
+        )
 
     # Raise costant return
     # def test10() -> Int8:

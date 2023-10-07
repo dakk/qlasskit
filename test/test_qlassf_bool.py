@@ -71,6 +71,20 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(qf.expressions[0][1], ex)
         compare_circuit_truth_table(self, qf)
 
+    def test_bool_eq(self):
+        f = "def test(a: bool, b: bool) -> bool:\n\treturn a == b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        compare_circuit_truth_table(self, qf)
+
+    def test_bool_neq(self):
+        f = "def test(a: bool, b: bool) -> bool:\n\treturn a != b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        compare_circuit_truth_table(self, qf)
+
     def test_or(self):
         ex = Or(Not(a), b)
         f = "def test(a: bool, b: bool) -> bool:\n\treturn not a or b"

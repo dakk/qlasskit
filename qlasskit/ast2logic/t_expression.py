@@ -16,10 +16,9 @@ from typing import List, Tuple, get_args
 
 from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, false, true
-from sympy.logic.boolalg import Boolean
 
 from . import Env, exceptions
-from .typing import Qint, Qint2, Qint4, Qint8, Qint12, Qint16, TType
+from .typing import Qint, Qint2, Qint4, Qint8, Qint12, Qint16, TExp
 
 
 def type_of_exp(vlist, base, res=[]) -> List[Symbol]:
@@ -40,7 +39,7 @@ def type_of_exp(vlist, base, res=[]) -> List[Symbol]:
         return [new_symb]
 
 
-def translate_expression(expr, env: Env) -> Tuple[TType, Boolean]:  # noqa: C901
+def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
     """Translate an expression"""
 
     # Name reference
@@ -167,22 +166,72 @@ def translate_expression(expr, env: Env) -> Tuple[TType, Boolean]:  # noqa: C901
 
         # Eq
         if isinstance(expr.ops[0], ast.Eq):
-            if issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
+            if tleft[0] == bool and tcomp[0] == bool:
+                return (
+                    bool,
+                    Or(And(tleft[1], tcomp[1]), And(Not(tleft[1]), Not(tcomp[1]))),
+                )
+            elif issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
                 return Qint.eq(tleft, tcomp)
 
             raise exceptions.TypeErrorException(tcomp[0], tleft[0])
 
-        # NotEq | Lt | LtE | Gt | GtE | Is | IsNot | In | NotIn
+        # NotEq
+        elif isinstance(expr.ops[0], ast.NotEq):
+            if tleft[0] == bool and tcomp[0] == bool:
+                return (
+                    bool,
+                    Not(Or(And(tleft[1], tcomp[1]), And(Not(tleft[1]), Not(tcomp[1])))),
+                )
+            elif issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
+                return Qint.not_eq(tleft, tcomp)
+
+            raise exceptions.TypeErrorException(tcomp[0], tleft[0])
+
+        # Lt
+        elif isinstance(expr.ops[0], ast.Lt):
+            if issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
+                return Qint.lt(tleft, tcomp)
+
+            raise exceptions.TypeErrorException(tcomp[0], tleft[0])
+
+        # LtE
+        elif isinstance(expr.ops[0], ast.LtE):
+            if issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
+                return Qint.lte(tleft, tcomp)
+
+            raise exceptions.TypeErrorException(tcomp[0], tleft[0])
+
+        # Gt
+        elif isinstance(expr.ops[0], ast.Gt):
+            if issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
+                return Qint.gt(tleft, tcomp)
+
+            raise exceptions.TypeErrorException(tcomp[0], tleft[0])
+
+        # GtE
+        elif isinstance(expr.ops[0], ast.GtE):
+            if issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
+                return Qint.gte(tleft, tcomp)
+
+            raise exceptions.TypeErrorException(tcomp[0], tleft[0])
+
+        # Is | IsNot | In | NotIn
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
+
+    elif isinstance(expr, ast.BinOp):
+        # Add | Sub | Mult | MatMult | Div | Mod | Pow | LShift | RShift
+        # | BitOr | BitXor | BitAnd | FloorDiv
+        raise exceptions.ExpressionNotHandledException(expr)
+
+    
     # Lambda
     # Dict
     # Set
     # Call
     # List
-    # op Add | Sub | Mult | MatMult | Div | Mod | Pow | LShift | RShift
-    # | BitOr | BitXor | BitAnd | FloorDiv
-
+    
     else:
         raise exceptions.ExpressionNotHandledException(expr)
