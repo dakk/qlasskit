@@ -56,6 +56,12 @@ class TestQlassfInt(unittest.TestCase):
             exceptions.OutOfBoundException, lambda f: qlassf(f, to_compile=False), f
         )
 
+    def test_int_return_tuple(self):
+        f = "def test(a: Qint2) -> Tuple[Qint2, bool]:\n\tb = a[0] and a[1]\n\treturn (a, b)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        self.assertEqual(len(qf.expressions), 4)
+        compare_circuit_truth_table(self, qf)
+
     def test_int_tuple(self):
         f = "def test(a: Tuple[Qint2, Qint2]) -> bool:\n\treturn a[0][0] and a[1][1]"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)

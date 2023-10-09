@@ -18,6 +18,7 @@ Python and translate them into unitary operators (gates) for use in quantum circ
    :maxdepth: 2
    
    howitworks
+   supported
    qlassf
    qcircuit
 

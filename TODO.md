@@ -27,6 +27,7 @@
 - [x] Poc compiler 2 using qcircuit abstraction
 - [x] OpenQASM3 exporter
 - [x] Int: comparison - eq, noteq
+- [x] Int: comparison - lt, gt, gte, lte
 
 #### Typechecker branch
 - [x] Translate_expr should returns ttype*expr
@@ -37,22 +38,29 @@
 ### Week 3: (9 Oct 23)
 - [ ] Test circuit and boolexp using the python code as reference
 - [ ] Fix structure and typing location
-- [x] Int: comparison - lt, gt, gte, lte
 - [ ] Qubit garbage uncomputing and recycling
 - [ ] Test: add qubit usage check
 - [ ] Compiler: remove consecutive X gates
-- [ ] Int arithmetic expressions (+, -, *, /)
 - [ ] Properly render documentation
 
 ### Week 4: (16 Oct 23)
-- [ ] Ast2logic: fixed size loops unrolling
+- [ ] Int arithmetic expressions (+, -, *, /)
+- [ ] Function call
+- [ ] Builtin functions: sum(), max(), min(), len()
+- [ ] Builtin debug functions: print()
 
 ## Month 2: 
 
 ### Week 1: (23 Oct 23)
+- [ ] Inner function
 - [ ] Parametrized qlassf
 
 ### Week 2: (30 Oct 23)
+- [ ] Lambda
+- [ ] FixedList type
+- [ ] Builtin functions: map, count
+- [ ] Ast2logic: fixed size loops unrolling
+
 ### Week 3: (6 Nov 23)
 
 ### Week 4: (13 Nov 23)
