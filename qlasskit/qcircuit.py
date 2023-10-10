@@ -29,10 +29,11 @@ class QCircuit:
         self.name = name
         self.num_qubits = num_qubits
         self.gates = []
+        self.gates_computed = []
         self.qubit_map = {}
 
-        self.ancillas = set()
-        self.free_ancillas = set()
+        self.ancilla_lst = set()
+        self.free_ancilla_lst = set()
 
         for x in range(num_qubits):
             self.qubit_map[f"q{x}"] = x
@@ -65,38 +66,83 @@ class QCircuit:
 
     def add_ancilla(self, name=None, is_free=True):
         """Add an ancilla qubit"""
-        i = self.add_qubit(name if name else f"anc_{len(self.ancillas)}")
-        self.ancillas.add(i)
+        i = self.add_qubit(name if name else f"anc_{len(self.ancilla_lst)}")
+        self.ancilla_lst.add(i)
         if is_free:
-            self.free_ancillas.add(i)
+            self.free_ancilla_lst.add(i)
         return i
 
     def free_ancilla(self, w):
         """Freeing of an ancilla qubit"""
         w = self[w]
-        if w not in self.ancillas:
-            raise Exception(f"Qubit {w} is not in the ancilla set")
+        if w not in self.ancilla_lst:
+            return  # we don't care
+            # raise Exception(f"Qubit {w} is not in the ancilla set")
 
-        if w in self.free_ancilla:
+        if w in self.free_ancilla_lst:
             raise Exception(f"Ancilla {w} is already free")
 
         self.uncompute(w)
-        self.free_ancillas.add(w)
+        self.free_ancilla_lst.add(w)
+
+    def free_ancillas(self, wl):
+        """Freeing of a list of ancilla qubits"""
+        for w in wl:
+            self.free_ancilla(w)
 
     def get_free_ancilla(self):
         """Get the first free ancilla available"""
-        if len(self.free_ancillas) == 0:
-            return self.add_ancilla(is_free=False)
-        return self.free_ancillas.pop()
+        if len(self.free_ancilla_lst) == 0:
+            anc = self.add_ancilla(is_free=False)
+        else:
+            anc = self.free_ancilla_lst.pop()
+
+        return anc
 
     def uncompute(self, w):
-        """Uncompute a specific qubit.
+        """Uncompute a specific ancilla qubit.
 
         Args:
             w (int): The index of the qubit to be uncomputed.
         """
         w = self[w]
-        raise Exception("Not yet implemented")
+        if w not in self.ancilla_lst:
+            raise Exception("qubit not in the ancilla list")
+
+        print("uncomputing ", w)
+
+        g_comp = []
+        self.barrier(label=f"U{w}")
+        for g, ws in self.gates_computed[::-1]:
+            # w is the target
+            if w == ws[-1]:
+                self.append(g, ws)
+            # w is a control
+            # elif w in ws[:-1]:
+            #     self.append(g, ws)
+            else:
+                g_comp.append((g, ws))
+
+        self.barrier(label=f"EU{w}")
+        self.gates_computed = g_comp[::-1]
+
+    # def uncompute(self):
+    #     """Uncompute released ancilla qubits"""
+
+    #     g_comp = []
+    #     self.barrier(label=f"U{''.join(map(str,self.uncomputable))}")
+    #     for g, ws in self.gates_computed[::-1]:
+    #         # w is the target
+    #         if ws[-1] in self.uncomputable:
+    #             self.append(g, ws)
+    #         # w is a control
+    #         # elif w in ws[:-1]:
+    #         #     self.append(g, ws)
+    #         else:
+    #             g_comp.append((g, ws))
+
+    #     self.barrier(label=f"EU{''.join(map(str,self.uncomputable))}")
+    #     self.gates_computed = g_comp[::-1]
 
     def map_qubit(self, name, index, promote=False):
         """Map a name to a qubit
@@ -111,8 +157,8 @@ class QCircuit:
         # if name in self.qubit_map:
         #     raise Exception(f'Name "{name}" already mapped (to {self.qubit_map[name]})')
 
-        if promote and index in self.ancillas:
-            self.ancillas.remove(index)
+        if promote and index in self.ancilla_lst:
+            self.ancilla_lst.remove(index)
 
         self.qubit_map[name] = index
 
@@ -151,10 +197,11 @@ class QCircuit:
                 raise Exception(f"qubit {x} not present")
 
         self.gates.append((gate_name, qubits))
+        self.gates_computed.append((gate_name, qubits))
 
-    def barrier(self):
+    def barrier(self, label=None):
         """Add a barrier to the circuit"""
-        self.append("bar")
+        self.gates.append(("bar", label))
 
     def x(self, w: int):
         """X gate"""
@@ -239,12 +286,13 @@ class QCircuit:
                 qc.ccx(w[0], w[1], w[2])
             elif g == "mcx":
                 qc.mcx(w[0:-1], w[-1])
-            elif g == "bar":
-                qc.barrier()
+            elif g == "bar" and mode != "gate":
+                qc.barrier(label=w)
             elif g == "fredkin":
                 qc.fredkin(w[0], w[1], w[2])
 
         if mode == "gate":
+            qc.remove_final_measurements()
             gate = qc.to_gate()
             gate.name = self.name
             return gate
@@ -295,3 +343,7 @@ class QCircuit:
             return self.__qasm_export(mode)
         else:
             raise Exception(f"Framework {framework} not supported")
+
+    def draw(self):
+        qc = self.export("circuit", "qiskit")
+        print(qc.draw("text"))

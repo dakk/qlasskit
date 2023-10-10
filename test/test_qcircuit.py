@@ -38,6 +38,32 @@ class TestQCircuit(unittest.TestCase):
         self.assertEqual(qc.gates, [("ccx", [0, 1, 2])])
 
 
+class TestQCircuitUncomputing(unittest.TestCase):
+    def test1(self):
+        qc = QCircuit()
+        a, b, c, d = qc.add_qubit(), qc.add_qubit(), qc.add_ancilla(), qc.add_ancilla()
+        f = qc.add_qubit("res")
+        qc.mcx([a, b], c)
+        qc.mcx([a, b, c], d)
+        qc.cx(d, f)
+        qc.uncompute(c)
+        qc.uncompute(d)  # this is invalidated
+        qc.draw()
+
+    def test2(self):
+        qc = QCircuit()
+        q = [qc.add_qubit() for x in range(4)]
+        a = [qc.add_ancilla() for x in range(4)]
+        r = qc.add_qubit()
+
+        qc.mcx(q, a[0])
+        qc.mcx(q + [a[0]], a[1])
+        qc.mcx(q + a[:1], a[2])
+        qc.mcx(q + a[:2], a[3])
+        qc.cx(a[3], r)
+        qc.draw()
+
+
 class TestQCircuitExport(unittest.TestCase):
     def test_export_qasm(self):
         qc = QCircuit()

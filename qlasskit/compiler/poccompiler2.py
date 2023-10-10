@@ -33,7 +33,8 @@ class POCCompiler2(Compiler):
 
         for sym, exp in exprs:
             iret = self.compile_expr(qc, self._symplify_exp(exp))
-            qc.map_qubit(sym, iret)
+            print("iret", iret)
+            qc.map_qubit(sym, iret, promote=True)
 
         return qc
 
@@ -44,32 +45,51 @@ class POCCompiler2(Compiler):
         elif isinstance(expr, Not):
             fa = qc.get_free_ancilla()
             eret = self.compile_expr(qc, expr.args[0])
-            qc.x(eret)
+
+            qc.barrier("not")
+
             qc.cx(eret, fa)
-            qc.x(eret)
+            qc.x(fa)
+
+            #qc.free_ancilla(eret)
+
             return fa
 
         elif isinstance(expr, And):
             erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))
             fa = qc.get_free_ancilla()
+
+            qc.barrier("and")
+
             qc.mcx(erets, fa)
+
+            qc.free_ancillas(erets)
+
             return fa
 
         elif isinstance(expr, Or):
-            nclau = len(expr.args)
-            iclau = list(map(lambda e: self.compile_expr(qc, e), expr.args))
-            fa = qc.get_free_ancilla()
+            # Translate or to and
+            expr = Not(And(*[Not(e) for e in expr.args]))
+            return self.compile_expr(qc, expr)
 
-            for i in range(nclau):
-                for j in range(i + 1, nclau - i):
-                    qc.x(iclau[j])
+        # OLD TRANSLATOR
+        # elif isinstance(expr, Or):
+        #     nclau = len(expr.args)
+        #     iclau = list(map(lambda e: self.compile_expr(qc, e), expr.args))
+        #     fa = qc.get_free_ancilla()
 
-                qc.mcx(iclau[i:], fa)
+        #     for i in range(nclau):
+        #         for j in range(i + 1, nclau - i):
+        #             qc.x(iclau[j])
 
-                for j in range(i + 1, nclau - i):
-                    qc.x(iclau[j])
+        #         qc.mcx(iclau[i:], fa)
 
-            return fa
+        #         for j in range(i + 1, nclau - i):
+        #             qc.x(iclau[j])
+
+        #     qc.free_ancillas(iclau)
+
+        #     return fa
 
         elif isinstance(expr, BooleanFalse) or isinstance(expr, BooleanTrue):
             raise CompilerException("Constant in expression is not allowed")

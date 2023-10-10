@@ -63,6 +63,20 @@ class TestQlassfTruthTable(unittest.TestCase):
             ],
         )
 
+    def test_or_not_truth(self):
+        f = "def test(a: bool, b: bool) -> bool:\n\treturn a or b"
+        qf = qlassf(f, to_compile=False)
+        tt = qf.truth_table()
+        self.assertEqual(
+            tt,
+            [
+                [False, False, False],
+                [False, True, True],
+                [True, False, True],
+                [True, True, True],
+            ],
+        )
+
     def test_big_truth(self):
         f = "def test(a: Qint4) -> Qint4:\n\treturn a"
         qf = qlassf(f, to_compile=False)

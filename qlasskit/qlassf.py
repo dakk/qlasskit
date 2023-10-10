@@ -100,6 +100,11 @@ class QlassF:
             exprs=self.expressions,
         )
 
+    def circuit(self):
+        if self._compiled_gate is None:
+            raise Exception("Not yet compiled")
+        return self._compiled_gate
+
     def gate(self, framework="qiskit"):
         """Returns the gate for a specific framework"""
         if self._compiled_gate is None:

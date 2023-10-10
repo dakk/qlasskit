@@ -48,6 +48,6 @@ class TestCompiler(unittest.TestCase):
         compare_circuit_truth_table(self, qf)
 
     def test_or_not(self):
-        f = "def test(a: bool, b: bool) -> bool:\n\treturn a or not b"
+        f = "def test(a: bool, b: bool) -> bool:\n\treturn not a or b"
         qf = qlassf(f, to_compile=True)
         compare_circuit_truth_table(self, qf)
