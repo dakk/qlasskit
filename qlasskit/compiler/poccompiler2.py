@@ -26,6 +26,13 @@ from . import Compiler, CompilerException
 class POCCompiler2(Compiler):
     """POC2 compiler translating an expression list to quantum circuit"""
 
+    def garbage_collect(self, qc):
+        uncomputed = qc.uncompute()
+
+        for k in self.mapped.keys():
+            if self.mapped[k] in uncomputed:
+                del self.mapped[k]
+
     def compile(self, name, args: Args, ret_size: int, exprs: BoolExpList) -> QCircuit:
         qc = QCircuit(name=name)
 
@@ -40,11 +47,8 @@ class POCCompiler2(Compiler):
             iret = self.compile_expr(qc, self._symplify_exp(exp))
             # print("iret", iret)
             qc.map_qubit(sym, iret, promote=True)
-            uncomputed = qc.uncompute()
 
-            for k in self.mapped.keys():
-                if self.mapped[k] in uncomputed:
-                    del self.mapped[k]
+            self.garbage_collect(qc)
 
         return qc
 
@@ -53,7 +57,7 @@ class POCCompiler2(Compiler):
             return qc[expr.name]
 
         elif expr in self.mapped:
-            print("!!cachehit!!", expr)
+            # print("!!cachehit!!", expr)
             return self.mapped[expr]
 
         elif isinstance(expr, Not):
@@ -65,9 +69,8 @@ class POCCompiler2(Compiler):
             qc.cx(eret, fa)
             qc.x(fa)
 
-            qc.uncompute()
-
             qc.mark_ancilla(eret)
+            self.garbage_collect(qc)
 
             self.mapped[expr] = fa
 
@@ -81,9 +84,10 @@ class POCCompiler2(Compiler):
 
             qc.mcx(erets, fa)
 
-            qc.uncompute()
-
             [qc.mark_ancilla(eret) for eret in erets]
+
+            self.garbage_collect(qc)
+
             self.mapped[expr] = fa
 
             return fa
