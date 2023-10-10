@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License..
 
+from typing import Dict
+
 from sympy import Symbol
 from sympy.logic import And, Not, Or
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
@@ -25,19 +27,24 @@ class POCCompiler2(Compiler):
     """POC2 compiler translating an expression list to quantum circuit"""
 
     def compile(self, name, args: Args, ret_size: int, exprs: BoolExpList) -> QCircuit:
-        self.mapped_not = {}
         qc = QCircuit(name=name)
 
         for arg in args:
             for arg_b in arg.bitvec:
                 qc.add_qubit(arg_b)
 
+        self.mapped: Dict[Boolean, int] = {}
+
         for sym, exp in exprs:
-            print(sym, exp, self._symplify_exp(exp))
+            # print(sym, self._symplify_exp(exp))
             iret = self.compile_expr(qc, self._symplify_exp(exp))
-            print("iret", iret)
+            # print("iret", iret)
             qc.map_qubit(sym, iret, promote=True)
-            qc.uncompute2()
+            uncomputed = qc.uncompute()
+
+            for k in self.mapped.keys():
+                if self.mapped[k] in uncomputed:
+                    del self.mapped[k]
 
         return qc
 
@@ -45,12 +52,9 @@ class POCCompiler2(Compiler):
         if isinstance(expr, Symbol):
             return qc[expr.name]
 
-        elif (
-            isinstance(expr, Not)
-            and isinstance(expr.args[0], Symbol)
-            and expr.args[0] in self.mapped_not
-        ):
-            return self.mapped_not[expr.args[0]]
+        elif expr in self.mapped:
+            print("!!cachehit!!", expr)
+            return self.mapped[expr]
 
         elif isinstance(expr, Not):
             fa = qc.get_free_ancilla()
@@ -61,13 +65,11 @@ class POCCompiler2(Compiler):
             qc.cx(eret, fa)
             qc.x(fa)
 
-            qc.uncompute2()
+            qc.uncompute()
 
             qc.mark_ancilla(eret)
-            # qc.free_ancilla(eret)
 
-            if isinstance(expr.args[0], Symbol):
-                self.mapped_not[expr.args[0]] = fa
+            self.mapped[expr] = fa
 
             return fa
 
@@ -79,17 +81,17 @@ class POCCompiler2(Compiler):
 
             qc.mcx(erets, fa)
 
-            qc.uncompute2()
+            qc.uncompute()
 
             [qc.mark_ancilla(eret) for eret in erets]
-            # qc.free_ancillas(erets)
+            self.mapped[expr] = fa
 
             return fa
 
         elif isinstance(expr, Or):
             # Translate or to and
             expr = Not(And(*[Not(e) for e in expr.args]))
-            print("trans", expr)
+            # print("trans", expr)
             return self.compile_expr(qc, expr)
 
         # OLD TRANSLATOR
@@ -106,8 +108,6 @@ class POCCompiler2(Compiler):
 
         #         for j in range(i + 1, nclau - i):
         #             qc.x(iclau[j])
-
-        #     qc.free_ancillas(iclau)
 
         #     return fa
 
