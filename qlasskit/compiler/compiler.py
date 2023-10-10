@@ -48,8 +48,16 @@ def optimizer(expr: Boolean) -> Boolean:
         and len(expr.args) == 2
         and isinstance(expr.args[0], And)
         and isinstance(expr.args[1], And)
-        and expr.args[1].args[0] == Not(expr.args[0].args[0])
-        and expr.args[1].args[1] == Not(expr.args[0].args[1])
+        and (
+            (
+                expr.args[1].args[0] == Not(expr.args[0].args[0])
+                and expr.args[1].args[1] == Not(expr.args[0].args[1])
+            )
+            or (
+                Not(expr.args[1].args[0]) == expr.args[0].args[0]
+                and Not(expr.args[1].args[1]) == expr.args[0].args[1]
+            )
+        )
     ):
         a = optimizer(expr.args[0].args[0])
         b = optimizer(expr.args[0].args[1])
@@ -66,7 +74,7 @@ def optimizer(expr: Boolean) -> Boolean:
         raise CompilerException("Constant in expression is not allowed")
 
     else:
-        return expr
+        raise Exception(expr)
 
 
 class Compiler:
@@ -74,7 +82,7 @@ class Compiler:
         self.qmap = {}
 
     def _symplify_exp(self, exp):
-        exp = simplify_logic(exp)
+        exp = simplify_logic(exp)  # TODO: remove this
         exp = optimizer(exp)
         print("exp3", exp)
         return exp
