@@ -63,20 +63,20 @@ def compare_circuit_truth_table(cls, qf):
         for i in range(qf.input_size):
             qc.initialize(1 if truth_line[i] else 0, i)
 
-        #(truth_line)
+        # (truth_line)
 
         qc.append(gate, list(range(qf.num_qubits)))
         # print(qc.decompose().draw("text"))
-        print(circ_qi.draw("text"))
+        # print(circ_qi.draw("text"))
 
         counts = qiskit_measure_and_count(qc)
-        #print(counts, circ.qubit_map)
+        # print(counts, circ.qubit_map)
 
         truth_str = "".join(
             map(lambda x: "1" if x else "0", truth_line[-qf.ret_size :])
         )
 
-        #print(truth_str)
+        # print(truth_str)
 
         res = list(counts.keys())[0][::-1]
         res_str = ""
@@ -84,7 +84,7 @@ def compare_circuit_truth_table(cls, qf):
             res_str += res[circ.qubit_map[qname]]
 
         # res = res[0 : len(truth_str)][::-1]
-        #print(res_str)
+        # print(res_str)
 
         cls.assertEqual(len(counts), 1)
         cls.assertEqual(truth_str, res_str)

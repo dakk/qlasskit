@@ -38,7 +38,7 @@ class Compiler:
 
         # Simplify the expression
         exp = simplify(exp)
-        exp = boolalg.to_cnf(exp)
+        # exp = boolalg.to_cnf(exp)
         return exp
 
     def compile(

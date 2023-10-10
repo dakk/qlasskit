@@ -99,6 +99,25 @@ class QCircuit:
 
         return anc
 
+    marked = []
+
+    def mark_ancilla(self, w):
+        self.marked.append(w)
+
+    def uncompute2(self):
+        print("uncomputing", self.ancilla_lst - self.free_ancilla_lst, self.marked)
+        for g, ws in self.gates_computed[::-1]:
+            if (
+                ws[-1] in self.marked
+                and ws[-1] in self.ancilla_lst
+                and ws[-1] not in self.free_ancilla_lst
+            ):
+                self.append(g, ws)
+                self.free_ancilla_lst.add(ws[-1])
+
+        self.marked = []
+        self.gates_computed = []
+
     def uncompute(self, w):
         """Uncompute a specific ancilla qubit.
 

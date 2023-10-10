@@ -25,6 +25,7 @@ class POCCompiler2(Compiler):
     """POC2 compiler translating an expression list to quantum circuit"""
 
     def compile(self, name, args: Args, ret_size: int, exprs: BoolExpList) -> QCircuit:
+        self.mapped_not = {}
         qc = QCircuit(name=name)
 
         for arg in args:
@@ -32,15 +33,24 @@ class POCCompiler2(Compiler):
                 qc.add_qubit(arg_b)
 
         for sym, exp in exprs:
+            print(sym, exp, self._symplify_exp(exp))
             iret = self.compile_expr(qc, self._symplify_exp(exp))
             print("iret", iret)
             qc.map_qubit(sym, iret, promote=True)
+            qc.uncompute2()
 
         return qc
 
     def compile_expr(self, qc: QCircuit, expr: Boolean) -> int:
         if isinstance(expr, Symbol):
             return qc[expr.name]
+
+        elif (
+            isinstance(expr, Not)
+            and isinstance(expr.args[0], Symbol)
+            and expr.args[0] in self.mapped_not
+        ):
+            return self.mapped_not[expr.args[0]]
 
         elif isinstance(expr, Not):
             fa = qc.get_free_ancilla()
@@ -51,7 +61,13 @@ class POCCompiler2(Compiler):
             qc.cx(eret, fa)
             qc.x(fa)
 
-            #qc.free_ancilla(eret)
+            qc.uncompute2()
+
+            qc.mark_ancilla(eret)
+            # qc.free_ancilla(eret)
+
+            if isinstance(expr.args[0], Symbol):
+                self.mapped_not[expr.args[0]] = fa
 
             return fa
 
@@ -63,13 +79,17 @@ class POCCompiler2(Compiler):
 
             qc.mcx(erets, fa)
 
-            qc.free_ancillas(erets)
+            qc.uncompute2()
+
+            [qc.mark_ancilla(eret) for eret in erets]
+            # qc.free_ancillas(erets)
 
             return fa
 
         elif isinstance(expr, Or):
             # Translate or to and
             expr = Not(And(*[Not(e) for e in expr.args]))
+            print("trans", expr)
             return self.compile_expr(qc, expr)
 
         # OLD TRANSLATOR
