@@ -15,8 +15,8 @@
 from typing import Dict
 
 from sympy import Symbol
-from sympy.logic import And, Not, Or
-from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
+from sympy.logic import And, Not, Xor
+from sympy.logic.boolalg import Boolean
 
 from .. import QCircuit
 from ..ast2logic.typing import Args, BoolExpList
@@ -43,7 +43,7 @@ class POCCompiler2(Compiler):
         self.mapped: Dict[Boolean, int] = {}
 
         for sym, exp in exprs:
-            # print(sym, self._symplify_exp(exp))
+            print(sym, self._symplify_exp(exp))
             iret = self.compile_expr(qc, self._symplify_exp(exp))
             # print("iret", iret)
             qc.map_qubit(sym, iret, promote=True)
@@ -92,31 +92,10 @@ class POCCompiler2(Compiler):
 
             return fa
 
-        elif isinstance(expr, Or):
-            # Translate or to and
-            expr = Not(And(*[Not(e) for e in expr.args]))
-            # print("trans", expr)
-            return self.compile_expr(qc, expr)
-
-        # OLD TRANSLATOR
-        # elif isinstance(expr, Or):
-        #     nclau = len(expr.args)
-        #     iclau = list(map(lambda e: self.compile_expr(qc, e), expr.args))
-        #     fa = qc.get_free_ancilla()
-
-        #     for i in range(nclau):
-        #         for j in range(i + 1, nclau - i):
-        #             qc.x(iclau[j])
-
-        #         qc.mcx(iclau[i:], fa)
-
-        #         for j in range(i + 1, nclau - i):
-        #             qc.x(iclau[j])
-
-        #     return fa
-
-        elif isinstance(expr, BooleanFalse) or isinstance(expr, BooleanTrue):
-            raise CompilerException("Constant in expression is not allowed")
+        elif isinstance(expr, Xor):
+            erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))
+            qc.mcx(erets[0:-1], erets[-1])
+            return erets[-1]
 
         else:
             raise CompilerException(expr)

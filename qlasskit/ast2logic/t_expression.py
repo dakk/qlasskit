@@ -18,7 +18,7 @@ from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, false, true
 
 from . import Env, exceptions
-from .typing import Qint, Qint2, Qint4, Qint8, Qint12, Qint16, TExp
+from .typing import Qint, Qint2, Qint4, Qint8, Qint12, Qint16, TExp, bool_eq, bool_neq
 
 
 def type_of_exp(vlist, base, res=[]) -> List[Symbol]:
@@ -173,10 +173,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         # Eq
         if isinstance(expr.ops[0], ast.Eq):
             if tleft[0] == bool and tcomp[0] == bool:
-                return (
-                    bool,
-                    Or(And(tleft[1], tcomp[1]), And(Not(tleft[1]), Not(tcomp[1]))),
-                )
+                return (bool, bool_eq(tleft[1], tcomp[1]))
             elif issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
                 return Qint.eq(tleft, tcomp)
 
@@ -185,10 +182,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         # NotEq
         elif isinstance(expr.ops[0], ast.NotEq):
             if tleft[0] == bool and tcomp[0] == bool:
-                return (
-                    bool,
-                    Not(Or(And(tleft[1], tcomp[1]), And(Not(tleft[1]), Not(tcomp[1])))),
-                )
+                return (bool, bool_neq(tleft[1], tcomp[1]))
             elif issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
                 return Qint.not_eq(tleft, tcomp)
 

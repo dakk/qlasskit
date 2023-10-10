@@ -15,7 +15,7 @@
 from typing import List, Tuple
 
 from sympy import Symbol
-from sympy.logic import And, Not, Or, false, true
+from sympy.logic import And, Not, Or, Xor, false, true
 from sympy.logic.boolalg import Boolean
 from typing_extensions import TypeAlias
 
@@ -25,8 +25,14 @@ TType: TypeAlias = object
 TExp: TypeAlias = Tuple[TType, Boolean]
 
 
-def xnor(a, b):
-    return Or(And(a, b), And(Not(a), Not(b)))
+# XOR
+def bool_neq(a, b):
+    return Xor(a, b)
+
+
+# !XOR
+def bool_eq(a, b):
+    return Not(bool_neq(a, b))
 
 
 class Arg:
@@ -83,7 +89,7 @@ class Qint(int, Qtype):
         """Compare two Qint for equality"""
         ex = true
         for x in zip(tleft[1], tcomp[1]):
-            ex = And(ex, xnor(x[0], x[1]))
+            ex = And(ex, bool_eq(x[0], x[1]))
 
         if len(tleft[1]) > len(tcomp[1]):
             for x in tleft[1][len(tcomp[1]) :]:
@@ -98,7 +104,19 @@ class Qint(int, Qtype):
     @staticmethod
     def not_eq(tleft: TExp, tcomp: TExp) -> TExp:
         """Compare two Qint for inequality"""
-        return (bool, Not(Qint.eq(tleft, tcomp)[1]))
+        ex = false
+        for x in zip(tleft[1], tcomp[1]):
+            ex = Or(ex, bool_neq(x[0], x[1]))
+
+        if len(tleft[1]) > len(tcomp[1]):
+            for x in tleft[1][len(tcomp[1]) :]:
+                ex = Or(ex, x)
+
+        if len(tleft[1]) < len(tcomp[1]):
+            for x in tcomp[1][len(tleft[1]) :]:
+                ex = Or(ex, x)
+
+        return (bool, ex)
 
     @staticmethod
     def gt(tleft: TExp, tcomp: TExp) -> TExp:

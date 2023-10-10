@@ -53,8 +53,7 @@ def compare_circuit_truth_table(cls, qf):
     gate = qf.gate()
     circ = qf.circuit()
     circ_qi = circ.export("circuit", "qiskit")
-
-    # cls.assertLessEqual(gate.num_qubits, len(qf.truth_table_header()))
+    print(circ_qi.draw("text"))
 
     for truth_line in truth_table:
         qc = QuantumCircuit(gate.num_qubits)
@@ -67,7 +66,6 @@ def compare_circuit_truth_table(cls, qf):
 
         qc.append(gate, list(range(qf.num_qubits)))
         # print(qc.decompose().draw("text"))
-        # print(circ_qi.draw("text"))
 
         counts = qiskit_measure_and_count(qc)
         # print(counts, circ.qubit_map)
@@ -88,3 +86,5 @@ def compare_circuit_truth_table(cls, qf):
 
         cls.assertEqual(len(counts), 1)
         cls.assertEqual(truth_str, res_str)
+
+    # cls.assertLessEqual(gate.num_qubits, len(qf.truth_table_header()))

@@ -15,7 +15,7 @@
 import unittest
 
 from sympy import Symbol, symbols
-from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
+from sympy.logic import ITE, And, Not, Or, Xor, false, simplify_logic, true
 
 from qlasskit import QlassF, exceptions, qlassf
 
@@ -35,7 +35,7 @@ class TestQlassfInt(unittest.TestCase):
         # compare_circuit_truth_table(self, qf)
 
     def test_int_arg2(self):
-        f = "def test(a: Qint2, b: bool) -> bool:\n\treturn True if a[0] and b else a[1]"
+        f = "def test(a: Qint2, b: bool) -> bool:\n\treturn True if (a[0] and b) else a[1]"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
@@ -127,21 +127,19 @@ class TestQlassfInt(unittest.TestCase):
 
     def test_const_int_compare_neq_different_type(self):
         f = "def test(a: Qint4) -> bool:\n\treturn 2 != a"
-        qf = qlassf(f, to_compile=False)  # TODO: fix COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
             qf.expressions[0][1],
-            Not(
-                And(
-                    Symbol("a.0"),
-                    Not(Symbol("a.1")),
-                    Not(Symbol("a.2")),
-                    Not(Symbol("a.3")),
-                )
+            Or(
+                Not(Symbol("a.0")),
+                Symbol("a.1"),
+                Symbol("a.2"),
+                Symbol("a.3"),
             ),
         )
-        # compare_circuit_truth_table(self, qf)
+        compare_circuit_truth_table(self, qf)
 
     def test_int_int_compare_eq(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a == b"
@@ -151,63 +149,25 @@ class TestQlassfInt(unittest.TestCase):
         self.assertEqual(
             qf.expressions[0][1],
             And(
-                Or(
-                    And(
-                        Symbol("a.0"),
-                        Symbol("b.0"),
-                    ),
-                    And(
-                        Not(Symbol("a.0")),
-                        Not(Symbol("b.0")),
-                    ),
-                ),
-                Or(
-                    And(
-                        Symbol("a.1"),
-                        Symbol("b.1"),
-                    ),
-                    And(
-                        Not(Symbol("a.1")),
-                        Not(Symbol("b.1")),
-                    ),
-                ),
+                Not(Xor(Symbol("a.0"), Symbol("b.0"))),
+                Not(Xor(Symbol("a.1"), Symbol("b.1"))),
             ),
         )
         compare_circuit_truth_table(self, qf)
 
     def test_int_int_compare_neq(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a != b"
-        qf = qlassf(f, to_compile=False)  # TODO: fix
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
             qf.expressions[0][1],
-            Not(
-                And(
-                    Or(
-                        And(
-                            Symbol("a.0"),
-                            Symbol("b.0"),
-                        ),
-                        And(
-                            Not(Symbol("a.0")),
-                            Not(Symbol("b.0")),
-                        ),
-                    ),
-                    Or(
-                        And(
-                            Symbol("a.1"),
-                            Symbol("b.1"),
-                        ),
-                        And(
-                            Not(Symbol("a.1")),
-                            Not(Symbol("b.1")),
-                        ),
-                    ),
-                )
+            Or(
+                Xor(Symbol("a.0"), Symbol("b.0")),
+                Xor(Symbol("a.1"), Symbol("b.1")),
             ),
         )
-        # compare_circuit_truth_table(self, qf)
+        compare_circuit_truth_table(self, qf)
 
     def test_const_int_compare_gt(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a > b"

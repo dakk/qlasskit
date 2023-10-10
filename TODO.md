@@ -38,7 +38,7 @@
 ### Week 3: (9 Oct 23)
 - [ ] Test circuit and boolexp using the python code as reference
 - [ ] Fix structure and typing location
-- [ ] Qubit garbage uncomputing and recycling
+- [x] Qubit garbage uncomputing and recycling
 - [ ] Test: add qubit usage check
 - [ ] Compiler: remove consecutive X gates
 - [ ] Properly render documentation
