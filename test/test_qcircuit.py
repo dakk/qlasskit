@@ -41,19 +41,23 @@ class TestQCircuit(unittest.TestCase):
 class TestQCircuitUncomputing(unittest.TestCase):
     def test1(self):
         qc = QCircuit()
-        a, b, c, d = qc.add_qubit(), qc.add_qubit(), qc.add_ancilla(), qc.add_ancilla()
+        a, b, c, d = (
+            qc.add_qubit(),
+            qc.add_qubit(),
+            qc.add_ancilla(is_free=False),
+            qc.add_ancilla(is_free=False),
+        )
         f = qc.add_qubit("res")
         qc.mcx([a, b], c)
         qc.mcx([a, b, c], d)
         qc.cx(d, f)
-        qc.uncompute(c)
-        qc.uncompute(d)  # this is invalidated
+        qc.uncompute([c, d])
         qc.draw()
 
     def test2(self):
         qc = QCircuit()
         q = [qc.add_qubit() for x in range(4)]
-        a = [qc.add_ancilla() for x in range(4)]
+        a = [qc.add_ancilla(is_free=False) for x in range(4)]
         r = qc.add_qubit()
 
         qc.mcx(q, a[0])
@@ -61,6 +65,7 @@ class TestQCircuitUncomputing(unittest.TestCase):
         qc.mcx(q + a[:1], a[2])
         qc.mcx(q + a[:2], a[3])
         qc.cx(a[3], r)
+        qc.uncompute(a)
         qc.draw()
 
 

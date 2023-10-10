@@ -34,6 +34,7 @@ class QCircuit:
 
         self.ancilla_lst = set()
         self.free_ancilla_lst = set()
+        self.marked_ancillas = []
 
         for x in range(num_qubits):
             self.qubit_map[f"q{x}"] = x
@@ -72,24 +73,6 @@ class QCircuit:
             self.free_ancilla_lst.add(i)
         return i
 
-    def free_ancilla(self, w):
-        """Freeing of an ancilla qubit"""
-        w = self[w]
-        if w not in self.ancilla_lst:
-            return  # we don't care
-            # raise Exception(f"Qubit {w} is not in the ancilla set")
-
-        if w in self.free_ancilla_lst:
-            raise Exception(f"Ancilla {w} is already free")
-
-        self.uncompute(w)
-        self.free_ancilla_lst.add(w)
-
-    def free_ancillas(self, wl):
-        """Freeing of a list of ancilla qubits"""
-        for w in wl:
-            self.free_ancilla(w)
-
     def get_free_ancilla(self):
         """Get the first free ancilla available"""
         if len(self.free_ancilla_lst) == 0:
@@ -99,50 +82,27 @@ class QCircuit:
 
         return anc
 
-    def uncompute(self, w):
-        """Uncompute a specific ancilla qubit.
+    def mark_ancilla(self, w):
+        self.marked_ancillas.append(w)
 
-        Args:
-            w (int): The index of the qubit to be uncomputed.
-        """
-        w = self[w]
-        if w not in self.ancilla_lst:
-            raise Exception("qubit not in the ancilla list")
+    def uncompute(self, to_mark=[]):
+        """Uncompute all the marked ancillas plus the to_mark list"""
+        [self.mark_ancilla(x) for x in to_mark]
 
-        print("uncomputing ", w)
-
-        g_comp = []
-        self.barrier(label=f"U{w}")
+        uncomputed = set()
         for g, ws in self.gates_computed[::-1]:
-            # w is the target
-            if w == ws[-1]:
+            if (
+                ws[-1] in self.marked_ancillas
+                and ws[-1] in self.ancilla_lst
+                and ws[-1] not in self.free_ancilla_lst
+            ):
+                uncomputed.add(ws[-1])
                 self.append(g, ws)
-            # w is a control
-            # elif w in ws[:-1]:
-            #     self.append(g, ws)
-            else:
-                g_comp.append((g, ws))
+                self.free_ancilla_lst.add(ws[-1])
 
-        self.barrier(label=f"EU{w}")
-        self.gates_computed = g_comp[::-1]
-
-    # def uncompute(self):
-    #     """Uncompute released ancilla qubits"""
-
-    #     g_comp = []
-    #     self.barrier(label=f"U{''.join(map(str,self.uncomputable))}")
-    #     for g, ws in self.gates_computed[::-1]:
-    #         # w is the target
-    #         if ws[-1] in self.uncomputable:
-    #             self.append(g, ws)
-    #         # w is a control
-    #         # elif w in ws[:-1]:
-    #         #     self.append(g, ws)
-    #         else:
-    #             g_comp.append((g, ws))
-
-    #     self.barrier(label=f"EU{''.join(map(str,self.uncomputable))}")
-    #     self.gates_computed = g_comp[::-1]
+        self.marked_ancillas = []  # self.marked_ancillas - uncomputed
+        self.gates_computed = []
+        return uncomputed
 
     def map_qubit(self, name, index, promote=False):
         """Map a name to a qubit

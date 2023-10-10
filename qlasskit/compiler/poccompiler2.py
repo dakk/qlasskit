@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License..
 
+from typing import Dict
+
 from sympy import Symbol
 from sympy.logic import And, Not, Or
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
@@ -31,16 +33,28 @@ class POCCompiler2(Compiler):
             for arg_b in arg.bitvec:
                 qc.add_qubit(arg_b)
 
+        self.mapped: Dict[Boolean, int] = {}
+
         for sym, exp in exprs:
+            # print(sym, self._symplify_exp(exp))
             iret = self.compile_expr(qc, self._symplify_exp(exp))
-            print("iret", iret)
+            # print("iret", iret)
             qc.map_qubit(sym, iret, promote=True)
+            uncomputed = qc.uncompute()
+
+            for k in self.mapped.keys():
+                if self.mapped[k] in uncomputed:
+                    del self.mapped[k]
 
         return qc
 
     def compile_expr(self, qc: QCircuit, expr: Boolean) -> int:
         if isinstance(expr, Symbol):
             return qc[expr.name]
+
+        elif expr in self.mapped:
+            print("!!cachehit!!", expr)
+            return self.mapped[expr]
 
         elif isinstance(expr, Not):
             fa = qc.get_free_ancilla()
@@ -51,7 +65,11 @@ class POCCompiler2(Compiler):
             qc.cx(eret, fa)
             qc.x(fa)
 
-            #qc.free_ancilla(eret)
+            qc.uncompute()
+
+            qc.mark_ancilla(eret)
+
+            self.mapped[expr] = fa
 
             return fa
 
@@ -63,13 +81,17 @@ class POCCompiler2(Compiler):
 
             qc.mcx(erets, fa)
 
-            qc.free_ancillas(erets)
+            qc.uncompute()
+
+            [qc.mark_ancilla(eret) for eret in erets]
+            self.mapped[expr] = fa
 
             return fa
 
         elif isinstance(expr, Or):
             # Translate or to and
             expr = Not(And(*[Not(e) for e in expr.args]))
+            # print("trans", expr)
             return self.compile_expr(qc, expr)
 
         # OLD TRANSLATOR
@@ -86,8 +108,6 @@ class POCCompiler2(Compiler):
 
         #         for j in range(i + 1, nclau - i):
         #             qc.x(iclau[j])
-
-        #     qc.free_ancillas(iclau)
 
         #     return fa
 

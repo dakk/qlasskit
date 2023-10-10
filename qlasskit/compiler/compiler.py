@@ -14,7 +14,7 @@
 
 
 from sympy import simplify, symbols
-from sympy.logic import ITE, And, Implies, Not, Or, boolalg
+from sympy.logic import ITE, And, Implies, Not, Or  # , boolalg
 
 from .. import QCircuit
 from ..ast2logic.typing import Args, BoolExpList
@@ -38,7 +38,7 @@ class Compiler:
 
         # Simplify the expression
         exp = simplify(exp)
-        exp = boolalg.to_cnf(exp)
+        # exp = boolalg.to_cnf(exp)
         return exp
 
     def compile(
