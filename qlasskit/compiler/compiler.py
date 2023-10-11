@@ -14,7 +14,7 @@
 
 
 from sympy import Symbol
-from sympy.logic import ITE, And, Implies, Not, Or, Xor, simplify_logic
+from sympy.logic import ITE, And, Implies, Not, Or, Xor  # , simplify_logic
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
 
 from .. import QCircuit
@@ -31,10 +31,12 @@ def optimizer(expr: Boolean) -> Boolean:
 
     elif isinstance(expr, ITE):
         c = optimizer(expr.args[0])
-        return Or(And(c, optimizer(expr.args[1])), And(Not(c), optimizer(expr.args[2])))
+        return optimizer(
+            Or(And(c, optimizer(expr.args[1])), And(Not(c), optimizer(expr.args[2])))
+        )
 
     elif isinstance(expr, Implies):
-        return Or(Not(optimizer(expr.args[0])), optimizer(expr.args[1]))
+        return optimizer(Or(Not(optimizer(expr.args[0])), optimizer(expr.args[1])))
 
     elif isinstance(expr, Not):
         return Not(optimizer(expr.args[0]))
@@ -82,7 +84,7 @@ class Compiler:
         self.qmap = {}
 
     def _symplify_exp(self, exp):
-        exp = simplify_logic(exp)  # TODO: remove this
+        # exp = simplify_logic(exp)  # TODO: remove this
         exp = optimizer(exp)
         # print("exp3", exp)
         return exp

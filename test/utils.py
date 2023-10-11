@@ -110,7 +110,7 @@ def compare_circuit_truth_table(cls, qf):
 
         res_original = qf.original_f(*args)
 
-        # print("Classical evalution", args, res_original)
+        print("\nClassical evalution", args, res_original)
 
         def res_to_str(res):
             if type(res) == bool:
@@ -121,8 +121,8 @@ def compare_circuit_truth_table(cls, qf):
                 return res.to_bool_str()
 
         res_original_str = res_to_str(res_original)
-        # print("Res (th, or)", res_str, res_original_str, truth_line)
-        # print(qf.expressions)
+        print("Res (th, or)", res_str, res_original_str, truth_line)
+        print(qf.expressions)
 
         cls.assertEqual(len(res_original_str), qf.ret_size)
         cls.assertEqual(res_str, res_original_str)

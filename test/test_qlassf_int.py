@@ -14,7 +14,6 @@
 
 import unittest
 
-import pytest
 from sympy import Symbol, symbols
 from sympy.logic import ITE, And, Not, Or, Xor, false, simplify_logic, true
 
@@ -26,7 +25,6 @@ a, b, c, d = symbols("a,b,c,d")
 _ret = Symbol("_ret")
 
 
-# @pytest.mark.parametrize("qint", [Qint2])
 class TestQlassfInt(unittest.TestCase):
     def test_int_arg(self):
         f = "def test(a: Qint2) -> bool:\n\treturn a[0]"
@@ -37,12 +35,13 @@ class TestQlassfInt(unittest.TestCase):
         # compare_circuit_truth_table(self, qf)
 
     def test_int_arg2(self):
-        f = "def test(a: Qint2, b: bool) -> bool:\n\treturn True if (a[0] and b) else a[1]"
+        f = "def test(a: Qint2, b: bool) -> bool:\n\treturn a[1] if (a[0] and b) else a[0]"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
-            qf.expressions[0][1], ITE(And(Symbol("a.0"), b), True, Symbol("a.1"))
+            qf.expressions[0][1],
+            ITE(And(Symbol("a.0"), b), Symbol("a.1"), Symbol("a.0")),
         )
         compare_circuit_truth_table(self, qf)
 
@@ -179,11 +178,18 @@ class TestQlassfInt(unittest.TestCase):
         compare_circuit_truth_table(self, qf)
 
     def test_const_int4_compare_gt(self):
-        f = "def test(a: Qint4) -> bool:\n\treturn a > 3"
+        f = "def test(a: Qint4) -> bool:\n\treturn a > 6"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         compare_circuit_truth_table(self, qf)
+
+    # def test_int4_int4_compare_gt(self):
+    #     f = "def test(a: Qint4, b: Qint4) -> bool:\n\treturn a > b"
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+    #     self.assertEqual(len(qf.expressions), 1)
+    #     self.assertEqual(qf.expressions[0][0], _ret)
+    #     compare_circuit_truth_table(self, qf)
 
     def test_const_int_compare_lt(self):
         f = "def test(a: Qint2) -> bool:\n\treturn a < 2"
@@ -192,12 +198,12 @@ class TestQlassfInt(unittest.TestCase):
         self.assertEqual(qf.expressions[0][0], _ret)
         compare_circuit_truth_table(self, qf)
 
-    # def test_const_int4_compare_lt(self):
-    #     f = "def test(a: Qint4) -> bool:\n\treturn a < 6"
-    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-    #     self.assertEqual(len(qf.expressions), 1)
-    #     self.assertEqual(qf.expressions[0][0], _ret)
-    #     compare_circuit_truth_table(self, qf)
+    def test_const_int4_compare_lt(self):
+        f = "def test(a: Qint4) -> bool:\n\treturn a < 6"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        compare_circuit_truth_table(self, qf)
 
     def test_int_int_compare_gt(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a > b"

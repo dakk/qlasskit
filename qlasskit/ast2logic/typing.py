@@ -136,20 +136,15 @@ class Qint(int, Qtype):
     @staticmethod
     def gt(tleft: TExp, tcomp: TExp) -> TExp:
         """Compare two Qint for greater than"""
-        ex = false
         prev: List[Symbol] = []
 
         for a, b in list(zip(tleft[1], tcomp[1]))[::-1]:
             if len(prev) == 0:
                 ex = And(a, Not(b))
             else:
-                ex = Or(
-                    ex,
-                    And(*([e for e in prev] + [Not(b), a])),
-                    And(*([Not(e) for e in prev] + [Not(b), a])),
-                )
+                ex = Or(ex, And(*(prev + [a, Not(b)])))
 
-            prev.extend([a, b])
+            prev.append(bool_eq(a, b))
 
         if len(tleft[1]) > len(tcomp[1]):
             for x in tleft[1][len(tcomp[1]) :]:
