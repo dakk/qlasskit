@@ -69,18 +69,33 @@ class Qint(int, Qtype):
         super().__init__()
         self.value = value
 
+    def __getitem__(self, i):
+        if i > self.BIT_SIZE:
+            raise Exception("Unbound")
+
+        return self.to_bool_str()[i] == "1"
+
+    @classmethod
+    def from_bool(cls, v: List[bool]):
+        return cls(int("".join(map(lambda x: "1" if x else "0", v[::-1])), 2))
+
+    def to_bool_str(self) -> str:
+        s = bin(self.value)[2:][0 : self.BIT_SIZE]
+        return ("0" * (self.BIT_SIZE - len(s)) + s)[::-1]
+
     @staticmethod
     def const(v: int) -> List[bool]:
         """Return the list of bool representing an int"""
-        return list(map(lambda c: True if c == "1" else False, bin(v)[2:]))
+        return list(map(lambda c: True if c == "1" else False, bin(v)[2:]))[::-1]
 
     @staticmethod
     def fill(v: Tuple[TType, List[bool]]) -> Tuple[TType, List[bool]]:
         """Fill a Qint to reach its bit_size"""
         if len(v[1]) < v[0].BIT_SIZE:  # type: ignore
+            print("fillused!")
             v = (
                 v[0],
-                [False] * (v[0].BIT_SIZE - len(v[1])) + v[1],  # type: ignore
+                (v[0].BIT_SIZE - len(v[1])) * v[1] + [False],  # type: ignore
             )
         return v
 
@@ -122,9 +137,27 @@ class Qint(int, Qtype):
     def gt(tleft: TExp, tcomp: TExp) -> TExp:
         """Compare two Qint for greater than"""
         ex = false
+        prev: List[Symbol] = []
 
-        for x in list(zip(tleft[1], tcomp[1]))[::-1]:
-            ex = Or(ex, And(Not(ex), And(Not(x[1]), x[0])))
+        for a, b in list(zip(tleft[1], tcomp[1]))[::-1]:
+            if len(prev) == 0:
+                ex = And(a, Not(b))
+            else:
+                ex = Or(
+                    ex,
+                    And(*([e for e in prev] + [Not(b), a])),
+                    And(*([Not(e) for e in prev] + [Not(b), a])),
+                )
+
+            prev.extend([a, b])
+
+        if len(tleft[1]) > len(tcomp[1]):
+            for x in tleft[1][len(tcomp[1]) :]:
+                ex = Or(ex, x)
+
+        if len(tleft[1]) < len(tcomp[1]):
+            for x in tcomp[1][len(tleft[1]) :]:
+                ex = Or(ex, x)
 
         return (bool, ex)
 

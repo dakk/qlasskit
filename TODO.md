@@ -36,12 +36,14 @@
 - [x] Typecheck all the expressions
 
 ### Week 3: (9 Oct 23)
-- [ ] Test circuit and boolexp using the python code as reference
-- [ ] Fix structure and typing location
+- [x] Test circuit and boolexp using the python code as reference
 - [x] Qubit garbage uncomputing and recycling
 - [ ] Test: add qubit usage check
 - [ ] Compiler: remove consecutive X gates
-- [ ] Properly render documentation
+- [ ] Doc: emphatize the compiler flow
+- [ ] Doc: properly render documentation
+- [ ] Fix structure and typing location
+- [ ] Parametrize qint tests over bit_size
 
 ### Week 4: (16 Oct 23)
 - [ ] Int arithmetic expressions (+, -, *, /)

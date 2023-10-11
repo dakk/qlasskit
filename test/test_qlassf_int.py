@@ -14,10 +14,11 @@
 
 import unittest
 
+import pytest
 from sympy import Symbol, symbols
 from sympy.logic import ITE, And, Not, Or, Xor, false, simplify_logic, true
 
-from qlasskit import QlassF, exceptions, qlassf
+from qlasskit import QlassF, exceptions, qlassf  # Qint2
 
 from .utils import COMPILATION_ENABLED, compare_circuit_truth_table
 
@@ -25,6 +26,7 @@ a, b, c, d = symbols("a,b,c,d")
 _ret = Symbol("_ret")
 
 
+# @pytest.mark.parametrize("qint", [Qint2])
 class TestQlassfInt(unittest.TestCase):
     def test_int_arg(self):
         f = "def test(a: Qint2) -> bool:\n\treturn a[0]"
@@ -90,7 +92,7 @@ class TestQlassfInt(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
-        self.assertEqual(qf.expressions[0][1], And(Symbol("a.0"), Not(Symbol("a.1"))))
+        self.assertEqual(qf.expressions[0][1], And(Symbol("a.1"), Not(Symbol("a.0"))))
         compare_circuit_truth_table(self, qf)
 
     def test_int_const_compare_eq_different_type(self):
@@ -101,8 +103,8 @@ class TestQlassfInt(unittest.TestCase):
         self.assertEqual(
             qf.expressions[0][1],
             And(
-                Symbol("a.0"),
-                Not(Symbol("a.1")),
+                Symbol("a.1"),
+                Not(Symbol("a.0")),
                 Not(Symbol("a.2")),
                 Not(Symbol("a.3")),
             ),
@@ -117,8 +119,8 @@ class TestQlassfInt(unittest.TestCase):
         self.assertEqual(
             qf.expressions[0][1],
             And(
-                Symbol("a.0"),
-                Not(Symbol("a.1")),
+                Symbol("a.1"),
+                Not(Symbol("a.0")),
                 Not(Symbol("a.2")),
                 Not(Symbol("a.3")),
             ),
@@ -133,8 +135,8 @@ class TestQlassfInt(unittest.TestCase):
         self.assertEqual(
             qf.expressions[0][1],
             Or(
-                Not(Symbol("a.0")),
-                Symbol("a.1"),
+                Not(Symbol("a.1")),
+                Symbol("a.0"),
                 Symbol("a.2"),
                 Symbol("a.3"),
             ),
@@ -170,13 +172,41 @@ class TestQlassfInt(unittest.TestCase):
         compare_circuit_truth_table(self, qf)
 
     def test_const_int_compare_gt(self):
-        f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a > b"
+        f = "def test(a: Qint2) -> bool:\n\treturn a > 1"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        compare_circuit_truth_table(self, qf)
+
+    def test_const_int4_compare_gt(self):
+        f = "def test(a: Qint4) -> bool:\n\treturn a > 3"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         compare_circuit_truth_table(self, qf)
 
     def test_const_int_compare_lt(self):
+        f = "def test(a: Qint2) -> bool:\n\treturn a < 2"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        compare_circuit_truth_table(self, qf)
+
+    # def test_const_int4_compare_lt(self):
+    #     f = "def test(a: Qint4) -> bool:\n\treturn a < 6"
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+    #     self.assertEqual(len(qf.expressions), 1)
+    #     self.assertEqual(qf.expressions[0][0], _ret)
+    #     compare_circuit_truth_table(self, qf)
+
+    def test_int_int_compare_gt(self):
+        f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a > b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        compare_circuit_truth_table(self, qf)
+
+    def test_int_int_compare_lt(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a < b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)

@@ -43,7 +43,7 @@ class POCCompiler2(Compiler):
         self.mapped: Dict[Boolean, int] = {}
 
         for sym, exp in exprs:
-            print(sym, self._symplify_exp(exp))
+            # print(sym, self._symplify_exp(exp))
             iret = self.compile_expr(qc, self._symplify_exp(exp))
             # print("iret", iret)
             qc.map_qubit(sym, iret, promote=True)

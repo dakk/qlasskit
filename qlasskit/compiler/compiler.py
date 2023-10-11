@@ -84,7 +84,7 @@ class Compiler:
     def _symplify_exp(self, exp):
         exp = simplify_logic(exp)  # TODO: remove this
         exp = optimizer(exp)
-        print("exp3", exp)
+        # print("exp3", exp)
         return exp
 
     def compile(

@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import inspect
+from typing import Tuple, get_args
+
 from qiskit import QuantumCircuit, transpile
 from qiskit_aer import Aer
 
-from qlasskit import QlassF
+from qlasskit import QlassF, Qtype
 
 COMPILATION_ENABLED = True
 
@@ -49,42 +52,79 @@ def qiskit_measure_and_count(circ, shots=1):
 def compare_circuit_truth_table(cls, qf):
     if not COMPILATION_ENABLED:
         return
+
     truth_table = qf.truth_table()
     gate = qf.gate()
     circ = qf.circuit()
     circ_qi = circ.export("circuit", "qiskit")
-    print(circ_qi.draw("text"))
+    # print(circ_qi.draw("text"))
 
     for truth_line in truth_table:
         qc = QuantumCircuit(gate.num_qubits)
 
         # Prepare inputs
-        for i in range(qf.input_size):
-            qc.initialize(1 if truth_line[i] else 0, i)
-
-        # (truth_line)
+        [qc.initialize(1 if truth_line[i] else 0, i) for i in range(qf.input_size)]
 
         qc.append(gate, list(range(qf.num_qubits)))
-        # print(qc.decompose().draw("text"))
 
+        # Measure
         counts = qiskit_measure_and_count(qc)
-        # print(counts, circ.qubit_map)
 
+        # Extract str of truthtable and result
         truth_str = "".join(
             map(lambda x: "1" if x else "0", truth_line[-qf.ret_size :])
         )
-
-        # print(truth_str)
 
         res = list(counts.keys())[0][::-1]
         res_str = ""
         for qname in qf.truth_table_header()[-qf.ret_size :]:
             res_str += res[circ.qubit_map[qname]]
 
-        # res = res[0 : len(truth_str)][::-1]
-        # print(res_str)
-
         cls.assertEqual(len(counts), 1)
         cls.assertEqual(truth_str, res_str)
+
+        # Calculate original result from python function
+        def truth_to_arg(truth, i, argtt):
+            # print(arg.ttype)
+            if argtt == bool:
+                return truth[i], i + 1
+            elif inspect.isclass(argtt) and issubclass(argtt, Qtype):
+                return (
+                    argtt.from_bool(truth[i : i + argtt.BIT_SIZE]),
+                    i + argtt.BIT_SIZE,
+                )
+            else:  # A tuple
+                al = []
+                for x in get_args(argtt):
+                    a, i = truth_to_arg(truth, i, x)
+                    al.append(a)
+                return tuple(al), i
+
+        args = []
+        i = 0
+        for x in qf.args:
+            arg, i = truth_to_arg(truth_line, i, x.ttype)
+            args.append(arg)
+
+        cls.assertEqual(i, qf.input_size)
+
+        res_original = qf.original_f(*args)
+
+        # print("Classical evalution", args, res_original)
+
+        def res_to_str(res):
+            if type(res) == bool:
+                return "1" if res else "0"
+            elif type(res) == tuple:
+                return "".join([res_to_str(x) for x in res])
+            else:
+                return res.to_bool_str()
+
+        res_original_str = res_to_str(res_original)
+        # print("Res (th, or)", res_str, res_original_str, truth_line)
+        # print(qf.expressions)
+
+        cls.assertEqual(len(res_original_str), qf.ret_size)
+        cls.assertEqual(res_str, res_original_str)
 
     # cls.assertLessEqual(gate.num_qubits, len(qf.truth_table_header()))
