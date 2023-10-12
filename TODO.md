@@ -43,6 +43,7 @@
 - [x] Allow constant functions
 - [x] Doc: emphatize the compiler flow
 - [x] Doc: properly render documentation
+- [x] Builtin debug functions: print()
 
 ### Week 4: (16 Oct 23)
 - [ ] Publish doc
@@ -50,7 +51,6 @@
 - [ ] Int arithmetic expressions (+, -, *, /)
 - [ ] Function call
 - [ ] Builtin functions: sum(), max(), min(), len()
-- [ ] Builtin debug functions: print()
 
 ## Month 2: 
 

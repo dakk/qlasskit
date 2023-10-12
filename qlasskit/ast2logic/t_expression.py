@@ -220,16 +220,26 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
+    # Binop
     elif isinstance(expr, ast.BinOp):
         # Add | Sub | Mult | MatMult | Div | Mod | Pow | LShift | RShift
         # | BitOr | BitXor | BitAnd | FloorDiv
         raise exceptions.ExpressionNotHandledException(expr)
 
+    # Call
+    elif isinstance(expr, ast.Call):
+        if expr.func.id == 'print':
+            return (None, None)
+        
+        else:
+            raise exceptions.ExpressionNotHandledException(expr)
+        
     # Lambda
     # Dict
     # Set
     # Call
     # List
+    
 
     else:
         raise exceptions.ExpressionNotHandledException(expr)

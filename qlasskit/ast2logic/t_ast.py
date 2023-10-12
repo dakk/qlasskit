@@ -43,6 +43,10 @@ def translate_ast(fun) -> LogicFun:
     exps = []
     for stmt in fun.body:
         s_exps, env = translate_statement(stmt, env)
+        
+        if s_exps == None:
+            continue 
+        
         exps.append(s_exps)
 
     exps_flat = flatten(exps)
