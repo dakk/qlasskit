@@ -20,7 +20,7 @@ from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
 
 from qlasskit import QlassF, exceptions, qlassf
 
-from .utils import COMPILATION_ENABLED, compare_circuit_truth_table
+from .utils import COMPILATION_ENABLED, compute_and_compare_results
 
 a, b, c, d = symbols("a,b,c,d")
 _ret = Symbol("_ret")
@@ -37,7 +37,7 @@ class TestQlassfTuple(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], And(a_0, a_1))
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_tuple_ite(self):
         f = "def test(b: bool, a: Tuple[bool, bool]) -> Tuple[bool,bool]:\n\treturn (a[1],a[0]) if b else a"
@@ -58,7 +58,7 @@ class TestQlassfTuple(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 3)
         self.assertEqual(qf.expressions[-1][0], _ret)
         self.assertEqual(qf.expressions[-1][1], And(b, c))
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_tuple_of_tuple_arg(self):
         f = "def test(a: Tuple[Tuple[bool, bool], bool]) -> bool:\n\treturn a[0][0] and a[0][1] and a[1]"
@@ -68,7 +68,7 @@ class TestQlassfTuple(unittest.TestCase):
         self.assertEqual(
             qf.expressions[0][1], And(Symbol("a.0.0"), And(Symbol("a.0.1"), a_1))
         )
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_tuple_of_tuple_of_tuple_arg(self):
         f = (
@@ -82,7 +82,7 @@ class TestQlassfTuple(unittest.TestCase):
             qf.expressions[0][1],
             And(Symbol("a.0.0.0"), And(Symbol("a.0.0.1"), And(Symbol("a.0.1"), a_1))),
         )
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_tuple_assign(self):
         f = "def test(a: Tuple[bool, bool]) -> bool:\n\tb = (a[1],a[0])\n\treturn b[0] and b[1]"
@@ -90,7 +90,7 @@ class TestQlassfTuple(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 3)
         self.assertEqual(qf.expressions[-1][0], _ret)
         self.assertEqual(qf.expressions[-1][1], And(b_0, b_1))
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_tuple_assign2(self):
         f = (
@@ -102,7 +102,7 @@ class TestQlassfTuple(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 4)
         self.assertEqual(qf.expressions[-1][0], _ret)
         self.assertEqual(qf.expressions[-1][1], And(b_0, And(b_1, Symbol("b.2"))))
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_tuple_assign3(self):
         f = (
@@ -116,7 +116,7 @@ class TestQlassfTuple(unittest.TestCase):
         self.assertEqual(
             qf.expressions[-1][1], And(b_0, And(Symbol("b.1.0"), Symbol("b.1.1")))
         )
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_tuple_result(self):
         f = "def test(a: bool, b: bool) -> Tuple[bool,bool]:\n\treturn a,b"

@@ -19,7 +19,7 @@ from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
 
 from qlasskit import QlassF, exceptions, qlassf
 
-from .utils import COMPILATION_ENABLED, compare_circuit_truth_table
+from .utils import COMPILATION_ENABLED, compute_and_compare_results
 
 a, b, c, d, e, g, h = symbols("a,b,c,d,e,g,h")
 _ret = Symbol("_ret")
@@ -51,7 +51,7 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_not_arg(self):
         ex = Not(a)
@@ -60,7 +60,7 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_and(self):
         ex = And(Not(a), b)
@@ -69,21 +69,21 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_bool_eq(self):
         f = "def test(a: bool, b: bool) -> bool:\n\treturn a == b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_bool_neq(self):
         f = "def test(a: bool, b: bool) -> bool:\n\treturn a != b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_or_not(self):
         ex = Or(Not(a), b)
@@ -92,7 +92,7 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_multiple_arg(self):
         ex = And(a, And(Not(b), c))
@@ -101,7 +101,7 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_multiple_arg2(self):
         ex = And(a, And(Not(b), Or(a, c)))
@@ -110,7 +110,7 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_ifexp(self):
         ex = ITE(a, true, false)
@@ -119,7 +119,7 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_ifexp2(self):
         ex = ITE(And(a, And(Not(b), c)), true, false)
@@ -128,7 +128,7 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], ex)
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_ifexp3(self):
         exp = ITE(
@@ -144,7 +144,7 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], exp)
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_assign(self):
         f = "def test(a: bool, b: bool) -> bool:\n\tc = a and b\n\treturn c"
@@ -154,7 +154,7 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(qf.expressions[0][1], And(a, b))
         self.assertEqual(qf.expressions[1][0], _ret)
         self.assertEqual(qf.expressions[1][1], c)
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_assign2(self):
         f = (
@@ -168,7 +168,7 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(qf.expressions[0][1], And(a, And(Not(b), c)))
         self.assertEqual(qf.expressions[1][0], _ret)
         self.assertEqual(qf.expressions[1][1], d)
-        compare_circuit_truth_table(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_assign3(self):
         f = (
