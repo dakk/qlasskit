@@ -270,6 +270,11 @@ class TestQlassfInt(unittest.TestCase):
         self.assertEqual(qf.expressions[1][1], ITE(a, Symbol("b.1"), Symbol("c.1")))
         compute_and_compare_results(self, qf)
 
+    def test_composed_comparators(self):
+        f = "def f_comp(n: Qint4) -> bool: return n > 3 or n == 7"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
     # def test(a: Qint2) -> Qint2:
     #     return a + 1
     # def test(a: Qint2, b: Qint2) -> Qint2:
