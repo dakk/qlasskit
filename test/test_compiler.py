@@ -14,9 +14,7 @@
 
 import unittest
 
-from qiskit import QuantumCircuit
-
-from qlasskit import exceptions, qlassf
+from qlasskit import compiler, qlassf
 
 from .utils import compare_circuit_truth_table
 

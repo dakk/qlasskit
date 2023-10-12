@@ -17,8 +17,9 @@ from typing import Tuple, get_args
 
 from qiskit import QuantumCircuit, transpile
 from qiskit_aer import Aer
+from sympy.logic.boolalg import gateinputcount
 
-from qlasskit import QlassF, Qtype
+from qlasskit import QlassF, Qtype, compiler
 
 COMPILATION_ENABLED = True
 
@@ -58,6 +59,7 @@ def compare_circuit_truth_table(cls, qf):
     circ = qf.circuit()
     circ_qi = circ.export("circuit", "qiskit")
     # print(circ_qi.draw("text"))
+    # print(qf.expressions)
 
     for truth_line in truth_table:
         qc = QuantumCircuit(gate.num_qubits)
@@ -85,7 +87,6 @@ def compare_circuit_truth_table(cls, qf):
 
         # Calculate original result from python function
         def truth_to_arg(truth, i, argtt):
-            # print(arg.ttype)
             if argtt == bool:
                 return truth[i], i + 1
             elif inspect.isclass(argtt) and issubclass(argtt, Qtype):
@@ -110,8 +111,6 @@ def compare_circuit_truth_table(cls, qf):
 
         res_original = qf.original_f(*args)
 
-        print("\nClassical evalution", args, res_original)
-
         def res_to_str(res):
             if type(res) == bool:
                 return "1" if res else "0"
@@ -121,10 +120,14 @@ def compare_circuit_truth_table(cls, qf):
                 return res.to_bool_str()
 
         res_original_str = res_to_str(res_original)
-        print("Res (th, or)", res_str, res_original_str, truth_line)
-        print(qf.expressions)
 
         cls.assertEqual(len(res_original_str), qf.ret_size)
         cls.assertEqual(res_str, res_original_str)
 
-    # cls.assertLessEqual(gate.num_qubits, len(qf.truth_table_header()))
+    max_qubits = (
+        qf.input_size
+        + len(qf.expressions)
+        + sum([gateinputcount(compiler.optimizer(e[1])) for e in qf.expressions])
+    )
+
+    cls.assertLessEqual(gate.num_qubits, max_qubits)

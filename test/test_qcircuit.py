@@ -37,6 +37,27 @@ class TestQCircuit(unittest.TestCase):
         self.assertEqual(qc.num_qubits, 3)
         self.assertEqual(qc.gates, [("ccx", [0, 1, 2])])
 
+    def test_duplicate_qubit(self):
+        qc = QCircuit()
+        a, b = qc.add_qubit("a"), qc.add_qubit("b")
+        self.assertRaises(Exception, lambda qc: qc.toffoli(a, b, a), qc)
+
+    def test_mapping(self):
+        qc = QCircuit(4)
+        qc.ccx("q0", "q1", "q2")
+
+    def test_get_key_by_index(self):
+        qc = QCircuit()
+        a, b = qc.add_qubit("a"), qc.add_qubit("b")
+        self.assertRaises(Exception, lambda qc: qc.get_key_by_index(3), qc)
+        self.assertEqual(qc.get_key_by_index(0), "a")
+
+    def test_add_free_ancilla(self):
+        qc = QCircuit()
+        a = qc.add_ancilla(is_free=True)
+        b = qc.get_free_ancilla()
+        self.assertEqual(a, b)
+
 
 class TestQCircuitUncomputing(unittest.TestCase):
     def test1(self):

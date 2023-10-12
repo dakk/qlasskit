@@ -14,18 +14,15 @@
 # isort:skip_file
 
 
-from .compiler import Compiler, CompilerException  # noqa: F401
+from .compiler import Compiler, CompilerException, optimizer  # noqa: F401
 
 from .multipass import MultipassCompiler
-from .poccompiler import POCCompiler
 from .poccompiler2 import POCCompiler2
 
 
 def to_quantum(name, args, ret_size, exprs, compiler="poc2"):
     if compiler == "multipass":
         s = MultipassCompiler()
-    elif compiler == "poc":
-        s = POCCompiler()
     elif compiler == "poc2":
         s = POCCompiler2()
 

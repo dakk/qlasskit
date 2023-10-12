@@ -34,20 +34,10 @@ class QCircuit:
 
         self.ancilla_lst = set()
         self.free_ancilla_lst = set()
-        self.marked_ancillas = []
+        self.marked_ancillas = set()
 
         for x in range(num_qubits):
             self.qubit_map[f"q{x}"] = x
-
-    def __add__(self, other: "QCircuit"):
-        """Combine two quantum circuits.
-
-        Args:
-            other (QCircuit): The other quantum circuit to be combined with this one.
-
-        """
-        self.num_qubits = max(self.num_qubits, other.num_qubits)
-        self.gates.extend(other.gates)
 
     def get_key_by_index(self, i: int):
         """Return the qubit name given its index"""
@@ -83,25 +73,37 @@ class QCircuit:
         return anc
 
     def mark_ancilla(self, w):
-        self.marked_ancillas.append(w)
+        if w in self.ancilla_lst:
+            self.marked_ancillas.add(w)
 
     def uncompute(self, to_mark=[]):
         """Uncompute all the marked ancillas plus the to_mark list"""
         [self.mark_ancilla(x) for x in to_mark]
 
+        self.barrier(label="un")
+
         uncomputed = set()
+        new_gates_comp = []
+        not_to_uncompute = set()
+
         for g, ws in self.gates_computed[::-1]:
-            if (
-                ws[-1] in self.marked_ancillas
-                and ws[-1] in self.ancilla_lst
-                and ws[-1] not in self.free_ancilla_lst
+            if ws[-1] in self.marked_ancillas and not all(
+                [ww in self.marked_ancillas for ww in ws[:-1]]
             ):
+                not_to_uncompute.add(ws[-1])
+
+        for g, ws in self.gates_computed[::-1]:
+            if ws[-1] in self.marked_ancillas and ws[-1] not in not_to_uncompute:
                 uncomputed.add(ws[-1])
                 self.append(g, ws)
-                self.free_ancilla_lst.add(ws[-1])
+            else:
+                new_gates_comp.append((g, ws))
 
-        self.marked_ancillas = []  # self.marked_ancillas - uncomputed
-        self.gates_computed = []
+        for x in uncomputed:
+            self.free_ancilla_lst.add(x)
+        self.marked_ancillas = self.marked_ancillas - uncomputed
+        self.gates_computed = new_gates_comp[::-1]
+
         return uncomputed
 
     def map_qubit(self, name, index, promote=False):
@@ -155,6 +157,12 @@ class QCircuit:
         for x in qubits:
             if self.num_qubits is None or x > self.num_qubits:
                 raise Exception(f"qubit {x} not present")
+
+        qs = set()
+        for q in qubits:
+            if q in qs:
+                raise Exception(f"duplicate qubit in gate append: {gate_name} {qubits}")
+            qs.add(q)
 
         self.gates.append((gate_name, qubits))
         self.gates_computed.append((gate_name, qubits))

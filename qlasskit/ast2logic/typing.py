@@ -92,7 +92,6 @@ class Qint(int, Qtype):
     def fill(v: Tuple[TType, List[bool]]) -> Tuple[TType, List[bool]]:
         """Fill a Qint to reach its bit_size"""
         if len(v[1]) < v[0].BIT_SIZE:  # type: ignore
-            print("fillused!")
             v = (
                 v[0],
                 (v[0].BIT_SIZE - len(v[1])) * v[1] + [False],  # type: ignore

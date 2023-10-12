@@ -81,12 +81,11 @@ def optimizer(expr: Boolean) -> Boolean:
 
 class Compiler:
     def __init__(self):
-        self.qmap = {}
+        pass
 
     def _symplify_exp(self, exp):
-        # exp = simplify_logic(exp)  # TODO: remove this
+        # exp = simplify_logic(exp)
         exp = optimizer(exp)
-        # print("exp3", exp)
         return exp
 
     def compile(
