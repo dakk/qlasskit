@@ -35,7 +35,7 @@ class TestQlassfTuple(unittest.TestCase):
         f = "def test() -> Tuple[bool, bool]:\n\treturn (True, True)"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
-        
+
     def test_tuple_arg(self):
         f = "def test(a: Tuple[bool, bool]) -> bool:\n\treturn a[0] and a[1]"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)

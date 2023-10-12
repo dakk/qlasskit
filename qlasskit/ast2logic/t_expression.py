@@ -228,18 +228,17 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
     # Call
     elif isinstance(expr, ast.Call):
-        if expr.func.id == 'print':
+        if expr.func.id == "print":  # type: ignore
             return (None, None)
-        
+
         else:
             raise exceptions.ExpressionNotHandledException(expr)
-        
+
     # Lambda
     # Dict
     # Set
     # Call
     # List
-    
 
     else:
         raise exceptions.ExpressionNotHandledException(expr)

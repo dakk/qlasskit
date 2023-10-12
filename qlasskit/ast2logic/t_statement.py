@@ -81,7 +81,7 @@ def translate_statement(  # noqa: C901
 
     elif isinstance(stmt, ast.Expr):
         texp, vexp = translate_expression(stmt.value, env)
-        return None, env
-        
+        return [], env
+
     else:
         raise exceptions.StatementNotHandledException(stmt)

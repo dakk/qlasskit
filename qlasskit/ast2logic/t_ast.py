@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from sympy.logic import false, simplify_logic, true
+from sympy.logic import simplify_logic
 
 from . import (
     Env,
@@ -43,10 +43,6 @@ def translate_ast(fun) -> LogicFun:
     exps = []
     for stmt in fun.body:
         s_exps, env = translate_statement(stmt, env)
-        
-        if s_exps == None:
-            continue 
-        
         exps.append(s_exps)
 
     exps_flat = flatten(exps)
