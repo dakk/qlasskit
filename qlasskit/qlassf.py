@@ -65,18 +65,24 @@ class QlassF:
         header.extend([sym.name for (sym, retex) in self.expressions[-self.ret_size :]])
         return header
 
-    def truth_table(self) -> List[List[bool]]:
-        """Returns the truth table for the function using the sympy boolean for computing"""
+    def truth_table(self, max=None) -> List[List[bool]]:
+        """Returns the truth table for the function using the sympy boolean for computing
+
+        Args:
+            max (int, optional): if set, return max lines, randomly selected
+        """
         truth = []
         arg_bits = flatten(list(map(lambda a: a.bitvec, self.args)))
         bits = len(arg_bits)
 
-        if (bits + self.ret_size) > MAX_TRUTH_TABLE_SIZE:
+        if not max and (bits + self.ret_size) > MAX_TRUTH_TABLE_SIZE:
             raise Exception(
                 f"Max truth table size reached: {bits + self.ret_size} > {MAX_TRUTH_TABLE_SIZE}"
             )
 
-        for i in range(2**bits):
+        for i in range(
+            0, 2**bits, int(2**bits / max) if max and max < 2**bits else 1
+        ):
             bin_str = bin(i)[2:]
             bin_str = "0" * (bits - len(bin_str)) + bin_str
             bin_arr = list(map(lambda c: c == "1", bin_str))

@@ -14,7 +14,7 @@
 
 
 from sympy import Symbol
-from sympy.logic import ITE, And, Implies, Not, Or, Xor  # , simplify_logic
+from sympy.logic import ITE, And, Implies, Not, Or, Xor
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
 
 from .. import QCircuit
@@ -72,8 +72,8 @@ def optimizer(expr: Boolean) -> Boolean:
     elif isinstance(expr, Xor):
         return Xor(*[optimizer(e) for e in expr.args])
 
-    elif isinstance(expr, BooleanFalse) or isinstance(expr, BooleanTrue):
-        raise CompilerException("Constant in expression is not allowed")
+    elif isinstance(expr, BooleanTrue) or isinstance(expr, BooleanFalse):
+        return expr
 
     else:
         raise Exception(expr)

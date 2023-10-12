@@ -13,13 +13,14 @@
 # limitations under the License.
 
 import inspect
+import random
 from typing import Tuple, get_args
 
 from qiskit import QuantumCircuit, transpile
 from qiskit_aer import Aer
 from sympy.logic.boolalg import gateinputcount
 
-from qlasskit import QlassF, Qtype, compiler
+from qlasskit import Qint, QlassF, Qtype, compiler
 
 COMPILATION_ENABLED = True
 
@@ -111,6 +112,10 @@ def compute_result_of_originalf(cls, qf, truth_line):
             return "1" if res else "0"
         elif type(res) == tuple:
             return "".join([res_to_str(x) for x in res])
+        elif type(res) == int:
+            qi = Qint(res)
+            qi.BIT_SIZE = len(bin(res)) - 2
+            return qi.to_bool_str()
         else:
             return res.to_bool_str()
 
@@ -132,7 +137,17 @@ def compute_result_of_originalf(cls, qf, truth_line):
 def compute_and_compare_results(cls, qf):
     """Create and simulate the qcircuit, and compare the result with the
     truthtable and with the original_f"""
-    truth_table = qf.truth_table()
+    MAX_Q_SIM = 64
+    MAX_C_SIM = 2**9
+    qc_truth = None
+
+    truth_table = qf.truth_table(MAX_C_SIM)
+
+    if len(truth_table) > MAX_C_SIM:
+        truth_table = [random.choice(truth_table) for x in range(MAX_C_SIM)]
+
+    if len(truth_table) > MAX_Q_SIM and COMPILATION_ENABLED:
+        qc_truth = [random.choice(truth_table) for x in range(MAX_Q_SIM)]
 
     for truth_line in truth_table:
         # Extract str of truthtable and result
@@ -141,7 +156,7 @@ def compute_and_compare_results(cls, qf):
         )
 
         # Calculate and compare the gate result
-        if COMPILATION_ENABLED:
+        if qc_truth and truth_line in qc_truth and COMPILATION_ENABLED:
             res_qc = compute_result_of_qcircuit(cls, qf, truth_line)
             cls.assertEqual(truth_str, res_qc)
 

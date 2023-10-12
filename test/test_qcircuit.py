@@ -73,7 +73,7 @@ class TestQCircuitUncomputing(unittest.TestCase):
         qc.mcx([a, b, c], d)
         qc.cx(d, f)
         qc.uncompute([c, d])
-        qc.draw()
+        # qc.draw()
 
     def test2(self):
         qc = QCircuit()
@@ -87,7 +87,7 @@ class TestQCircuitUncomputing(unittest.TestCase):
         qc.mcx(q + a[:2], a[3])
         qc.cx(a[3], r)
         qc.uncompute(a)
-        qc.draw()
+        # qc.draw()
 
 
 class TestQCircuitExport(unittest.TestCase):

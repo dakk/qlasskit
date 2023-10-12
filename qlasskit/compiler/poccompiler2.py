@@ -16,7 +16,7 @@ from typing import Dict
 
 from sympy import Symbol
 from sympy.logic import And, Not, Xor
-from sympy.logic.boolalg import Boolean
+from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
 
 from .. import QCircuit
 from ..ast2logic.typing import Args, BoolExpList
@@ -129,6 +129,14 @@ class POCCompiler2(Compiler):
 
             qc.mcx(erets[0:-1], erets[-1])
             return erets[-1]
+
+        elif isinstance(expr, BooleanFalse):
+            return qc.get_free_ancilla()
+
+        elif isinstance(expr, BooleanTrue):
+            fa = qc.get_free_ancilla()
+            qc.x(fa)
+            return fa
 
         else:
             raise CompilerException(expr)

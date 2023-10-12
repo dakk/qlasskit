@@ -39,12 +39,14 @@
 - [x] Test circuit and boolexp using the python code as reference
 - [x] Qubit garbage uncomputing and recycling
 - [x] Test: add qubit usage check
+- [x] Parametrize qint tests over bit_size
+- [x] Allow constant functions
 - [ ] Doc: emphatize the compiler flow
 - [ ] Doc: properly render documentation
 - [ ] Fix structure and typing location
-- [ ] Parametrize qint tests over bit_size
 
 ### Week 4: (16 Oct 23)
+- [ ] Test: Optimize compute_result_of_qcircuit in order to increase MAX_Q_SIM
 - [ ] Int arithmetic expressions (+, -, *, /)
 - [ ] Function call
 - [ ] Builtin functions: sum(), max(), min(), len()

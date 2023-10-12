@@ -50,11 +50,6 @@ class UnboundException(Exception):
         super().__init__(f"{symbol} in {env}")
 
 
-class ConstantReturnException(Exception):
-    def __init__(self, name, val):
-        super().__init__(f"{name} is costant = {val}")
-
-
 class SymbolReassignedException(Exception):
     def __init__(self, name):
         super().__init__(f"{name} cannot be reassinged")

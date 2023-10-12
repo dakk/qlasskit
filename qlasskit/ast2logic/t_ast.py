@@ -48,8 +48,8 @@ def translate_ast(fun) -> LogicFun:
     exps_flat = flatten(exps)
     exps_simpl = list(map(lambda e: simplify_logic(e, form="cnf"), exps_flat))
 
-    for n, e in exps_simpl:
-        if e == true or e == false:
-            raise exceptions.ConstantReturnException(n, e)
+    # for n, e in exps_simpl:
+    #     if e == true or e == false:
+    #         print(f"Warning: expression {n} is returning a costant: {e}")
 
     return fun_name, args, ret_size, exps_simpl

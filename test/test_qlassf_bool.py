@@ -26,12 +26,6 @@ _ret = Symbol("_ret")
 
 
 class TestQlassfBoolean(unittest.TestCase):
-    def test_constant_result(self):
-        f = "def test() -> bool:\n\treturn True"
-        self.assertRaises(
-            exceptions.ConstantReturnException, lambda f: qlassf(f, to_compile=False), f
-        )
-
     def test_unbound(self):
         f = "def test() -> bool:\n\treturn a"
         self.assertRaises(
@@ -43,6 +37,16 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertRaises(
             exceptions.NoReturnTypeException, lambda f: qlassf(f, to_compile=False), f
         )
+
+    def test_bool_const(self):
+        f = "def test(a: bool) -> bool:\n\tc=True\n\treturn c"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        self.assertEqual(len(qf.expressions), 2)
+        self.assertEqual(qf.expressions[0][0], Symbol("c"))
+        self.assertEqual(qf.expressions[0][1], true)
+        self.assertEqual(qf.expressions[1][0], _ret)
+        self.assertEqual(qf.expressions[1][1], Symbol("c"))
+        compute_and_compare_results(self, qf)
 
     def test_arg_identity(self):
         ex = a
@@ -183,7 +187,7 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 5)
         self.assertEqual(qf.expressions[-1][1], ITE(d & e, g, h))
         # TODO: this is not simulable without recycling registers
-        # compare_circuit_truth_table(self, qf)
+        # compute_and_compare_results(self, qf)
 
     def test_reassign_exception(self):
         f = "def test(a: bool) -> bool:\n\ta = not a\n\treturn a"

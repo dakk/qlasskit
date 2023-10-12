@@ -31,6 +31,11 @@ b_1 = Symbol("b.1")
 
 
 class TestQlassfTuple(unittest.TestCase):
+    def test_tuple_const(self):
+        f = "def test() -> Tuple[bool, bool]:\n\treturn (True, True)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+        
     def test_tuple_arg(self):
         f = "def test(a: Tuple[bool, bool]) -> bool:\n\treturn a[0] and a[1]"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
@@ -45,7 +50,7 @@ class TestQlassfTuple(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 2)
         self.assertEqual(qf.expressions[0][1], ITE(b, a_1, a_0))
         self.assertEqual(qf.expressions[1][1], ITE(b, a_0, a_1))
-        # compare_circuit_truth_table(self, qf) # TODO: fix
+        # compute_and_compare_results(self, qf) # TODO: fix
 
     def test_tuple_arg_assign(self):
         f = (
@@ -126,4 +131,4 @@ class TestQlassfTuple(unittest.TestCase):
         self.assertEqual(qf.expressions[0][1], a)
         self.assertEqual(qf.expressions[1][0], Symbol("_ret.1"))
         self.assertEqual(qf.expressions[1][1], b)
-        # compare_circuit_truth_table(self, qf)
+        # compute_and_compare_results(self, qf)
