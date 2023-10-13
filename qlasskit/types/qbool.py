@@ -11,20 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# isort:skip_file
 
-__version__ = "0.0.1"
+from sympy.logic import Not, Xor
 
-from .qcircuit import QCircuit  # noqa: F401
-from .qlassf import QlassF, qlassf  # noqa: F401
-from .ast2logic import exceptions  # noqa: F401
-from .types import (  # noqa: F401, F403
-    Qtype,
-    Qbool,
-    Qint,
-    Qint2,
-    Qint4,
-    Qint8,
-    Qint12,
-    Qint16,
-)
+
+class Qbool:
+    @staticmethod
+    def neq(a, b):
+        return Xor(a, b)
+
+    @staticmethod
+    def eq(a, b):
+        return Not(Qbool.neq(a, b))

@@ -13,7 +13,7 @@ This tool will be useful for any algorithm that relies on a 'blackbox' function 
 
 ```python
 @qlassf
-def f(n: Int4) -> bool:
+def f(n: Qint4) -> bool:
   if n == 3:
     return True
   else:
@@ -30,7 +30,7 @@ qc.append(f.gate(), f.qubits_list(0))
 Or, you can define a function with parameters:
 ```python
 @qlassf
-def f(n: Int4, n_it: Param[int]) -> Int8:
+def f(n: Qint4, n_it: Param[int]) -> Qint8:
   v = 0
   for x in range(n_it):
     v += n
@@ -49,13 +49,13 @@ Qlasskit (will) supports complex data types, like tuples and fixed size lists:
 
 ```python
 @qlassf
-def f(a: Tuple[Int8, Int8]) -> Tuple[bool, bool]:
+def f(a: Tuple[Qint8, Qint8]) -> Tuple[bool, bool]:
   return a[0] == 42, a[1] == 0
 ```
 
 ```python
 @qlassf
-def search(alist: List4[Int2], to_search: Int2):
+def search(alist: List4[Qint2], to_search: Qint2):
   for x in alist:
     if x == to_search:
       return True

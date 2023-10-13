@@ -44,11 +44,11 @@
 - [x] Doc: emphatize the compiler flow
 - [x] Doc: properly render documentation
 - [x] Builtin debug functions: print()
+- [x] Fix code structure and typing location
 
 ### Week 4: (16 Oct 23)
 - [ ] Publish doc
-- [ ] Fix structure and typing location
-- [ ] Int arithmetic expressions (+, -, *, /)
+- [ ] Int arithmetic: +
 - [ ] Function call
 - [ ] Builtin functions: sum(), max(), min(), len()
 
@@ -56,6 +56,7 @@
 
 ### Week 1: (23 Oct 23)
 - [ ] Inner function
+- [ ] Int arithmetic expressions (-, *, /)
 - [ ] Parametrized qlassf
 
 ### Week 2: (30 Oct 23)

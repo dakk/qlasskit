@@ -17,8 +17,8 @@ from typing import List, Tuple, get_args
 from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, false, true
 
+from ..types import Qbool, Qint, Qint2, Qint4, Qint8, Qint12, Qint16, TExp
 from . import Env, exceptions
-from .typing import Qint, Qint2, Qint4, Qint8, Qint12, Qint16, TExp, bool_eq, bool_neq
 
 
 def type_of_exp(vlist, base, res=[]) -> List[Symbol]:
@@ -173,7 +173,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         # Eq
         if isinstance(expr.ops[0], ast.Eq):
             if tleft[0] == bool and tcomp[0] == bool:
-                return (bool, bool_eq(tleft[1], tcomp[1]))
+                return (bool, Qbool.eq(tleft[1], tcomp[1]))
             elif issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
                 return Qint.eq(tleft, tcomp)
 
@@ -182,9 +182,9 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         # NotEq
         elif isinstance(expr.ops[0], ast.NotEq):
             if tleft[0] == bool and tcomp[0] == bool:
-                return (bool, bool_neq(tleft[1], tcomp[1]))
+                return (bool, Qbool.neq(tleft[1], tcomp[1]))
             elif issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
-                return Qint.not_eq(tleft, tcomp)
+                return Qint.neq(tleft, tcomp)
 
             raise exceptions.TypeErrorException(tcomp[0], tleft[0])
 

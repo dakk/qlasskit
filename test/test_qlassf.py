@@ -14,7 +14,7 @@
 
 import unittest
 
-from qlasskit import Qint4, QlassF, qlassf
+from qlasskit import Qint4, Qint12, QlassF, qlassf
 
 from . import utils
 from .utils import COMPILATION_ENABLED, compute_and_compare_results

@@ -1,10 +1,10 @@
 from qiskit import QuantumCircuit
 
-from qlasskit import Int8, Param, qlassf
+from qlasskit import Param, Qint8, qlassf
 
 
 @qlassf
-def f(n: Int4, n_it: Param[int]) -> Int8:
+def f(n: Qint4, n_it: Param[int]) -> Qint8:
     v = 0
     for x in range(n_it):
         v += n
