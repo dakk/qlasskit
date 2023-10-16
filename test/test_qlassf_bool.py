@@ -186,8 +186,7 @@ class TestQlassfBoolean(unittest.TestCase):
         qf = qlassf(f, to_compile=False)
         self.assertEqual(len(qf.expressions), 5)
         self.assertEqual(qf.expressions[-1][1], ITE(d & e, g, h))
-        # TODO: this is not simulable without recycling registers
-        # compute_and_compare_results(self, qf)
+        compute_and_compare_results(self, qf)
 
     def test_reassign_exception(self):
         f = "def test(a: bool) -> bool:\n\ta = not a\n\treturn a"

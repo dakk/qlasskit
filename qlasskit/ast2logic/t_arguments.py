@@ -16,11 +16,11 @@ from typing import List, Tuple
 
 from ..types import *  # noqa: F401, F403
 from ..types import TType
-from . import exceptions
+from . import Env, exceptions
 from .typing import Arg, Args
 
 
-def translate_argument(ann, base="") -> Arg:
+def translate_argument(ann, env, base="") -> Arg:
     def to_name(a):
         return a.attr if isinstance(a, ast.Attribute) else a.id
 
@@ -34,31 +34,30 @@ def translate_argument(ann, base="") -> Arg:
                 al.append(f"{base}.{ind}")
                 ttypes.append(bool)
             else:
-                inner_arg = translate_argument(i, base=f"{base}.{ind}")
+                inner_arg = translate_argument(i, env, base=f"{base}.{ind}")
                 ttypes.append(inner_arg.ttype)
                 al.extend(inner_arg.bitvec)
             ind += 1
         ttypes_t = tuple(ttypes)
         return Arg(base, Tuple[ttypes_t], al)
 
-    # QintX
-    elif to_name(ann)[0:4] == "Qint":
-        n = int(to_name(ann)[4::])
-        arg_list = [f"{base}.{i}" for i in range(n)]
-        # arg_list.append((f"{base}{arg.arg}", n))
-        return Arg(base, eval(to_name(ann)), arg_list)
-
     # Bool
     elif to_name(ann) == "bool":
         return Arg(base, bool, [f"{base}"])
+
+    # Check if it is a know type in env
+    elif env.know_type(to_name(ann)):
+        t = env.gettype(to_name(ann))
+        arg_list = [f"{base}.{i}" for i in range(t.BIT_SIZE)]
+        return Arg(base, t, arg_list)
 
     else:
         raise exceptions.UnknownTypeException(ann)
 
 
-def translate_arguments(args) -> Args:
+def translate_arguments(args, env: Env) -> Args:
     """Parse an argument list"""
     args_unrolled = map(
-        lambda arg: translate_argument(arg.annotation, base=arg.arg), args
+        lambda arg: translate_argument(arg.annotation, env=env, base=arg.arg), args
     )
     return list(args_unrolled)

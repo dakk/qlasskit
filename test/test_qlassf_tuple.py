@@ -50,7 +50,7 @@ class TestQlassfTuple(unittest.TestCase):
         self.assertEqual(len(qf.expressions), 2)
         self.assertEqual(qf.expressions[0][1], ITE(b, a_1, a_0))
         self.assertEqual(qf.expressions[1][1], ITE(b, a_0, a_1))
-        # compute_and_compare_results(self, qf) # TODO: fix
+        compute_and_compare_results(self, qf)
 
     def test_tuple_arg_assign(self):
         f = (
