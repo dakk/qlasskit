@@ -21,13 +21,13 @@ from ..types import Qbool, Qint, TExp, const_to_qtype
 from . import Env, exceptions
 
 
-def type_of_exp(vlist, base, res=[]) -> List[Symbol]:
-    """Type inference for expressions: iterate over val, and decompose to bool"""
+def decompose_to_symbols(vlist, base, res=[]) -> List[Symbol]:
+    """Decompose exp to symbols"""
     if isinstance(vlist, list):
         i = 0
         res = []
         for in_val in vlist:
-            r_new = type_of_exp(in_val, f"{base}.{i}", res)
+            r_new = decompose_to_symbols(in_val, f"{base}.{i}", res)
             if isinstance(r_new, list):
                 res.extend(r_new)
             else:
