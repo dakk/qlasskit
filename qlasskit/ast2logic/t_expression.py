@@ -17,7 +17,7 @@ from typing import List, Tuple, get_args
 from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, false, true
 
-from ..types import Qbool, Qint, Qint2, Qint4, Qint8, Qint12, Qint16, TExp
+from ..types import Qbool, Qint, TExp, const_to_qtype
 from . import Env, exceptions
 
 
@@ -143,14 +143,11 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             return (bool, true)
         elif expr.value is False:
             return (bool, false)
-        elif isinstance(expr.value, int):
-            v = expr.value
 
-            for t in [Qint2, Qint4, Qint8, Qint12, Qint16]:
-                if v < 2**t.BIT_SIZE:
-                    return Qint.fill((t, Qint.const(v)))
+        q_value = const_to_qtype(expr.value)
 
-            raise Exception(f"Constant value is too big: {v}")
+        if q_value:
+            return q_value
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
@@ -170,10 +167,14 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         tleft = translate_expression(expr.left, env)
         tcomp = translate_expression(expr.comparators[0], env)
 
+        # TODO: check comparability here
+
         # Eq
         if isinstance(expr.ops[0], ast.Eq):
             if tleft[0] == bool and tcomp[0] == bool:
                 return (bool, Qbool.eq(tleft[1], tcomp[1]))
+
+            # TODO: get here method from type class automatically, and use a type comparison table
             elif issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
                 return Qint.eq(tleft, tcomp)
 
@@ -183,6 +184,8 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         elif isinstance(expr.ops[0], ast.NotEq):
             if tleft[0] == bool and tcomp[0] == bool:
                 return (bool, Qbool.neq(tleft[1], tcomp[1]))
+
+            # TODO: get here method from type class automatically, and use a type comparison table
             elif issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
                 return Qint.neq(tleft, tcomp)
 
@@ -190,6 +193,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
         # Lt
         elif isinstance(expr.ops[0], ast.Lt):
+            # TODO: get here method from type class automatically, and use a type comparison table
             if issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
                 return Qint.lt(tleft, tcomp)
 
@@ -197,6 +201,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
         # LtE
         elif isinstance(expr.ops[0], ast.LtE):
+            # TODO: get here method from type class automatically, and use a type comparison table
             if issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
                 return Qint.lte(tleft, tcomp)
 
@@ -204,6 +209,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
         # Gt
         elif isinstance(expr.ops[0], ast.Gt):
+            # TODO: get here method from type class automatically, and use a type comparison table
             if issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
                 return Qint.gt(tleft, tcomp)
 
@@ -211,6 +217,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
         # GtE
         elif isinstance(expr.ops[0], ast.GtE):
+            # TODO: get here method from type class automatically, and use a type comparison table
             if issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
                 return Qint.gte(tleft, tcomp)
 

@@ -12,8 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Any
+
 from .qbool import Qbool  # noqa: F401
 from .qint import Qint, Qint2, Qint4, Qint8, Qint12, Qint16  # noqa: F401
 from .qtype import Qtype, TExp, TType  # noqa: F401
 
 BUILTIN_TYPES = [Qint2, Qint4, Qint8, Qint12, Qint16]
+
+
+def const_to_qtype(value: Any):
+    if isinstance(value, int):
+        for det_type in [Qint2, Qint4, Qint8, Qint12, Qint16]:
+            if value < 2**det_type.BIT_SIZE:
+                return det_type.const(value)
+
+        raise Exception(f"Constant value is too big: {value}")
+
+    return None
