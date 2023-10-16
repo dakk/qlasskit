@@ -115,9 +115,9 @@ def compute_result_of_originalf(cls, qf, truth_line):
         elif type(res) == int:
             qi = Qint(res)
             qi.BIT_SIZE = len(bin(res)) - 2
-            return qi.to_bool_str()
+            return qi.to_bin()
         else:
-            return res.to_bool_str()
+            return res.to_bin()
 
     args = []
     i = 0

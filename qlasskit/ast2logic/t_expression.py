@@ -17,7 +17,7 @@ from typing import List, Tuple, get_args
 from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, false, true
 
-from ..types import Qbool, Qint, TExp, const_to_qtype
+from ..types import Qbool, Qtype, TExp, const_to_qtype
 from . import Env, exceptions
 
 
@@ -167,65 +167,33 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         tleft = translate_expression(expr.left, env)
         tcomp = translate_expression(expr.comparators[0], env)
 
-        # TODO: check comparability here
+        # Check comparability
+        if tleft[0] == bool and tcomp[0] == bool:
+            op_type = Qbool
+        elif issubclass(tleft[0], Qtype) and issubclass(tcomp[0], Qtype):  # type: ignore
+            if not tleft[0].comparable(tcomp[0]):  # type: ignore
+                raise exceptions.TypeErrorException(tcomp[0], tleft[0])
+            op_type = tleft[0]  # type: ignore
 
-        # Eq
-        if isinstance(expr.ops[0], ast.Eq):
-            if tleft[0] == bool and tcomp[0] == bool:
-                return (bool, Qbool.eq(tleft[1], tcomp[1]))
+        # Call the comparator
+        comparators = [
+            (ast.Eq, "eq"),
+            (ast.NotEq, "neq"),
+            (ast.Lt, "lt"),
+            (ast.LtE, "lte"),
+            (ast.Gt, "gt"),
+            (ast.GtE, "gte"),
+        ]
 
-            # TODO: get here method from type class automatically, and use a type comparison table
-            elif issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
-                return Qint.eq(tleft, tcomp)
+        for ast_comp, comp_name in comparators:
+            if isinstance(expr.ops[0], ast_comp):
+                if not hasattr(op_type, comp_name):
+                    raise exceptions.OperationNotSupportedException(op_type, comp_name)
 
-            raise exceptions.TypeErrorException(tcomp[0], tleft[0])
-
-        # NotEq
-        elif isinstance(expr.ops[0], ast.NotEq):
-            if tleft[0] == bool and tcomp[0] == bool:
-                return (bool, Qbool.neq(tleft[1], tcomp[1]))
-
-            # TODO: get here method from type class automatically, and use a type comparison table
-            elif issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
-                return Qint.neq(tleft, tcomp)
-
-            raise exceptions.TypeErrorException(tcomp[0], tleft[0])
-
-        # Lt
-        elif isinstance(expr.ops[0], ast.Lt):
-            # TODO: get here method from type class automatically, and use a type comparison table
-            if issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
-                return Qint.lt(tleft, tcomp)
-
-            raise exceptions.TypeErrorException(tcomp[0], tleft[0])
-
-        # LtE
-        elif isinstance(expr.ops[0], ast.LtE):
-            # TODO: get here method from type class automatically, and use a type comparison table
-            if issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
-                return Qint.lte(tleft, tcomp)
-
-            raise exceptions.TypeErrorException(tcomp[0], tleft[0])
-
-        # Gt
-        elif isinstance(expr.ops[0], ast.Gt):
-            # TODO: get here method from type class automatically, and use a type comparison table
-            if issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
-                return Qint.gt(tleft, tcomp)
-
-            raise exceptions.TypeErrorException(tcomp[0], tleft[0])
-
-        # GtE
-        elif isinstance(expr.ops[0], ast.GtE):
-            # TODO: get here method from type class automatically, and use a type comparison table
-            if issubclass(tleft[0], Qint) and issubclass(tcomp[0], Qint):  # type: ignore
-                return Qint.gte(tleft, tcomp)
-
-            raise exceptions.TypeErrorException(tcomp[0], tleft[0])
+                return getattr(op_type, comp_name)(tleft, tcomp)
 
         # Is | IsNot | In | NotIn
-        else:
-            raise exceptions.ExpressionNotHandledException(expr)
+        raise exceptions.ExpressionNotHandledException(expr)
 
     # Binop
     elif isinstance(expr, ast.BinOp):

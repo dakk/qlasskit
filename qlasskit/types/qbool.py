@@ -11,15 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from sympy.logic import Not, Xor
+from . import TExp, _eq, _neq
 
 
 class Qbool:
     @staticmethod
-    def neq(a, b):
-        return Xor(a, b)
+    def eq(tleft: TExp, tcomp: TExp) -> TExp:
+        return (tleft[0], _eq(tleft[1], tcomp[1]))
 
     @staticmethod
-    def eq(a, b):
-        return Not(Qbool.neq(a, b))
+    def neq(tleft: TExp, tcomp: TExp) -> TExp:
+        return (tleft[0], _neq(tleft[1], tcomp[1]))

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Tuple
+from typing import Any, List, Tuple
 
 from sympy.logic.boolalg import Boolean
 from typing_extensions import TypeAlias
@@ -23,3 +23,66 @@ TExp: TypeAlias = Tuple[TType, Boolean]
 
 class Qtype:
     BIT_SIZE = 0
+
+    def __getitem__(self, i):
+        """Return the i-nth bit value"""
+        if i > self.BIT_SIZE:
+            raise Exception("Unbound")
+
+        return self.to_bin()[i] == "1"
+
+    def to_bin(self) -> str:
+        """Return the binary representation of the value"""
+        raise Exception("abstract")
+
+    @classmethod
+    def from_bool(cls, v: List[bool]) -> "Qtype":
+        """Return the Qtype object from a list of booleans"""
+        raise Exception("abstract")
+
+    @classmethod
+    def comparable(cls, other_type=None) -> bool:
+        """Return true if the type is comparable with itself or
+        with [other_type]"""
+        raise Exception("abstract")
+
+    @classmethod
+    def size(cls) -> int:
+        """Return the size in bit"""
+        return cls.BIT_SIZE
+
+    @classmethod
+    def const(cls, value: Any) -> TExp:
+        """Return a list of bool representing the value"""
+        raise Exception("abstract")
+
+    @staticmethod
+    def fill(v: TExp) -> TExp:
+        """Fill with leading false"""
+        raise Exception("abstract")
+
+    # Comparators
+
+    @staticmethod
+    def eq(tleft: TExp, tcomp: TExp) -> TExp:
+        raise Exception("abstract")
+
+    @staticmethod
+    def neq(tleft: TExp, tcomp: TExp) -> TExp:
+        raise Exception("abstract")
+
+    @staticmethod
+    def gt(tleft: TExp, tcomp: TExp) -> TExp:
+        raise Exception("abstract")
+
+    @staticmethod
+    def gte(tleft: TExp, tcomp: TExp) -> TExp:
+        raise Exception("abstract")
+
+    @staticmethod
+    def lt(tleft: TExp, tcomp: TExp) -> TExp:
+        raise Exception("abstract")
+
+    @staticmethod
+    def lte(tleft: TExp, tcomp: TExp) -> TExp:
+        raise Exception("abstract")

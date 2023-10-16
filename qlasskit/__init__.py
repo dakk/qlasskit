@@ -20,7 +20,6 @@ from .qlassf import QlassF, qlassf  # noqa: F401
 from .ast2logic import exceptions  # noqa: F401
 from .types import (  # noqa: F401, F403
     Qtype,
-    Qbool,
     Qint,
     Qint2,
     Qint4,

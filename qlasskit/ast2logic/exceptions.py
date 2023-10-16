@@ -15,6 +15,11 @@
 import ast
 
 
+class OperationNotSupportedException(Exception):
+    def __init__(self, tt, op):
+        super().__init__(f"Operation '{op}' not supported by type {tt}")
+
+
 class TypeErrorException(Exception):
     def __init__(self, got, excepted):
         super().__init__(f"Got '{got}' excepted '{excepted}'")
