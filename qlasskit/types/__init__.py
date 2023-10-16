@@ -15,3 +15,5 @@
 from .qbool import Qbool  # noqa: F401
 from .qint import Qint, Qint2, Qint4, Qint8, Qint12, Qint16  # noqa: F401
 from .qtype import Qtype, TExp, TType  # noqa: F401
+
+BUILTIN_TYPES = [Qint2, Qint4, Qint8, Qint12, Qint16]

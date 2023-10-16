@@ -30,14 +30,14 @@ def translate_ast(fun) -> LogicFun:
     # env contains names visible from the current scope
     env = Env()
 
-    args: Args = translate_arguments(fun.args.args)
+    args: Args = translate_arguments(fun.args.args, env)
 
     [env.bind(arg) for arg in args]
 
     if not fun.returns:
         raise exceptions.NoReturnTypeException()
 
-    ret_ = translate_argument(fun.returns)  # TODO: we need to preserve this
+    ret_ = translate_argument(fun.returns, env)  # TODO: we need to preserve this
     ret_size = len(ret_)
 
     exps = []
