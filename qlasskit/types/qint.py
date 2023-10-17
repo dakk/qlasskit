@@ -36,6 +36,11 @@ class Qint(int, Qtype):
         s = bin(self.value)[2:][0 : self.BIT_SIZE]
         return ("0" * (self.BIT_SIZE - len(s)) + s)[::-1]
 
+    def to_amplitudes(self) -> List[complex]:
+        ampl = [0.] * 2**self.BIT_SIZE
+        ampl[self.value] = 1
+        return ampl
+    
     @classmethod
     def comparable(cls, other_type=None) -> bool:
         """Return true if the type is comparable with itself or

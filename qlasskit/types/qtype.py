@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, List, Tuple
+from typing import Any, List, Tuple, Literal
 
 from sympy.logic.boolalg import Boolean
 from typing_extensions import TypeAlias
@@ -34,6 +34,18 @@ class Qtype:
     def to_bin(self) -> str:
         """Return the binary representation of the value"""
         raise Exception("abstract")
+
+    def to_amplitudes(self) -> List[complex]:
+        """Return complex amplitudes to initialize the current value on a quantum circuit"""
+        raise Exception("abstract")
+
+    def export(self, mode: Literal["amplitudes", "binary"] = "binary"):
+        if mode == "amplitudes":
+            return self.to_amplitudes()
+        elif mode == "binary":
+            return self.to_bin()
+        else:
+            raise Exception(f"Mode {mode} not supported")            
 
     @classmethod
     def from_bool(cls, v: List[bool]) -> "Qtype":
