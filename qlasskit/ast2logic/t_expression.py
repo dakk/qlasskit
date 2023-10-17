@@ -205,9 +205,23 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
     elif isinstance(expr, ast.Call):
         if expr.func.id == "print":  # type: ignore
             return (None, None)
+        elif expr.func.id == "len" and len(expr.args) == 1:  # type: ignore
+            targ = translate_expression(expr.args[0], env)
+            if isinstance(targ[1], List):
+                return const_to_qtype(len(targ[1]))
+            
+        # elif expr.func.id in ["max", "min"]:  # type: ignore
+        #     targs = list(map(lambda e: translate_expression(e, env), expr.args))
+            
+        #     if len(targs) == 1 and isinstance(targs[0][1], List):
+        #         targs = targs[0]
+            
+        #     print (len(targs), targs)
+            
+        #     # TODO: DOING
 
-        else:
-            raise exceptions.ExpressionNotHandledException(expr)
+        # print(ast.dump(expr))
+        raise exceptions.ExpressionNotHandledException(expr)
 
     # Lambda
     # Dict

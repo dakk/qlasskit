@@ -52,7 +52,9 @@ class Qint(int, Qtype):
     @classmethod
     def const(cls, v: int) -> TExp:
         """Return the list of bool representing an int"""
-        return (cls, list(map(lambda c: True if c == "1" else False, bin(v)[2:]))[::-1])
+        return cls.fill(
+            (cls, list(map(lambda c: True if c == "1" else False, bin(v)[2:]))[::-1])
+        )
 
     @staticmethod
     def fill(v: TExp) -> TExp:

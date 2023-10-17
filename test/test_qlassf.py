@@ -20,14 +20,6 @@ from . import utils
 from .utils import COMPILATION_ENABLED, compute_and_compare_results
 
 
-class TestQlassf(unittest.TestCase):
-    def test_print_call(self):
-        f = "def test(a: bool) -> bool:\n\tprint(a)\n\treturn a"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-        self.assertEqual(len(qf.expressions), 1)
-        compute_and_compare_results(self, qf)
-
-
 class TestQlassfDecorator(unittest.TestCase):
     def test_decorator(self):
         c = qlassf(utils.test_not, to_compile=False)

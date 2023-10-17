@@ -19,6 +19,7 @@ from .qcircuit import QCircuit  # noqa: F401
 from .qlassf import QlassF, qlassf  # noqa: F401
 from .ast2logic import exceptions  # noqa: F401
 from .types import (  # noqa: F401, F403
+    const_to_qtype,
     Qtype,
     Qint,
     Qint2,

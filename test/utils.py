@@ -20,7 +20,7 @@ from qiskit import QuantumCircuit, transpile
 from qiskit_aer import Aer
 from sympy.logic.boolalg import gateinputcount
 
-from qlasskit import Qint, QlassF, Qtype, compiler
+from qlasskit import Qint, QlassF, Qtype, compiler, const_to_qtype
 
 COMPILATION_ENABLED = True
 
@@ -110,8 +110,8 @@ def compute_result_of_originalf(cls, qf, truth_line):
         elif type(res) == tuple:
             return "".join([res_to_str(x) for x in res])
         elif type(res) == int:
-            qi = Qint(res)
-            qi.BIT_SIZE = len(bin(res)) - 2
+            qc = const_to_qtype(res)
+            qi = qc[0].from_bool(qc[1])
             return qi.to_bin()
         else:
             return res.to_bin()
