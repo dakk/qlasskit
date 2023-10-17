@@ -26,27 +26,25 @@ a, b, c, d = symbols("a,b,c,d")
 _ret = Symbol("_ret")
 
 
-
 class TestQint(unittest.TestCase):
     def test_qint2_to_amplitudes(self):
         c = Qint2(int(1)).to_amplitudes()
         self.assertEqual(c, [0.0, 1, 0.0, 0.0])
-        self.assertEqual(c, Qint2(1).export('amplitudes'))
-        
+        self.assertEqual(c, Qint2(1).export("amplitudes"))
+
     def test_qint2_to_bin(self):
         c = Qint2(1).to_bin()
-        self.assertEqual(c, '10')
-        self.assertEqual(c, Qint2(1).export('binary'))
+        self.assertEqual(c, "10")
+        self.assertEqual(c, Qint2(1).export("binary"))
 
 
-        
 @parameterized_class(
     ("ttype", "ttype_str", "ttype_size"),
     [
         (Qint2, "Qint2", 2),
         (Qint4, "Qint4", 4),
         (Qint8, "Qint8", 8),
-    ]
+    ],
 )
 class TestQlassfIntParametrized_2_4_8(unittest.TestCase):
     def test_int_arg(self):
