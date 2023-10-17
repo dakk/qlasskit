@@ -24,11 +24,12 @@ from . import (
 from .typing import Args, LogicFun
 
 
-def translate_ast(fun) -> LogicFun:
+def translate_ast(fun, types) -> LogicFun:
     fun_name: str = fun.name
 
     # env contains names visible from the current scope
     env = Env()
+    [env.bind_type((t.__name__, t)) for t in types]
 
     args: Args = translate_arguments(fun.args.args, env)
 

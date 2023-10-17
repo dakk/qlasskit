@@ -162,7 +162,7 @@ class QlassF:
         fun_ast = ast.parse(f if isinstance(f, str) else inspect.getsource(f))
         fun = fun_ast.body[0]
 
-        fun_name, args, fun_ret, exps = translate_ast(fun)
+        fun_name, args, fun_ret, exps = translate_ast(fun, types)
         original_f = eval(fun_name) if isinstance(f, str) else f
 
         qf = QlassF(fun_name, original_f, args, fun_ret, exps)

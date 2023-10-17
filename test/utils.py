@@ -29,16 +29,13 @@ def test_not(a: bool) -> bool:
     return not a
 
 
-# def get_qlassf_input_bits(qf: QlassF) -> int:
-#     pass
+class Qint3(Qint):
+    BIT_SIZE = 3
 
 
-# def get_input_combinations(n_bits: int) -> List[List[bool]]:
-#     pass
+def test_qint3(a: Qint3) -> bool:
+    return not a[0]
 
-
-# def compute_originalf_results(qf: QlassF) -> List[List[bool]]:
-#     pass
 
 aer_simulator = Aer.get_backend("aer_simulator")
 

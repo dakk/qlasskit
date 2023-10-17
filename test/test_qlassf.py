@@ -14,7 +14,7 @@
 
 import unittest
 
-from qlasskit import Qint4, Qint12, QlassF, qlassf
+from qlasskit import Qint, Qint4, Qint12, QlassF, exceptions, qlassf
 
 from . import utils
 from .utils import COMPILATION_ENABLED, compute_and_compare_results
@@ -32,6 +32,21 @@ class TestQlassfDecorator(unittest.TestCase):
     def test_decorator(self):
         c = qlassf(utils.test_not, to_compile=False)
         self.assertTrue(isinstance(c, QlassF))
+
+
+class TestQlassfCustomTypes(unittest.TestCase):
+    def test_custom_qint3(self):
+        qf = qlassf(
+            utils.test_qint3, types=[utils.Qint3], to_compile=COMPILATION_ENABLED
+        )
+        compute_and_compare_results(self, qf)
+
+    def test_custom_qint3_notfound(self):
+        self.assertRaises(
+            exceptions.UnknownTypeException,
+            lambda f: qlassf(f, types=[], to_compile=COMPILATION_ENABLED),
+            utils.test_qint3,
+        )
 
 
 class TestQlassfTruthTable(unittest.TestCase):
