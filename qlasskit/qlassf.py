@@ -20,6 +20,7 @@ from typing import Callable, List, Tuple, Union  # noqa: F401
 from . import compiler
 from .ast2logic import Args, BoolExpList, flatten, translate_ast
 from .types import *  # noqa: F403, F401
+from .types import Qtype
 
 MAX_TRUTH_TABLE_SIZE = 20
 
@@ -151,7 +152,9 @@ class QlassF:
         return self.original_f
 
     @staticmethod
-    def from_function(f: Union[str, Callable], to_compile=True) -> "QlassF":
+    def from_function(
+        f: Union[str, Callable], types: List[Qtype] = [], to_compile: bool = True
+    ) -> "QlassF":
         """Create a QlassF from a function or a string containing a function"""
         if isinstance(f, str):
             exec(f)
@@ -159,7 +162,7 @@ class QlassF:
         fun_ast = ast.parse(f if isinstance(f, str) else inspect.getsource(f))
         fun = fun_ast.body[0]
 
-        fun_name, args, fun_ret, exps = translate_ast(fun)
+        fun_name, args, fun_ret, exps = translate_ast(fun, types)
         original_f = eval(fun_name) if isinstance(f, str) else f
 
         qf = QlassF(fun_name, original_f, args, fun_ret, exps)
@@ -168,10 +171,14 @@ class QlassF:
         return qf
 
 
-def qlassf(f: Union[str, Callable], to_compile=True) -> QlassF:
+def qlassf(
+    f: Union[str, Callable], types: List[Qtype] = [], to_compile: bool = True
+) -> QlassF:
     """Decorator / function creating a QlassF object
 
     Args:
         f: String or function
+        types (List[Qtype], optional): A list of new types to bind
+        to_compile (bool, optional): Compile the circuit after parsing
     """
-    return QlassF.from_function(f, to_compile)
+    return QlassF.from_function(f, types, to_compile)

@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Tuple
+from typing import List
 
 from sympy import Symbol
 from sympy.logic import And, Not, Or, false, true
 
-from .qbool import Qbool
-from .qtype import Qtype, TExp, TType
+from . import _eq, _neq
+from .qtype import Qtype, TExp
 
 
 class Qint(int, Qtype):
@@ -28,27 +28,34 @@ class Qint(int, Qtype):
         super().__init__()
         self.value = value
 
-    def __getitem__(self, i):
-        if i > self.BIT_SIZE:
-            raise Exception("Unbound")
-
-        return self.to_bool_str()[i] == "1"
-
     @classmethod
     def from_bool(cls, v: List[bool]):
         return cls(int("".join(map(lambda x: "1" if x else "0", v[::-1])), 2))
 
-    def to_bool_str(self) -> str:
+    def to_bin(self) -> str:
         s = bin(self.value)[2:][0 : self.BIT_SIZE]
         return ("0" * (self.BIT_SIZE - len(s)) + s)[::-1]
 
-    @staticmethod
-    def const(v: int) -> List[bool]:
+    def to_amplitudes(self) -> List[float]:
+        ampl = [0.0] * 2**self.BIT_SIZE
+        ampl[self.value] = 1
+        return ampl
+
+    @classmethod
+    def comparable(cls, other_type=None) -> bool:
+        """Return true if the type is comparable with itself or
+        with [other_type]"""
+        if not other_type or issubclass(other_type, Qint):
+            return True
+        return False
+
+    @classmethod
+    def const(cls, v: int) -> TExp:
         """Return the list of bool representing an int"""
-        return list(map(lambda c: True if c == "1" else False, bin(v)[2:]))[::-1]
+        return (cls, list(map(lambda c: True if c == "1" else False, bin(v)[2:]))[::-1])
 
     @staticmethod
-    def fill(v: Tuple[TType, List[bool]]) -> Tuple[TType, List[bool]]:
+    def fill(v: TExp) -> TExp:
         """Fill a Qint to reach its bit_size"""
         if len(v[1]) < v[0].BIT_SIZE:  # type: ignore
             v = (
@@ -57,12 +64,14 @@ class Qint(int, Qtype):
             )
         return v
 
+    # Comparators
+
     @staticmethod
     def eq(tleft: TExp, tcomp: TExp) -> TExp:
         """Compare two Qint for equality"""
         ex = true
         for x in zip(tleft[1], tcomp[1]):
-            ex = And(ex, Qbool.eq(x[0], x[1]))
+            ex = And(ex, _eq(x[0], x[1]))
 
         if len(tleft[1]) > len(tcomp[1]):
             for x in tleft[1][len(tcomp[1]) :]:
@@ -79,7 +88,7 @@ class Qint(int, Qtype):
         """Compare two Qint for inequality"""
         ex = false
         for x in zip(tleft[1], tcomp[1]):
-            ex = Or(ex, Qbool.neq(x[0], x[1]))
+            ex = Or(ex, _neq(x[0], x[1]))
 
         if len(tleft[1]) > len(tcomp[1]):
             for x in tleft[1][len(tcomp[1]) :]:
@@ -102,7 +111,7 @@ class Qint(int, Qtype):
             else:
                 ex = Or(ex, And(*(prev + [a, Not(b)])))
 
-            prev.append(Qbool.eq(a, b))
+            prev.append(_eq(a, b))
 
         if len(tleft[1]) > len(tcomp[1]):
             for x in tleft[1][len(tcomp[1]) :]:

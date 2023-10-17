@@ -29,16 +29,13 @@ def test_not(a: bool) -> bool:
     return not a
 
 
-# def get_qlassf_input_bits(qf: QlassF) -> int:
-#     pass
+class Qint3(Qint):
+    BIT_SIZE = 3
 
 
-# def get_input_combinations(n_bits: int) -> List[List[bool]]:
-#     pass
+def test_qint3(a: Qint3) -> bool:
+    return not a[0]
 
-
-# def compute_originalf_results(qf: QlassF) -> List[List[bool]]:
-#     pass
 
 aer_simulator = Aer.get_backend("aer_simulator")
 
@@ -115,9 +112,9 @@ def compute_result_of_originalf(cls, qf, truth_line):
         elif type(res) == int:
             qi = Qint(res)
             qi.BIT_SIZE = len(bin(res)) - 2
-            return qi.to_bool_str()
+            return qi.to_bin()
         else:
-            return res.to_bool_str()
+            return res.to_bin()
 
     args = []
     i = 0

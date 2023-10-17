@@ -47,6 +47,7 @@
 - [x] Fix code structure and typing location
 
 ### Week 4: (16 Oct 23)
+- [x] Extensible type system
 - [ ] Publish doc
 - [ ] Int arithmetic: +
 - [ ] Function call

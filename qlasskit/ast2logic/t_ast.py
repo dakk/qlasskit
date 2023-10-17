@@ -24,20 +24,21 @@ from . import (
 from .typing import Args, LogicFun
 
 
-def translate_ast(fun) -> LogicFun:
+def translate_ast(fun, types) -> LogicFun:
     fun_name: str = fun.name
 
     # env contains names visible from the current scope
     env = Env()
+    [env.bind_type((t.__name__, t)) for t in types]
 
-    args: Args = translate_arguments(fun.args.args)
+    args: Args = translate_arguments(fun.args.args, env)
 
     [env.bind(arg) for arg in args]
 
     if not fun.returns:
         raise exceptions.NoReturnTypeException()
 
-    ret_ = translate_argument(fun.returns)  # TODO: we need to preserve this
+    ret_ = translate_argument(fun.returns, env)  # TODO: we need to preserve this
     ret_size = len(ret_)
 
     exps = []

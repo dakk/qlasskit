@@ -17,7 +17,7 @@ from .env import Env, Binding  # noqa: F401, E402
 from .utils import flatten  # noqa: F401, E402
 from .typing import Args, BoolExpList  # noqa: F401, E402
 from .t_arguments import translate_argument, translate_arguments  # noqa: F401, E402
-from .t_expression import translate_expression, type_of_exp  # noqa: F401, E402
+from .t_expression import translate_expression, decompose_to_symbols  # noqa: F401, E402
 from .t_statement import translate_statement  # noqa: F401, E402
 from .t_ast import translate_ast  # noqa: F401, E402
 from . import exceptions  # noqa: F401, E402

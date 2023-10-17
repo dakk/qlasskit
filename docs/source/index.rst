@@ -21,6 +21,7 @@ Python and translate them into unitary operators (gates) for use in quantum circ
    howitworks
    supported
    qlassf
+   types
    qcircuit
 
 
