@@ -44,9 +44,7 @@ class ASTRewriter(ast.NodeTransformer):
                         for l_it in arg_l[1:]
                     ]
                     comp = ast.BoolOp(op=ast.And(), values=comps)
-                    return ast.IfExp(
-                        test=comp, body=arg_l[0], orelse=iterif(arg_l[1:])
-                    )
+                    return ast.IfExp(test=comp, body=arg_l[0], orelse=iterif(arg_l[1:]))
 
             return iterif(args)
 

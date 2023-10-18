@@ -48,10 +48,10 @@
 
 ### Week 4: (16 Oct 23)
 - [x] Extensible type system
+- [x] Builtin functions: max(), min(), len()
+- [x] Function call (to builtin)
 - [ ] Publish doc
 - [ ] Int arithmetic: +
-- [ ] Function call
-- [ ] Builtin functions: sum(), max(), min(), len()
 
 ## Month 2: 
 
@@ -67,6 +67,7 @@
 - [ ] Ast2logic: fixed size loops unrolling
 
 ### Week 3: (6 Nov 23)
+- [ ] Builtin functions: sum(), all(),
 
 ### Week 4: (13 Nov 23)
 

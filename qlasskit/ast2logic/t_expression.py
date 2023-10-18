@@ -212,7 +212,6 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             if isinstance(targ[1], List):
                 return const_to_qtype(len(targ[1]))
 
-
         # print(ast.dump(expr))
         raise exceptions.ExpressionNotHandledException(expr)
 

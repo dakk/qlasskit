@@ -60,7 +60,7 @@ class TestQlassfBuiltinFunctions(unittest.TestCase):
         f = "def test(a: Qint2, b: Qint2) -> Qint2:\n\treturn max(a,b)"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
-        
+
     def test_max_of3(self):
         f = "def test(a: Qint2, b: Qint2) -> Qint2:\n\treturn max(a,b,3)"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
