@@ -2,7 +2,8 @@ How it works
 ============
 
 In order to translate python code to quantum circuit, qlasskit performs several transformations;
-it starts from the python *AST* (abstract synthax tree) creating *boolean expressions* as intermediate
+it starts from the python *AST* (abstract synthax tree) rewriting it to a simplified version. 
+Then the simplified *AST* is translated to *boolean expressions* as intermediate
 form. Then these boolean expressions are compiled into a *quantum circuit*.
 
 While other existing libraries translate individual operations into quantum circuits and then 

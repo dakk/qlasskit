@@ -102,6 +102,17 @@ Comparators
    a > b or b <= c
 
 
+Function call
+^^^^^^^^^^^^^
+
+Bultin functions:
+- `print()`: debug function, ignore by conversion
+- `len(Tuple)`: returns the length of a tuple
+- `max(a, b, ...)`, `max(Tuple)`: returns the max of a tuple
+- `min(a, b, ...)`, `min(Tuple)`: returns the min of a tuple
+.. - `sum(Tuple)`: returns the sum of the elemnts of a tuple
+.. - `all(a, b, ...)`, `all(Tuple)`:
+
 
 
 Statements 
