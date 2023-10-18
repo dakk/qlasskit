@@ -17,7 +17,7 @@ from typing import List
 from sympy import Symbol
 from sympy.logic import And, Not, Or, false, true
 
-from . import _eq, _neq
+from . import _eq, _full_adder, _neq
 from .qtype import Qtype, TExp
 
 
@@ -26,7 +26,10 @@ class Qint(int, Qtype):
 
     def __init__(self, value):
         super().__init__()
-        self.value = value
+        self.value = value % 2**self.BIT_SIZE
+        
+    def __add__(self, b):
+        return (self.value + b) % 2**self.BIT_SIZE
 
     @classmethod
     def from_bool(cls, v: List[bool]):
@@ -140,9 +143,21 @@ class Qint(int, Qtype):
         """Compare two Qint for greater than - equal"""
         return (bool, Not(Qint.lt(tleft, tcomp)[1]))
 
-    # @staticmethod
-    # def add(tleft: TExp, tright: TExp) -> TExp:
-    #     """Add two Qint"""
+    # Operations
+
+    @classmethod
+    def add(cls, tleft: TExp, tright: TExp) -> TExp:
+        """Add two Qint"""
+        if len(tleft[1]) != len(tright[1]):  # TODO: handle this
+            raise Exception("Ints have differnt sizes")
+
+        carry = False
+        sums = []
+        for x in zip(tleft[1], tright[1]):
+            carry, sum = _full_adder(carry, x[0], x[1])
+            sums.append(sum)
+
+        return (cls, sums)
 
 
 class Qint2(Qint):

@@ -199,7 +199,14 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
     elif isinstance(expr, ast.BinOp):
         # Add | Sub | Mult | MatMult | Div | Mod | Pow | LShift | RShift
         # | BitOr | BitXor | BitAnd | FloorDiv
-        raise exceptions.ExpressionNotHandledException(expr)
+        # print(ast.dump(expr))
+        tleft = translate_expression(expr.left, env)
+        tright = translate_expression(expr.right, env)
+        
+        if isinstance(expr.op, ast.Add):
+            return tleft[0].add(tleft, tright)
+        else:
+            raise exceptions.ExpressionNotHandledException(expr)
 
     # Call
     elif isinstance(expr, ast.Call):

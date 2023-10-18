@@ -291,3 +291,15 @@ class TestQlassfInt(unittest.TestCase):
     #     return a + 1
     # def test(a: Qint2, b: Qint2) -> Qint2:
     #     return a + b
+
+
+class TestQlassfIntAdd(unittest.TestCase):
+    def test_add(self):
+        f = "def test(a: Qint2, b: Qint2) -> Qint2: return a + b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_add_const(self):
+        f = "def test(a: Qint2) -> Qint2: return a + 1"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)

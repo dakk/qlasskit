@@ -98,3 +98,9 @@ class Qtype:
     @staticmethod
     def lte(tleft: TExp, tcomp: TExp) -> TExp:
         raise Exception("abstract")
+
+    # Operations
+
+    @staticmethod
+    def add(tleft: TExp, tcomp: TExp) -> TExp:
+        raise Exception("abstract")
