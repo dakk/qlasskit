@@ -80,7 +80,8 @@ def translate_statement(  # noqa: C901
         # Match
 
     elif isinstance(stmt, ast.Expr):
-        texp, vexp = translate_expression(stmt.value, env)
+        if hasattr(stmt, "value"):
+            texp, vexp = translate_expression(stmt.value, env)
         return [], env
 
     else:

@@ -18,6 +18,7 @@ from functools import reduce
 from typing import Callable, List, Tuple, Union  # noqa: F401
 
 from . import compiler
+from .ast2ast import ast2ast
 from .ast2logic import Args, BoolExpList, flatten, translate_ast
 from .types import *  # noqa: F403, F401
 from .types import Qtype
@@ -160,7 +161,7 @@ class QlassF:
             exec(f)
 
         fun_ast = ast.parse(f if isinstance(f, str) else inspect.getsource(f))
-        fun = fun_ast.body[0]
+        fun = ast2ast(fun_ast.body[0])
 
         fun_name, args, fun_ret, exps = translate_ast(fun, types)
         original_f = eval(fun_name) if isinstance(f, str) else f

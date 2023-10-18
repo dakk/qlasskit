@@ -25,12 +25,12 @@ TypeBinding = Tuple[str, Qtype]
 
 
 class Env:
-    def __init__(self):
+    def __init__(self) -> None:
         self.bindings: List[Binding] = []
         self.types: List[TypeBinding] = []
 
         for t in BUILTIN_TYPES:
-            self.bind_type((t.__name__, t))
+            self.bind_type((t.__name__, t))  # type: ignore
 
     def bind_type(self, bb: TypeBinding):
         if self.know_type(bb[0]):

@@ -46,12 +46,49 @@ class TestQlassfBuiltinFunctions(unittest.TestCase):
         self.assertEqual(qf.expressions[3][1], False)
         compute_and_compare_results(self, qf)
 
+    def test_min(self):
+        f = "def test(a: Qint2, b: Qint2) -> Qint2:\n\treturn min(a,b)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
 
-    # def test_max(self):
-    #     f = "def test(a: Qint2, b: Qint2) -> Qint2:\n\treturn max(a,b)"
+    def test_min_const(self):
+        f = "def test(a: Qint2) -> Qint2:\n\treturn min(a,3)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_max(self):
+        f = "def test(a: Qint2, b: Qint2) -> Qint2:\n\treturn max(a,b)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+        
+    def test_max_of3(self):
+        f = "def test(a: Qint2, b: Qint2) -> Qint2:\n\treturn max(a,b,3)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_max_const(self):
+        f = "def test(a: Qint2) -> Qint2:\n\treturn max(a,3)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    # TODO: fixed by cast
+    # def test_max_const2(self):
+    #     f = "def test(a: Qint4) -> Qint2:\n\treturn max(a,3)"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
     #     compute_and_compare_results(self, qf)
-        
+
+    # TODO: not handled
+    # def test_max_tuple(self):
+    #     f = "def test(a: Tuple[Qint2, Qint2]) -> Qint2:\n\treturn max(a)"
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+    #     compute_and_compare_results(self, qf)
+
+    def test_max_tuple_const(self):
+        f = "def test(a: Qint2, b: Qint2) -> Qint2:\n\treturn max((a, b))"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    # TODO: not handled
     # def test_max_tuple(self):
     #     f = "def test(a: Tuple[Qint2, Qint2]) -> Qint2:\n\treturn max(a)"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
