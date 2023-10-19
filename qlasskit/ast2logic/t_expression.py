@@ -84,7 +84,13 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
                 else:
                     raise exceptions.OutOfBoundException(len(get_args(inner_type)), i)
 
-        return (inner_type, Symbol(sn))
+        if hasattr(inner_type, "BIT_SIZE"):
+            return (
+                inner_type,
+                [Symbol(f"{sn}.{i}") for i in range(inner_type.BIT_SIZE)],
+            )
+        else:
+            return (inner_type, Symbol(sn))
 
     # Boolop: and, or
     elif isinstance(expr, ast.BoolOp):
@@ -202,8 +208,8 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         # print(ast.dump(expr))
         tleft = translate_expression(expr.left, env)
         tright = translate_expression(expr.right, env)
-        
-        if isinstance(expr.op, ast.Add):
+
+        if isinstance(expr.op, ast.Add) and hasattr(tleft[0], "add"):
             return tleft[0].add(tleft, tright)
         else:
             raise exceptions.ExpressionNotHandledException(expr)
@@ -213,13 +219,14 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         if not hasattr(expr.func, "id"):
             raise exceptions.ExpressionNotHandledException(expr)
 
-        # This can be moved to ast2ast
-        if expr.func.id == "len" and len(expr.args) == 1:
-            targ = translate_expression(expr.args[0], env)
-            if isinstance(targ[1], List):
-                return const_to_qtype(len(targ[1]))
+        # Typecast
+        if (
+            env.know_type(expr.func.id)
+            and len(expr.args) == 1
+            and isinstance(expr.args[0], ast.Constant)
+        ):
+            return env.gettype(expr.func.id).const(expr.args[0].value)
 
-        # print(ast.dump(expr))
         raise exceptions.ExpressionNotHandledException(expr)
 
     # Lambda

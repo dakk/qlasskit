@@ -37,6 +37,13 @@ class TestQlassfBuiltinFunctions(unittest.TestCase):
         self.assertEqual(qf.expressions[1][1], True)
         compute_and_compare_results(self, qf)
 
+    def test_len2(self):
+        f = "def test(a: Tuple[bool, bool]) -> Qint2:\n\tc=a\n\treturn len(c)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        self.assertEqual(qf.expressions[-2][1], False)
+        self.assertEqual(qf.expressions[-1][1], True)
+        compute_and_compare_results(self, qf)
+
     def test_len4(self):
         f = "def test(a: Tuple[bool, bool, bool, bool]) -> Qint4:\n\treturn len(a)"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
@@ -77,19 +84,12 @@ class TestQlassfBuiltinFunctions(unittest.TestCase):
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
     #     compute_and_compare_results(self, qf)
 
-    # TODO: not handled
-    # def test_max_tuple(self):
-    #     f = "def test(a: Tuple[Qint2, Qint2]) -> Qint2:\n\treturn max(a)"
-    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-    #     compute_and_compare_results(self, qf)
+    def test_max_tuple(self):
+        f = "def test(a: Tuple[Qint2, Qint2]) -> Qint2:\n\treturn max(a)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
 
     def test_max_tuple_const(self):
         f = "def test(a: Qint2, b: Qint2) -> Qint2:\n\treturn max((a, b))"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
-
-    # TODO: not handled
-    # def test_max_tuple(self):
-    #     f = "def test(a: Tuple[Qint2, Qint2]) -> Qint2:\n\treturn max(a)"
-    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-    #     compute_and_compare_results(self, qf)

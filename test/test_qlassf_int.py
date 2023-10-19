@@ -294,6 +294,11 @@ class TestQlassfInt(unittest.TestCase):
 
 
 class TestQlassfIntAdd(unittest.TestCase):
+    def test_add2(self):
+        f = "def test(a: Tuple[Qint2, Qint2]) -> Qint2: return a[0] + a[1]"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
     def test_add(self):
         f = "def test(a: Qint2, b: Qint2) -> Qint2: return a + b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
@@ -301,5 +306,10 @@ class TestQlassfIntAdd(unittest.TestCase):
 
     def test_add_const(self):
         f = "def test(a: Qint2) -> Qint2: return a + 1"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_add_const2(self):
+        f = "def test() -> Qint4: return Qint4(3) + 3"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)

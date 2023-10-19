@@ -27,7 +27,7 @@ class Qint(int, Qtype):
     def __init__(self, value):
         super().__init__()
         self.value = value % 2**self.BIT_SIZE
-        
+
     def __add__(self, b):
         return (self.value + b) % 2**self.BIT_SIZE
 
@@ -55,17 +55,16 @@ class Qint(int, Qtype):
     @classmethod
     def const(cls, v: int) -> TExp:
         """Return the list of bool representing an int"""
-        return cls.fill(
-            (cls, list(map(lambda c: True if c == "1" else False, bin(v)[2:]))[::-1])
-        )
+        cval = list(map(lambda c: True if c == "1" else False, bin(v)[2:]))[::-1]
+        return cls.fill((cls, cval))
 
-    @staticmethod
-    def fill(v: TExp) -> TExp:
+    @classmethod
+    def fill(cls, v: TExp) -> TExp:
         """Fill a Qint to reach its bit_size"""
-        if len(v[1]) < v[0].BIT_SIZE:  # type: ignore
+        if len(v[1]) < cls.BIT_SIZE:  # type: ignore
             v = (
-                v[0],
-                (v[0].BIT_SIZE - len(v[1])) * v[1] + [False],  # type: ignore
+                cls,
+                v[1] + (cls.BIT_SIZE - len(v[1])) * [False],  # type: ignore
             )
         return v
 
@@ -148,8 +147,11 @@ class Qint(int, Qtype):
     @classmethod
     def add(cls, tleft: TExp, tright: TExp) -> TExp:
         """Add two Qint"""
-        if len(tleft[1]) != len(tright[1]):  # TODO: handle this
-            raise Exception("Ints have differnt sizes")
+        if len(tleft[1]) > len(tright[1]):
+            tright = tleft[0].fill(tright)  # type: ignore
+
+        elif len(tleft[1]) < len(tright[1]):
+            tleft = tright[0].fill(tleft)  # type: ignore
 
         carry = False
         sums = []
@@ -157,7 +159,7 @@ class Qint(int, Qtype):
             carry, sum = _full_adder(carry, x[0], x[1])
             sums.append(sum)
 
-        return (cls, sums)
+        return (cls if cls.BIT_SIZE > tleft[0].BIT_SIZE else tleft[0], sums)  # type: ignore
 
 
 class Qint2(Qint):
