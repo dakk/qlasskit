@@ -183,7 +183,7 @@ class TestQlassfBoolean(unittest.TestCase):
             + "\th = (not a) and b and (not c)\n"
             + "\treturn g if d and e else h"
         )
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         self.assertEqual(len(qf.expressions), 5)
         self.assertEqual(qf.expressions[-1][1], ITE(d & e, g, h))
         compute_and_compare_results(self, qf)

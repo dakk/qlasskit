@@ -54,14 +54,12 @@ def compute_result_of_qcircuit(cls, qf, truth_line):
     gate = qf.gate()
     qc = QuantumCircuit(gate.num_qubits)
 
-    # circ_qi = circ.export("circuit", "qiskit")
-    # print(circ_qi.draw("text"))
-    # print(qf.expressions)
-
     # Prepare inputs
     [qc.initialize(1 if truth_line[i] else 0, i) for i in range(qf.input_size)]
 
     qc.append(gate, list(range(qf.num_qubits)))
+
+    # print(qc.decompose().draw("text"))
 
     # Measure
     counts = qiskit_measure_and_count(qc)
@@ -111,7 +109,7 @@ def compute_result_of_originalf(cls, qf, truth_line):
             return "".join([res_to_str(x) for x in res])
         elif type(res) == int:
             qc = const_to_qtype(res)
-            qi = qc[0].from_bool(qc[1])
+            qi = qf.returns.ttype.from_bool(qc[1])
             return qi.to_bin()
         else:
             return res.to_bin()
@@ -145,6 +143,11 @@ def compute_and_compare_results(cls, qf):
 
     if len(truth_table) > MAX_Q_SIM and COMPILATION_ENABLED:
         qc_truth = [random.choice(truth_table) for x in range(MAX_Q_SIM)]
+    elif COMPILATION_ENABLED:
+        qc_truth = truth_table
+
+    # circ_qi = qf.circuit().export("circuit", "qiskit")
+    # print(circ_qi.draw("text"))
 
     for truth_line in truth_table:
         # Extract str of truthtable and result
@@ -152,11 +155,11 @@ def compute_and_compare_results(cls, qf):
             map(lambda x: "1" if x else "0", truth_line[-qf.ret_size :])
         )
 
+        # Calculate and compare the originalf result
+        res_original = compute_result_of_originalf(cls, qf, truth_line)
+        cls.assertEqual(truth_str, res_original)
+
         # Calculate and compare the gate result
         if qc_truth and truth_line in qc_truth and COMPILATION_ENABLED:
             res_qc = compute_result_of_qcircuit(cls, qf, truth_line)
             cls.assertEqual(truth_str, res_qc)
-
-        # Calculate and compare the originalf result
-        res_original = compute_result_of_originalf(cls, qf, truth_line)
-        cls.assertEqual(truth_str, res_original)

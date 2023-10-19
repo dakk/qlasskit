@@ -50,8 +50,10 @@
 - [x] Extensible type system
 - [x] Builtin functions: max(), min(), len()
 - [x] Function call (to builtin)
+- [x] Int arithmetic: +
+- [ ] Int: shift right / left
+- [ ] Int: subtraction
 - [ ] Publish doc
-- [ ] Int arithmetic: +
 
 ## Month 2: 
 

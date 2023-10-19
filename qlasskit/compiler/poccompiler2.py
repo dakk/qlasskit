@@ -123,12 +123,27 @@ class POCCompiler2(Compiler):
 
         elif isinstance(expr, Xor):
             erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))
+            last = erets.pop()
 
             qc.barrier("xor")
-            [qc.mark_ancilla(eret) for eret in erets[:-1]]
 
-            qc.mcx(erets[0:-1], erets[-1])
-            return erets[-1]
+            if last in qc.ancilla_lst:
+                fa = last
+                self.expqmap.update_exp_for_qubit(last, expr)
+            else:
+                fa = qc.get_free_ancilla()
+
+                qc.cx(last, fa)
+                qc.mark_ancilla(last)
+                self.expqmap[expr] = fa
+
+            for x in erets:
+                qc.cx(x, fa)
+
+            [qc.mark_ancilla(eret) for eret in erets]
+            self.garbage_collect(qc)
+
+            return fa
 
         elif isinstance(expr, BooleanFalse):
             return qc.get_free_ancilla()

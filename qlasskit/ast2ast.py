@@ -72,7 +72,7 @@ class ASTRewriter(ast.NodeTransformer):
             else:
                 args = node.args
 
-            op = ast.Gt() if node.func.id == "max" else ast.Lt()
+            op = ast.Gt() if node.func.id == "max" else ast.LtE()
 
             def iterif(arg_l):
                 if len(arg_l) == 1:
