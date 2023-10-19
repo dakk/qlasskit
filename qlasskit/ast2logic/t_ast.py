@@ -38,8 +38,7 @@ def translate_ast(fun, types) -> LogicFun:
     if not fun.returns:
         raise exceptions.NoReturnTypeException()
 
-    ret_ = translate_argument(fun.returns, env)  # TODO: we need to preserve this
-    ret_size = len(ret_)
+    ret_ = translate_argument(fun.returns, env)
 
     exps = []
     for stmt in fun.body:
@@ -53,4 +52,4 @@ def translate_ast(fun, types) -> LogicFun:
     #     if e == true or e == false:
     #         print(f"Warning: expression {n} is returning a costant: {e}")
 
-    return fun_name, args, ret_size, exps_simpl
+    return fun_name, args, ret_, exps_simpl

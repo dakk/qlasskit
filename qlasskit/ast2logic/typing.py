@@ -38,4 +38,4 @@ class Arg:
 
 Args = List[Arg]
 BoolExpList = List[Tuple[Symbol, Boolean]]
-LogicFun = Tuple[str, Args, int, BoolExpList]
+LogicFun = Tuple[str, Args, Arg, BoolExpList]

@@ -19,7 +19,7 @@ from typing import Callable, List, Tuple, Union  # noqa: F401
 
 from . import compiler
 from .ast2ast import ast2ast
-from .ast2logic import Args, BoolExpList, flatten, translate_ast
+from .ast2logic import Arg, Args, BoolExpList, flatten, translate_ast
 from .types import *  # noqa: F403, F401
 from .types import Qtype
 
@@ -32,7 +32,7 @@ class QlassF:
     name: str
     original_f: Callable
     args: Args
-    ret_size: int
+    returns: Arg
     expressions: BoolExpList
 
     def __init__(
@@ -40,21 +40,26 @@ class QlassF:
         name: str,
         original_f: Callable,
         args: Args,
-        ret_size: int,
+        returns: Arg,
         exps: BoolExpList,
     ):
         self.name = name
         self.original_f = original_f
         self.args = args
-        self.ret_size = ret_size
+        self.returns = returns
         self.expressions = exps
 
         self._compiled_gate = None
 
     def __repr__(self):
+        ret_str = f"{self.returns.ttype}[{len(self.returns)}]"
         arg_str = ", ".join(map(lambda arg: f"{arg.name}:{arg.ttype}", self.args))
         exp_str = "\n\t".join(map(lambda exp: f"{exp[0]} = {exp[1]}", self.expressions))
-        return f"QlassF<{self.name}>({arg_str}) -> bool[{self.ret_size}]:\n\t{exp_str}"
+        return f"QlassF<{self.name}>({arg_str}) -> {ret_str}:\n\t{exp_str}"
+
+    @property
+    def ret_size(self):
+        return len(self.returns)
 
     def __add__(self, qf2) -> "QlassF":
         """Adds two qlassf and return the combination"""
