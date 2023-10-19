@@ -51,6 +51,7 @@
 - [x] Builtin functions: max(), min(), len()
 - [x] Function call (to builtin)
 - [x] Int arithmetic: +
+- [ ] Int: bitwise not
 - [ ] Int: shift right / left
 - [ ] Int: subtraction
 - [ ] Publish doc

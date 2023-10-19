@@ -78,7 +78,7 @@ class POCCompiler2(Compiler):
 
         return qc
 
-    def compile_expr(self, qc: QCircuit, expr: Boolean) -> int:
+    def compile_expr(self, qc: QCircuit, expr: Boolean) -> int:  # noqa: C901
         if isinstance(expr, Symbol):
             return qc[expr.name]
 
