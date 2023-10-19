@@ -287,10 +287,23 @@ class TestQlassfInt(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
 
-    # def test(a: Qint2) -> Qint2:
-    #     return a + 1
-    # def test(a: Qint2, b: Qint2) -> Qint2:
-    #     return a + b
+    def test_shift_left(self):
+        f = "def test(n: Qint2) -> Qint4: return n << 1"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        print(qf.expressions)
+        compute_and_compare_results(self, qf)
+
+    def test_shift_right(self):
+        f = "def test(n: Qint2) -> Qint4: return n >> 1"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        print(qf.expressions)
+        compute_and_compare_results(self, qf)
+
+    # Our Qint are unsigned
+    # def test_invert_bitwise_not(self):
+    #     f = "def test(n: Qint4) -> bool: return ~n"
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+    #     compute_and_compare_results(self, qf)
 
 
 # TODO: parameterize

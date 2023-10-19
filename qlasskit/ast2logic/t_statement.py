@@ -17,11 +17,12 @@ from typing import List, Tuple
 from sympy import Symbol
 from sympy.logic.boolalg import Boolean
 
+from ..types import TType
 from . import Binding, Env, decompose_to_symbols, exceptions, translate_expression
 
 
 def translate_statement(  # noqa: C901
-    stmt, env: Env
+    stmt, env: Env, ret_type: TType
 ) -> Tuple[List[Tuple[str, Boolean]], Env]:
     """Parse a statement"""
     # match stmt:
@@ -65,6 +66,16 @@ def translate_statement(  # noqa: C901
 
     elif isinstance(stmt, ast.Return):
         texp, vexp = translate_expression(stmt.value, env)  # TODO: typecheck
+
+        if (
+            hasattr(texp, "BIT_SIZE")
+            and hasattr(ret_type, "BIT_SIZE")
+            and texp.BIT_SIZE < ret_type.BIT_SIZE
+        ):
+            texp, vexp = ret_type.fill((texp, vexp))  # type: ignore
+        elif texp != ret_type:
+            raise exceptions.TypeErrorException(texp, ret_type)
+
         res = decompose_to_symbols(vexp, "_ret")
         env.bind(Binding("_ret", texp, [x[0] for x in res]))
         res = list(map(lambda x: (Symbol(x[0]), x[1]), res))

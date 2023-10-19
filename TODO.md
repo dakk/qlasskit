@@ -51,16 +51,16 @@
 - [x] Builtin functions: max(), min(), len()
 - [x] Function call (to builtin)
 - [x] Int arithmetic: +
-- [ ] Int: bitwise not
-- [ ] Int: shift right / left
+- [x] Qtype: bitwise not
+- [x] Qtype: shift right / left
 - [ ] Int: subtraction
-- [ ] Publish doc
+- [ ] Publish doc on github
 
 ## Month 2: 
 
 ### Week 1: (23 Oct 23)
 - [ ] Inner function
-- [ ] Int arithmetic expressions (-, *, /)
+- [ ] Int arithmetic expressions (*, /)
 - [ ] Parametrized qlassf
 
 ### Week 2: (30 Oct 23)

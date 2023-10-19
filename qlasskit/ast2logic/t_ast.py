@@ -42,7 +42,7 @@ def translate_ast(fun, types) -> LogicFun:
 
     exps = []
     for stmt in fun.body:
-        s_exps, env = translate_statement(stmt, env)
+        s_exps, env = translate_statement(stmt, env, ret_.ttype)
         exps.append(s_exps)
 
     exps_flat = flatten(exps)

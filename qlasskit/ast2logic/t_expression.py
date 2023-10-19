@@ -110,13 +110,15 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
     # Unary: not
     elif isinstance(expr, ast.UnaryOp):
-        if isinstance(expr.op, ast.Not):
-            texp, exp = translate_expression(expr.operand, env)
+        texp, exp = translate_expression(expr.operand, env)
 
+        if isinstance(expr.op, ast.Not):
             if texp != bool:
                 raise exceptions.TypeErrorException(texp, bool)
-
             return (bool, Not(exp))
+
+        elif isinstance(expr.op, ast.Invert) and hasattr(texp, "bitwise_not"):
+            return texp.bitwise_not((texp, exp))
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
@@ -203,7 +205,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
     # Binop
     elif isinstance(expr, ast.BinOp):
-        # Add | Sub | Mult | MatMult | Div | Mod | Pow | LShift | RShift
+        # Sub | Mult | MatMult | Div | Mod | Pow |
         # | BitOr | BitXor | BitAnd | FloorDiv
         # print(ast.dump(expr))
         tleft = translate_expression(expr.left, env)
@@ -211,6 +213,18 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
         if isinstance(expr.op, ast.Add) and hasattr(tleft[0], "add"):
             return tleft[0].add(tleft, tright)
+        elif (
+            isinstance(expr.op, ast.LShift)
+            and hasattr(tleft[0], "shift_left")
+            and isinstance(expr.right, ast.Constant)
+        ):
+            return tleft[0].shift_left(tleft, expr.right.value)
+        elif (
+            isinstance(expr.op, ast.RShift)
+            and hasattr(tleft[0], "shift_right")
+            and isinstance(expr.right, ast.Constant)
+        ):
+            return tleft[0].shift_right(tleft, expr.right.value)
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 

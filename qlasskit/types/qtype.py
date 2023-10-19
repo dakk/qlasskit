@@ -14,7 +14,7 @@
 
 from typing import Any, List, Literal, Tuple
 
-from sympy.logic.boolalg import Boolean
+from sympy.logic.boolalg import Boolean, Not
 from typing_extensions import TypeAlias
 
 TType: TypeAlias = object
@@ -100,6 +100,21 @@ class Qtype:
         raise Exception("abstract")
 
     # Operations
+
+    @staticmethod
+    def bitwise_not(v: TExp) -> TExp:
+        """Apply a bitwise not"""
+        return (v[0], list(map(Not, v[1])))
+
+    @staticmethod
+    def shift_right(v: TExp, i: int = 1) -> TExp:
+        """Apply a shift right"""
+        return (v[0], v[1][i:])
+
+    @staticmethod
+    def shift_left(v: TExp, i: int = 1) -> TExp:
+        """Apply a shift left"""
+        return (v[0], [False] * i + v[1])
 
     @staticmethod
     def add(tleft: TExp, tcomp: TExp) -> TExp:

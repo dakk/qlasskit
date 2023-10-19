@@ -25,6 +25,6 @@ class TestAst2Logic_translate_statement(unittest.TestCase):
 
         self.assertRaises(
             exceptions.StatementNotHandledException,
-            lambda e: ast2logic.translate_statement(e, {}),
+            lambda e: ast2logic.translate_statement(e, {}, bool),
             e,
         )
