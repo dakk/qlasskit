@@ -213,6 +213,8 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
         if isinstance(expr.op, ast.Add) and hasattr(tleft[0], "add"):
             return tleft[0].add(tleft, tright)
+        elif isinstance(expr.op, ast.Sub) and hasattr(tleft[0], "sub"):
+            return tleft[0].sub(tleft, tright)
         elif (
             isinstance(expr.op, ast.LShift)
             and hasattr(tleft[0], "shift_left")

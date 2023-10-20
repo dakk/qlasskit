@@ -119,3 +119,7 @@ class Qtype:
     @staticmethod
     def add(tleft: TExp, tcomp: TExp) -> TExp:
         raise Exception("abstract")
+
+    @staticmethod
+    def sub(tleft: TExp, tcomp: TExp) -> TExp:
+        raise Exception("abstract")

@@ -1,21 +1,21 @@
 from qiskit import QuantumCircuit
 
-from qlasskit import Qint4, qlassf
+from qlasskit import Qint2, qlassf
 
 
 @qlassf
-def f1(n: Qint4) -> Qint4:
-    return n + 1
+def f1(n: Qint2, q: Qint2) -> Qint2:
+    return n + q
 
 
 @qlassf
-def f2(n: Qint4) -> Qint4:
-    return n + 3
+def f2(n: Qint2, z: Qint2) -> Qint2:
+    return n + z
 
 
 @qlassf
-def f_comp(n: Qint4) -> Qint4:
-    return n + 1 + 3
+def f_comp(n: Qint2, q: Qint2, z: Qint2) -> Qint2:
+    return n + q + z
 
 
 print(f_comp.expressions)
@@ -25,9 +25,13 @@ qc.append(gate, list(range(gate.num_qubits)))
 print(qc.decompose().draw("text"))
 
 
+print(f1.expressions, f2.expressions)
 gate1 = f1.gate()
 gate2 = f2.gate()
-qc = QuantumCircuit(max(gate1.num_qubits, gate2.num_qubits))
+qc = QuantumCircuit(-2 + gate1.num_qubits + gate2.num_qubits)
 qc.append(gate1, list(range(gate1.num_qubits)))
-qc.append(gate2, list(range(gate2.num_qubits)))
+qc.barrier()
+qc.append(
+    gate2, list(range(gate1.num_qubits - 2, gate1.num_qubits + gate2.num_qubits - 2))
+)
 print(qc.decompose().draw("text"))

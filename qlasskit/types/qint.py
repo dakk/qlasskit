@@ -31,6 +31,9 @@ class Qint(int, Qtype):
     def __add__(self, b):
         return (self.value + b) % 2**self.BIT_SIZE
 
+    def __sub__(self, b):
+        return (self.value - b) % 2**self.BIT_SIZE
+
     @classmethod
     def from_bool(cls, v: List[bool]):
         return cls(int("".join(map(lambda x: "1" if x else "0", v[::-1])), 2))
@@ -160,6 +163,13 @@ class Qint(int, Qtype):
             sums.append(sum)
 
         return (cls if cls.BIT_SIZE > tleft[0].BIT_SIZE else tleft[0], sums)  # type: ignore
+
+    @classmethod
+    def sub(cls, tleft: TExp, tright: TExp) -> TExp:
+        """Subtract two Qint"""
+        an = cls.bitwise_not(cls.fill(tleft))  # type: ignore
+        su = cls.add(an, cls.fill(tright))  # type: ignore
+        return cls.bitwise_not(su)  # type: ignore
 
 
 class Qint2(Qint):

@@ -102,6 +102,36 @@ Comparators
    a > b or b <= c
 
 
+Unary Op
+^^^^^^^^^
+
+.. code-block:: python
+
+   ~a
+
+
+
+Bin Op
+^^^^^^^^^
+
+.. code-block:: python
+
+   a << 1
+
+.. code-block:: python
+
+   a >> 2
+
+.. code-block:: python
+
+   a + b
+
+.. code-block:: python
+
+   a - b
+
+   
+
 Function call
 ^^^^^^^^^^^^^
 

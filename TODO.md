@@ -53,7 +53,7 @@
 - [x] Int arithmetic: +
 - [x] Qtype: bitwise not
 - [x] Qtype: shift right / left
-- [ ] Int: subtraction
+- [x] Int: subtraction
 - [ ] Publish doc on github
 
 ## Month 2: 
