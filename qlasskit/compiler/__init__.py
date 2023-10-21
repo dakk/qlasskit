@@ -20,11 +20,11 @@ from .multipass import MultipassCompiler
 from .poccompiler2 import POCCompiler2
 
 
-def to_quantum(name, args, ret_size, exprs, compiler="poc2"):
+def to_quantum(name, args, returns, exprs, compiler="poc2"):
     if compiler == "multipass":
         s = MultipassCompiler()
     elif compiler == "poc2":
         s = POCCompiler2()
 
-    circ = s.compile(name, args, ret_size, exprs)
+    circ = s.compile(name, args, returns, exprs)
     return circ

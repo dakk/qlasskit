@@ -18,7 +18,7 @@ from sympy.logic import ITE, And, Implies, Not, Or, Xor
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
 
 from .. import QCircuit
-from ..ast2logic.typing import Args, BoolExpList
+from ..ast2logic.typing import Args, Arg, BoolExpList
 
 
 class CompilerException(Exception):
@@ -89,6 +89,6 @@ class Compiler:
         return exp
 
     def compile(
-        self, name: str, args: Args, ret_size: int, expr: BoolExpList
+        self, name: str, args: Args, returns: Arg, expr: BoolExpList
     ) -> QCircuit:
         raise Exception("abstract")

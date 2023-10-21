@@ -108,7 +108,7 @@ class QlassF:
         self._compiled_gate = compiler.to_quantum(
             name=self.name,
             args=self.args,
-            ret_size=self.ret_size,
+            returns=self.returns,
             exprs=self.expressions,
         )
 
