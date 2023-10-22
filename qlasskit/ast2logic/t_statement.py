@@ -55,12 +55,10 @@ def translate_statement(  # noqa: C901
 
         target = stmt.targets[0].id
 
-        if target in env:
-            raise exceptions.SymbolReassignedException(target)
-
         tval, val = translate_expression(stmt.value, env)  # TODO: typecheck
         res = decompose_to_symbols(val, f"{target}")
-        env.bind(Binding(target, tval, [x[0] for x in res]))
+
+        env.bind(Binding(target, tval, [x[0] for x in res]), rebind=target in env)
         res = list(map(lambda x: (Symbol(x[0]), x[1]), res))
         return res, env
 

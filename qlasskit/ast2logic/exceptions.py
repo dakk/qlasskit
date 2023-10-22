@@ -53,8 +53,3 @@ class OutOfBoundException(Exception):
 class UnboundException(Exception):
     def __init__(self, symbol, env):
         super().__init__(f"{symbol} in {env}")
-
-
-class SymbolReassignedException(Exception):
-    def __init__(self, name):
-        super().__init__(f"{name} cannot be reassinged")

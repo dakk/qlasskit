@@ -58,6 +58,9 @@
 ## Month 2: 
 
 ### Week 1: (23 Oct 23)
+- [x] Symbol reassign and augassign
+- [ ] For unrolling
+
 ### Week 2: (30 Oct 23)
 ### Week 3: (6 Nov 23)
 ### Week 4: (13 Nov 23)

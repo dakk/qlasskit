@@ -17,6 +17,8 @@ import inspect
 from functools import reduce
 from typing import Callable, List, Tuple, Union  # noqa: F401
 
+from sympy import Symbol
+
 from . import compiler
 from .ast2ast import ast2ast
 from .ast2logic import Arg, Args, BoolExpList, flatten, translate_ast
@@ -96,9 +98,13 @@ class QlassF:
 
             for ename, exp in self.expressions:
                 exp_sub = exp.subs(known)
-                known.append((ename, exp_sub))
 
-            res = known[0 : len(arg_bits)] + known[-self.ret_size :]
+                known = list(filter(lambda x: x[0] != ename.name, known))
+                known.append(
+                    (ename.name if isinstance(ename, Symbol) else ename, exp_sub)
+                )
+
+            res = list(zip(arg_bits, bin_arr)) + known[-self.ret_size :]
             res_clean = list(map(lambda y: y[1], res))
             truth.append(res_clean)
 

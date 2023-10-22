@@ -46,8 +46,8 @@ class Env:
         except:
             raise exceptions.UnboundException(type_name, self)
 
-    def bind(self, bb: Binding):
-        if bb.name in self:
+    def bind(self, bb: Binding, rebind=False):
+        if not rebind and bb.name in self:
             raise Exception("duplicate bind")
 
         self.bindings.append(bb)

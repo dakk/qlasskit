@@ -188,14 +188,6 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(qf.expressions[-1][1], ITE(d & e, g, h))
         compute_and_compare_results(self, qf)
 
-    def test_reassign_exception(self):
-        f = "def test(a: bool) -> bool:\n\ta = not a\n\treturn a"
-        self.assertRaises(
-            exceptions.SymbolReassignedException,
-            lambda f: qlassf(f, to_compile=False),
-            f,
-        )
-
     # def test_if(self):
     #     f = (
     #         "def test(a: bool, b: bool) -> bool:\n"

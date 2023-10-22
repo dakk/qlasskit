@@ -19,21 +19,6 @@ class ASTRewriter(ast.NodeTransformer):
         self.env = {}
         self.ret = None
 
-    def generic_visit(self, node):
-        return super().generic_visit(node)
-
-    def visit_FunctionDef(self, node):
-        for x in node.args.args:
-            self.env[x.arg] = x.annotation
-        self.ret = node.returns
-
-        return super().generic_visit(node)
-
-    def visit_Assign(self, node):
-        if isinstance(node.value, ast.Name) and node.value.id in self.env:
-            self.env[node.targets[0].id] = self.env[node.value.id]
-        return node
-
     def __unroll_arg(self, arg):
         if isinstance(arg, ast.Tuple):
             return arg.elts
@@ -51,6 +36,79 @@ class ASTRewriter(ast.NodeTransformer):
                     for i in range(len(self.env[arg.id].slice.value.elts))
                 ]
         return [arg]
+
+    def generic_visit(self, node):
+        return super().generic_visit(node)
+
+    def visit_FunctionDef(self, node):
+        for x in node.args.args:
+            self.env[x.arg] = x.annotation
+        self.ret = node.returns
+
+        return super().generic_visit(node)
+
+    def visit_Assign(self, node):
+        was_known = node.targets[0].id in self.env
+
+        if isinstance(node.value, ast.Name) and node.value.id in self.env:
+            self.env[node.targets[0].id] = self.env[node.value.id]
+        else:
+            self.env[node.targets[0].id] = "Uknown"
+
+        # TODO: support unrolling tuple
+        # Reassigning an already present variable (use a temp variable)
+        if was_known:
+            new_targ = ast.Name(id=f"__{node.targets[0].id}", ctx=ast.Load())
+            return [
+                ast.Assign(
+                    targets=[new_targ],
+                    value=node.value,
+                ),
+                ast.Assign(
+                    targets=node.targets,
+                    value=new_targ,
+                ),
+            ]
+
+        return node
+
+    def visit_AugAssign(self, node):
+        """Translate AugAssign to Assign + BinOp (+=, -=, etc)"""
+        # Reassigning an already present variable (use a temp variable)
+        # if node.target.id in self.env:
+        new_targ = ast.Name(id=f"__{node.target.id}", ctx=ast.Load())
+
+        return [
+            ast.Assign(
+                targets=[new_targ],
+                value=ast.BinOp(left=node.target, op=node.op, right=node.value),
+            ),
+            ast.Assign(
+                targets=[node.target],
+                value=new_targ,
+            ),
+        ]
+
+    def visit_For(self, node):
+        # For(
+        #     target=Name(id="x", ctx=Store()),
+        #     iter=Call(
+        #         func=Name(id="range", ctx=Load()),
+        #         args=[Constant(value=2, kind=None)],
+        #         keywords=[],
+        #     ),
+        #     body=[
+        #         AugAssign(
+        #             target=Name(id="a", ctx=Store()),
+        #             op=Add(),
+        #             value=Constant(value=1, kind=None),
+        #         )
+        #     ],
+        #     orelse=[],
+        #     type_comment=None,
+        # )
+        # print(ast.dump(node))
+        return node
 
     def visit_Call(self, node):
         if not hasattr(node.func, "id"):

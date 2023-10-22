@@ -354,3 +354,25 @@ class TestQlassfIntSub(unittest.TestCase):
         f = "def test(a: Qint4) -> Qint4: return a - 8"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
+
+
+class TestQlassfIntReassign(unittest.TestCase):
+    def test_reassign_newvar(self):
+        f = "def test(a: Qint2) -> Qint2:\n\tb = 0\n\tb = a + 1\n\treturn b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_reassign_arg(self):
+        f = "def test(a: Qint2) -> Qint2:\n\ta = a + 1\n\treturn a"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_aug_reassign_newvar(self):
+        f = "def test(a: Qint2) -> Qint2:\n\tb = a\n\tb += 1\n\treturn b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_aug_reassign_arg(self):
+        f = "def test(a: Qint2) -> Qint2:\n\ta += 1\n\treturn a"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
