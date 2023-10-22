@@ -18,6 +18,7 @@ from .compiler import Compiler, CompilerException, optimizer  # noqa: F401
 
 from .multipass import MultipassCompiler
 from .poccompiler2 import POCCompiler2
+from .poccompiler3 import POCCompiler3
 
 
 def to_quantum(name, args, returns, exprs, compiler="poc2"):
@@ -25,6 +26,8 @@ def to_quantum(name, args, returns, exprs, compiler="poc2"):
         s = MultipassCompiler()
     elif compiler == "poc2":
         s = POCCompiler2()
+    elif compiler == "poc3":
+        s = POCCompiler3()
 
     circ = s.compile(name, args, returns, exprs)
     return circ

@@ -18,7 +18,7 @@ from sympy.logic import ITE, And, Implies, Not, Or, Xor
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
 
 from .. import QCircuit
-from ..ast2logic.typing import Args, Arg, BoolExpList
+from ..ast2logic.typing import Arg, Args, BoolExpList
 
 
 class CompilerException(Exception):

@@ -54,28 +54,13 @@
 - [x] Qtype: bitwise not
 - [x] Qtype: shift right / left
 - [x] Int: subtraction
-- [ ] Publish doc on github
 
 ## Month 2: 
 
 ### Week 1: (23 Oct 23)
-- [ ] Inner function
-- [ ] Int arithmetic expressions (*, /)
-- [ ] Parametrized qlassf
-
 ### Week 2: (30 Oct 23)
-- [ ] Lambda
-- [ ] FixedList type
-- [ ] Builtin functions: map, count
-- [ ] Ast2logic: fixed size loops unrolling
-
 ### Week 3: (6 Nov 23)
-- [ ] Builtin functions: sum(), all(),
-
 ### Week 4: (13 Nov 23)
-
-- [ ] First beta release
-
 
 ## Month 3:
 
@@ -94,14 +79,29 @@
 
 - [ ] First stable release
 
+
+
+
 ## Future features
+
+
+- [ ] Publish doc on github
+- [ ] Inner function
+- [ ] Int arithmetic expressions (*, /)
+- [ ] Parametrized qlassf
+- [ ] Lambda
+- [ ] FixedList type
+- [ ] Builtin functions: map, count
+- [ ] Ast2logic: fixed size loops unrolling
+- [ ] Builtin functions: sum(), all(),
+- [ ] First beta release
 
 ### Language support
 
 - [ ] Ast2logic: if-then-else statement
-- [ ] Datatype: Integer
-- [ ] Integer comparators
-- [ ] Integer constant
+- [x] Datatype: Integer
+- [x] Integer comparators
+- [x] Integer constant
 - [ ] Integer operations
 - [ ] Datatype: List
 - [ ] Datatype: Dict
@@ -128,4 +128,5 @@
 
 ### Tools
 
-- [ ] py2qasm tools
+- [ ] py2qasm tool
+- [ ] py2boolexp tool

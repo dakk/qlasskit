@@ -344,12 +344,12 @@ class TestQlassfIntSub(unittest.TestCase):
         f = "def test(a: Qint2) -> Qint2: return a - 1"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
-        
+
     def test_sub_const2(self):
         f = "def test(a: Qint2) -> Qint2: return a - 3"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
-        
+
     def test_sub_const3(self):
         f = "def test(a: Qint4) -> Qint4: return a - 8"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)

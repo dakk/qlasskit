@@ -19,7 +19,7 @@ from sympy.logic import And, Not, Xor
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
 
 from .. import QCircuit
-from ..ast2logic.typing import Args, Arg, BoolExpList
+from ..ast2logic.typing import Arg, Args, BoolExpList
 from . import Compiler, CompilerException
 
 
