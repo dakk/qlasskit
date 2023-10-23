@@ -119,7 +119,6 @@ class POCCompiler3(Compiler):
             and isinstance(expr.args[0], Symbol)
             and self.symbol_count[expr.args[0].name] <= 1
         ):
-            print("called not simp")
             self.symbol_count[expr.args[0].name] = 0
             eret = self.compile_expr(qc, expr.args[0])
             qc.x(eret)
@@ -132,7 +131,6 @@ class POCCompiler3(Compiler):
                 for e in expr.args
             ]
         ):
-            print("called xor simp")
             erets = []
 
             for e in expr.args:

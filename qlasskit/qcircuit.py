@@ -46,6 +46,25 @@ class QCircuit:
                 return key
         raise Exception(f"Qubit with index {i} not found")
 
+    def __contains__(self, key: Union[str, Symbol, int]):
+        if isinstance(key, str):
+            return key in self.qubit_map
+        elif isinstance(key, Symbol):
+            return key.name in self.qubit_map
+        return False
+
+    def __delitem__(self, key: Union[str, Symbol, int]):
+        if isinstance(key, str):
+            del self.qubit_map[key]
+        elif isinstance(key, Symbol):
+            del self.qubit_map[key.name]
+
+    def __setitem__(self, key: Union[str, Symbol, int], val):
+        if isinstance(key, str):
+            self.qubit_map[key] = val
+        elif isinstance(key, Symbol):
+            self.qubit_map[key.name] = val
+
     def __getitem__(self, key: Union[str, Symbol, int]):
         """Return the qubit index given its name or index"""
         if isinstance(key, str):
@@ -60,13 +79,17 @@ class QCircuit:
         i = 0
         len_g = len(self.gates)
         while i < len_g:
-            if i < (len_g - 2) and self.gates[i] == self.gates[i + 1]:
+            if i < (len_g - 1) and self.gates[i] == self.gates[i + 1]:
+                if result[-1][0] == "bar":
+                    result.pop()
                 i += 2
             elif (
-                i < (len_g - 3)
+                i < (len_g - 2)
                 and self.gates[i] == self.gates[i + 2]
                 and self.gates[i + 1][0] == "bar"
             ):
+                if result[-1][0] == "bar":
+                    result.pop()
                 i += 3
             else:
                 result.append(self.gates[i])
@@ -144,7 +167,7 @@ class QCircuit:
         if promote and index in self.ancilla_lst:
             self.ancilla_lst.remove(index)
 
-        self.qubit_map[name] = index
+        self[name] = index
 
     def add_qubit(self, name=None):
         """Add a qubit to the circuit.

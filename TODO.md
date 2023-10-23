@@ -61,7 +61,8 @@
 - [x] Symbol reassign and augassign
 - [x] Remove unneccessary expressions
 - [x] Remove quantum circuit identities
-- [ ] For unrolling
+- [x] For unrolling
+- [ ] Aggregate cascading expressions in for unrolling
 
 ### Week 2: (30 Oct 23)
 ### Week 3: (6 Nov 23)

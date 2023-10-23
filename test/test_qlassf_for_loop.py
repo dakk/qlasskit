@@ -42,8 +42,17 @@ class TestForLoop(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
 
-    # def test_for_cond(self):
-    #     f = "def test(a: Qint2, b: bool) -> Qint2:\n\tfor i in range(3):\n\t\ta += (i if b else 1)\n\treturn a"
+    def test_for_nit_bool_many(self):
+        f = "def test(a: bool) -> bool:\n\tfor i in range(15):\n\t\ta = not a\n\treturn a"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    # def test_for_nit_tbool_many(self):
+    #     f = "def test(a: Tuple[bool,bool]) -> Tuple[bool,bool]:\n\tfor i in range(32):\n\t\ta[0] = not a[0]\n\t\ta[1] = not a[1]\n\treturn a"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-    #     print(qf.expressions)
     #     compute_and_compare_results(self, qf)
+
+    def test_for_cond(self):
+        f = "def test(a: Qint2, b: bool) -> Qint2:\n\tfor i in range(2):\n\t\ta += (i if b else 1)\n\treturn a"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)

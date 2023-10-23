@@ -151,11 +151,9 @@ class TestQlassfBoolean(unittest.TestCase):
     def test_assign(self):
         f = "def test(a: bool, b: bool) -> bool:\n\tc = a and b\n\treturn c"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-        self.assertEqual(len(qf.expressions), 2)
-        self.assertEqual(qf.expressions[0][0], c)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], And(a, b))
-        self.assertEqual(qf.expressions[1][0], _ret)
-        self.assertEqual(qf.expressions[1][1], c)
         compute_and_compare_results(self, qf)
 
     def test_assign2(self):
@@ -165,11 +163,9 @@ class TestQlassfBoolean(unittest.TestCase):
             + "\treturn True if d else False"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-        self.assertEqual(len(qf.expressions), 2)
-        self.assertEqual(qf.expressions[0][0], d)
+        self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][1], And(a, And(Not(b), c)))
-        self.assertEqual(qf.expressions[1][0], _ret)
-        self.assertEqual(qf.expressions[1][1], d)
+        self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_assign3(self):

@@ -46,7 +46,35 @@ def remove_const_exps(exps: BoolExpList, fun_ret: Arg) -> BoolExpList:
     return n_exps
 
 
-# Remove exp like: __a.0 = a.0, a.0 = __a.0
+# Subsitute exps (replace a = ~a, a = ~a, a = ~a => a = ~a)
+# def subsitute_exps(exps: BoolExpList, fun_ret: Arg) -> BoolExpList:
+#     const: Dict[Symbol, Boolean] = {}
+#     n_exps: BoolExpList = []
+#     print(exps)
+    
+#     for i in range(len(exps)):
+#         (s, e) = exps[i]
+#         e = e.subs(const)
+#         const[s] = e
+        
+#         for x in e.free_symbols:
+#             if x in const:
+#                 n_exps.append((x, const[x]))
+#                 del const[x]
+    
+#     for (s,e) in const.items():
+#         if s == e:
+#             continue
+        
+#         n_exps.append((s,e))
+        
+#     print(n_exps)
+#     print()
+#     print()
+#     return n_exps
+
+
+# Remove exp like: __a.0 = a.0, ..., a.0 = __a.0
 def remove_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
     n_exps: BoolExpList = []
 
@@ -64,6 +92,20 @@ def remove_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
 
     for s, e in exps:
         if not isinstance(e, Symbol) or should_add(s, e, n_exps):
+            n_exps.append((s, e))
+
+    return n_exps
+
+
+# Translate exp like: __a.0 = !a, a = __a.0 ===> a = !a
+def merge_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
+    n_exps: BoolExpList = []
+
+    for s, e in exps:
+        if len(n_exps) >= 1 and n_exps[-1][0] == e:
+            old = n_exps.pop()
+            n_exps.append((s, old[1]))
+        else:
             n_exps.append((s, e))
 
     return n_exps
@@ -221,6 +263,8 @@ class QlassF:
         # Remove unnecessary expressions
         exps = remove_const_exps(exps, fun_ret)
         exps = remove_unnecessary_assigns(exps)
+        exps = merge_unnecessary_assigns(exps)
+        # exps = subsitute_exps(exps, fun_ret)
 
         # Return the qlassf object
         qf = QlassF(fun_name, original_f, args, fun_ret, exps)

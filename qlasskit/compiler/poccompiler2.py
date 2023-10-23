@@ -77,13 +77,13 @@ class POCCompiler2(Compiler):
             self.expqmap.update_exp_for_qubit(iret, sym)
             qc.map_qubit(sym, iret, promote=not is_temp)
 
-            # Mark temp symbols
-            if isinstance(symp_exp, Symbol) and symp_exp.name[0:2] == "__":
-                qc.ancilla_lst.add(iret)
-                qc.mark_ancilla(iret)
-                self.expqmap.remove_map_by_qubits([iret])
-
             self.garbage_collect(qc)
+
+            # print(sym, exp)
+            # circ_qi = qc.export("circuit", "qiskit")
+            # print(circ_qi.draw("text"))
+            # print()
+            # print()
 
         qc.remove_identities()
         return qc

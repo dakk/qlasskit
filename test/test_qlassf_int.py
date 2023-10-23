@@ -286,13 +286,11 @@ class TestQlassfInt(unittest.TestCase):
     def test_shift_left(self):
         f = "def test(n: Qint2) -> Qint4: return n << 1"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-        print(qf.expressions)
         compute_and_compare_results(self, qf)
 
     def test_shift_right(self):
         f = "def test(n: Qint2) -> Qint4: return n >> 1"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-        print(qf.expressions)
         compute_and_compare_results(self, qf)
 
     # Our Qint are unsigned
