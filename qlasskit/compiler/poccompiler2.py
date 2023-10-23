@@ -69,13 +69,23 @@ class POCCompiler2(Compiler):
         self.expqmap = ExpQMap()
 
         for sym, exp in exprs:
-            # print(sym, self._symplify_exp(exp))
-            iret = self.compile_expr(qc, self._symplify_exp(exp))
-            # print("iret", iret)
-            qc.map_qubit(sym, iret, promote=True)
+            is_temp = sym.name[0:2] == "__"
+            symp_exp = self._symplify_exp(exp)
+
+            iret = self.compile_expr(qc, symp_exp)
+
+            self.expqmap.update_exp_for_qubit(iret, sym)
+            qc.map_qubit(sym, iret, promote=not is_temp)
+
+            # Mark temp symbols
+            if isinstance(symp_exp, Symbol) and symp_exp.name[0:2] == "__":
+                qc.ancilla_lst.add(iret)
+                qc.mark_ancilla(iret)
+                self.expqmap.remove_map_by_qubits([iret])
 
             self.garbage_collect(qc)
 
+        qc.remove_identities()
         return qc
 
     def compile_expr(self, qc: QCircuit, expr: Boolean) -> int:  # noqa: C901

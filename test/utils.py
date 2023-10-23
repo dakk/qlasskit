@@ -149,6 +149,7 @@ def compute_and_compare_results(cls, qf):
         qc_truth = truth_table
 
     # circ_qi = qf.circuit().export("circuit", "qiskit")
+    # print(qf.expressions)
     # print(circ_qi.draw("text"))
 
     for truth_line in truth_table:

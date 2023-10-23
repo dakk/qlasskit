@@ -59,6 +59,8 @@
 
 ### Week 1: (23 Oct 23)
 - [x] Symbol reassign and augassign
+- [x] Remove unneccessary expressions
+- [x] Remove quantum circuit identities
 - [ ] For unrolling
 
 ### Week 2: (30 Oct 23)

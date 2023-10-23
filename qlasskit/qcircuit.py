@@ -60,17 +60,12 @@ class QCircuit:
         i = 0
         len_g = len(self.gates)
         while i < len_g:
-            if (
-                i < (len_g - 2)
-                and self.gates[i] == self.gates[i + 1]
-                # and self.gates[i][0] == "x"
-            ):
+            if i < (len_g - 2) and self.gates[i] == self.gates[i + 1]:
                 i += 2
             elif (
                 i < (len_g - 3)
                 and self.gates[i] == self.gates[i + 2]
                 and self.gates[i + 1][0] == "bar"
-                # and self.gates[i][0] == "x"
             ):
                 i += 3
             else:

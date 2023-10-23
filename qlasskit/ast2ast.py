@@ -13,6 +13,8 @@
 # limitations under the License.
 import ast
 
+from .ast2logic import flatten
+
 
 class ASTRewriter(ast.NodeTransformer):
     def __init__(self, env={}, ret=None):
@@ -40,6 +42,11 @@ class ASTRewriter(ast.NodeTransformer):
     def generic_visit(self, node):
         return super().generic_visit(node)
 
+    def visit_Name(self, node):
+        if node.id[0:2] == "__":
+            raise Exception("invalid name starting with __")
+        return node
+
     def visit_FunctionDef(self, node):
         for x in node.args.args:
             self.env[x.arg] = x.annotation
@@ -56,9 +63,11 @@ class ASTRewriter(ast.NodeTransformer):
             self.env[node.targets[0].id] = "Uknown"
 
         # TODO: support unrolling tuple
+        # TODO: if value is not self referencing, we can skip this (ie: a = b + 1)
         # Reassigning an already present variable (use a temp variable)
-        if was_known:
+        if was_known and not isinstance(node.value, ast.Constant):
             new_targ = ast.Name(id=f"__{node.targets[0].id}", ctx=ast.Load())
+
             return [
                 ast.Assign(
                     targets=[new_targ],
@@ -90,25 +99,54 @@ class ASTRewriter(ast.NodeTransformer):
         ]
 
     def visit_For(self, node):
-        # For(
-        #     target=Name(id="x", ctx=Store()),
-        #     iter=Call(
-        #         func=Name(id="range", ctx=Load()),
-        #         args=[Constant(value=2, kind=None)],
-        #         keywords=[],
-        #     ),
-        #     body=[
-        #         AugAssign(
-        #             target=Name(id="a", ctx=Store()),
-        #             op=Add(),
-        #             value=Constant(value=1, kind=None),
-        #         )
-        #     ],
-        #     orelse=[],
-        #     type_comment=None,
-        # )
-        # print(ast.dump(node))
-        return node
+        iter = self.visit(node.iter)
+
+        rolls = []
+        for i in iter:
+            tar_assign = self.visit(
+                ast.Assign(targets=[node.target], value=ast.Constant(value=i))
+            )
+            rolls.extend(flatten([tar_assign]))
+            rolls.extend(flatten([self.visit(b) for b in node.body]))
+
+        # print(list(map(ast.dump, rolls)))
+        return rolls
+
+    def __call_range(self, node):
+        if not all([isinstance(a, ast.Constant) for a in node.args]):
+            raise Exception("not handled")
+
+        args = [a.value for a in node.args]
+        it = list(range(*args))
+        return it
+
+    def __call_len(self, node):
+        if len(node.args) != 1:
+            raise Exception("not handled")
+
+        args = self.__unroll_arg(node.args[0])
+        return ast.Constant(value=len(args))
+
+    def __call_minmax(self, node):
+        if len(node.args) == 1:
+            args = self.__unroll_arg(node.args[0])
+        else:
+            args = node.args
+
+        op = ast.Gt() if node.func.id == "max" else ast.LtE()
+
+        def iterif(arg_l):
+            if len(arg_l) == 1:
+                return arg_l[0]
+            else:
+                comps = [
+                    ast.Compare(left=arg_l[0], ops=[op], comparators=[l_it])
+                    for l_it in arg_l[1:]
+                ]
+                comp = ast.BoolOp(op=ast.And(), values=comps)
+                return ast.IfExp(test=comp, body=arg_l[0], orelse=iterif(arg_l[1:]))
+
+        return iterif(args)
 
     def visit_Call(self, node):
         if not hasattr(node.func, "id"):
@@ -117,33 +155,14 @@ class ASTRewriter(ast.NodeTransformer):
         if node.func.id == "print":
             return None
 
-        elif node.func.id == "len":
-            if len(node.args) != 1:
-                raise Exception("not handled")
+        elif node.func.id == "range":
+            return self.__call_range(node)
 
-            args = self.__unroll_arg(node.args[0])
-            return ast.Constant(value=len(args))
+        elif node.func.id == "len":
+            return self.__call_len(node)
 
         elif node.func.id in ["min", "max"]:
-            if len(node.args) == 1:
-                args = self.__unroll_arg(node.args[0])
-            else:
-                args = node.args
-
-            op = ast.Gt() if node.func.id == "max" else ast.LtE()
-
-            def iterif(arg_l):
-                if len(arg_l) == 1:
-                    return arg_l[0]
-                else:
-                    comps = [
-                        ast.Compare(left=arg_l[0], ops=[op], comparators=[l_it])
-                        for l_it in arg_l[1:]
-                    ]
-                    comp = ast.BoolOp(op=ast.And(), values=comps)
-                    return ast.IfExp(test=comp, body=arg_l[0], orelse=iterif(arg_l[1:]))
-
-            return iterif(args)
+            return self.__call_minmax(node)
 
         else:
             return node
