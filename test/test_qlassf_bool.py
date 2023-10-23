@@ -41,11 +41,9 @@ class TestQlassfBoolean(unittest.TestCase):
     def test_bool_const(self):
         f = "def test(a: bool) -> bool:\n\tc=True\n\treturn c"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-        self.assertEqual(len(qf.expressions), 2)
-        self.assertEqual(qf.expressions[0][0], Symbol("c"))
-        self.assertEqual(qf.expressions[0][1], true)
-        self.assertEqual(qf.expressions[1][0], _ret)
-        self.assertEqual(qf.expressions[1][1], Symbol("c"))
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], True)
         compute_and_compare_results(self, qf)
 
     def test_arg_identity(self):

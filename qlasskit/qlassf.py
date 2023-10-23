@@ -15,9 +15,10 @@
 import ast
 import inspect
 from functools import reduce
-from typing import Callable, List, Tuple, Union  # noqa: F401
+from typing import Callable, Dict, List, Tuple, Union  # noqa: F401
 
 from sympy import Symbol
+from sympy.logic.boolalg import Boolean
 
 from . import compiler
 from .ast2ast import ast2ast
@@ -26,6 +27,46 @@ from .types import *  # noqa: F403, F401
 from .types import Qtype
 
 MAX_TRUTH_TABLE_SIZE = 20
+
+
+# Remove const exps
+def remove_const_exps(exps: BoolExpList, fun_ret: Arg) -> BoolExpList:
+    const: Dict[Symbol, Boolean] = {}
+    n_exps: BoolExpList = []
+    for i in range(len(exps)):
+        (s, e) = exps[i]
+        e = e.subs(const)
+        if (e == False or e == True) and i < (len(exps) - len(fun_ret)):  # noqa: E712
+            const[s] = e
+        else:
+            if s in const:
+                del const[s]
+            n_exps.append((s, e))
+
+    return n_exps
+
+
+# Remove exp like: __a.0 = a.0, a.0 = __a.0
+def remove_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
+    n_exps: BoolExpList = []
+
+    def should_add(s, e, n_exps2):
+        ename = f"__{s.name}"
+        if e.name == ename:
+            for s1, e1 in n_exps2[::-1]:
+                if s1.name == ename:
+                    if isinstance(e1, Symbol) and e1.name == s.name:
+                        n_exps2.remove((s1, e1))
+                        return False
+                    else:
+                        return True
+        return True
+
+    for s, e in exps:
+        if not isinstance(e, Symbol) or should_add(s, e, n_exps):
+            n_exps.append((s, e))
+
+    return n_exps
 
 
 class QlassF:
@@ -177,6 +218,11 @@ class QlassF:
         fun_name, args, fun_ret, exps = translate_ast(fun, types)
         original_f = eval(fun_name) if isinstance(f, str) else f
 
+        # Remove unnecessary expressions
+        exps = remove_const_exps(exps, fun_ret)
+        exps = remove_unnecessary_assigns(exps)
+
+        # Return the qlassf object
         qf = QlassF(fun_name, original_f, args, fun_ret, exps)
         if to_compile:
             qf.compile()

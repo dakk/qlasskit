@@ -13,8 +13,18 @@
 # limitations under the License.
 # isort:skip_file
 
-from typing import List, Any
+from typing import List, Any, Iterable, Union
 
 
-def flatten(m: List[List[Any]]) -> List[Any]:
-    return [item for row in m for item in row]
+# def flatten(m: List[List[Any]]) -> List[Any]:
+#     return [item for row in m for item in row]
+
+
+def flatten(m: List[Union[Any, List[Any]]]) -> List[Any]:
+    return [
+        item
+        for row in m
+        for item in (
+            row if isinstance(row, Iterable) and not isinstance(row, str) else [row]
+        )
+    ]

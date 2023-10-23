@@ -144,13 +144,9 @@ class TestQlassfInt(unittest.TestCase):
     def test_int_const(self):
         f = "def test(a: Qint2) -> Qint2:\n\tc=2\n\treturn c"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-        self.assertEqual(len(qf.expressions), 4)
-        self.assertEqual(qf.expressions[0][0], Symbol("c.0"))
-        self.assertEqual(qf.expressions[0][1], false)
-        self.assertEqual(qf.expressions[1][0], Symbol("c.1"))
-        self.assertEqual(qf.expressions[1][1], true)
-        self.assertEqual(qf.expressions[2][1], Symbol("c.0"))
-        self.assertEqual(qf.expressions[3][1], Symbol("c.1"))
+        self.assertEqual(len(qf.expressions), 2)
+        self.assertEqual(qf.expressions[-2][1], False)
+        self.assertEqual(qf.expressions[-1][1], True)
         compute_and_compare_results(self, qf)
 
     def test_int_const_compare_eq(self):
