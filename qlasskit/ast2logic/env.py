@@ -31,6 +31,10 @@ class Env:
 
         for t in BUILTIN_TYPES:
             self.bind_type((t.__name__, t))  # type: ignore
+            
+            
+    def __repr__(self):
+        return str((self.bindings, self.types))
 
     def bind_type(self, bb: TypeBinding):
         if self.know_type(bb[0]):
@@ -50,6 +54,9 @@ class Env:
         if not rebind and bb.name in self:
             raise Exception("duplicate bind")
 
+        if rebind:
+            self.bindings.remove(self[bb.name])
+            
         self.bindings.append(bb)
 
     def __contains__(self, key):
