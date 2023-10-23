@@ -55,6 +55,30 @@ class QCircuit:
         else:
             return key
 
+    def remove_identities(self):
+        result = []
+        i = 0
+        len_g = len(self.gates)
+        while i < len_g:
+            if (
+                i < (len_g - 2)
+                and self.gates[i] == self.gates[i + 1]
+                # and self.gates[i][0] == "x"
+            ):
+                i += 2
+            elif (
+                i < (len_g - 3)
+                and self.gates[i] == self.gates[i + 2]
+                and self.gates[i + 1][0] == "bar"
+                # and self.gates[i][0] == "x"
+            ):
+                i += 3
+            else:
+                result.append(self.gates[i])
+                i += 1
+
+        self.gates = result
+
     def add_ancilla(self, name=None, is_free=True):
         """Add an ancilla qubit"""
         i = self.add_qubit(name if name else f"anc_{len(self.ancilla_lst)}")
@@ -103,6 +127,9 @@ class QCircuit:
             self.free_ancilla_lst.add(x)
         self.marked_ancillas = self.marked_ancillas - uncomputed
         self.gates_computed = new_gates_comp[::-1]
+
+        if len(uncomputed) == 0:
+            self.gates.pop()
 
         return uncomputed
 
