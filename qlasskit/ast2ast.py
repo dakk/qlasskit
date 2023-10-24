@@ -76,7 +76,7 @@ class ASTRewriter(ast.NodeTransformer):
 
         # TODO: support unrolling tuple
         # TODO: if value is not self referencing, we can skip this (ie: a = b + 1)
-        
+
         # Reassigning an already present variable (use a temp variable)
         if was_known and not isinstance(node.value, ast.Constant):
             new_targ = ast.Name(id=f"__{node.targets[0].id}", ctx=ast.Load())

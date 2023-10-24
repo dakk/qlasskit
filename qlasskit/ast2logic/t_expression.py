@@ -15,7 +15,7 @@ import ast
 from typing import List, Tuple, get_args
 
 from sympy import Symbol
-from sympy.logic import ITE, And, Not, Or, false, true
+from sympy.logic import ITE, And, Not, Or, Xor, false, true
 
 from ..types import Qbool, Qtype, TExp, const_to_qtype
 from . import Env, exceptions
@@ -205,16 +205,29 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
     # Binop
     elif isinstance(expr, ast.BinOp):
-        # Sub | Mult | MatMult | Div | Mod | Pow |
-        # | BitOr | BitXor | BitAnd | FloorDiv
+        # Sub | Mult | MatMult | Div | Mod | Pow | FloorDiv
         # print(ast.dump(expr))
         tleft = translate_expression(expr.left, env)
         tright = translate_expression(expr.right, env)
+
+        if tleft[0] == bool and tright[0] == bool:
+            if isinstance(expr.op, ast.BitXor):
+                return bool, Xor(tleft[1], tright[1])
+            elif isinstance(expr.op, ast.BitAnd):
+                return bool, And(tleft[1], tright[1])
+            elif isinstance(expr.op, ast.BitOr):
+                return bool, Or(tleft[1], tright[1])
 
         if isinstance(expr.op, ast.Add) and hasattr(tleft[0], "add"):
             return tleft[0].add(tleft, tright)
         elif isinstance(expr.op, ast.Sub) and hasattr(tleft[0], "sub"):
             return tleft[0].sub(tleft, tright)
+        elif isinstance(expr.op, ast.BitXor) and hasattr(tleft[0], "bitwise_xor"):
+            return tleft[0].bitwise_xor(tleft, tright)
+        elif isinstance(expr.op, ast.BitAnd) and hasattr(tleft[0], "bitwise_and"):
+            return tleft[0].bitwise_and(tleft, tright)
+        elif isinstance(expr.op, ast.BitOr) and hasattr(tleft[0], "bitwise_or"):
+            return tleft[0].bitwise_or(tleft, tright)
         elif (
             isinstance(expr.op, ast.LShift)
             and hasattr(tleft[0], "shift_left")

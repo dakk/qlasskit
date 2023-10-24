@@ -195,3 +195,20 @@ class TestQlassfBoolean(unittest.TestCase):
     #     qf = qlassf(f, to_compile=False)
     #     self.assertEqual(len(qf.expressions), 2)
     #     self.assertEqual(qf.expressions[-1][1], ITE(d & e, g, h))
+
+
+class TestQlassfBoolBitwise(unittest.TestCase):
+    def test_bitwise_and(self):
+        f = f"def test(a: bool, b: bool) -> bool:\n\treturn a & b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_bitwise_or(self):
+        f = f"def test(a: bool, b: bool) -> bool:\n\treturn a | b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_bitwise_xor(self):
+        f = f"def test(a: bool, b: bool) -> bool:\n\treturn a ^ b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)

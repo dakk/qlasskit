@@ -50,7 +50,7 @@
 - [x] Extensible type system
 - [x] Builtin functions: max(), min(), len()
 - [x] Function call (to builtin)
-- [x] Int arithmetic: +
+- [x] Int arithmetic: +, -
 - [x] Qtype: bitwise not
 - [x] Qtype: shift right / left
 - [x] Int: subtraction
@@ -62,10 +62,14 @@
 - [x] Remove unneccessary expressions
 - [x] Remove quantum circuit identities
 - [x] For unrolling
+- [x] Bitwise xor, or, and
 - [ ] Aggregate cascading expressions in for unrolling
 
 ### Week 2: (30 Oct 23)
 ### Week 3: (6 Nov 23)
+
+- [ ] Slideshow for UF midterm
+
 ### Week 4: (13 Nov 23)
 
 ## Month 3:
@@ -93,13 +97,13 @@
 
 - [ ] Publish doc on github
 - [ ] Inner function
-- [ ] Int arithmetic expressions (*, /)
+- [ ] Int arithmetic expressions (*, /, mod)
 - [ ] Parametrized qlassf
 - [ ] Lambda
 - [ ] FixedList type
 - [ ] Builtin functions: map, count
 - [ ] Ast2logic: fixed size loops unrolling
-- [ ] Builtin functions: sum(), all(),
+- [ ] Builtin functions: sum(), all(), any()
 - [ ] First beta release
 
 ### Language support
@@ -136,3 +140,8 @@
 
 - [ ] py2qasm tool
 - [ ] py2boolexp tool
+
+
+### Experiments
+
+- [ ] Logic2FPGA backend

@@ -15,7 +15,7 @@
 from typing import List
 
 from sympy import Symbol
-from sympy.logic import And, Not, Or, false, true
+from sympy.logic import And, Not, Or, Xor, false, true
 
 from . import _eq, _full_adder, _neq
 from .qtype import Qtype, TExp
@@ -170,6 +170,30 @@ class Qint(int, Qtype):
         an = cls.bitwise_not(cls.fill(tleft))  # type: ignore
         su = cls.add(an, cls.fill(tright))  # type: ignore
         return cls.bitwise_not(su)  # type: ignore
+
+    @classmethod
+    def bitwise_generic(cls, op, tleft: TExp, tright: TExp) -> TExp:
+        """Bitwise generic"""
+        if len(tleft[1]) > len(tright[1]):
+            tright = tleft[0].fill(tright)  # type: ignore
+
+        elif len(tleft[1]) < len(tright[1]):
+            tleft = tright[0].fill(tleft)  # type: ignore
+
+        newl = [op(a, b) for (a, b) in zip(tleft[1], tright[1])]
+        return (tright[0], newl)
+
+    @classmethod
+    def bitwise_xor(cls, tleft: TExp, tright: TExp) -> TExp:
+        return cls.bitwise_generic(Xor, tleft, tright)
+
+    @classmethod
+    def bitwise_and(cls, tleft: TExp, tright: TExp) -> TExp:
+        return cls.bitwise_generic(And, tleft, tright)
+
+    @classmethod
+    def bitwise_or(cls, tleft: TExp, tright: TExp) -> TExp:
+        return cls.bitwise_generic(Or, tleft, tright)
 
 
 class Qint2(Qint):

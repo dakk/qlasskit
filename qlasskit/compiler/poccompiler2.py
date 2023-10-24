@@ -64,7 +64,8 @@ class POCCompiler2(Compiler):
 
         for arg in args:
             for arg_b in arg.bitvec:
-                qc.add_qubit(arg_b)
+                qi = qc.add_qubit(arg_b)
+                # qc.ancilla_lst.add(qi)
 
         self.expqmap = ExpQMap()
 
@@ -88,7 +89,7 @@ class POCCompiler2(Compiler):
         qc.remove_identities()
         return qc
 
-    def compile_expr(self, qc: QCircuit, expr: Boolean) -> int:  # noqa: C901
+    def compile_expr(self, qc: QCircuit, expr: Boolean, dest=None) -> int:  # noqa: C901
         if isinstance(expr, Symbol):
             return qc[expr.name]
 
@@ -105,31 +106,33 @@ class POCCompiler2(Compiler):
                 self.expqmap.update_exp_for_qubit(eret, expr)
                 return eret
             else:
-                fa = qc.get_free_ancilla()
-                qc.cx(eret, fa)
-                qc.x(fa)
+                if dest is None:
+                    dest = qc.get_free_ancilla()
+                qc.cx(eret, dest)
+                qc.x(dest)
                 qc.mark_ancilla(eret)
 
                 self.garbage_collect(qc)
-                self.expqmap[expr] = fa
+                self.expqmap[expr] = dest
 
-                return fa
+                return dest
 
         elif isinstance(expr, And):
             erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))
-            fa = qc.get_free_ancilla()
+            if dest is None:
+                dest = qc.get_free_ancilla()
 
             qc.barrier("and")
 
-            qc.mcx(erets, fa)
+            qc.mcx(erets, dest)
 
             [qc.mark_ancilla(eret) for eret in erets]
 
             self.garbage_collect(qc)
 
-            self.expqmap[expr] = fa
+            self.expqmap[expr] = dest
 
-            return fa
+            return dest
 
         elif isinstance(expr, Xor):
             erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))
@@ -138,30 +141,32 @@ class POCCompiler2(Compiler):
             qc.barrier("xor")
 
             if last in qc.ancilla_lst:
-                fa = last
+                dest = last
                 self.expqmap.update_exp_for_qubit(last, expr)
             else:
-                fa = qc.get_free_ancilla()
+                if dest is None:
+                    dest = qc.get_free_ancilla()
 
-                qc.cx(last, fa)
+                qc.cx(last, dest)
                 qc.mark_ancilla(last)
-                self.expqmap[expr] = fa
+                self.expqmap[expr] = dest
 
             for x in erets:
-                qc.cx(x, fa)
+                qc.cx(x, dest)
 
             [qc.mark_ancilla(eret) for eret in erets]
             self.garbage_collect(qc)
 
-            return fa
+            return dest
 
         elif isinstance(expr, BooleanFalse):
             return qc.get_free_ancilla()
 
         elif isinstance(expr, BooleanTrue):
-            fa = qc.get_free_ancilla()
-            qc.x(fa)
-            return fa
+            if dest is None:
+                dest = qc.get_free_ancilla()
+            qc.x(dest)
+            return dest
 
         else:
             raise CompilerException(expr)

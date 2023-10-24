@@ -123,3 +123,15 @@ class Qtype:
     @staticmethod
     def sub(tleft: TExp, tcomp: TExp) -> TExp:
         raise Exception("abstract")
+
+    @staticmethod
+    def bitwsie_xor(tleft: TExp, tcomp: TExp) -> TExp:
+        raise Exception("abstract")
+
+    @staticmethod
+    def bitwsie_and(tleft: TExp, tcomp: TExp) -> TExp:
+        raise Exception("abstract")
+
+    @staticmethod
+    def bitwsie_or(tleft: TExp, tcomp: TExp) -> TExp:
+        raise Exception("abstract")

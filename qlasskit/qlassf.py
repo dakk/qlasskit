@@ -51,23 +51,23 @@ def remove_const_exps(exps: BoolExpList, fun_ret: Arg) -> BoolExpList:
 #     const: Dict[Symbol, Boolean] = {}
 #     n_exps: BoolExpList = []
 #     print(exps)
-    
+
 #     for i in range(len(exps)):
 #         (s, e) = exps[i]
 #         e = e.subs(const)
 #         const[s] = e
-        
+
 #         for x in e.free_symbols:
 #             if x in const:
 #                 n_exps.append((x, const[x]))
 #                 del const[x]
-    
+
 #     for (s,e) in const.items():
 #         if s == e:
 #             continue
-        
+
 #         n_exps.append((s,e))
-        
+
 #     print(n_exps)
 #     print()
 #     print()

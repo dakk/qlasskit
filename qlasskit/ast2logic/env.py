@@ -31,8 +31,7 @@ class Env:
 
         for t in BUILTIN_TYPES:
             self.bind_type((t.__name__, t))  # type: ignore
-            
-            
+
     def __repr__(self):
         return str((self.bindings, self.types))
 
@@ -56,7 +55,7 @@ class Env:
 
         if rebind:
             self.bindings.remove(self[bb.name])
-            
+
         self.bindings.append(bb)
 
     def __contains__(self, key):

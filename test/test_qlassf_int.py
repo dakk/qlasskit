@@ -350,6 +350,30 @@ class TestQlassfIntSub(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
 
+@parameterized_class(
+    ("ttype", "ttype_str", "ttype_size"),
+    [
+        (Qint2, "Qint2", 2),
+        (Qint4, "Qint4", 4),
+    ],
+)
+class TestQlassfIntBitwise(unittest.TestCase):
+    def test_bitwise_and(self):
+        f = f"def test(a: {self.ttype_str}, b: {self.ttype_str}) -> {self.ttype_str}:\n\treturn a & b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_bitwise_or(self):
+        f = f"def test(a: {self.ttype_str}, b: {self.ttype_str}) -> {self.ttype_str}:\n\treturn a | b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_bitwise_xor(self):
+        f = f"def test(a: {self.ttype_str}, b: {self.ttype_str}) -> {self.ttype_str}:\n\treturn a ^ b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+
 class TestQlassfIntReassign(unittest.TestCase):
     def test_reassign_newvar(self):
         f = "def test(a: Qint2) -> Qint2:\n\tb = 0\n\tb = a + 1\n\treturn b"
