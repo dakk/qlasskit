@@ -64,7 +64,8 @@ class POCCompiler2(Compiler):
 
         for arg in args:
             for arg_b in arg.bitvec:
-                qi = qc.add_qubit(arg_b)
+                # qi =
+                qc.add_qubit(arg_b)
                 # qc.ancilla_lst.add(qi)
 
         self.expqmap = ExpQMap()
