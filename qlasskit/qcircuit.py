@@ -11,11 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import List, Literal, Union
+from typing import List, Literal, Union, get_args
 
 from sympy import Symbol
 from sympy.physics.quantum.gate import CNOT, H, T, X
 from sympy.physics.quantum.qubit import Qubit
+
+SupportedFramework = Literal["qiskit", "sympy", "qasm"]
+SupportedFrameworks = list(get_args(SupportedFramework))
 
 
 class QCircuit:
@@ -47,6 +50,7 @@ class QCircuit:
         raise Exception(f"Qubit with index {i} not found")
 
     def __contains__(self, key: Union[str, Symbol, int]):
+        """Return True if the circuit contain a qubit with a given name/symbol"""
         if isinstance(key, str):
             return key in self.qubit_map
         elif isinstance(key, Symbol):
@@ -54,16 +58,18 @@ class QCircuit:
         return False
 
     def __delitem__(self, key: Union[str, Symbol, int]):
+        """Remove a mapping key=>qubit"""
         if isinstance(key, str):
             del self.qubit_map[key]
         elif isinstance(key, Symbol):
             del self.qubit_map[key.name]
 
-    def __setitem__(self, key: Union[str, Symbol, int], val):
+    def __setitem__(self, key: Union[str, Symbol, int], qubit: int):
+        """Set a mapping key=>qubit"""
         if isinstance(key, str):
-            self.qubit_map[key] = val
+            self.qubit_map[key] = qubit
         elif isinstance(key, Symbol):
-            self.qubit_map[key.name] = val
+            self.qubit_map[key.name] = qubit
 
     def __getitem__(self, key: Union[str, Symbol, int]):
         """Return the qubit index given its name or index"""
@@ -74,7 +80,12 @@ class QCircuit:
         else:
             return key
 
+    def __add__(self, qc: "QCircuit") -> "QCircuit":
+        """Create a new QCircuit that merges two"""
+        raise Exception("not implemented")
+
     def remove_identities(self):
+        """Remove identities from the circuit"""
         result = []
         i = 0
         len_g = len(self.gates)
@@ -115,6 +126,7 @@ class QCircuit:
         return anc
 
     def mark_ancilla(self, w):
+        """Mark an ancilla for uncomputing"""
         if w in self.ancilla_lst:
             self.marked_ancillas.add(w)
 
@@ -155,6 +167,8 @@ class QCircuit:
         """Map a name to a qubit
 
         Args:
+            name (str): name of the qubit
+            index (int): index of the qubit
             promote (bool, optional): if True and if the qubit is an ancilla,
                 remove from the ancilla set
         """
@@ -315,6 +329,7 @@ class QCircuit:
             raise Exception(f"Uknown export mode: {mode}")
 
     def __qasm_export(self, mode: Literal["circuit", "gate"]):
+        """Internal function for exporting qasm quantum circuit"""
         gate_qasm = f"gate {self.name} "
         gate_qasm += " ".join(self.qubit_map.keys())
         gate_qasm += " {\n"
@@ -331,14 +346,18 @@ class QCircuit:
 
         return qasm
 
-    def export(self, mode: Literal["circuit", "gate"] = "circuit", framework="qiskit"):
+    def export(
+        self,
+        mode: Literal["circuit", "gate"] = "circuit",
+        framework: SupportedFramework = "qiskit",
+    ):
         """Exports the circuit to another framework.
 
         Args:
             mode (Literal["circuit", "gate"], optional): The export mode, which can be "circuit"
                 or "gate". Defaults to "circuit".
-            framework (str, optional): The target framework for export, either "qiskit" or "sympy".
-                Defaults to "qiskit".
+            framework (SupportedFramework, optional): The target framework for export,
+                either "qiskit", "sympy", "qasm". Defaults to "qiskit".
 
         Returns:
             Any: The exported circuit or gate representation in the specified framework.
@@ -358,5 +377,6 @@ class QCircuit:
             raise Exception(f"Framework {framework} not supported")
 
     def draw(self):
+        """Draw the circuit"""
         qc = self.export("circuit", "qiskit")
         print(qc.draw("text"))

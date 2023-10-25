@@ -147,7 +147,7 @@ class QlassF:
         return len(self.returns)
 
     def __add__(self, qf2) -> "QlassF":
-        """Adds two qlassf and return the combination"""
+        """Adds two qlassf and return the combination f + g = f(g())"""
         raise Exception("not implemented")
 
     def truth_table_header(self) -> List[str]:

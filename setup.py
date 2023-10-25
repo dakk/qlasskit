@@ -10,7 +10,13 @@ setup(
     author="Davide Gessa",
     setup_requires="setuptools",
     author_email="gessadavide@gmail.com",
-    packages=["qlasskit", "qlasskit.types", "qlasskit.ast2logic", "qlasskit.compiler"],
+    packages=[
+        "qlasskit",
+        "qlasskit.types",
+        "qlasskit.ast2logic",
+        "qlasskit.compiler",
+        "qlasskit.algorithms",
+    ],
     zip_safe=False,
     install_requires=[
         "sympy==1.12",
