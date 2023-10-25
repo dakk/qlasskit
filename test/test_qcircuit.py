@@ -83,10 +83,27 @@ class TestQCircuitUncomputing(unittest.TestCase):
 
         qc.mcx(q, a[0])
         qc.mcx(q + [a[0]], a[1])
-        qc.mcx(q + a[:1], a[2])
-        qc.mcx(q + a[:2], a[3])
+        qc.mcx(q + a[:2], a[2])
+        qc.mcx(q + a[:3], a[3])
         qc.cx(a[3], r)
         qc.uncompute(a)
+
+        self.assertEqual(len(qc.free_ancilla_lst), len(a))
+        # qc.draw()
+
+    def test_uncompute_all(self):
+        qc = QCircuit()
+        q = [qc.add_qubit() for x in range(4)]
+        a = [qc.add_ancilla(is_free=False) for x in range(4)]
+        r = qc.add_qubit()
+
+        qc.mcx(q, a[0])
+        qc.mcx(q + [a[0]], a[1])
+        qc.mcx(q + a[:2], a[2])
+        qc.mcx(q + a[:3], a[3])
+        qc.cx(a[3], r)
+        qc.uncompute(a)
+        qc.uncompute_all([r])
         # qc.draw()
 
 

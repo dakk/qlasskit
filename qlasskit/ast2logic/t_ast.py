@@ -38,7 +38,7 @@ def translate_ast(fun, types) -> LogicFun:
     if not fun.returns:
         raise exceptions.NoReturnTypeException()
 
-    ret_ = translate_argument(fun.returns, env)
+    ret_ = translate_argument(fun.returns, env, base="_ret")
 
     exps = []
     for stmt in fun.body:

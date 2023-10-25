@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import copy
 from typing import List, Literal, Union, get_args
 
 from sympy import Symbol
@@ -130,38 +131,53 @@ class QCircuit:
         if w in self.ancilla_lst:
             self.marked_ancillas.add(w)
 
-    def uncompute_all(self, keep=[]):
-        """Uncompute the whole circuit expect for the keep"""
-        pass
+    def uncompute_all(self, keep: List[Union[Symbol, int]] = []):
+        """Uncompute the whole circuit expect for the keep (symbols or qubit)"""
+        # TODO: replace with + invert(keep)
+        scopy = copy.deepcopy(self.gates)
+        uncomputed = set()
+        self.barrier(label="un_all")
+        for g, qbs in reversed(scopy):
+            if qbs[-1] in keep or g == "bar" or qbs[-1] in self.free_ancilla_lst:
+                continue
+            uncomputed.add(qbs[-1])
+
+            if qbs[-1] in self.ancilla_lst:
+                self.free_ancilla_lst.add(qbs[-1])
+
+            self.append(g, qbs)
+
+        # Remove barrier if no uncomputed
+        if len(uncomputed) == 0:
+            self.gates.pop()
+
+        return uncomputed
 
     def uncompute(self, to_mark=[]):
         """Uncompute all the marked ancillas plus the to_mark list"""
         [self.mark_ancilla(x) for x in to_mark]
 
+        if len(self.marked_ancillas) == 0:
+            return []
+
         self.barrier(label="un")
 
         uncomputed = set()
         new_gates_comp = []
-        not_to_uncompute = set()
 
-        for g, ws in self.gates_computed[::-1]:
-            if ws[-1] in self.marked_ancillas and not all(
-                [ww in self.marked_ancillas for ww in ws[:-1]]
-            ):
-                not_to_uncompute.add(ws[-1])
-
-        for g, ws in self.gates_computed[::-1]:
-            if ws[-1] in self.marked_ancillas and ws[-1] not in not_to_uncompute:
+        for g, ws in reversed(self.gates_computed):
+            if ws[-1] in self.marked_ancillas:
                 uncomputed.add(ws[-1])
                 self.append(g, ws)
             else:
                 new_gates_comp.append((g, ws))
 
-        for x in uncomputed:
+        for x in self.marked_ancillas:
             self.free_ancilla_lst.add(x)
         self.marked_ancillas = self.marked_ancillas - uncomputed
         self.gates_computed = new_gates_comp[::-1]
 
+        # Remove barrier if no uncomputed
         if len(uncomputed) == 0:
             self.gates.pop()
 
