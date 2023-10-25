@@ -12,44 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License..
 
-from typing import Dict
-
 from sympy import Symbol
 from sympy.logic import And, Not, Xor
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
 
 from .. import QCircuit
 from ..ast2logic.typing import Arg, Args, BoolExpList
-from . import Compiler, CompilerException
-
-
-class ExpQMap:
-    """Mapping between qubit and boolexp and vice-versa"""
-
-    def __init__(self):
-        self.exp_map: Dict[Boolean, int] = {}
-
-    def __contains__(self, k):
-        return k in self.exp_map
-
-    def __getitem__(self, k):
-        return self.exp_map[k]
-
-    def __setitem__(self, k, v):
-        self.exp_map[k] = v
-
-    def remove_map_by_qubits(self, qbs):
-        todel = []
-        for k in self.exp_map.keys():
-            if self.exp_map[k] in qbs:
-                todel.append(k)
-
-        for k in todel:
-            del self.exp_map[k]
-
-    def update_exp_for_qubit(self, qb, exp):
-        self.remove_map_by_qubits([qb])
-        self[exp] = qb
+from . import Compiler, CompilerException, ExpQMap
 
 
 class POCCompiler2(Compiler):
@@ -57,7 +26,7 @@ class POCCompiler2(Compiler):
 
     def garbage_collect(self, qc):
         uncomputed = qc.uncompute()
-        self.expqmap.remove_map_by_qubits(uncomputed)
+        self.expqmap.remove(uncomputed)
 
     def compile(self, name, args: Args, returns: Arg, exprs: BoolExpList) -> QCircuit:
         qc = QCircuit(name=name)
@@ -76,7 +45,7 @@ class POCCompiler2(Compiler):
 
             iret = self.compile_expr(qc, symp_exp)
 
-            self.expqmap.update_exp_for_qubit(iret, sym)
+            self.expqmap[sym] = iret
             qc.map_qubit(sym, iret, promote=not is_temp)
 
             self.garbage_collect(qc)
@@ -104,7 +73,7 @@ class POCCompiler2(Compiler):
 
             if eret in qc.ancilla_lst:
                 qc.x(eret)
-                self.expqmap.update_exp_for_qubit(eret, expr)
+                self.expqmap[expr] = eret
                 return eret
             else:
                 if dest is None:
@@ -143,7 +112,7 @@ class POCCompiler2(Compiler):
 
             if last in qc.ancilla_lst:
                 dest = last
-                self.expqmap.update_exp_for_qubit(last, expr)
+                self.expqmap[expr] = last
             else:
                 if dest is None:
                     dest = qc.get_free_ancilla()

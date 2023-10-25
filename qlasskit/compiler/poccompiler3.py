@@ -12,15 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License..
 
-from typing import Dict
-
 from sympy import Symbol
 from sympy.logic import And, Not, Xor
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
 
 from .. import QCircuit
 from ..ast2logic.typing import Arg, Args, BoolExpList
-from . import Compiler, CompilerException
+from . import Compiler, CompilerException, ExpQMap
 
 
 def count_symbol_in_expr(expr, d={}):
@@ -44,41 +42,12 @@ def count_symbols_in_exprs(exprs):
     return d
 
 
-class ExpQMap:
-    """Mapping between qubit and boolexp and vice-versa"""
-
-    def __init__(self):
-        self.exp_map: Dict[Boolean, int] = {}
-
-    def __contains__(self, k):
-        return k in self.exp_map
-
-    def __getitem__(self, k):
-        return self.exp_map[k]
-
-    def __setitem__(self, k, v):
-        self.exp_map[k] = v
-
-    def remove_map_by_qubits(self, qbs):
-        todel = []
-        for k in self.exp_map.keys():
-            if self.exp_map[k] in qbs:
-                todel.append(k)
-
-        for k in todel:
-            del self.exp_map[k]
-
-    def update_exp_for_qubit(self, qb, exp):
-        self.remove_map_by_qubits([qb])
-        self[exp] = qb
-
-
 class POCCompiler3(Compiler):
     """POC2 compiler translating an expression list to quantum circuit"""
 
     def garbage_collect(self, qc):
         uncomputed = qc.uncompute()
-        self.expqmap.remove_map_by_qubits(uncomputed)
+        self.expqmap.remove(uncomputed)
 
     def compile(self, name, args: Args, returns: Arg, exprs: BoolExpList) -> QCircuit:
         exprs = [(symb, self._symplify_exp(exp)) for symb, exp in exprs]
@@ -122,7 +91,7 @@ class POCCompiler3(Compiler):
             self.symbol_count[expr.args[0].name] = 0
             eret = self.compile_expr(qc, expr.args[0])
             qc.x(eret)
-            self.expqmap.update_exp_for_qubit(expr, eret)
+            self.expqmap[expr] = eret
             return eret
 
         elif isinstance(expr, Xor) and any(
@@ -144,25 +113,22 @@ class POCCompiler3(Compiler):
 
             [qc.mark_ancilla(eret) for eret in erets]
             self.garbage_collect(qc)
-
-            self.expqmap.update_exp_for_qubit(last, expr)
+            self.expqmap[expr] = last
             return last
 
         elif isinstance(expr, Not):
             eret = self.compile_expr(qc, expr.args[0])
-
             qc.barrier("not")
 
             if eret in qc.ancilla_lst:
                 qc.x(eret)
-                self.expqmap.update_exp_for_qubit(eret, expr)
+                self.expqmap[expr] = eret
                 return eret
             else:
                 fa = qc.get_free_ancilla()
                 qc.cx(eret, fa)
                 qc.x(fa)
                 qc.mark_ancilla(eret)
-
                 self.garbage_collect(qc)
                 self.expqmap[expr] = fa
 
@@ -171,15 +137,10 @@ class POCCompiler3(Compiler):
         elif isinstance(expr, And):
             erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))
             fa = qc.get_free_ancilla()
-
             qc.barrier("and")
-
             qc.mcx(erets, fa)
-
             [qc.mark_ancilla(eret) for eret in erets]
-
             self.garbage_collect(qc)
-
             self.expqmap[expr] = fa
 
             return fa
@@ -187,15 +148,13 @@ class POCCompiler3(Compiler):
         elif isinstance(expr, Xor):
             erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))
             last = erets.pop()
-
             qc.barrier("xor")
 
             if last in qc.ancilla_lst:
                 fa = last
-                self.expqmap.update_exp_for_qubit(last, expr)
+                self.expqmap[expr] = last
             else:
                 fa = qc.get_free_ancilla()
-
                 qc.cx(last, fa)
                 qc.mark_ancilla(last)
                 self.expqmap[expr] = fa

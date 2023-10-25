@@ -14,6 +14,7 @@
 # isort:skip_file
 
 
+from .expqmap import ExpQMap  # noqa: F401
 from .compiler import Compiler, CompilerException, optimizer  # noqa: F401
 
 from .multipass import MultipassCompiler

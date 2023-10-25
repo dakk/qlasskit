@@ -15,6 +15,7 @@
 import math
 from typing import List, Optional, Union
 
+from ..qcircuit import QCircuit
 from ..qlassf import QlassF
 from ..types import Qtype
 from .qalgorithm import QAlgorithm, format_outcome
@@ -22,7 +23,10 @@ from .qalgorithm import QAlgorithm, format_outcome
 
 class Groover(QAlgorithm):
     def __init__(
-        self, oracle: QlassF, element_to_search: Qtype, n_iterations: Optional[int] = None
+        self,
+        oracle: QlassF,
+        element_to_search: Qtype,
+        n_iterations: Optional[int] = None,
     ):
         """
         Args:
@@ -36,32 +40,31 @@ class Groover(QAlgorithm):
         if len(oracle.args) != 1:
             raise Exception("the oracle should receive exactly one parameter")
 
-        self.oracle = oracle
+        self.oracle: QlassF = oracle
         self.search_space_size = len(self.oracle.args[0])
 
         if n_iterations is None:
             n_iterations = math.ceil(math.pi / 4.0 * math.sqrt(self.search_space_size))
 
         self.n_iterations = n_iterations
-        
+
         self.qc = QCircuit(self.search_space_size)
-        
+
         # State preparation
         for i in range(self.search_space_size):
-            qc.h(i)
-        
+            self.qc.h(i)
+
         # Prepare and add the quantum oracle
         # TODO
-        
+
         # Uncompute the oracle expect for the result
         # TODO
-        
+
         # Build the diffuser
         # TODO
-        
+
         # Apply for n_iterations
         # TODO
-        
 
     def interpret_output(self, outcome: Union[str, int, List[bool]]) -> Qtype:
         out = format_outcome(outcome)

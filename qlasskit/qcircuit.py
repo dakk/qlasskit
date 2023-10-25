@@ -130,6 +130,10 @@ class QCircuit:
         if w in self.ancilla_lst:
             self.marked_ancillas.add(w)
 
+    def uncompute_all(self, keep=[]):
+        """Uncompute the whole circuit expect for the keep"""
+        pass
+
     def uncompute(self, to_mark=[]):
         """Uncompute all the marked ancillas plus the to_mark list"""
         [self.mark_ancilla(x) for x in to_mark]
@@ -229,6 +233,16 @@ class QCircuit:
     def barrier(self, label=None):
         """Add a barrier to the circuit"""
         self.gates.append(("bar", label))
+
+    def h(self, w: int):
+        """H gate"""
+        w = self[w]
+        self.append("h", [w])
+
+    def z(self, w: int):
+        """Z gate"""
+        w = self[w]
+        self.append("z", [w])
 
     def x(self, w: int):
         """X gate"""
