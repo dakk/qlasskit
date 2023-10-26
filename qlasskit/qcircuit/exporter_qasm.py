@@ -14,6 +14,7 @@
 
 from typing import Literal
 
+from . import gates
 from .exporter import QCircuitExporter
 
 
@@ -22,9 +23,12 @@ class QasmExporter(QCircuitExporter):
         gate_qasm = f"gate {_selfqc.name} "
         gate_qasm += " ".join(_selfqc.qubit_map.keys())
         gate_qasm += " {\n"
-        for x in _selfqc.gates:
-            qbs = list(map(lambda gq: _selfqc.get_key_by_index(gq), x[1]))
-            gate_qasm += f'\t{x[0]} {" ".join(qbs)}\n'
+        for g, ws, p in _selfqc.gates:
+            if isinstance(g, gates.NopGate):
+                continue
+
+            qbs = list(map(lambda gq: _selfqc.get_key_by_index(gq), ws))
+            gate_qasm += f'\t{g.__name__.lower()} {" ".join(qbs)}\n'
         gate_qasm += "}\n\n"
 
         if mode == "gate":

@@ -65,6 +65,7 @@
 - [x] Bitwise xor, or, and
 - [x] Integrate tweedledum for compilation
 - [x] Aggregate cascading expressions in for unrolling
+- [x] Rewrite qcircuit abstraction
 
 ### Week 2: (30 Oct 23)
 ### Week 3: (6 Nov 23)
@@ -131,7 +132,7 @@
 ### Framwork support
 
 - [x] Qiskit
-- [ ] QASM
+- [x] QASM
 - [ ] QuTip
 - [ ] Pennylane
 - [ ] Cirq

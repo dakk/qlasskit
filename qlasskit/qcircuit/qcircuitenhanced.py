@@ -17,6 +17,7 @@ from typing import List, Union
 
 from sympy import Symbol
 
+from . import gates
 from .qcircuit import QCircuit
 
 
@@ -55,15 +56,15 @@ class QCircuitEnhanced(QCircuit):
         len_g = len(self.gates)
         while i < len_g:
             if i < (len_g - 1) and self.gates[i] == self.gates[i + 1]:
-                if result[-1][0] == "bar":
+                if isinstance(result[-1][0], gates.Barrier):
                     result.pop()
                 i += 2
             elif (
                 i < (len_g - 2)
                 and self.gates[i] == self.gates[i + 2]
-                and self.gates[i + 1][0] == "bar"
+                and isinstance(self.gates[i + 1][0], gates.Barrier)
             ):
-                if result[-1][0] == "bar":
+                if isinstance(result[-1][0], gates.Barrier):
                     result.pop()
                 i += 3
             else:
@@ -101,7 +102,11 @@ class QCircuitEnhanced(QCircuit):
         uncomputed = set()
         self.barrier(label="un_all")
         for g, qbs, p in reversed(scopy):
-            if qbs[-1] in keep or g == "bar" or qbs[-1] in self.free_ancilla_lst:
+            if (
+                isinstance(g, gates.NopGate)
+                or qbs[-1] in keep
+                or qbs[-1] in self.free_ancilla_lst
+            ):
                 continue
             uncomputed.add(qbs[-1])
 

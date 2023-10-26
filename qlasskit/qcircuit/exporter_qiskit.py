@@ -14,32 +14,32 @@
 
 from typing import Literal
 
+from . import gates
 from .exporter import QCircuitExporter
 
 
 class QiskitExporter(QCircuitExporter):
     def export(self, _selfqc, mode: Literal["circuit", "gate"]):  # noqa: C901
         from qiskit import QuantumCircuit
-        from qiskit.circuit.library.standard_gates import RXGate
 
         qc = QuantumCircuit(_selfqc.num_qubits, 0)
 
         for g, w, p in _selfqc.gates:
-            if g == "x":
-                qc.x(w[0])
-            elif g == "cx":
-                qc.cx(w[0], w[1])
-            elif g == "ccx":
-                qc.ccx(w[0], w[1], w[2])
-            elif g == "mcx":
+            if isinstance(g, gates.X):
+                qc.x(*w)
+            elif isinstance(g, gates.CX):
+                qc.cx(*w)
+            elif isinstance(g, gates.CCX):
+                qc.ccx(*w)
+            elif isinstance(g, gates.MCX):
                 qc.mcx(w[0:-1], w[-1])
-            elif g == "bar" and mode != "gate":
-                qc.barrier(label=w)
-            elif g == "fredkin":
-                qc.fredkin(w[0], w[1], w[2])
-            elif g == "mcrx":
-                qc.append(RXGate(p).control(len(w[0:-1])), w)
-            elif g != "bar":
+            elif isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.X):
+                qc.mcx(w[0:-1], w[-1])
+
+            elif isinstance(g, gates.Barrier) and mode != "gate":
+                qc.barrier(label=p)
+
+            elif not (isinstance(g, gates.NopGate)):
                 raise Exception(f"not handled {g}")
 
         if mode == "gate":

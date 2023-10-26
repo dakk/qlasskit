@@ -24,6 +24,7 @@ from tweedledum.synthesis import xag_synth
 
 from .. import QCircuit
 from ..ast2logic.typing import Arg, Args, BoolExpList
+from ..qcircuit import gates
 from . import Compiler
 
 
@@ -120,6 +121,13 @@ class TweedledumCompiler(Compiler):
             n_ctrls = instruction.num_controls()
             angle = rotation_angle(instruction)
 
+            if op == "rx":
+                op = "x"
+                angle = None
+
+            if op == "x":
+                op = gates.X()
+
             if n_ctrls > 0:
                 qb = []
                 for u, pol in qubits:
@@ -127,10 +135,7 @@ class TweedledumCompiler(Compiler):
                         qc.x(u)
                     qb.append(u)
 
-                if op == "rx":
-                    op = "x"
-                    angle = None
-                qc.mctrl_gate(op, qb[0:-1], qb[-1], angle)
+                qc.mctrl(op, qb[0:-1], qb[-1], angle)
 
                 for u, pol in qubits:
                     if not pol:

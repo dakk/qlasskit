@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
+from typing import Any, List, Tuple
 
 
 class QGate:
@@ -25,10 +25,21 @@ class QGate:
         return cls
 
 
+class NopGate(QGate):
+    def __init__(self, name="nop"):
+        super().__init__(name, 0)
+
+
+class Barrier(NopGate):
+    def __init__(self):
+        super().__init__("_barrier")
+
+
 class QControlledGate(QGate):
     def __init__(self, gate: QGate, n_controls: int):
-        super().__init__("C" + gate.__name__)
+        super().__init__(("C" * n_controls) + gate.__name__, n_controls + gate.n_qubits)
         self.n_controls = n_controls
+        self.gate = gate
 
 
 class X(QGate):
@@ -46,12 +57,12 @@ class Z(QGate):
         super().__init__("Z")
 
 
-def CX(QControlledGate):
+class CX(QControlledGate):
     def __init__(self):
         super().__init__(X(), 1)
 
 
-def CCX(QControlledGate):
+class CCX(QControlledGate):
     def __init__(self):
         super().__init__(X(), 2)
 
@@ -59,14 +70,23 @@ def CCX(QControlledGate):
 Toffoli = CCX
 
 
-def MCX(QControlledGate):
+class MCX(QControlledGate):
     def __init__(self, n_controls):
         super().__init__(X(), n_controls)
 
 
-def apply(gate: QGate, qubits: List[int], param=None):
-    pass
+class MCtrl(QControlledGate):
+    def __init__(self, gate, n_controls):
+        super().__init__(gate, n_controls)
 
+
+def apply(gate: QGate, qubits: List[int], param=None):
+    if len(qubits) != gate.n_qubits:
+        raise Exception(f"expected {gate.n_qubits} qubits ({len(qubits)} given)")
+    return [gate, qubits, param]
+
+
+AppliedGate = Tuple[QGate, List[int], Any]
 
 # qc.append(CX(), [0, 1])
 # qc += apply(CX(), [0, 1])

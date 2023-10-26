@@ -17,6 +17,7 @@ from typing import Literal
 from sympy.physics.quantum.gate import CNOT, H, T, X
 from sympy.physics.quantum.qubit import Qubit
 
+from . import gates
 from .exporter import QCircuitExporter
 
 
@@ -46,15 +47,13 @@ class SympyExporter(QCircuitExporter):
 
         for g, w, p in _selfqc.gates:
             ga = None
-            if g == "x":
+            if isinstance(g, gates.X):
                 ga = X(w[0])
-            elif g == "cx":
+            elif isinstance(g, gates.CX):
                 ga = CNOT(w[0], w[1])
-            elif g == "ccx":
+            elif isinstance(g, gates.CCX):
                 raise Exception("Not implemented yet")
-            elif g == "fredkin":
-                raise Exception("Not implemented yet")
-            elif g == "mcx":
+            elif isinstance(g, gates.MCX):
                 raise Exception("Not implemented yet")
             elif g != "bar":
                 raise Exception(f"not handled {g}")

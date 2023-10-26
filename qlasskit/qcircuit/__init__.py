@@ -18,5 +18,6 @@ from typing import Literal, get_args  # noqa: F401
 SupportedFramework = Literal["qiskit", "sympy", "qasm"]
 SupportedFrameworks = list(get_args(SupportedFramework))
 
+from . import gates  # noqa: F401, E402
 from .qcircuit import QCircuit  # noqa: F401, E402
 from .qcircuitenhanced import QCircuitEnhanced  # noqa: F401, E402

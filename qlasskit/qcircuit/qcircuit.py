@@ -15,7 +15,8 @@ from typing import Any, List, Literal, Union
 
 from sympy import Symbol
 
-from . import SupportedFramework
+from . import SupportedFramework, gates
+from .gates import QGate
 
 
 class QCircuit:
@@ -26,10 +27,10 @@ class QCircuit:
             num_qubits (int, optional): The number of qubits in the circuit. Defaults to 0.
 
         """
-        self.name = name
-        self.num_qubits = num_qubits
-        self.gates = []
-        self.gates_computed = []
+        self.name: str = name
+        self.num_qubits: int = num_qubits
+        self.gates: List[gates.AppliedGate] = []
+        self.gates_computed: List[gates.AppliedGate] = []
         self.qubit_map = {}
 
         for x in range(num_qubits):
@@ -98,7 +99,7 @@ class QCircuit:
         self.num_qubits += 1
         return self.num_qubits - 1
 
-    def append(self, gate_name: str, qubits: List[int], param: Any = None):
+    def append(self, gate: QGate, qubits: List[int], param: Any = None):
         """Append a gate operation to the circuit.
 
         Args:
@@ -116,57 +117,55 @@ class QCircuit:
         qs = set()
         for q in qubits:
             if q in qs:
-                raise Exception(f"duplicate qubit in gate append: {gate_name} {qubits}")
+                raise Exception(f"duplicate qubit in gate append: {qubits}")
             qs.add(q)
 
-        self.gates.append((gate_name, qubits, param))
-        self.gates_computed.append((gate_name, qubits, param))
+        applied = gates.apply(gate, qubits, param)
+        self.gates.append(applied)
+
+        if not isinstance(gate, gates.NopGate):
+            self.gates_computed.append(applied)
 
     def barrier(self, label=None):
         """Add a barrier to the circuit"""
-        self.gates.append(("bar", label, None))
+        self.append(gates.Barrier(), [], label)
 
     def h(self, w: int):
         """H gate"""
         w = self[w]
-        self.append("h", [w])
+        self.append(gates.H(), [w])
 
     def z(self, w: int):
         """Z gate"""
         w = self[w]
-        self.append("z", [w])
+        self.append(gates.Z(), [w])
 
     def x(self, w: int):
         """X gate"""
         w = self[w]
-        self.append("x", [w])
+        self.append(gates.X(), [w])
 
     def cx(self, w1, w2):
         """CX gate"""
         w1, w2 = self[w1], self[w2]
-        self.append("cx", [w1, w2])
+        self.append(gates.CX(), [w1, w2])
 
     def ccx(self, w1, w2, w3):
         """CCX gate"""
         w1, w2, w3 = self[w1], self[w2], self[w3]
-        self.append("ccx", [w1, w2, w3])
+        self.append(gates.CCX(), [w1, w2, w3])
 
-    def mctrl_gate(self, g, wl: List[int], target, param=None):
+    def mctrl(self, g, wl: List[int], target, param=None):
         """Multi controlled gate"""
         target = self[target]
         wl = list(map(lambda w: self[w], wl))
-        self.append(f"mc{g}", wl + [target], param)
+        self.append(gates.MCtrl(g, len(wl)), wl + [target], param)
 
     def mcx(self, wl: List[int], target):
         """Multi CX gate"""
         target = self[target]
         wl = list(map(lambda w: self[w], wl))
-        self.append("mcx", wl + [target])
-
-    def fredkin(self, w1, w2, w3):
-        """Fredkin (cswap) gate"""
-        w1, w2, w3 = self[w1], self[w2], self[w3]
-        self.append("fredkin", [w1, w2, w3])
+        self.append(gates.MCX(len(wl)), wl + [target])
 
     def export(
         self,

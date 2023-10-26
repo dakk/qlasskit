@@ -19,7 +19,7 @@ from sympy import Symbol
 from sympy.physics.quantum.qapply import qapply
 from sympy.physics.quantum.qubit import Qubit, measure_all
 
-from qlasskit.qcircuit import QCircuit, QCircuitEnhanced
+from qlasskit.qcircuit import QCircuit, QCircuitEnhanced, gates
 
 from .utils import qiskit_measure_and_count
 
@@ -35,7 +35,8 @@ class TestQCircuit(unittest.TestCase):
         a, b, c = qc.add_qubit("a"), qc.add_qubit("b"), qc.add_qubit(Symbol("c"))
         qc.ccx("a", Symbol("b"), c)
         self.assertEqual(qc.num_qubits, 3)
-        self.assertEqual(qc.gates, [("ccx", [0, 1, 2], None)])
+        self.assertTrue(isinstance(qc.gates[0][0], gates.CCX))
+        self.assertEqual(qc.gates[0][1:], [[0, 1, 2], None])
 
     def test_duplicate_qubit(self):
         qc = QCircuit()
@@ -164,13 +165,3 @@ class TestQCircuitExport(unittest.TestCase):
         circ = qc.export("circuit", "qiskit")
         counts = qiskit_measure_and_count(circ, shots=1)
         self.assertDictEqual(counts, {"111": 1})
-
-    def test_export_qiskit_fredkin(self):
-        qc = QCircuit()
-        a, b, c = qc.add_qubit(), qc.add_qubit(), qc.add_qubit()
-        qc.x(a)
-        qc.x(b)
-        qc.fredkin(a, b, c)
-        circ = qc.export("circuit", "qiskit")
-        counts = qiskit_measure_and_count(circ, shots=1)
-        self.assertDictEqual(counts, {"101": 1})
