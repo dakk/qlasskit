@@ -15,7 +15,7 @@
 
 from sympy import Symbol
 from sympy.logic import ITE, And, Implies, Not, Or, Xor
-from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue #, to_anf
+from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue  # , to_anf
 
 from .. import QCircuit
 from ..ast2logic.typing import Arg, Args, BoolExpList

@@ -89,7 +89,9 @@ def twcircuit_to_qcircuit(twc):
 class TweedledumCompiler(Compiler):
     """Compile using tweedledum synthesis library"""
 
-    def compile(self, name, args: Args, returns: Arg, exprs: BoolExpList) -> QCircuit: # noqa: C901
+    def compile(  # noqa: C901
+        self, name, args: Args, returns: Arg, exprs: BoolExpList
+    ) -> QCircuit:
         exprs = [(symb, self._symplify_exp(exp)) for symb, exp in exprs]
         _logic_network = sympy_to_logic_network(name, args, returns, exprs)
 
