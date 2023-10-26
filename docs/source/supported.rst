@@ -142,6 +142,7 @@ Bultin functions:
 - `min(a, b, ...)`, `min(Tuple)`: returns the min of a tuple
 .. - `sum(Tuple)`: returns the sum of the elemnts of a tuple
 .. - `all(a, b, ...)`, `all(Tuple)`:
+.. - `any(a, b, ...)`, `any(Tuple)`:
 
 
 
@@ -161,3 +162,12 @@ Return
 .. code-block:: python
 
    return b+1
+
+
+For loop
+^^^^^^^^
+
+.. code-block:: python
+
+   for i in range(4):
+      a += i

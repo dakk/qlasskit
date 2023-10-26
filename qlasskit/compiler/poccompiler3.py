@@ -16,8 +16,8 @@ from sympy import Symbol
 from sympy.logic import And, Not, Xor
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
 
-from .. import QCircuit
 from ..ast2logic.typing import Arg, Args, BoolExpList
+from ..qcircuit import QCircuit, QCircuitEnhanced
 from . import Compiler, CompilerException, ExpQMap
 
 
@@ -49,7 +49,7 @@ class POCCompiler3(Compiler):
     def compile(self, name, args: Args, returns: Arg, exprs: BoolExpList) -> QCircuit:
         exprs = [(symb, self._symplify_exp(exp)) for symb, exp in exprs]
 
-        qc = QCircuit(name=name)
+        qc = QCircuitEnhanced(name=name)
 
         for arg in args:
             for arg_b in arg.bitvec:
@@ -75,7 +75,7 @@ class POCCompiler3(Compiler):
             print()
         return qc
 
-    def compile_expr(self, qc: QCircuit, expr: Boolean) -> int:  # noqa: C901
+    def compile_expr(self, qc: QCircuitEnhanced, expr: Boolean) -> int:  # noqa: C901
         if isinstance(expr, Symbol):
             if expr.name in self.symbol_count and self.symbol_count[expr.name] > 0:
                 self.symbol_count[expr.name] -= 1

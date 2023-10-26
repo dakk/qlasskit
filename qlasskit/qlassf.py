@@ -137,8 +137,10 @@ class QlassF:
         self._compiled_gate = None
 
     def __repr__(self):
-        ret_str = f"{self.returns.ttype}[{len(self.returns)}]"
-        arg_str = ", ".join(map(lambda arg: f"{arg.name}:{arg.ttype}", self.args))
+        ret_str = f"{self.returns.ttype.__name__}"
+        arg_str = ", ".join(
+            map(lambda arg: f"{arg.name}:{arg.ttype.__name__}", self.args)
+        )
         exp_str = "\n\t".join(map(lambda exp: f"{exp[0]} = {exp[1]}", self.expressions))
         return f"QlassF<{self.name}>({arg_str}) -> {ret_str}:\n\t{exp_str}"
 

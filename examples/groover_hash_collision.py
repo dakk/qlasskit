@@ -15,15 +15,15 @@ from qlasskit import Qint4, qlassf
 
 @qlassf
 def hash(k: Qint4) -> bool:
-    h = False
+    h = True
     for i in range(4):
-        h = h or k[i]
+        h = h and k[i]
     return h
 
 
 # @qlassf(defs=[hash])
 # def find_coll(k: Qint4):
-#     return hash(k) == 0b0101
+#     return hash(k)
 
 
 print(hash)

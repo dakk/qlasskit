@@ -16,8 +16,8 @@ from sympy import Symbol
 from sympy.logic import And, Not, Xor
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
 
-from .. import QCircuit
 from ..ast2logic.typing import Arg, Args, BoolExpList
+from ..qcircuit import QCircuit, QCircuitEnhanced
 from . import Compiler, CompilerException, ExpQMap
 
 
@@ -25,7 +25,7 @@ class InternalCompiler(Compiler):
     """InternalCompiler translating an expression list to quantum circuit"""
 
     def compile(self, name, args: Args, returns: Arg, exprs: BoolExpList) -> QCircuit:
-        qc = QCircuit(name=name)
+        qc = QCircuitEnhanced(name=name)
         self.expqmap = ExpQMap()
 
         for arg in args:
@@ -59,7 +59,9 @@ class InternalCompiler(Compiler):
 
         return qc
 
-    def compile_expr(self, qc: QCircuit, expr: Boolean, dest=None) -> int:  # noqa: C901
+    def compile_expr(  # noqa: C901
+        self, qc: QCircuitEnhanced, expr: Boolean, dest=None
+    ) -> int:
         if isinstance(expr, Symbol) and expr.name in qc:
             return qc[expr.name]
 

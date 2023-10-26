@@ -19,7 +19,7 @@ from sympy import Symbol
 from sympy.physics.quantum.qapply import qapply
 from sympy.physics.quantum.qubit import Qubit, measure_all
 
-from qlasskit import QCircuit
+from qlasskit.qcircuit import QCircuit, QCircuitEnhanced
 
 from .utils import qiskit_measure_and_count
 
@@ -53,7 +53,7 @@ class TestQCircuit(unittest.TestCase):
         self.assertEqual(qc.get_key_by_index(0), "a")
 
     def test_add_free_ancilla(self):
-        qc = QCircuit()
+        qc = QCircuitEnhanced()
         a = qc.add_ancilla(is_free=True)
         b = qc.get_free_ancilla()
         self.assertEqual(a, b)
@@ -61,7 +61,7 @@ class TestQCircuit(unittest.TestCase):
 
 class TestQCircuitUncomputing(unittest.TestCase):
     def test1(self):
-        qc = QCircuit()
+        qc = QCircuitEnhanced()
         a, b, c, d = (
             qc.add_qubit(),
             qc.add_qubit(),
@@ -76,7 +76,7 @@ class TestQCircuitUncomputing(unittest.TestCase):
         # qc.draw()
 
     def test2(self):
-        qc = QCircuit()
+        qc = QCircuitEnhanced()
         q = [qc.add_qubit() for x in range(4)]
         a = [qc.add_ancilla(is_free=False) for x in range(4)]
         r = qc.add_qubit()
@@ -92,7 +92,7 @@ class TestQCircuitUncomputing(unittest.TestCase):
         # qc.draw()
 
     def test_uncompute_all(self):
-        qc = QCircuit()
+        qc = QCircuitEnhanced()
         q = [qc.add_qubit() for x in range(4)]
         a = [qc.add_ancilla(is_free=False) for x in range(4)]
         r = qc.add_qubit()

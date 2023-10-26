@@ -14,6 +14,7 @@ setup(
         "qlasskit",
         "qlasskit.types",
         "qlasskit.ast2logic",
+        "qlasskit.qcircuit",
         "qlasskit.compiler",
         "qlasskit.algorithms",
     ],
