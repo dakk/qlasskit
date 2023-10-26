@@ -89,14 +89,12 @@ def twcircuit_to_qcircuit(twc):
 class TweedledumCompiler(Compiler):
     """Compile using tweedledum synthesis library"""
 
-    def compile(self, name, args: Args, returns: Arg, exprs: BoolExpList) -> QCircuit:
+    def compile(self, name, args: Args, returns: Arg, exprs: BoolExpList) -> QCircuit: # noqa: C901
         exprs = [(symb, self._symplify_exp(exp)) for symb, exp in exprs]
-
         _logic_network = sympy_to_logic_network(name, args, returns, exprs)
 
         sy = xag_synth(_logic_network)
         sy = parity_decomp(sy)
-        # print(exprs)
         # print(sy)
 
         qc = QCircuit(sy.num_qubits(), native=sy)
@@ -127,6 +125,9 @@ class TweedledumCompiler(Compiler):
                         qc.x(u)
                     qb.append(u)
 
+                if op == "rx":
+                    op = "x"
+                    angle = None
                 qc.mctrl_gate(op, qb[0:-1], qb[-1], angle)
 
                 for u, pol in qubits:

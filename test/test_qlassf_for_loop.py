@@ -31,6 +31,11 @@ class TestForLoop(unittest.TestCase):
         f = "def test(a: Qint2) -> Qint2:\n\tfor x in range(1):\n\t\ta += 1\n\treturn a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
+        
+    def test_for_4it(self):
+        f = "def test(a: Qint2) -> Qint2:\n\tfor x in range(4):\n\t\ta += 1\n\treturn a"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
 
     def test_for_3it(self):
         f = "def test(a: Qint2) -> Qint2:\n\tfor i in range(3):\n\t\ta += i\n\treturn a"

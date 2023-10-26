@@ -42,7 +42,7 @@ class QCircuit:
 
         for x in range(num_qubits):
             self.qubit_map[f"q{x}"] = x
-            
+
         self.__native = native
 
     def get_key_by_index(self, i: int):
