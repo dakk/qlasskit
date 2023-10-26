@@ -20,15 +20,18 @@ from .compiler import Compiler, CompilerException, optimizer  # noqa: F401
 from .multipass import MultipassCompiler
 from .poccompiler2 import POCCompiler2
 from .poccompiler3 import POCCompiler3
+from .tweedledumcompiler import TweedledumCompiler
 
 
-def to_quantum(name, args, returns, exprs, compiler="poc2"):
+def to_quantum(name, args, returns, exprs, compiler="tw"):
     if compiler == "multipass":
         s = MultipassCompiler()
     elif compiler == "poc2":
         s = POCCompiler2()
     elif compiler == "poc3":
         s = POCCompiler3()
+    elif compiler == "tw":
+        s = TweedledumCompiler()
 
     circ = s.compile(name, args, returns, exprs)
     return circ

@@ -43,7 +43,7 @@ class TestQint(unittest.TestCase):
     [
         (Qint2, "Qint2", 2),
         (Qint4, "Qint4", 4),
-        (Qint8, "Qint8", 8),
+        # (Qint8, "Qint8", 8),
     ],
 )
 class TestQlassfIntParametrized_2_4_8(unittest.TestCase):

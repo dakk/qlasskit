@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import copy
-from typing import List, Literal, Union, get_args
+from typing import Any, List, Literal, Union, get_args
 
 from sympy import Symbol
 from sympy.physics.quantum.gate import CNOT, H, T, X
@@ -23,7 +23,7 @@ SupportedFrameworks = list(get_args(SupportedFramework))
 
 
 class QCircuit:
-    def __init__(self, num_qubits=0, name="qc"):
+    def __init__(self, num_qubits=0, name="qc", native=None):
         """Initialize a quantum circuit.
 
         Args:
@@ -42,6 +42,8 @@ class QCircuit:
 
         for x in range(num_qubits):
             self.qubit_map[f"q{x}"] = x
+            
+        self.__native = native
 
     def get_key_by_index(self, i: int):
         """Return the qubit name given its index"""
@@ -137,7 +139,7 @@ class QCircuit:
         scopy = copy.deepcopy(self.gates)
         uncomputed = set()
         self.barrier(label="un_all")
-        for g, qbs in reversed(scopy):
+        for g, qbs, p in reversed(scopy):
             if qbs[-1] in keep or g == "bar" or qbs[-1] in self.free_ancilla_lst:
                 continue
             uncomputed.add(qbs[-1])
@@ -145,7 +147,7 @@ class QCircuit:
             if qbs[-1] in self.ancilla_lst:
                 self.free_ancilla_lst.add(qbs[-1])
 
-            self.append(g, qbs)
+            self.append(g, qbs, p)
 
         # Remove barrier if no uncomputed
         if len(uncomputed) == 0:
@@ -165,12 +167,12 @@ class QCircuit:
         uncomputed = set()
         new_gates_comp = []
 
-        for g, ws in reversed(self.gates_computed):
+        for g, ws, p in reversed(self.gates_computed):
             if ws[-1] in self.marked_ancillas:
                 uncomputed.add(ws[-1])
-                self.append(g, ws)
+                self.append(g, ws, p)
             else:
-                new_gates_comp.append((g, ws))
+                new_gates_comp.append((g, ws, p))
 
         for x in self.marked_ancillas:
             self.free_ancilla_lst.add(x)
@@ -222,7 +224,7 @@ class QCircuit:
         self.num_qubits += 1
         return self.num_qubits - 1
 
-    def append(self, gate_name: str, qubits: List[int]):
+    def append(self, gate_name: str, qubits: List[int], param: Any = None):
         """Append a gate operation to the circuit.
 
         Args:
@@ -243,12 +245,12 @@ class QCircuit:
                 raise Exception(f"duplicate qubit in gate append: {gate_name} {qubits}")
             qs.add(q)
 
-        self.gates.append((gate_name, qubits))
-        self.gates_computed.append((gate_name, qubits))
+        self.gates.append((gate_name, qubits, param))
+        self.gates_computed.append((gate_name, qubits, param))
 
     def barrier(self, label=None):
         """Add a barrier to the circuit"""
-        self.gates.append(("bar", label))
+        self.gates.append(("bar", label, None))
 
     def h(self, w: int):
         """H gate"""
@@ -274,6 +276,12 @@ class QCircuit:
         """CCX gate"""
         w1, w2, w3 = self[w1], self[w2], self[w3]
         self.append("ccx", [w1, w2, w3])
+
+    def mctrl_gate(self, g, wl: List[int], target, param=None):
+        """Multi controlled gate"""
+        target = self[target]
+        wl = list(map(lambda w: self[w], wl))
+        self.append(f"mc{g}", wl + [target], param)
 
     def mcx(self, wl: List[int], target):
         """Multi CX gate"""
@@ -311,7 +319,7 @@ class QCircuit:
 
         qstate = Qubit("0" * self.num_qubits)
 
-        for g, w in self.gates:
+        for g, w, p in self.gates:
             ga = None
             if g == "x":
                 ga = X(w[0])
@@ -323,18 +331,22 @@ class QCircuit:
                 raise Exception("Not implemented yet")
             elif g == "mcx":
                 raise Exception("Not implemented yet")
+            else:
+                raise Exception(f"not handled {g}")
+
             if ga:
                 qstate = ga * qstate
 
         return qstate
 
-    def __qiskit_export(self, mode: Literal["circuit", "gate"]):
+    def __qiskit_export(self, mode: Literal["circuit", "gate"]):  # noqa: C901
         """Internal function for exporting qiskit quantum circuit"""
         from qiskit import QuantumCircuit
+        from qiskit.circuit.library.standard_gates import RXGate
 
         qc = QuantumCircuit(self.num_qubits, 0)
 
-        for g, w in self.gates:
+        for g, w, p in self.gates:
             if g == "x":
                 qc.x(w[0])
             elif g == "cx":
@@ -347,6 +359,10 @@ class QCircuit:
                 qc.barrier(label=w)
             elif g == "fredkin":
                 qc.fredkin(w[0], w[1], w[2])
+            elif g == "mcrx":
+                qc.append(RXGate(p).control(len(w[0:-1])), w)
+            else:
+                raise Exception(f"not handled {g}")
 
         if mode == "gate":
             qc.remove_final_measurements()
@@ -408,5 +424,8 @@ class QCircuit:
 
     def draw(self):
         """Draw the circuit"""
-        qc = self.export("circuit", "qiskit")
-        print(qc.draw("text"))
+        if self.__native:
+            print(self.__native)
+        else:
+            qc = self.export("circuit", "qiskit")
+            print(qc.draw("text"))

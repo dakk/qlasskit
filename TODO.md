@@ -63,7 +63,8 @@
 - [x] Remove quantum circuit identities
 - [x] For unrolling
 - [x] Bitwise xor, or, and
-- [ ] Aggregate cascading expressions in for unrolling
+- [x] Integrate tweedledum for compilation
+- [x] Aggregate cascading expressions in for unrolling
 
 ### Week 2: (30 Oct 23)
 ### Week 3: (6 Nov 23)

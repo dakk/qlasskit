@@ -10,7 +10,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License..
+# limitations under the License.
 
 from sympy import Symbol
 from sympy.logic import And, Not, Xor
@@ -24,7 +24,6 @@ from . import Compiler, CompilerException, ExpQMap
 def count_symbol_in_expr(expr, d={}):
     for arg in expr.args:
         if isinstance(arg, Symbol):
-            # print(arg)
             if arg.name not in d:
                 d[arg.name] = 0
             d[arg.name] += 1
@@ -36,14 +35,12 @@ def count_symbol_in_expr(expr, d={}):
 def count_symbols_in_exprs(exprs):
     d = {}
     for s, e in exprs:
-        # print(s,e)
         d = count_symbol_in_expr(e, d)
-        # print(d)
     return d
 
 
 class POCCompiler3(Compiler):
-    """POC2 compiler translating an expression list to quantum circuit"""
+    """POC3 compiler translating an expression list to quantum circuit"""
 
     def garbage_collect(self, qc):
         uncomputed = qc.uncompute()
@@ -62,6 +59,7 @@ class POCCompiler3(Compiler):
         self.expqmap = ExpQMap()
 
         for sym, exp in exprs:
+            print(self.symbol_count)
             # print(sym, self._symplify_exp(exp))
             iret = self.compile_expr(qc, exp)
             # print("iret", iret)
@@ -69,6 +67,12 @@ class POCCompiler3(Compiler):
 
             self.garbage_collect(qc)
 
+            print(sym, exp)
+            print(self.symbol_count)
+            circ_qi = qc.export("circuit", "qiskit")
+            print(circ_qi.draw("text"))
+            print()
+            print()
         return qc
 
     def compile_expr(self, qc: QCircuit, expr: Boolean) -> int:  # noqa: C901
@@ -78,6 +82,7 @@ class POCCompiler3(Compiler):
             return qc[expr.name]
 
         elif expr in self.expqmap:
+            print(expr, self.expqmap.exp_map)
             for s, c in count_symbol_in_expr(expr, {}).items():
                 self.symbol_count[s] -= c
 
@@ -86,9 +91,9 @@ class POCCompiler3(Compiler):
         elif (
             isinstance(expr, Not)
             and isinstance(expr.args[0], Symbol)
-            and self.symbol_count[expr.args[0].name] <= 1
+            and self.symbol_count[expr.args[0].name] == 1
         ):
-            self.symbol_count[expr.args[0].name] = 0
+            print("thegame")
             eret = self.compile_expr(qc, expr.args[0])
             qc.x(eret)
             self.expqmap[expr] = eret
@@ -96,7 +101,7 @@ class POCCompiler3(Compiler):
 
         elif isinstance(expr, Xor) and any(
             [
-                isinstance(e, Symbol) and self.symbol_count[e.name] <= 1
+                isinstance(e, Symbol) and self.symbol_count[e.name] == 1
                 for e in expr.args
             ]
         ):
@@ -112,7 +117,6 @@ class POCCompiler3(Compiler):
                 qc.cx(x, last)
 
             [qc.mark_ancilla(eret) for eret in erets]
-            self.garbage_collect(qc)
             self.expqmap[expr] = last
             return last
 
@@ -129,7 +133,6 @@ class POCCompiler3(Compiler):
                 qc.cx(eret, fa)
                 qc.x(fa)
                 qc.mark_ancilla(eret)
-                self.garbage_collect(qc)
                 self.expqmap[expr] = fa
 
                 return fa
@@ -140,7 +143,6 @@ class POCCompiler3(Compiler):
             qc.barrier("and")
             qc.mcx(erets, fa)
             [qc.mark_ancilla(eret) for eret in erets]
-            self.garbage_collect(qc)
             self.expqmap[expr] = fa
 
             return fa
@@ -163,7 +165,6 @@ class POCCompiler3(Compiler):
                 qc.cx(x, fa)
 
             [qc.mark_ancilla(eret) for eret in erets]
-            self.garbage_collect(qc)
 
             return fa
 

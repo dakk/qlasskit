@@ -35,7 +35,7 @@ class TestQCircuit(unittest.TestCase):
         a, b, c = qc.add_qubit("a"), qc.add_qubit("b"), qc.add_qubit(Symbol("c"))
         qc.ccx("a", Symbol("b"), c)
         self.assertEqual(qc.num_qubits, 3)
-        self.assertEqual(qc.gates, [("ccx", [0, 1, 2])])
+        self.assertEqual(qc.gates, [("ccx", [0, 1, 2], None)])
 
     def test_duplicate_qubit(self):
         qc = QCircuit()
