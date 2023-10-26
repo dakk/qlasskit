@@ -91,7 +91,10 @@ The boolean expressions are then being fed to the `qlasskit.compiler`` which tra
 to invertible circuits, introducing auxiliary qubits. In this step, the compiler will automatically uncompute 
 auxiliary qubits in order to reduce the number of qubits needed and the circuit footprint. 
 
+For the compilation, two backends are supported:
 
+- InternalCompiler
+- Tweedledum.xag_synth
 
 
 Result 

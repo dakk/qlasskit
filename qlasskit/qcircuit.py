@@ -331,7 +331,7 @@ class QCircuit:
                 raise Exception("Not implemented yet")
             elif g == "mcx":
                 raise Exception("Not implemented yet")
-            else:
+            elif g != "bar":
                 raise Exception(f"not handled {g}")
 
             if ga:
@@ -361,7 +361,7 @@ class QCircuit:
                 qc.fredkin(w[0], w[1], w[2])
             elif g == "mcrx":
                 qc.append(RXGate(p).control(len(w[0:-1])), w)
-            else:
+            elif g != "bar":
                 raise Exception(f"not handled {g}")
 
         if mode == "gate":

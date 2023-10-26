@@ -21,8 +21,8 @@ from ..ast2logic.typing import Arg, Args, BoolExpList
 from . import Compiler, CompilerException, ExpQMap
 
 
-class POCCompiler2(Compiler):
-    """POC2 compiler translating an expression list to quantum circuit"""
+class InternalCompiler(Compiler):
+    """InternalCompiler translating an expression list to quantum circuit"""
 
     def compile(self, name, args: Args, returns: Arg, exprs: BoolExpList) -> QCircuit:
         qc = QCircuit(name=name)
