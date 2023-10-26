@@ -83,11 +83,11 @@ class MCtrl(QControlledGate):
 def apply(gate: QGate, qubits: List[int], param=None):
     if len(qubits) != gate.n_qubits:
         raise Exception(f"expected {gate.n_qubits} qubits ({len(qubits)} given)")
-    return [gate, qubits, param]
+    return (
+        gate,
+        qubits,
+        param,
+    )
 
 
 AppliedGate = Tuple[QGate, List[int], Any]
-
-# qc.append(CX(), [0, 1])
-# qc += apply(CX(), [0, 1])
-# qc += another_circ

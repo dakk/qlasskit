@@ -36,7 +36,7 @@ class TestQCircuit(unittest.TestCase):
         qc.ccx("a", Symbol("b"), c)
         self.assertEqual(qc.num_qubits, 3)
         self.assertTrue(isinstance(qc.gates[0][0], gates.CCX))
-        self.assertEqual(qc.gates[0][1:], [[0, 1, 2], None])
+        self.assertEqual(qc.gates[0][1:], ([0, 1, 2], None))
 
     def test_duplicate_qubit(self):
         qc = QCircuit()
@@ -46,6 +46,17 @@ class TestQCircuit(unittest.TestCase):
     def test_mapping(self):
         qc = QCircuit(4)
         qc.ccx("q0", "q1", "q2")
+
+    def test_augassign(self):
+        qc = QCircuit(1)
+        qc += gates.apply(gates.X(), [0])
+
+    def test_augassign_othercirc(self):
+        qc = QCircuit(1)
+        qc += gates.apply(gates.X(), [0])
+
+        qc2 = QCircuit(1)
+        qc2 += qc
 
     def test_get_key_by_index(self):
         qc = QCircuit()

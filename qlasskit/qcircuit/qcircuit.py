@@ -6,12 +6,14 @@
 
 # http://www.apache.org/licenses/LICENSE-2.0
 
+import copy
+
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, List, Literal, Union
+from typing import Any, List, Literal, Tuple, Union
 
 from sympy import Symbol
 
@@ -78,7 +80,28 @@ class QCircuit:
 
     def __add__(self, qc: "QCircuit") -> "QCircuit":
         """Create a new QCircuit that merges two"""
-        raise Exception("not implemented")
+        nqc = copy.deepcopy(self)
+        nqc += qc
+        return nqc
+
+    def __iadd__(self, other: Union[gates.AppliedGate, "QCircuit"]):  # type: ignore
+        """AugAssign between a qcircuit and a AppliedGate|QCircuit"""
+        if isinstance(other, Tuple):  # type: ignore
+            self.append(other[0], other[1], other[2])
+        elif isinstance(other, QCircuit):  # type: ignore
+            if other.num_qubits > self.num_qubits:
+                raise Exception(
+                    f"Other circuit has too many qubits {other.num_qubits} > {self.num_qubits}"
+                )
+
+            self.gates.extend(other.gates)
+            self.gates_computed.extend(other.gates_computed)
+
+            for s, q in other.qubit_map.items():
+                if s not in self.qubit_map:
+                    self.qubit_map[s] = q
+
+        return self
 
     def add_qubit(self, name=None):
         """Add a qubit to the circuit.
