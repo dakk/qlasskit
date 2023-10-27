@@ -8,7 +8,7 @@ from qlasskit.algorithms import Groover
 
 def qiskit_simulate(qc):
     qc.measure_all()
-    print(qc.draw('text'))
+    print(qc.draw("text"))
 
     simulator = Aer.get_backend("aer_simulator")
     circ = transpile(qc, simulator)
@@ -55,5 +55,5 @@ plot_histogram(counts_readable)
 plt.show()
 
 
-print(hash.circuit().export("circuit", 'qiskit').draw('text'))
+print(hash.circuit().export("circuit", "qiskit").draw("text"))
 # plt.show()

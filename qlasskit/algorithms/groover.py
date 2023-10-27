@@ -97,7 +97,6 @@ def oracle_outer(v: {argt_name}) -> bool:
         ]
         self.qc.h(oracle_qc["_ret_phased"])
 
-
         for i in range(n_iterations):
             self.qc.barrier(label=f"g{i}")
             # self.qc.barrier(label=f"orac_{i}")
