@@ -61,3 +61,11 @@ class TestForLoop(unittest.TestCase):
         f = "def test(a: Qint2, b: bool) -> Qint2:\n\tfor i in range(2):\n\t\ta += (i if b else 1)\n\treturn a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
+
+
+# TODO: a test to do
+# def hash(k: Qint4) -> bool:
+#     z = 1
+#     for i in range(3):
+#         z += i
+#     return z == 3

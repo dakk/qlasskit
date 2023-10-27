@@ -83,6 +83,10 @@ class QCircuit:
         nqc = copy.deepcopy(self)
         nqc += qc
         return nqc
+    
+    def copy(self) -> "QCircuit":
+        self.__native = None
+        return copy.deepcopy(self)
 
     def __iadd__(self, other: Union[gates.AppliedGate, "QCircuit"]):  # type: ignore
         """AugAssign between a qcircuit and a AppliedGate|QCircuit"""

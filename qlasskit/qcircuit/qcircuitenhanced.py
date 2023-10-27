@@ -100,7 +100,7 @@ class QCircuitEnhanced(QCircuit):
         # TODO: replace with + invert(keep)
         scopy = copy.deepcopy(self.gates)
         uncomputed = set()
-        self.barrier(label="un_all")
+        # self.barrier(label="un_all")
         for g, qbs, p in reversed(scopy):
             if (
                 isinstance(g, gates.NopGate)
@@ -116,8 +116,8 @@ class QCircuitEnhanced(QCircuit):
             self.append(g, qbs, p)
 
         # Remove barrier if no uncomputed
-        if len(uncomputed) == 0:
-            self.gates.pop()
+        # if len(uncomputed) == 0:
+        #     self.gates.pop()
 
         return uncomputed
 
@@ -128,7 +128,7 @@ class QCircuitEnhanced(QCircuit):
         if len(self.marked_ancillas) == 0:
             return []
 
-        self.barrier(label="un")
+        # self.barrier(label="un")
 
         uncomputed = set()
         new_gates_comp = []
@@ -146,7 +146,7 @@ class QCircuitEnhanced(QCircuit):
         self.gates_computed = new_gates_comp[::-1]
 
         # Remove barrier if no uncomputed
-        if len(uncomputed) == 0:
-            self.gates.pop()
+        # if len(uncomputed) == 0:
+        #     self.gates.pop()
 
         return uncomputed

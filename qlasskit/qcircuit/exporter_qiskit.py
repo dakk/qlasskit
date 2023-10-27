@@ -21,12 +21,15 @@ from .exporter import QCircuitExporter
 class QiskitExporter(QCircuitExporter):
     def export(self, _selfqc, mode: Literal["circuit", "gate"]):  # noqa: C901
         from qiskit import QuantumCircuit
+        from qiskit.circuit.library.standard_gates import ZGate
 
-        qc = QuantumCircuit(_selfqc.num_qubits, 0)
+        qc = QuantumCircuit(_selfqc.num_qubits, _selfqc.num_qubits)
 
         for g, w, p in _selfqc.gates:
             if isinstance(g, gates.X):
                 qc.x(*w)
+            elif isinstance(g, gates.H):
+                qc.h(*w)
             elif isinstance(g, gates.CX):
                 qc.cx(*w)
             elif isinstance(g, gates.CCX):
@@ -35,6 +38,9 @@ class QiskitExporter(QCircuitExporter):
                 qc.mcx(w[0:-1], w[-1])
             elif isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.X):
                 qc.mcx(w[0:-1], w[-1])
+            elif isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.Z):
+                zg = ZGate().control(len(w[0:-1]))
+                qc.append(zg, w)
 
             elif isinstance(g, gates.Barrier) and mode != "gate":
                 qc.barrier(label=p)

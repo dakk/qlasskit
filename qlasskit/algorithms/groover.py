@@ -15,7 +15,7 @@
 import math
 from typing import List, Optional, Union
 
-from ..qcircuit import QCircuit
+from ..qcircuit import QCircuit, gates
 from ..qlassf import QlassF
 from ..types import Qtype
 from .qalgorithm import QAlgorithm, format_outcome
@@ -34,9 +34,6 @@ class Groover(QAlgorithm):
             element_to_search (Qtype): the element we want to search
             n_iterations (int, optional): force a number of iterations (otherwise, pi/4*sqrt(N))
         """
-        if element_to_search is not None:
-            raise Exception("not implemented yet")
-
         if len(oracle.args) != 1:
             raise Exception("the oracle should receive exactly one parameter")
 
@@ -51,25 +48,73 @@ class Groover(QAlgorithm):
         self.qc = QCircuit(self.search_space_size)
 
         # State preparation
+        self.qc.barrier(label="state_prep")
         for i in range(self.search_space_size):
             self.qc.h(i)
 
         # Prepare and add the quantum oracle
-        # TODO
+        if element_to_search is not None:
+            oracle_outer = QlassF.from_function(
+                f"""
+def oracle_outer(v: {self.oracle.args[0].ttype.__name__}) -> bool:
+    return {self.oracle.name}(v) == {element_to_search}
+""",
+                defs=[self.oracle.to_logicfun()],
+            )
+        else:
+            oracle_outer = self.oracle
 
-        # Uncompute the oracle expect for the result
-        # TODO
+
+        oracle_qc = oracle_outer.circuit()
+        
+        # Add negative phase to result
+        oracle_qc.add_qubit(name="_ret_phased")
+        oracle_qc.mctrl(gates.Z(), [oracle_qc["_ret"]], oracle_qc["_ret_phased"])
 
         # Build the diffuser
-        # TODO
+        diffuser_qc = QCircuit(oracle_qc.num_qubits)
+        for i in range(self.search_space_size):
+            diffuser_qc.h(i)
+            diffuser_qc.x(i)
+        diffuser_qc.h(oracle_qc["_ret_phased"])
+        diffuser_qc.x(oracle_qc["_ret_phased"])
+        
+        diffuser_qc.mctrl(
+            gates.Z(), list(range(self.search_space_size)), oracle_qc["_ret_phased"]
+        )
+
+        for i in range(self.search_space_size):
+            diffuser_qc.x(i)
+            diffuser_qc.h(i)
+        diffuser_qc.x(oracle_qc["_ret_phased"])
+        diffuser_qc.h(oracle_qc["_ret_phased"])
 
         # Apply for n_iterations
-        # TODO
+        [
+            self.qc.add_qubit()
+            for i in range(oracle_qc.num_qubits - self.search_space_size)
+        ]
+        self.qc.h(oracle_qc["_ret_phased"])
 
-    def interpret_output(self, outcome: Union[str, int, List[bool]]) -> Qtype:
+        self.qc.barrier(label="groover")
+
+        for i in range(n_iterations):
+            self.qc.barrier(label=f"orac_{i}")
+            self.qc += oracle_qc.copy()
+
+            self.qc.barrier(label=f"diff_{i}")
+            self.qc += diffuser_qc.copy()
+            
+        self.qc.barrier(label="end")
+
+    def circuit(self) -> QCircuit:
+        return self.qc
+
+    def interpret_outcome(self, outcome: Union[str, int, List[bool]]) -> Qtype:
         out = format_outcome(outcome)
 
-        if self.oracle.ret_size == 1:
+        len_a = len(self.oracle.args[0])
+        if len_a == 1:
             return out[0]  # type: ignore
 
-        return self.oracle.returns.ttype.from_bool(out)  # type: ignore
+        return self.oracle.args[0].ttype.from_bool(out[::-1][0:len_a])  # type: ignore

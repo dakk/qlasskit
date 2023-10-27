@@ -1,16 +1,9 @@
 from qiskit import Aer, QuantumCircuit, transpile
+from qiskit.visualization import plot_histogram
 
 from qlasskit import Qint4, qlassf
 
-# from qlasskit.algorithms import Groover
-
-
-# @qlassf
-# def hash(k: Qint4) -> Tuple[bool, bool]:
-#     h = (False, False)
-#     for i in range(4):
-#         h = (h[0] or k[i], not h[1] and k[i])
-#     return h
+from qlasskit.algorithms import Groover
 
 
 @qlassf
@@ -21,32 +14,22 @@ def hash(k: Qint4) -> bool:
     return h
 
 
-# @qlassf(defs=[hash])
-# def find_coll(k: Qint4):
-#     return hash(k)
+print (hash.circuit().export("circuit", 'qiskit').draw('text'))
 
+algo = Groover(hash, True)
 
-print(hash)
-
-
-# algo = Groover(hash, True, 12)
-# qc = algo.export('qiskit')
-# ### EXEC
-# algo.interpret_output()
-
-qc = hash.circuit().export("circuit")
+qc = algo.circuit().export("circuit", 'qiskit')
+qc.measure([0,1,2,3],[0,1,2,3])
 print(qc.draw("text"))
 
-# gate = hash.gate()
-# qc = QuantumCircuit(gate.num_qubits)
-# qc.barrier(label="hash")
-# qc.append(gate, list(range(gate.num_qubits)))
-# print(qc.decompose().draw("text"))
-# print(qc.decompose().count_ops())
+simulator = Aer.get_backend("aer_simulator")
+circ = transpile(qc, simulator)
+result = simulator.run(circ).result()
+counts = result.get_counts(circ)
 
+counts_readable = algo.interpet_counts(counts)
 
-# simulator = Aer.get_backend("aer_simulator")
-# circ = transpile(qc, simulator)
-# result = simulator.run(circ).result()
-# counts = result.get_counts(circ)
-# print(counts)
+from matplotlib import pyplot as plt
+fig = plot_histogram(counts_readable)
+print(fig)
+plt.show()

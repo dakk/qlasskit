@@ -46,6 +46,10 @@ class X(QGate):
     def __init__(self):
         super().__init__("X")
 
+class T(QGate):
+    def __init__(self):
+        super().__init__("T")
+
 
 class H(QGate):
     def __init__(self):

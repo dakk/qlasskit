@@ -22,7 +22,7 @@ from .poccompiler3 import POCCompiler3
 from .tweedledumcompiler import TweedledumCompiler
 
 
-def to_quantum(name, args, returns, exprs, compiler="tw"):
+def to_quantum(name, args, returns, exprs, compiler="int"):
     if compiler == "int":
         s = InternalCompiler()
     elif compiler == "poc3":
