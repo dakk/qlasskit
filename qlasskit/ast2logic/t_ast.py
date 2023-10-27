@@ -11,6 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from typing import List
+
 from sympy.logic import simplify_logic
 
 from . import (
@@ -24,7 +27,7 @@ from . import (
 from .typing import Args, LogicFun
 
 
-def translate_ast(fun, types) -> LogicFun:
+def translate_ast(fun, types: List = [], defs: List[LogicFun] = []) -> LogicFun:
     fun_name: str = fun.name
 
     # env contains names visible from the current scope
@@ -34,6 +37,7 @@ def translate_ast(fun, types) -> LogicFun:
     args: Args = translate_arguments(fun.args.args, env)
 
     [env.bind(arg) for arg in args]
+    [env.bind_function(f) for f in defs]
 
     if not fun.returns:
         raise exceptions.NoReturnTypeException()

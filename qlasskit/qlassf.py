@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import ast
+import copy
 import inspect
 from functools import reduce
 from typing import Callable, Dict, List, Tuple, Union  # noqa: F401
@@ -22,7 +23,7 @@ from sympy.logic.boolalg import Boolean
 
 from . import compiler
 from .ast2ast import ast2ast
-from .ast2logic import Arg, Args, BoolExpList, flatten, translate_ast
+from .ast2logic import Arg, Args, BoolExpList, LogicFun, flatten, translate_ast
 from .types import *  # noqa: F403, F401
 from .types import Qtype
 
@@ -248,18 +249,31 @@ class QlassF:
         """Returns the classical python function"""
         return self.original_f
 
+    def to_logicfun(self) -> LogicFun:
+        return copy.deepcopy((self.name, self.args, self.returns, self.expressions))
+
     @staticmethod
     def from_function(
-        f: Union[str, Callable], types: List[Qtype] = [], to_compile: bool = True
+        f: Union[str, Callable],
+        types: List[Qtype] = [],
+        defs: List[LogicFun] = [],
+        to_compile: bool = True,
     ) -> "QlassF":
-        """Create a QlassF from a function or a string containing a function"""
+        """Create a QlassF from a function or a string containing a function
+
+        Args:
+            f (Union[str, Callable]): the function to be parsed, as a str code or callable
+            types (List[Qtype]): list of qtypes to inject
+            to_compile (boolean, optional): if True, compile to quantum circuit (default: True)
+            defs (List[LogicFun]): list of LogicFun to inject
+        """
         if isinstance(f, str):
             exec(f)
 
         fun_ast = ast.parse(f if isinstance(f, str) else inspect.getsource(f))
         fun = ast2ast(fun_ast.body[0])
 
-        fun_name, args, fun_ret, exps = translate_ast(fun, types)
+        fun_name, args, fun_ret, exps = translate_ast(fun, types, defs)
         original_f = eval(fun_name) if isinstance(f, str) else f
 
         # Remove unnecessary expressions
@@ -276,13 +290,19 @@ class QlassF:
 
 
 def qlassf(
-    f: Union[str, Callable], types: List[Qtype] = [], to_compile: bool = True
+    f: Union[str, Callable],
+    types: List[Qtype] = [],
+    defs: List[QlassF] = [],
+    to_compile: bool = True,
 ) -> QlassF:
     """Decorator / function creating a QlassF object
 
     Args:
-        f: String or function
-        types (List[Qtype], optional): A list of new types to bind
-        to_compile (bool, optional): Compile the circuit after parsing
+        f (Union[str, Callable]): the function to be parsed, as a str code or callable
+        types (List[Qtype]): list of qtypes to inject
+        to_compile (boolean, optional): if True, compile to quantum circuit (default: True)
+        defs (List[Qlassf]): list of qlassf to inject
     """
-    return QlassF.from_function(f, types, to_compile)
+    defs_fun = list(map(lambda q: q.to_logicfun(), defs))
+
+    return QlassF.from_function(f, types, defs_fun, to_compile)

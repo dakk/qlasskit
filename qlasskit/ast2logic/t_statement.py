@@ -79,19 +79,24 @@ def translate_statement(  # noqa: C901
         res = list(map(lambda x: (Symbol(x[0]), x[1]), res))
         return res, env
 
-        # FunctionDef
-        # For
+    elif isinstance(stmt, ast.FunctionDef):
+        from .t_ast import translate_ast
+
+        lofun = translate_ast(stmt)
+        env.bind_function(lofun)
+        return [], env
+
+    elif isinstance(stmt, ast.Expr):
+        if hasattr(stmt, "value"):
+            texp, vexp = translate_expression(stmt.value, env)
+        return [], env
+
         # While
         # Expr
         # Pass
         # Break
         # Continue
         # Match
-
-    elif isinstance(stmt, ast.Expr):
-        if hasattr(stmt, "value"):
-            texp, vexp = translate_expression(stmt.value, env)
-        return [], env
 
     else:
         raise exceptions.StatementNotHandledException(stmt)

@@ -256,7 +256,31 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         ):
             return env.gettype(expr.func.id).const(expr.args[0].value)
 
-        raise exceptions.ExpressionNotHandledException(expr)
+        # Known function
+        if env.know_function(expr.func.id):
+            def_f = env.getdef(expr.func.id)
+            args = [translate_expression(e, env) for e in expr.args]
+
+            # Check if args match function args and replace
+            if len(args) != len(def_f[1]):
+                raise exceptions.TypeErrorException(args, def_f[1])
+
+            subs = {}
+            for a, fa in zip(args, def_f[1]):
+                subs[fa.name] = a[1]
+
+            n_exps = []
+            for s, e in def_f[3]:
+                n_exps.append((s, e.subs(subs, simultaneus=True)))
+
+            _ret = list(map(lambda se: se[1], n_exps))
+
+            if len(_ret) == 1:
+                return (bool, _ret[0])
+
+            return (def_f[2].ttype, _ret)
+
+        raise exceptions.UnknownSymbolException(expr.func.id, env)
 
     # Lambda
     # Dict

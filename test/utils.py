@@ -131,7 +131,7 @@ def compute_result_of_originalf(cls, qf, truth_line):
     return res_original_str
 
 
-def compute_and_compare_results(cls, qf):
+def compute_and_compare_results(cls, qf, test_original_f=True):
     """Create and simulate the qcircuit, and compare the result with the
     truthtable and with the original_f"""
     MAX_Q_SIM = 64
@@ -159,8 +159,9 @@ def compute_and_compare_results(cls, qf):
         )
 
         # Calculate and compare the originalf result
-        res_original = compute_result_of_originalf(cls, qf, truth_line)
-        cls.assertEqual(truth_str, res_original)
+        if test_original_f:
+            res_original = compute_result_of_originalf(cls, qf, truth_line)
+            cls.assertEqual(truth_str, res_original)
 
         # Calculate and compare the gate result
         if qc_truth and truth_line in qc_truth and COMPILATION_ENABLED:

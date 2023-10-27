@@ -66,6 +66,7 @@
 - [x] Integrate tweedledum for compilation
 - [x] Aggregate cascading expressions in for unrolling
 - [x] Rewrite qcircuit abstraction
+- [x] Inner function
 
 ### Week 2: (30 Oct 23)
 ### Week 3: (6 Nov 23)
@@ -98,7 +99,6 @@
 
 
 - [ ] Publish doc on github
-- [ ] Inner function
 - [ ] Int arithmetic expressions (*, /, mod)
 - [ ] Parametrized qlassf
 - [ ] Lambda

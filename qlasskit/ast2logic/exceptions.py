@@ -53,3 +53,8 @@ class OutOfBoundException(Exception):
 class UnboundException(Exception):
     def __init__(self, symbol, env):
         super().__init__(f"{symbol} in {env}")
+
+
+class UnknownSymbolException(Exception):
+    def __init__(self, symbol, env):
+        super().__init__(f"{symbol} in {env}")
