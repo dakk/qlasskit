@@ -50,7 +50,15 @@ class QAlgorithm:
 
     def interpet_counts(self, counts: Dict[str, int]) -> Dict[Any, int]:
         """Interpet data inside a circuit counts dict"""
-        return dict((self.interpret_outcome(e), c) for (e, c) in counts.items())
+        l = [(self.interpret_outcome(e), c) for (e, c) in counts.items()]
+        d = {}
+        for (e, c) in l:
+            inter = self.interpret_outcome(e)
+            if inter in d:
+                d[inter] += c
+            else:
+                d[inter] = c
+        return d
 
     def export(self, framework: SupportedFramework = "qiskit") -> Any:
         """Export the algorithm to a supported framework"""

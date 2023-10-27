@@ -67,8 +67,12 @@
 - [x] Aggregate cascading expressions in for unrolling
 - [x] Rewrite qcircuit abstraction
 - [x] Inner function
+- [x] Groover algorithm
 
 ### Week 2: (30 Oct 23)
+
+- [ ] Groover algorithm tests 
+
 ### Week 3: (6 Nov 23)
 
 - [ ] Slideshow for UF midterm

@@ -48,7 +48,7 @@ class Groover(QAlgorithm):
         self.qc = QCircuit(self.search_space_size)
 
         # State preparation
-        self.qc.barrier(label="state_prep")
+        self.qc.barrier(label="s")
         for i in range(self.search_space_size):
             self.qc.h(i)
 
@@ -97,16 +97,16 @@ def oracle_outer(v: {argt_name}) -> bool:
         ]
         self.qc.h(oracle_qc["_ret_phased"])
 
-        self.qc.barrier(label="groover")
 
         for i in range(n_iterations):
-            self.qc.barrier(label=f"orac_{i}")
+            self.qc.barrier(label=f"g{i}")
+            # self.qc.barrier(label=f"orac_{i}")
             self.qc += oracle_qc.copy()
 
-            self.qc.barrier(label=f"diff_{i}")
+            # self.qc.barrier(label=f"diff_{i}")
             self.qc += diffuser_qc.copy()
 
-        self.qc.barrier(label="end")
+        # self.qc.barrier(label="end")
 
     def circuit(self) -> QCircuit:
         return self.qc

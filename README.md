@@ -5,7 +5,7 @@
 ![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-blue)
 
 
-Qlasskit is a Python library that allows quantum developers to write classical algorithms in pure Python and translate them into unitary operators (gates) for use in quantum circuits.
+Qlasskit is a Python library that allows quantum developers to write classical algorithms in pure Python and translate them into unitary operators (gates) for use in quantum circuits, using boolean expressions as intermediate form.
 
 This tool will be useful for any algorithm that relies on a 'blackbox' function and for describing the classical components of a quantum algorithm.
 
@@ -13,21 +13,33 @@ This tool will be useful for any algorithm that relies on a 'blackbox' function 
 
 ```python
 @qlassf
-def f(n: Qint4) -> bool:
-  if n == 3:
-    return True
-  else:
-    return False
+def hash(k: Qint4) -> bool:
+    h = True
+    for i in range(4):
+        h = h and k[i]
+    return h
 ```
 
-And then use it inside a circuit:
+Qlasskit will take care of translating the function to boolean expressions, simplify them and
+translate to a quantum circuit.
+
+![Groover](https://github.com/dakk/qlasskit/docs/source/_images/hash_circ.png?raw=true)
+
+Then, we can use groover to find which hash(k) returns True:
+
 ```python
-qc = QuantumCircuit(f.num_qubits)
-...
-qc.append(f.gate(), f.qubits_list(0))
+from qlasskit.algorithms import Groover
+
+algo = Groover(hash, True)
+qc = algo.circuit().export("circuit", "qiskit")
 ```
 
-Or, you can define a function with parameters:
+And that's it:
+
+![Groover](https://github.com/dakk/qlasskit/docs/source/_images/grover_circ.png?raw=true)
+
+
+You can also define a function with parameters:
 ```python
 @qlassf
 def f(n: Qint4, n_it: Param[int]) -> Qint8:
@@ -40,12 +52,22 @@ def f(n: Qint4, n_it: Param[int]) -> Qint8:
 And then, you can bind it with a value:
 ```python
 f4 = f.bind(n_it=4)
-qc = QuantumCircuit(f4.num_qubits)
-...
-qc.append(f4.gate(), f4.qubits_list(0))
 ```
 
-Qlasskit (will) supports complex data types, like tuples and fixed size lists:
+Use other functions:
+
+```python
+@qlassf
+def equal_8(n: Qint4) -> bool:
+  return equal_8
+
+@qlassf
+def f(n: Qint4) -> bool:
+  n = n+1 if equal_8(n) else n
+  return n
+```
+
+Qlasskit supports complex data types, like tuples and fixed size lists:
 
 ```python
 @qlassf
