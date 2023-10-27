@@ -99,13 +99,10 @@ def oracle_outer(v: {argt_name}) -> bool:
 
         for i in range(n_iterations):
             self.qc.barrier(label=f"g{i}")
-            # self.qc.barrier(label=f"orac_{i}")
             self.qc += oracle_qc.copy()
 
-            # self.qc.barrier(label=f"diff_{i}")
+            self.qc.barrier()
             self.qc += diffuser_qc.copy()
-
-        # self.qc.barrier(label="end")
 
     def circuit(self) -> QCircuit:
         return self.qc

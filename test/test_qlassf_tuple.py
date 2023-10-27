@@ -132,3 +132,13 @@ class TestQlassfTuple(unittest.TestCase):
         self.assertEqual(qf.expressions[1][0], Symbol("_ret.1"))
         self.assertEqual(qf.expressions[1][1], b)
         # compute_and_compare_results(self, qf)
+
+    def test_tuple_compare(self):
+        f = "def test(a: Tuple[bool, bool], b: Tuple[bool, bool]) -> bool:\n\treturn a == b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_tuple_int_compare(self):
+        f = "def test(a: Tuple[Qint2, Qint2], b: Tuple[Qint2, Qint2]) -> bool:\n\treturn a == b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)

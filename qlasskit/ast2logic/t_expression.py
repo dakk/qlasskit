@@ -178,6 +178,34 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         # Check comparability
         if tleft[0] == bool and tcomp[0] == bool:
             op_type = Qbool
+
+        # Compare tuples for equality / inequality
+        elif len(get_args(tleft[0])) > 0 and len(get_args(tcomp[0])) > 0:
+            arg_l = get_args(tleft[0])
+            arg_r = get_args(tcomp[0])
+            if arg_l != arg_r:
+                raise exceptions.TypeErrorException(tleft[0], tcomp[0])
+
+            if isinstance(expr.ops[0], ast.Eq):
+                op = Qbool.eq
+            elif isinstance(expr.ops[0], ast.NotEq):
+                op = Qbool.neq
+            else:
+                raise exceptions.OperationNotSupportedException(bool, expr.ops[0])
+
+            c = True
+            idx = 0
+            for left, right in zip(arg_l, arg_r):
+                if left == bool:
+                    c = And(c, op((bool, tleft[1][idx]), (bool, tcomp[1][idx]))[1])
+                    idx += 1
+                else:
+                    for si in range(left.BIT_SIZE):
+                        c = And(c, op((bool, tleft[1][i]), (bool, tcomp[1][idx]))[1])
+                        idx += 1
+
+            return (bool, c)
+
         elif issubclass(tleft[0], Qtype) and issubclass(tcomp[0], Qtype):  # type: ignore
             if not tleft[0].comparable(tcomp[0]):  # type: ignore
                 raise exceptions.TypeErrorException(tcomp[0], tleft[0])

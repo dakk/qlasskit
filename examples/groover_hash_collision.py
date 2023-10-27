@@ -41,6 +41,21 @@ def qiskit_simulate(qc):
 #     return (k<<1) + 2 if inner(k) else 4
 
 
+# from typing import Tuple
+
+# @qlassf
+# def hash(k: Qint8) -> Tuple[bool, bool]:
+#     return k[0] and k[1] and not k[2] and not k[3], k[4] and not k[5] and k[6] and not k[7]
+# algo = Groover(hash, (True,True))
+
+
+# @qlassf
+# def hash(k: Qint8) -> bool:
+#     return k[0] and k[1] and not k[2] and not k[3] and k[4] and not k[5] and k[6] and not k[7]
+
+# algo = Groover(hash, True)
+
+
 @qlassf
 def hash(k: Qint4) -> Qint4:
     return (k << 1) + 2

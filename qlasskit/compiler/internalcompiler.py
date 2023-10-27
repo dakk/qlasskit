@@ -71,8 +71,6 @@ class InternalCompiler(Compiler):
         elif isinstance(expr, Not):
             eret = self.compile_expr(qc, expr.args[0])
 
-            # qc.barrier("not")
-
             if eret in qc.ancilla_lst:
                 qc.x(eret)
                 self.expqmap[expr] = eret
@@ -92,7 +90,6 @@ class InternalCompiler(Compiler):
             if dest is None:
                 dest = qc.get_free_ancilla()
 
-            # qc.barrier("and")
             qc.mcx(erets, dest)
 
             [qc.mark_ancilla(eret) for eret in erets]
@@ -103,8 +100,6 @@ class InternalCompiler(Compiler):
         elif isinstance(expr, Xor):
             erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))
             last = erets.pop()
-
-            # qc.barrier("xor")
 
             if last in qc.ancilla_lst:
                 dest = last

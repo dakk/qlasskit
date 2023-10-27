@@ -71,6 +71,7 @@
 
 ### Week 2: (30 Oct 23)
 
+- [x] Tuple-tuple comparison
 - [ ] Groover algorithm tests 
 
 ### Week 3: (6 Nov 23)
