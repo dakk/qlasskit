@@ -68,11 +68,12 @@
 - [x] Rewrite qcircuit abstraction
 - [x] Inner function
 - [x] Groover algorithm
+- [x] Tuple-tuple comparison
 
 ### Week 2: (30 Oct 23)
 
-- [x] Tuple-tuple comparison
 - [ ] Groover algorithm tests 
+- [ ] Slideshow for UF midterm
 
 ### Week 3: (6 Nov 23)
 

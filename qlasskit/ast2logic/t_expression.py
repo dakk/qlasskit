@@ -201,7 +201,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
                     idx += 1
                 else:
                     for si in range(left.BIT_SIZE):
-                        c = And(c, op((bool, tleft[1][i]), (bool, tcomp[1][idx]))[1])
+                        c = And(c, op((bool, tleft[1][idx]), (bool, tcomp[1][idx]))[1])
                         idx += 1
 
             return (bool, c)
