@@ -23,7 +23,7 @@ class QiskitExporter(QCircuitExporter):
         from qiskit import QuantumCircuit
         from qiskit.circuit.library.standard_gates import ZGate
 
-        qc = QuantumCircuit(_selfqc.num_qubits, _selfqc.num_qubits)
+        qc = QuantumCircuit(_selfqc.num_qubits, 0)
 
         for g, w, p in _selfqc.gates:
             if isinstance(g, gates.X):

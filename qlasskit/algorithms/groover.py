@@ -54,9 +54,11 @@ class Groover(QAlgorithm):
 
         # Prepare and add the quantum oracle
         if element_to_search is not None:
+            argt_name = self.oracle.args[0].ttype.__name__  # type: ignore
+
             oracle_outer = QlassF.from_function(
                 f"""
-def oracle_outer(v: {self.oracle.args[0].ttype.__name__}) -> bool:
+def oracle_outer(v: {argt_name}) -> bool:
     return {self.oracle.name}(v) == {element_to_search}
 """,
                 defs=[self.oracle.to_logicfun()],
@@ -64,9 +66,8 @@ def oracle_outer(v: {self.oracle.args[0].ttype.__name__}) -> bool:
         else:
             oracle_outer = self.oracle
 
-
         oracle_qc = oracle_outer.circuit()
-        
+
         # Add negative phase to result
         oracle_qc.add_qubit(name="_ret_phased")
         oracle_qc.mctrl(gates.Z(), [oracle_qc["_ret"]], oracle_qc["_ret_phased"])
@@ -78,7 +79,7 @@ def oracle_outer(v: {self.oracle.args[0].ttype.__name__}) -> bool:
             diffuser_qc.x(i)
         diffuser_qc.h(oracle_qc["_ret_phased"])
         diffuser_qc.x(oracle_qc["_ret_phased"])
-        
+
         diffuser_qc.mctrl(
             gates.Z(), list(range(self.search_space_size)), oracle_qc["_ret_phased"]
         )
@@ -104,15 +105,15 @@ def oracle_outer(v: {self.oracle.args[0].ttype.__name__}) -> bool:
 
             self.qc.barrier(label=f"diff_{i}")
             self.qc += diffuser_qc.copy()
-            
+
         self.qc.barrier(label="end")
 
     def circuit(self) -> QCircuit:
         return self.qc
-    
+
     def out_qubits(self) -> List[int]:
         len_a = len(self.oracle.args[0])
-        return range(len_a)
+        return list(range(len_a))
 
     def interpret_outcome(self, outcome: Union[str, int, List[bool]]) -> Qtype:
         out = format_outcome(outcome)

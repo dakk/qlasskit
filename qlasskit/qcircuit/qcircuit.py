@@ -83,7 +83,7 @@ class QCircuit:
         nqc = copy.deepcopy(self)
         nqc += qc
         return nqc
-    
+
     def copy(self) -> "QCircuit":
         self.__native = None
         return copy.deepcopy(self)

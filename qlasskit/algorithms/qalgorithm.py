@@ -43,7 +43,7 @@ class QAlgorithm:
             Any: the outcome in a meaningful format
         """
         raise Exception("abstract")
-    
+
     def out_qubits(self) -> List[int]:
         """Returns a list of output qubits"""
         raise Exception("abstract")

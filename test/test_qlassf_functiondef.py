@@ -39,7 +39,7 @@ class TestQlassfFunctionDef(unittest.TestCase):
         qg = qlassf(g, to_compile=COMPILATION_ENABLED, defs=[qf])
         compute_and_compare_results(self, qf)
         compute_and_compare_results(self, qg, test_original_f=False)
-        
+
     def test_pass_tuplearg_function(self):
         f = "def neg(b: Tuple[bool, bool]) -> bool:\n\treturn not b[0] and b[1]"
         g = "def test(a: bool, ff: bool) -> bool:\n\treturn neg((a, ff))"
@@ -55,7 +55,6 @@ class TestQlassfFunctionDef(unittest.TestCase):
         qg = qlassf(g, to_compile=COMPILATION_ENABLED, defs=[qf])
         compute_and_compare_results(self, qf)
         compute_and_compare_results(self, qg, test_original_f=False)
-        
 
     def test_pass_multi_stmt_function(self):
         f = "def neg(b: bool) -> bool:\n\tc=not b\n\td=not c\n\treturn d"
