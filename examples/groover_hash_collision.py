@@ -1,35 +1,42 @@
 from qiskit import Aer, QuantumCircuit, transpile
 from qiskit.visualization import plot_histogram
+from matplotlib import pyplot as plt
 
 from qlasskit import Qint4, qlassf
-
 from qlasskit.algorithms import Groover
 
 
 @qlassf
-def hash(k: Qint4) -> bool:
-    h = True
-    for i in range(4):
-        h = h and k[i]
-    return h
+def hash(k: Qint4) -> Qint4:
+    return (k<<1)+2
 
+algo = Groover(hash, Qint4(12))
 
-print (hash.circuit().export("circuit", 'qiskit').draw('text'))
+# @qlassf
+# def hash(k: Qint4) -> bool:
+#     h = True
+#     for i in range(4):
+#         h = h and k[i]
+#     return h
 
-algo = Groover(hash, True)
+# algo = Groover(hash, True)
 
+# Export the circuit
 qc = algo.circuit().export("circuit", 'qiskit')
-qc.measure([0,1,2,3],[0,1,2,3])
+qc.measure(algo.out_qubits(), algo.out_qubits())
 print(qc.draw("text"))
 
+# Simulate the circuit
 simulator = Aer.get_backend("aer_simulator")
 circ = transpile(qc, simulator)
 result = simulator.run(circ).result()
+
+# Get and show interpreted result counts
 counts = result.get_counts(circ)
-
 counts_readable = algo.interpet_counts(counts)
-
-from matplotlib import pyplot as plt
-fig = plot_histogram(counts_readable)
-print(fig)
+plot_histogram(counts_readable)
 plt.show()
+
+
+
+print (hash.circuit().export("circuit", 'qiskit').draw('text'))

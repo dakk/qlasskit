@@ -109,6 +109,10 @@ def oracle_outer(v: {self.oracle.args[0].ttype.__name__}) -> bool:
 
     def circuit(self) -> QCircuit:
         return self.qc
+    
+    def out_qubits(self) -> List[int]:
+        len_a = len(self.oracle.args[0])
+        return range(len_a)
 
     def interpret_outcome(self, outcome: Union[str, int, List[bool]]) -> Qtype:
         out = format_outcome(outcome)

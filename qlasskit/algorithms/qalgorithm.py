@@ -43,6 +43,10 @@ class QAlgorithm:
             Any: the outcome in a meaningful format
         """
         raise Exception("abstract")
+    
+    def out_qubits(self) -> List[int]:
+        """Returns a list of output qubits"""
+        raise Exception("abstract")
 
     def interpet_counts(self, counts: Dict[str, int]) -> Dict[Any, int]:
         """Interpet data inside a circuit counts dict"""
