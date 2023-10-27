@@ -23,7 +23,7 @@ def hash(k: Qint4) -> bool:
 Qlasskit will take care of translating the function to boolean expressions, simplify them and
 translate to a quantum circuit.
 
-![Groover](docs/source/_images/hash_circ.png?raw=true)
+![Groover](docs/source/_images/hash_circ.png)
 
 Then, we can use groover to find which hash(k) returns True:
 
@@ -36,7 +36,7 @@ qc = algo.circuit().export("circuit", "qiskit")
 
 And that's it:
 
-![Groover](docs/source/_images/grover_circ.png?raw=true)
+![Groover](docs/source/_images/groover_circ.png)
 
 
 You can also define a function with parameters:
