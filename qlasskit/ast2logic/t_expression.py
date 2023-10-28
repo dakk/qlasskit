@@ -297,7 +297,11 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             for a, fa in zip(args, def_f[1]):
                 if isinstance(a[1], List):
                     for i in range(len(a[1])):  # type: ignore
-                        subs[f"{fa.name}.{i}"] = a[1][i]  # type: ignore
+                        index = ".".join(a[1][i].name.split(".")[1:])
+                        if index == '':
+                            index = f'{i}'
+                        
+                        subs[f"{fa.name}.{index}"] = a[1][i]  # type: ignore
 
                 else:
                     subs[fa.name] = a[1]

@@ -24,7 +24,7 @@ def format_outcome(out: Union[str, int, List[bool]]) -> List[bool]:
         return format_outcome(str(bin(out))[2:])
     elif isinstance(out, List):
         return out
-    raise Exception("Invalid format")
+    raise Exception(f"Invalid format: {out}")
 
 
 class QAlgorithm:
@@ -53,11 +53,10 @@ class QAlgorithm:
         outcomes = [(self.interpret_outcome(e), c) for (e, c) in counts.items()]
         int_counts: Dict[Any, int] = {}
         for e, c in outcomes:
-            inter = self.interpret_outcome(e)
-            if inter in int_counts:
-                int_counts[inter] += c
+            if e in int_counts:
+                int_counts[e] += c
             else:
-                int_counts[inter] = c
+                int_counts[e] = c
         return int_counts
 
     def export(self, framework: SupportedFramework = "qiskit") -> Any:

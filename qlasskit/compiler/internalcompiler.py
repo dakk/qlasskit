@@ -62,8 +62,11 @@ class InternalCompiler(Compiler):
     def compile_expr(  # noqa: C901
         self, qc: QCircuitEnhanced, expr: Boolean, dest=None
     ) -> int:
-        if isinstance(expr, Symbol) and expr.name in qc:
-            return qc[expr.name]
+        if isinstance(expr, Symbol):
+            if expr.name in qc:
+                return qc[expr.name]
+            else:
+                raise CompilerException(f'Symbol not found in qc: {expr.name}')
 
         elif expr in self.expqmap:
             return self.expqmap[expr]

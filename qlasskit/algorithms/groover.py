@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import math
-from typing import List, Optional, Union
+from typing import List, Optional, Union, get_args
 
 from ..qcircuit import QCircuit, gates
 from ..qlassf import QlassF
@@ -41,7 +41,7 @@ class Groover(QAlgorithm):
         self.search_space_size = len(self.oracle.args[0])
 
         if n_iterations is None:
-            n_iterations = math.ceil(math.pi / 4.0 * math.sqrt(self.search_space_size))
+            n_iterations = math.ceil(math.pi / 4.0 * math.sqrt(2**self.search_space_size))
 
         self.n_iterations = n_iterations
 
@@ -54,7 +54,16 @@ class Groover(QAlgorithm):
 
         # Prepare and add the quantum oracle
         if element_to_search is not None:
-            argt_name = self.oracle.args[0].ttype.__name__  # type: ignore
+            if hasattr(self.oracle.args[0].ttype, "__name__"):
+                argt_name = self.oracle.args[0].ttype.__name__  # type: ignore
+            elif self.oracle.args[0].ttype == bool:
+                argt_name = "bool"
+            else:
+                argt_name = "Tuple["
+                argt_name += ",".join(
+                    [x.__name__ for x in get_args(self.oracle.args[0].ttype)]
+                )
+                argt_name += "]"
 
             oracle_outer = QlassF.from_function(
                 f"""
@@ -118,4 +127,16 @@ def oracle_outer(v: {argt_name}) -> bool:
         if len_a == 1:
             return out[0]  # type: ignore
 
-        return self.oracle.args[0].ttype.from_bool(out[::-1][0:len_a])  # type: ignore
+        if hasattr(self.oracle.args[0].ttype, "__name__"):
+            return self.oracle.args[0].ttype.from_bool(out[::-1][0:len_a])  # type: ignore
+        elif self.oracle.args[0].ttype == bool:
+            return out[::-1][0]
+        else: # Tuple
+            idx_s = 0
+            values = []
+            for x in get_args(self.oracle.args[0].ttype):
+                len_a = x.BIT_SIZE
+                values.append(x.from_bool(out[::-1][idx_s:idx_s+len_a]))
+                idx_s += len_a
+
+            return tuple(values)
