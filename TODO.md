@@ -69,6 +69,7 @@
 - [x] Inner function
 - [x] Groover algorithm
 - [x] Tuple-tuple comparison
+- [x] Multi var assign
 
 ### Week 2: (30 Oct 23)
 

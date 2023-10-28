@@ -73,6 +73,11 @@ class Qtype:
         """Fill with leading false"""
         raise Exception("abstract")
 
+    @staticmethod
+    def crop(v: TExp) -> TExp:
+        """Crop to right size"""
+        raise Exception("abstract")
+
     # Comparators
 
     @staticmethod

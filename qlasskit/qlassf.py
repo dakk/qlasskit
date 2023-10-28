@@ -284,6 +284,7 @@ class QlassF:
 
         # Return the qlassf object
         qf = QlassF(fun_name, original_f, args, fun_ret, exps)
+
         if to_compile:
             qf.compile()
         return qf

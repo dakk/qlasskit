@@ -17,6 +17,21 @@ import copy
 from .ast2logic import flatten
 
 
+class NameConstantReplacer(ast.NodeTransformer):
+    def __init__(self, name_id, constant):
+        self.name_id = name_id
+        self.constant = constant
+
+    def generic_visit(self, node):
+        return super().generic_visit(node)
+
+    def visit_Name(self, node):
+        if node.id == self.name_id:
+            return ast.Constant(value=self.constant)
+
+        return node
+
+
 class ASTRewriter(ast.NodeTransformer):
     def __init__(self, env={}, ret=None):
         self.env = {}
@@ -145,7 +160,12 @@ class ASTRewriter(ast.NodeTransformer):
                 ast.Assign(targets=[node.target], value=ast.Constant(value=i))
             )
             rolls.extend(flatten([tar_assign]))
-            rolls.extend(flatten([self.visit(copy.deepcopy(b)) for b in node.body]))
+
+            new_body = [
+                NameConstantReplacer(node.target.id, i).visit(copy.deepcopy(b))
+                for b in node.body
+            ]
+            rolls.extend(flatten([self.visit(copy.deepcopy(b)) for b in new_body]))
 
         return rolls
 

@@ -253,7 +253,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         elif isinstance(expr.op, ast.BitXor) and hasattr(tleft[0], "bitwise_xor"):
             return tleft[0].bitwise_xor(tleft, tright)
         elif isinstance(expr.op, ast.BitAnd) and hasattr(tleft[0], "bitwise_and"):
-            return tleft[0].bitwise_and(tleft, tright)
+            return tright[0].bitwise_and(tleft, tright)  # type: ignore
         elif isinstance(expr.op, ast.BitOr) and hasattr(tleft[0], "bitwise_or"):
             return tleft[0].bitwise_or(tleft, tright)
         elif (

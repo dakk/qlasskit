@@ -71,6 +71,12 @@ def translate_statement(  # noqa: C901
             and texp.BIT_SIZE < ret_type.BIT_SIZE
         ):
             texp, vexp = ret_type.fill((texp, vexp))  # type: ignore
+        elif (
+            hasattr(texp, "BIT_SIZE")
+            and hasattr(ret_type, "BIT_SIZE")
+            and texp.BIT_SIZE > ret_type.BIT_SIZE
+        ):
+            texp, vexp = ret_type.crop((texp, vexp))  # type: ignore
         elif texp != ret_type:
             raise exceptions.TypeErrorException(texp, ret_type)
 

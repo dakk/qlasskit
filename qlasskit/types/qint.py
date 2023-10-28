@@ -71,6 +71,16 @@ class Qint(int, Qtype):
             )
         return v
 
+    @classmethod
+    def crop(cls, v: TExp) -> TExp:
+        """Crop a Qint to reach its bit_size"""
+        if len(v[1]) > cls.BIT_SIZE:  # type: ignore
+            v = (
+                cls,
+                v[1][0 : cls.BIT_SIZE],  # type: ignore
+            )
+        return v
+
     # Comparators
 
     @staticmethod
