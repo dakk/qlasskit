@@ -123,6 +123,21 @@ class TestQlassfTuple(unittest.TestCase):
         )
         compute_and_compare_results(self, qf)
 
+    def test_multi_assign(self):
+        f = "def test(a: bool) -> bool:\n\tc, d = a, not a\n\treturn c and d"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_multi_assign2(self):
+        f = "def test() -> Qint4:\n\tc, d = 1, 2\n\treturn c+d"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_multi_assign3(self):
+        f = "def test() -> Qint4:\n\tc, d, e = 1, 2, 0xa\n\treturn c+d+e"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
     def test_tuple_result(self):
         f = "def test(a: bool, b: bool) -> Tuple[bool,bool]:\n\treturn a,b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)

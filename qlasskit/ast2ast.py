@@ -67,6 +67,28 @@ class ASTRewriter(ast.NodeTransformer):
         return super().generic_visit(node)
 
     def visit_Assign(self, node):
+        # Transform multi-target assign to single target assigns
+        if len(node.targets) == 1 and hasattr(node.targets[0], "elts"):
+            _temptup = self.visit(
+                ast.Assign(targets=[ast.Name(id="_temptup")], value=node.value)
+            )
+
+            single_assigns = [
+                self.visit(
+                    ast.Assign(
+                        targets=[ast.Name(id=node.targets[0].elts[i].id)],
+                        value=ast.Subscript(
+                            value=ast.Name(id="_temptup"),
+                            slice=ast.Index(
+                                value=ast.Constant(value=i), ctx=ast.Load()
+                            ),
+                        ),
+                    )
+                )
+                for i in range(len(node.targets[0].elts))
+            ]
+            return [_temptup] + single_assigns
+
         was_known = node.targets[0].id in self.env
 
         if isinstance(node.value, ast.Name) and node.value.id in self.env:
