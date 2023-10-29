@@ -15,6 +15,7 @@
 import unittest
 from typing import Tuple
 
+from parameterized import parameterized_class
 from sympy import Symbol, symbols
 from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
 
@@ -23,11 +24,18 @@ from qlasskit import QlassF, exceptions, qlassf
 from .utils import COMPILATION_ENABLED, compute_and_compare_results
 
 
+@parameterized_class(
+    ("compiler"),
+    [
+        ("internal",),
+        ("tweedledum",),
+    ],
+)
 class TestQlassfFunctionDef(unittest.TestCase):
     def test_pass_another_function(self):
         f = "def neg(b: bool) -> bool:\n\treturn not b"
         g = "def test(a: bool) -> bool:\n\treturn neg(a)"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         qg = qlassf(g, to_compile=COMPILATION_ENABLED, defs=[qf])
         compute_and_compare_results(self, qf)
         compute_and_compare_results(self, qg, test_original_f=False)
@@ -35,7 +43,7 @@ class TestQlassfFunctionDef(unittest.TestCase):
     def test_pass_multiarg_function(self):
         f = "def neg(b: bool, c: bool) -> bool:\n\treturn not b and c"
         g = "def test(a: bool, ff: bool) -> bool:\n\treturn neg(a, ff)"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         qg = qlassf(g, to_compile=COMPILATION_ENABLED, defs=[qf])
         compute_and_compare_results(self, qf)
         compute_and_compare_results(self, qg, test_original_f=False)
@@ -43,7 +51,7 @@ class TestQlassfFunctionDef(unittest.TestCase):
     def test_pass_tuplearg_function(self):
         f = "def neg(b: Tuple[bool, bool]) -> bool:\n\treturn not b[0] and b[1]"
         g = "def test(a: bool, ff: bool) -> bool:\n\treturn neg((a, ff))"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         qg = qlassf(g, to_compile=COMPILATION_ENABLED, defs=[qf])
         compute_and_compare_results(self, qf)
         compute_and_compare_results(self, qg, test_original_f=False)
@@ -51,7 +59,7 @@ class TestQlassfFunctionDef(unittest.TestCase):
     def test_pass_multires_function(self):
         f = "def neg(b: bool) -> Tuple[bool, bool]:\n\treturn (not b, b)"
         g = "def test(a: bool) -> bool:\n\tc = neg(a)\n\treturn c[0]"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         qg = qlassf(g, to_compile=COMPILATION_ENABLED, defs=[qf])
         compute_and_compare_results(self, qf)
         compute_and_compare_results(self, qg, test_original_f=False)
@@ -59,7 +67,7 @@ class TestQlassfFunctionDef(unittest.TestCase):
     def test_pass_multi_stmt_function(self):
         f = "def neg(b: bool) -> bool:\n\tc=not b\n\td=not c\n\treturn d"
         g = "def test(a: bool) -> bool:\n\treturn neg(a)"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         qg = qlassf(g, to_compile=COMPILATION_ENABLED, defs=[qf])
         compute_and_compare_results(self, qf)
         compute_and_compare_results(self, qg, test_original_f=False)
@@ -69,5 +77,5 @@ class TestQlassfFunctionDef(unittest.TestCase):
     def test2(b:bool) -> bool:
         return not b
     return test2(a)"""
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)

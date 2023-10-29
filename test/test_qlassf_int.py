@@ -39,17 +39,19 @@ class TestQint(unittest.TestCase):
 
 
 @parameterized_class(
-    ("ttype", "ttype_str", "ttype_size"),
+    ("ttype", "ttype_str", "ttype_size", "compiler"),
     [
-        (Qint2, "Qint2", 2),
-        (Qint4, "Qint4", 4),
+        (Qint2, "Qint2", 2, "internal"),
+        (Qint4, "Qint4", 4, "internal"),
+        (Qint2, "Qint2", 2, "tweedledum"),
+        (Qint4, "Qint4", 4, "tweedledum"),
         # (Qint8, "Qint8", 8),
     ],
 )
 class TestQlassfIntParametrized_2_4_8(unittest.TestCase):
     def test_int_arg(self):
         f = f"def test(a: {self.ttype_str}) -> bool:\n\treturn a[0]"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], Symbol("a.0"))
@@ -57,7 +59,7 @@ class TestQlassfIntParametrized_2_4_8(unittest.TestCase):
 
     def test_int_arg2(self):
         f = f"def test(a: {self.ttype_str}, b: bool) -> bool:\n\treturn a[1] if (a[0] and b) else a[0]"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
@@ -74,13 +76,13 @@ class TestQlassfIntParametrized_2_4_8(unittest.TestCase):
 
     def test_int_return_tuple(self):
         f = f"def test(a: {self.ttype_str}) -> Tuple[{self.ttype_str}, bool]:\n\tb = a[0] and a[1]\n\treturn (a, b)"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), self.ttype_size + 2)
         compute_and_compare_results(self, qf)
 
     def test_int_tuple(self):
         f = f"def test(a: Tuple[{self.ttype_str}, {self.ttype_str}]) -> bool:\n\treturn a[0][0] and a[1][1]"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], And(Symbol("a.0.0"), Symbol("a.1.1")))
@@ -88,7 +90,7 @@ class TestQlassfIntParametrized_2_4_8(unittest.TestCase):
 
     def test_int_identity(self):
         f = f"def test(a: {self.ttype_str}) -> {self.ttype_str}:\n\treturn a"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), self.ttype_size)
         for i in range(self.ttype_size):
             self.assertEqual(qf.expressions[i][0], Symbol(f"_ret.{i}"))
@@ -97,53 +99,62 @@ class TestQlassfIntParametrized_2_4_8(unittest.TestCase):
 
     def test_int_const_compare_eq(self):
         f = f"def test(a: {self.ttype_str}) -> bool:\n\treturn a == {int(self.ttype_size/2-1)}"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
 
 @parameterized_class(
-    ("ttype", "ttype_str", "ttype_size"),
+    ("ttype", "ttype_str", "ttype_size", "compiler"),
     [
-        (Qint2, "Qint2", 2),
-        (Qint4, "Qint4", 4),
+        (Qint2, "Qint2", 2, "internal"),
+        (Qint4, "Qint4", 4, "internal"),
+        (Qint2, "Qint2", 2, "tweedledum"),
+        (Qint4, "Qint4", 4, "tweedledum"),
     ],
 )
 class TestQlassfIntParametrized_2_4(unittest.TestCase):
     def test_int_int_compare_eq(self):
         f = f"def test(a: {self.ttype_str}, b: {self.ttype_str}) -> bool:\n\treturn a == b"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_int_int_compare_neq(self):
         f = f"def test(a: {self.ttype_str}, b: {self.ttype_str}) -> bool:\n\treturn a != b"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_const_int_compare_gt(self):
         f = f"def test(a: {self.ttype_str}) -> bool:\n\treturn a > 1"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_const_int_compare_lt(self):
         f = f"def test(a: {self.ttype_str}) -> bool:\n\treturn a < 2"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
 
+@parameterized_class(
+    ("compiler"),
+    [
+        ("internal",),
+        ("tweedledum",),
+    ],
+)
 class TestQlassfInt(unittest.TestCase):
     def test_int_const(self):
         f = "def test(a: Qint2) -> Qint2:\n\tc=2\n\treturn c"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 2)
         self.assertEqual(qf.expressions[-2][1], False)
         self.assertEqual(qf.expressions[-1][1], True)
@@ -151,7 +162,7 @@ class TestQlassfInt(unittest.TestCase):
 
     def test_int_const_compare_eq(self):
         f = "def test(a: Qint2) -> bool:\n\treturn a == 2"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], And(Symbol("a.1"), Not(Symbol("a.0"))))
@@ -159,7 +170,7 @@ class TestQlassfInt(unittest.TestCase):
 
     def test_int_const_compare_eq_different_type(self):
         f = "def test(a: Qint4) -> bool:\n\treturn a == 2"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
@@ -175,7 +186,7 @@ class TestQlassfInt(unittest.TestCase):
 
     def test_const_int_compare_eq_different_type(self):
         f = "def test(a: Qint4) -> bool:\n\treturn 2 == a"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
@@ -191,7 +202,7 @@ class TestQlassfInt(unittest.TestCase):
 
     def test_const_int_compare_neq_different_type(self):
         f = "def test(a: Qint4) -> bool:\n\treturn 2 != a"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
@@ -207,7 +218,7 @@ class TestQlassfInt(unittest.TestCase):
 
     def test_int_int_compare_neq(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a != b"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
@@ -221,56 +232,56 @@ class TestQlassfInt(unittest.TestCase):
 
     def test_const_int_compare_gt(self):
         f = f"def test(a: Qint4) -> bool:\n\treturn a > 6"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
     # def test_int4_int4_compare_gt(self):
     #     f = "def test(a: Qint4, b: Qint4) -> bool:\n\treturn a > b"
-    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     self.assertEqual(len(qf.expressions), 1)
     #     self.assertEqual(qf.expressions[0][0], _ret)
     #     compute_and_compare_results(self, qf)
 
     def test_const_int4_compare_lt(self):
         f = "def test(a: Qint4) -> bool:\n\treturn a < 6"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_int_int_compare_gt(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a > b"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_int_int_compare_lt(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a < b"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_const_int_compare_gte(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a >= b"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_const_int_compare_lte(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a <= b"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_ite_return_qint(self):
         f = "def test(a: bool, b: Qint2, c: Qint2) -> Qint2:\n\treturn b if a else c"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 2)
         self.assertEqual(qf.expressions[0][0], Symbol("_ret.0"))
         self.assertEqual(qf.expressions[0][1], ITE(a, Symbol("b.0"), Symbol("c.0")))
@@ -280,117 +291,140 @@ class TestQlassfInt(unittest.TestCase):
 
     def test_composed_comparators(self):
         f = "def f_comp(n: Qint4) -> bool: return n > 3 or n == 7"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_shift_left(self):
         f = "def test(n: Qint2) -> Qint4: return n << 1"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_shift_right(self):
         f = "def test(n: Qint2) -> Qint4: return n >> 1"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     # Our Qint are unsigned
     # def test_invert_bitwise_not(self):
     #     f = "def test(n: Qint4) -> bool: return ~n"
-    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)
 
 
 # TODO: parameterize
+@parameterized_class(
+    ("compiler"),
+    [
+        ("internal",),
+        ("tweedledum",),
+    ],
+)
 class TestQlassfIntAdd(unittest.TestCase):
     def test_add_tuple(self):
         f = "def test(a: Tuple[Qint2, Qint2]) -> Qint2: return a[0] + a[1]"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_add(self):
         f = "def test(a: Qint2, b: Qint2) -> Qint2: return a + b"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_add_const(self):
         f = "def test(a: Qint2) -> Qint2: return a + 1"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_add_const2(self):
         f = "def test() -> Qint4: return Qint4(3) + 3"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_add_const3(self):
         f = "def test(a: Qint2, b: Qint2) -> Qint4: return Qint4(3) + a if a == 3 else Qint4(1) + b"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_add_const4(self):
         f = "def test(a: Qint2) -> Qint2: return a + 2"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-        compute_and_compare_results(self, qf)
-
-
-class TestQlassfIntSub(unittest.TestCase):
-    def test_sub_const(self):
-        f = "def test(a: Qint2) -> Qint2: return a - 1"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-        compute_and_compare_results(self, qf)
-
-    def test_sub_const2(self):
-        f = "def test(a: Qint2) -> Qint2: return a - 3"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-        compute_and_compare_results(self, qf)
-
-    def test_sub_const3(self):
-        f = "def test(a: Qint4) -> Qint4: return a - 8"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
 
 @parameterized_class(
-    ("ttype", "ttype_str", "ttype_size"),
+    ("compiler"),
     [
-        (Qint2, "Qint2", 2),
-        (Qint4, "Qint4", 4),
+        ("internal",),
+        ("tweedledum",),
+    ],
+)
+class TestQlassfIntSub(unittest.TestCase):
+    def test_sub_const(self):
+        f = "def test(a: Qint2) -> Qint2: return a - 1"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_sub_const2(self):
+        f = "def test(a: Qint2) -> Qint2: return a - 3"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_sub_const3(self):
+        f = "def test(a: Qint4) -> Qint4: return a - 8"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+
+@parameterized_class(
+    ("ttype", "ttype_str", "ttype_size", "compiler"),
+    [
+        (Qint2, "Qint2", 2, "internal"),
+        (Qint4, "Qint4", 4, "internal"),
+        (Qint2, "Qint2", 2, "tweedledum"),
+        (Qint4, "Qint4", 4, "tweedledum"),
     ],
 )
 class TestQlassfIntBitwise(unittest.TestCase):
     def test_bitwise_and(self):
         f = f"def test(a: {self.ttype_str}, b: {self.ttype_str}) -> {self.ttype_str}:\n\treturn a & b"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_bitwise_or(self):
         f = f"def test(a: {self.ttype_str}, b: {self.ttype_str}) -> {self.ttype_str}:\n\treturn a | b"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_bitwise_xor(self):
         f = f"def test(a: {self.ttype_str}, b: {self.ttype_str}) -> {self.ttype_str}:\n\treturn a ^ b"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
 
+@parameterized_class(
+    ("compiler"),
+    [
+        ("internal",),
+        ("tweedledum",),
+    ],
+)
 class TestQlassfIntReassign(unittest.TestCase):
     def test_reassign_newvar(self):
         f = "def test(a: Qint2) -> Qint2:\n\tb = 0\n\tb = a + 1\n\treturn b"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_reassign_arg(self):
         f = "def test(a: Qint2) -> Qint2:\n\ta = a + 1\n\treturn a"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_aug_reassign_newvar(self):
         f = "def test(a: Qint2) -> Qint2:\n\tb = a\n\tb += 1\n\treturn b"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_aug_reassign_arg(self):
         f = "def test(a: Qint2) -> Qint2:\n\ta += 1\n\treturn a"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)

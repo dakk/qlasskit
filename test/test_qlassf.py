@@ -14,6 +14,8 @@
 
 import unittest
 
+from parameterized import parameterized_class
+
 from qlasskit import Qint, Qint4, Qint12, QlassF, exceptions, qlassf
 
 from . import utils
@@ -26,17 +28,29 @@ class TestQlassfDecorator(unittest.TestCase):
         self.assertTrue(isinstance(c, QlassF))
 
 
+@parameterized_class(
+    ("compiler"),
+    [
+        ("internal",),
+        ("tweedledum",),
+    ],
+)
 class TestQlassfCustomTypes(unittest.TestCase):
     def test_custom_qint3(self):
         qf = qlassf(
-            utils.test_qint3, types=[utils.Qint3], to_compile=COMPILATION_ENABLED
+            utils.test_qint3,
+            types=[utils.Qint3],
+            to_compile=COMPILATION_ENABLED,
+            compiler=self.compiler,
         )
         compute_and_compare_results(self, qf)
 
     def test_custom_qint3_notfound(self):
         self.assertRaises(
             exceptions.UnknownTypeException,
-            lambda f: qlassf(f, types=[], to_compile=COMPILATION_ENABLED),
+            lambda f: qlassf(
+                f, types=[], to_compile=COMPILATION_ENABLED, compiler=self.compiler
+            ),
             utils.test_qint3,
         )
 

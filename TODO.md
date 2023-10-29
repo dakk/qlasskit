@@ -73,6 +73,8 @@
 
 ### Week 2: (30 Oct 23)
 
+- [ ] Test on multiple py version
+- [ ] Fixed size list support
 - [ ] Groover algorithm tests 
 - [ ] Slideshow for UF midterm
 
@@ -111,7 +113,7 @@
 - [ ] Lambda
 - [ ] FixedList type
 - [ ] Builtin functions: map, count
-- [ ] Ast2logic: fixed size loops unrolling
+- [x] Ast2logic: fixed size loops unrolling
 - [ ] Builtin functions: sum(), all(), any()
 - [ ] First beta release
 
@@ -127,7 +129,7 @@
 - [ ] Datatype: Fixed
 - [ ] Datatype: Enum
 - [ ] While loop
-- [ ] For loop
+- [x] For loop
 - [ ] Recursion
 - [ ] Parameter bind
 
