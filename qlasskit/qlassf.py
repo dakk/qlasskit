@@ -21,9 +21,9 @@ from typing import Callable, Dict, List, Tuple, Union  # noqa: F401
 from sympy import Symbol
 from sympy.logic.boolalg import Boolean
 
-from . import compiler
 from .ast2ast import ast2ast
 from .ast2logic import Arg, Args, BoolExpList, LogicFun, flatten, translate_ast
+from .compiler import SupportedCompiler, to_quantum
 from .types import *  # noqa: F403, F401
 from .types import Qtype
 
@@ -196,12 +196,13 @@ class QlassF:
 
         return truth
 
-    def compile(self):
-        self._compiled_gate = compiler.to_quantum(
+    def compile(self, compiler: SupportedCompiler = "internal"):
+        self._compiled_gate = to_quantum(
             name=self.name,
             args=self.args,
             returns=self.returns,
             exprs=self.expressions,
+            compiler=compiler,
         )
 
     def circuit(self):
@@ -258,14 +259,16 @@ class QlassF:
         types: List[Qtype] = [],
         defs: List[LogicFun] = [],
         to_compile: bool = True,
+        compiler: SupportedCompiler = "internal",
     ) -> "QlassF":
         """Create a QlassF from a function or a string containing a function
 
         Args:
             f (Union[str, Callable]): the function to be parsed, as a str code or callable
             types (List[Qtype]): list of qtypes to inject
-            to_compile (boolean, optional): if True, compile to quantum circuit (default: True)
             defs (List[LogicFun]): list of LogicFun to inject
+            to_compile (boolean, optional): if True, compile to quantum circuit (default: True)
+            compiler (SupportedCompiler, optional): override default compiler (default: internal)
         """
         if isinstance(f, str):
             exec(f)
@@ -286,7 +289,7 @@ class QlassF:
         qf = QlassF(fun_name, original_f, args, fun_ret, exps)
 
         if to_compile:
-            qf.compile()
+            qf.compile(compiler)
         return qf
 
 
@@ -295,15 +298,17 @@ def qlassf(
     types: List[Qtype] = [],
     defs: List[QlassF] = [],
     to_compile: bool = True,
+    compiler: SupportedCompiler = "internal",
 ) -> QlassF:
     """Decorator / function creating a QlassF object
 
     Args:
         f (Union[str, Callable]): the function to be parsed, as a str code or callable
         types (List[Qtype]): list of qtypes to inject
-        to_compile (boolean, optional): if True, compile to quantum circuit (default: True)
         defs (List[Qlassf]): list of qlassf to inject
+        to_compile (boolean, optional): if True, compile to quantum circuit (default: True)
+            compiler (SupportedCompiler, optional): override default compiler (default: internal)
     """
     defs_fun = list(map(lambda q: q.to_logicfun(), defs))
 
-    return QlassF.from_function(f, types, defs_fun, to_compile)
+    return QlassF.from_function(f, types, defs_fun, to_compile, compiler)

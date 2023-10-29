@@ -13,6 +13,7 @@
 # limitations under the License.
 # isort:skip_file
 
+from typing import Literal, get_args
 
 from .expqmap import ExpQMap  # noqa: F401
 from .compiler import Compiler, CompilerException, optimizer  # noqa: F401
@@ -22,13 +23,23 @@ from .poccompiler3 import POCCompiler3
 from .tweedledumcompiler import TweedledumCompiler
 
 
-def to_quantum(name, args, returns, exprs, compiler="int"):
-    if compiler == "int":
-        s = InternalCompiler()
-    elif compiler == "poc3":
-        s = POCCompiler3()
-    elif compiler == "tw":
-        s = TweedledumCompiler()
+SupportedCompiler = Literal["internal", "poc3", "tweedledum"]
+SupportedCompilers = list(get_args(SupportedCompiler))
 
-    circ = s.compile(name, args, returns, exprs)
+
+def to_quantum(name, args, returns, exprs, compiler: SupportedCompiler = "internal"):
+    sel_compiler: Compiler
+
+    if compiler == "internal":
+        sel_compiler = InternalCompiler()
+    elif compiler == "poc3":
+        sel_compiler = POCCompiler3()
+    elif compiler == "tweedledum":
+        sel_compiler = TweedledumCompiler()
+    else:
+        raise Exception(
+            f"Compiler {compiler} not supported. Choose one between {SupportedCompilers}"
+        )
+
+    circ = sel_compiler.compile(name, args, returns, exprs)
     return circ
