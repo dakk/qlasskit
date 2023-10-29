@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from matplotlib import pyplot as plt
-from qiskit import Aer, QuantumCircuit, transpile, ClassicalRegister
+from qiskit import Aer, ClassicalRegister, QuantumCircuit, transpile
 from qiskit.visualization import plot_histogram
 
 from qlasskit import Qint2, Qint4, Qint8, Qint16, qlassf
@@ -52,7 +52,8 @@ def md5_simp(message: Tuple[Qint4, Qint4]) -> Qint8:
         # C = (C + (char << 1)) & 0xFF
         # D = (D - char) & 0xFF
 
-    return (A<<4) + B
+    return (A << 4) + B
+
 
 # @qlassf
 # def md5_simp(m: Tuple[Qint2, Qint2]) -> Qint4:

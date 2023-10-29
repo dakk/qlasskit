@@ -66,7 +66,7 @@ class InternalCompiler(Compiler):
             if expr.name in qc:
                 return qc[expr.name]
             else:
-                raise CompilerException(f'Symbol not found in qc: {expr.name}')
+                raise CompilerException(f"Symbol not found in qc: {expr.name}")
 
         elif expr in self.expqmap:
             return self.expqmap[expr]
