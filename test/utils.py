@@ -16,7 +16,9 @@ import inspect
 import random
 from typing import Tuple, get_args
 
+from pyqrack import qrack_simulator
 from qiskit import QuantumCircuit, transpile
+from qiskit.providers.qrack import Qrack
 from qiskit_aer import Aer
 from sympy.logic.boolalg import gateinputcount
 
@@ -38,6 +40,7 @@ def test_qint3(a: Qint3) -> bool:
 
 
 aer_simulator = Aer.get_backend("aer_simulator")
+# aer_simulator = Qrack.get_backend("qasm_simulator")
 
 
 def qiskit_measure_and_count(circ, shots=1):
@@ -65,6 +68,10 @@ def compute_result_of_qcircuit(cls, qf, truth_line):
     counts = qiskit_measure_and_count(qc)
 
     res = list(counts.keys())[0][::-1]
+
+    if len(res) < qc.num_qubits:
+        res += "0" * (qc.num_qubits - len(res))
+
     res_str = ""
     for qname in qf.truth_table_header()[-qf.ret_size :]:
         res_str += res[circ.qubit_map[qname]]

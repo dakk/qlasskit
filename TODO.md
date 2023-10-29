@@ -73,6 +73,7 @@
 
 ### Week 2: (30 Oct 23)
 
+- [x] Integrate qrack on test suite
 - [ ] Test on multiple py version
 - [ ] Fixed size list support
 - [ ] Groover algorithm tests 
@@ -142,6 +143,7 @@
 
 - [x] Qiskit
 - [x] QASM
+- [ ] PyQrack
 - [ ] QuTip
 - [ ] Pennylane
 - [ ] Cirq
