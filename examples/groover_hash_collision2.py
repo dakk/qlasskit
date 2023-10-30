@@ -14,20 +14,15 @@ def qiskit_simulate(qc, alog):
     qc.measure(algo.out_qubits(), c)
     print(qc.draw("text"))
 
-
     simulator = Aer.get_backend("aer_simulator")
-    circ = transpile (qc, simulator, optimization_level=3)
-    
+    circ = transpile(qc, simulator, optimization_level=3)
+
     # from pyqrack import qrack_simulator
     # from qiskit.providers.qrack import Qrack
-
     # simulator = Qrack.get_backend("qasm_simulator")
-    # basis_gates = ["u", "cx"]
-    # circ = transpile(qc, simulator, basis_gates=basis_gates, optimization_level=3)
-    
-    
-    result = simulator.run(circ).result()
+    # circ = transpile(qc, simulator)
 
+    result = simulator.run(circ).result()
     return result.get_counts(circ)
 
 

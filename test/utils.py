@@ -132,7 +132,7 @@ def compute_result_of_originalf(cls, qf, truth_line):
         """Translate res to a binary string"""
         if type(res) == bool:
             return "1" if res else "0"
-        elif type(res) == tuple:
+        elif type(res) == tuple or type(res) == list:
             return "".join([res_to_str(x) for x in res])
         elif type(res) == int:
             qc = const_to_qtype(res)

@@ -23,7 +23,7 @@ from .qalgorithm import QAlgorithm, format_outcome
 
 
 class Groover(QAlgorithm):
-    def __init__( # noqa: C901
+    def __init__(  # noqa: C901
         self,
         oracle: QlassF,
         element_to_search: Qtype,

@@ -39,6 +39,11 @@ Tuple
 Container type holding different types.
 
 
+List
+^^^^
+
+A fixed size list; its type is `Qlist[T, size]`.
+
 
 Expressions
 -----------
@@ -61,6 +66,12 @@ Tuple
 .. code-block:: python
 
    (a, b)
+
+List (fixed size)
+^^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+   [a, b]
 
 
 Subscript
@@ -171,3 +182,13 @@ For loop
 
    for i in range(4):
       a += i
+
+
+
+Function def
+^^^^^^^^^^^^
+
+.. code-block:: python
+
+   def f(t: Qlist[Qint4,2]) -> Qint4:
+      return t[0] + t[1]

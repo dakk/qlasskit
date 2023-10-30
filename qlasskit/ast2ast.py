@@ -88,9 +88,40 @@ class ASTRewriter(ast.NodeTransformer):
 
         return node
 
+    def visit_List(self, node):
+        return ast.Tuple(elts=[self.visit(el) for el in node.elts])
+
     def visit_FunctionDef(self, node):
+        def _replace_types(ann, arg=None):
+            # Replace Qlist[T,n] with Tuple[(T,)*3]
+            if isinstance(ann, ast.Subscript) and ann.value.id == "Qlist":
+                if sys.version_info < (3, 9):
+                    _elts = ann.slice.value.elts
+                else:
+                    _elts = ann.slice.elts
+
+                _ituple = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[1].value)
+
+                if sys.version_info < (3, 9):
+                    _ituple = ast.Index(value=_ituple)
+
+                ann = ast.Subscript(
+                    value=ast.Name(id="Tuple", ctx=ast.Load()),
+                    slice=_ituple,
+                )
+
+            if arg is not None:
+                arg.annotation = ann
+                return arg
+            else:
+                return ann
+
+        node.args.args = [_replace_types(x.annotation, arg=x) for x in node.args.args]
+
         for x in node.args.args:
             self.env[x.arg] = x.annotation
+
+        node.returns = _replace_types(node.returns)
         self.ret = node.returns
 
         return super().generic_visit(node)

@@ -75,7 +75,7 @@
 
 - [x] Integrate qrack on test suite
 - [x] Test / support on multiple py version >= 3.8
-- [ ] Fixed size list sugar
+- [x] Fixed size list
 - [ ] Groover algorithm tests 
 - [ ] Slideshow for UF midterm
 
