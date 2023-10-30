@@ -74,8 +74,8 @@
 ### Week 2: (30 Oct 23)
 
 - [x] Integrate qrack on test suite
-- [ ] Test on multiple py version
-- [ ] Fixed size list support
+- [x] Test / support on multiple py version >= 3.8
+- [ ] Fixed size list sugar
 - [ ] Groover algorithm tests 
 - [ ] Slideshow for UF midterm
 

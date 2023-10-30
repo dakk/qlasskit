@@ -12,10 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 from typing import Any, List, Literal, Tuple
 
 from sympy.logic.boolalg import Boolean, Not
-from typing_extensions import TypeAlias
+
+if sys.version_info < (3, 11):
+    from typing_extensions import TypeAlias
+else:
+    from typing import TypeAlias
 
 TType: TypeAlias = object
 TExp: TypeAlias = Tuple[TType, Boolean]

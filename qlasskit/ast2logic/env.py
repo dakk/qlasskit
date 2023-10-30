@@ -12,11 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 from typing import Dict, List, Tuple
 
 from sympy import Symbol
 from sympy.logic.boolalg import Boolean
-from typing_extensions import TypeAlias
+
+if sys.version_info < (3, 11):
+    from typing_extensions import TypeAlias
+else:
+    from typing import TypeAlias
 
 from ..types import BUILTIN_TYPES, Qint, Qtype  # noqa: F401, E402
 from . import exceptions
