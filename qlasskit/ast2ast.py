@@ -13,6 +13,7 @@
 # limitations under the License.
 import ast
 import copy
+import sys
 
 from .ast2logic import flatten
 
@@ -47,12 +48,17 @@ class ASTRewriter(ast.NodeTransformer):
                 and isinstance(self.env[arg.id], ast.Subscript)
                 and self.env[arg.id].value.id == "Tuple"
             ):
+                if sys.version_info < (3, 9):
+                    _sval = self.env[arg.id].slice.value
+                else:
+                    _sval = self.env[arg.id].slice
+
                 return [
                     ast.Subscript(
                         value=ast.Name(id=arg.id, ctx=ast.Load()),
                         slice=ast.Index(value=ast.Constant(value=i, kind=None)),
                     )
-                    for i in range(len(self.env[arg.id].slice.value.elts))
+                    for i in range(len(_sval.elts))
                 ]
         return [arg]
 
@@ -60,12 +66,20 @@ class ASTRewriter(ast.NodeTransformer):
         return super().generic_visit(node)
 
     def visit_Subscript(self, node):
+        if sys.version_info < (3, 9):
+            _sval = node.slice.value
+        else:
+            _sval = node.slice
+
         if (
             isinstance(node.slice, ast.Index)
-            and isinstance(node.slice.value, ast.Name)
-            and node.slice.value.id in self.const
+            and isinstance(_sval, ast.Name)
+            and _sval.id in self.const
         ):
-            node.slice.value = self.const[node.slice.value.id]
+            if sys.version_info < (3, 9):
+                node.slice.value = self.const[_sval.id]
+            else:
+                node.slice = self.const[_sval.id]
         return node
 
     def visit_Name(self, node):
