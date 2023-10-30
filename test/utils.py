@@ -24,6 +24,15 @@ from qlasskit import Qint, QlassF, Qtype, compiler, const_to_qtype
 
 COMPILATION_ENABLED = True
 
+ENABLED_COMPILERS = [("internal",)]
+
+try:
+    import tweedledum
+
+    ENABLED_COMPILERS.append(("tweedledum",))
+except:
+    pass
+
 try:
     from pyqrack import qrack_simulator
     from qiskit.providers.qrack import Qrack
@@ -31,6 +40,15 @@ try:
     qsk_simulator = Qrack.get_backend("qasm_simulator")
 except:
     qsk_simulator = Aer.get_backend("aer_simulator")
+
+
+def inject_parameterized_compilers(params):
+    param_inj = []
+    for comp in ENABLED_COMPILERS:
+        for par in params:
+            param_inj.append(tuple(list(par) + [comp[0]]))
+
+    return param_inj
 
 
 def test_not(a: bool) -> bool:

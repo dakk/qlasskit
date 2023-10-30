@@ -53,9 +53,9 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
         def unroll_subscripts(sub, st):
             if sys.version_info < (3, 9):
-                _sval = sub.slice.value # type: ignore
+                _sval = sub.slice.value  # type: ignore
             else:
-                _sval = sub.slice # type: ignore
+                _sval = sub.slice  # type: ignore
 
             if isinstance(sub.value, ast.Subscript):
                 st = f"{_sval.value}{'.' if st else ''}{st}"
@@ -67,9 +67,9 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             raise exceptions.ExpressionNotHandledException(expr)
 
         if sys.version_info < (3, 9):
-            _sval = expr.slice.value # type: ignore
+            _sval = expr.slice.value  # type: ignore
         else:
-            _sval = expr.slice # type: ignore
+            _sval = expr.slice  # type: ignore
 
         if not isinstance(_sval, ast.Constant):
             raise exceptions.ExpressionNotHandledException(expr)

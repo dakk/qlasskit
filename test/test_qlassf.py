@@ -19,7 +19,7 @@ from parameterized import parameterized_class
 from qlasskit import Qint, Qint4, Qint12, QlassF, exceptions, qlassf
 
 from . import utils
-from .utils import COMPILATION_ENABLED, compute_and_compare_results
+from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
 
 class TestQlassfDecorator(unittest.TestCase):
@@ -28,13 +28,7 @@ class TestQlassfDecorator(unittest.TestCase):
         self.assertTrue(isinstance(c, QlassF))
 
 
-@parameterized_class(
-    ("compiler"),
-    [
-        ("internal",),
-        ("tweedledum",),
-    ],
-)
+@parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfCustomTypes(unittest.TestCase):
     def test_custom_qint3(self):
         qf = qlassf(

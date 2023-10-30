@@ -21,7 +21,7 @@ from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
 
 from qlasskit import QlassF, exceptions, qlassf
 
-from .utils import COMPILATION_ENABLED, compute_and_compare_results
+from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
 a, b, c, d = symbols("a,b,c,d")
 _ret = Symbol("_ret")
@@ -31,13 +31,7 @@ b_0 = Symbol("b.0")
 b_1 = Symbol("b.1")
 
 
-@parameterized_class(
-    ("compiler"),
-    [
-        ("internal",),
-        ("tweedledum",),
-    ],
-)
+@parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfTuple(unittest.TestCase):
     def test_tuple_const(self):
         f = "def test() -> Tuple[bool, bool]:\n\treturn (True, True)"

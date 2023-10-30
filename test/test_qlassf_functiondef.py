@@ -21,16 +21,10 @@ from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
 
 from qlasskit import QlassF, exceptions, qlassf
 
-from .utils import COMPILATION_ENABLED, compute_and_compare_results
+from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
 
-@parameterized_class(
-    ("compiler"),
-    [
-        ("internal",),
-        ("tweedledum",),
-    ],
-)
+@parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfFunctionDef(unittest.TestCase):
     def test_pass_another_function(self):
         f = "def neg(b: bool) -> bool:\n\treturn not b"

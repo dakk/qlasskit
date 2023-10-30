@@ -20,7 +20,12 @@ from sympy.logic import ITE, And, Not, Or, Xor, false, simplify_logic, true
 
 from qlasskit import Qint2, Qint4, Qint8, QlassF, exceptions, qlassf
 
-from .utils import COMPILATION_ENABLED, compute_and_compare_results
+from .utils import (
+    COMPILATION_ENABLED,
+    ENABLED_COMPILERS,
+    compute_and_compare_results,
+    inject_parameterized_compilers,
+)
 
 a, b, c, d = symbols("a,b,c,d")
 _ret = Symbol("_ret")
@@ -40,13 +45,13 @@ class TestQint(unittest.TestCase):
 
 @parameterized_class(
     ("ttype", "ttype_str", "ttype_size", "compiler"),
-    [
-        (Qint2, "Qint2", 2, "internal"),
-        (Qint4, "Qint4", 4, "internal"),
-        (Qint2, "Qint2", 2, "tweedledum"),
-        (Qint4, "Qint4", 4, "tweedledum"),
-        # (Qint8, "Qint8", 8),
-    ],
+    inject_parameterized_compilers(
+        [
+            (Qint2, "Qint2", 2),
+            (Qint4, "Qint4", 4),
+            # (Qint8, "Qint8", 8),
+        ]
+    ),
 )
 class TestQlassfIntParametrized_2_4_8(unittest.TestCase):
     def test_int_arg(self):
@@ -107,12 +112,12 @@ class TestQlassfIntParametrized_2_4_8(unittest.TestCase):
 
 @parameterized_class(
     ("ttype", "ttype_str", "ttype_size", "compiler"),
-    [
-        (Qint2, "Qint2", 2, "internal"),
-        (Qint4, "Qint4", 4, "internal"),
-        (Qint2, "Qint2", 2, "tweedledum"),
-        (Qint4, "Qint4", 4, "tweedledum"),
-    ],
+    inject_parameterized_compilers(
+        [
+            (Qint2, "Qint2", 2),
+            (Qint4, "Qint4", 4),
+        ]
+    ),
 )
 class TestQlassfIntParametrized_2_4(unittest.TestCase):
     def test_int_int_compare_eq(self):
@@ -144,13 +149,7 @@ class TestQlassfIntParametrized_2_4(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
 
-@parameterized_class(
-    ("compiler"),
-    [
-        ("internal",),
-        ("tweedledum",),
-    ],
-)
+@parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfInt(unittest.TestCase):
     def test_int_const(self):
         f = "def test(a: Qint2) -> Qint2:\n\tc=2\n\treturn c"
@@ -312,13 +311,7 @@ class TestQlassfInt(unittest.TestCase):
 
 
 # TODO: parameterize
-@parameterized_class(
-    ("compiler"),
-    [
-        ("internal",),
-        ("tweedledum",),
-    ],
-)
+@parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfIntAdd(unittest.TestCase):
     def test_add_tuple(self):
         f = "def test(a: Tuple[Qint2, Qint2]) -> Qint2: return a[0] + a[1]"
@@ -351,13 +344,7 @@ class TestQlassfIntAdd(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
 
-@parameterized_class(
-    ("compiler"),
-    [
-        ("internal",),
-        ("tweedledum",),
-    ],
-)
+@parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfIntSub(unittest.TestCase):
     def test_sub_const(self):
         f = "def test(a: Qint2) -> Qint2: return a - 1"
@@ -377,12 +364,12 @@ class TestQlassfIntSub(unittest.TestCase):
 
 @parameterized_class(
     ("ttype", "ttype_str", "ttype_size", "compiler"),
-    [
-        (Qint2, "Qint2", 2, "internal"),
-        (Qint4, "Qint4", 4, "internal"),
-        (Qint2, "Qint2", 2, "tweedledum"),
-        (Qint4, "Qint4", 4, "tweedledum"),
-    ],
+    inject_parameterized_compilers(
+        [
+            (Qint2, "Qint2", 2),
+            (Qint4, "Qint4", 4),
+        ]
+    ),
 )
 class TestQlassfIntBitwise(unittest.TestCase):
     def test_bitwise_and(self):
@@ -401,13 +388,7 @@ class TestQlassfIntBitwise(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
 
-@parameterized_class(
-    ("compiler"),
-    [
-        ("internal",),
-        ("tweedledum",),
-    ],
-)
+@parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfIntReassign(unittest.TestCase):
     def test_reassign_newvar(self):
         f = "def test(a: Qint2) -> Qint2:\n\tb = 0\n\tb = a + 1\n\treturn b"

@@ -32,9 +32,9 @@ def translate_argument(ann, env, base="") -> Arg:
         ttypes: List[TType] = []
 
         if sys.version_info < (3, 9):
-            _elts = ann.slice.value.elts # type: ignore
+            _elts = ann.slice.value.elts  # type: ignore
         else:
-            _elts = ann.slice.elts # type: ignore
+            _elts = ann.slice.elts  # type: ignore
 
         for i in _elts:  # type: ignore
             if isinstance(i, ast.Name) and to_name(i) == "bool":

@@ -19,12 +19,16 @@ setup(
         "qlasskit.algorithms",
     ],
     zip_safe=False,
-    install_requires=["sympy==1.12", "tweedledum==1.1.1"],
+    install_requires=["sympy==1.12"],
+    extras_require={
+        "tweedledum": ["tweedledum==1.1.1"],
+    },
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
 )

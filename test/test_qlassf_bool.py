@@ -20,19 +20,13 @@ from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
 
 from qlasskit import QlassF, exceptions, qlassf
 
-from .utils import COMPILATION_ENABLED, compute_and_compare_results
+from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
 a, b, c, d, e, g, h = symbols("a,b,c,d,e,g,h")
 _ret = Symbol("_ret")
 
 
-@parameterized_class(
-    ("compiler"),
-    [
-        ("internal",),
-        ("tweedledum",),
-    ],
-)
+@parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfBoolean(unittest.TestCase):
     def test_unbound(self):
         f = "def test() -> bool:\n\treturn a"
@@ -205,13 +199,7 @@ class TestQlassfBoolean(unittest.TestCase):
     #     self.assertEqual(qf.expressions[-1][1], ITE(d & e, g, h))
 
 
-@parameterized_class(
-    ("compiler"),
-    [
-        ("internal",),
-        ("tweedledum",),
-    ],
-)
+@parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfBoolBitwise(unittest.TestCase):
     def test_bitwise_and(self):
         f = f"def test(a: bool, b: bool) -> bool:\n\treturn a & b"

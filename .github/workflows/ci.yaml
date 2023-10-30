@@ -23,6 +23,28 @@ jobs:
       run: pip install tox
 
     - name: Run tests
+      run: tox -e unit-tests --override testenv.deps+=tweedledum --override testenv.extras=tweedledum
+
+  unit-tests-notw:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: pip install tox
+
+    - name: Run tests
       run: tox -e unit-tests
 
   linters:

@@ -18,13 +18,25 @@ from typing import Literal, get_args
 from .expqmap import ExpQMap  # noqa: F401
 from .compiler import Compiler, CompilerException, optimizer  # noqa: F401
 
-from .internalcompiler import InternalCompiler
-from .poccompiler3 import POCCompiler3
-from .tweedledumcompiler import TweedledumCompiler
+try:
+    import tweedledum  # noqa: F401
+
+    TWEEDLEDUM_ENABLED = True
+except:
+    TWEEDLEDUM_ENABLED = False
+
+from .internalcompiler import InternalCompiler  # noqa: E402
+from .poccompiler3 import POCCompiler3  # noqa: E402
+
+if TWEEDLEDUM_ENABLED:
+    from .tweedledumcompiler import TweedledumCompiler
 
 
 SupportedCompiler = Literal["internal", "poc3", "tweedledum"]
 SupportedCompilers = list(get_args(SupportedCompiler))
+
+if not TWEEDLEDUM_ENABLED:
+    SupportedCompilers.remove("tweedledum")
 
 
 def to_quantum(name, args, returns, exprs, compiler: SupportedCompiler = "internal"):
@@ -34,7 +46,7 @@ def to_quantum(name, args, returns, exprs, compiler: SupportedCompiler = "intern
         sel_compiler = InternalCompiler()
     elif compiler == "poc3":
         sel_compiler = POCCompiler3()
-    elif compiler == "tweedledum":
+    elif compiler == "tweedledum" and TWEEDLEDUM_ENABLED:
         sel_compiler = TweedledumCompiler()
     else:
         raise Exception(
