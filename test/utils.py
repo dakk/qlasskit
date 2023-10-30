@@ -16,15 +16,21 @@ import inspect
 import random
 from typing import Tuple, get_args
 
-from pyqrack import qrack_simulator
 from qiskit import QuantumCircuit, transpile
-from qiskit.providers.qrack import Qrack
 from qiskit_aer import Aer
 from sympy.logic.boolalg import gateinputcount
 
 from qlasskit import Qint, QlassF, Qtype, compiler, const_to_qtype
 
 COMPILATION_ENABLED = True
+
+try:
+    from pyqrack import qrack_simulator
+    from qiskit.providers.qrack import Qrack
+
+    qsk_simulator = Qrack.get_backend("qasm_simulator")
+except:
+    qsk_simulator = Aer.get_backend("aer_simulator")
 
 
 def test_not(a: bool) -> bool:
@@ -39,14 +45,10 @@ def test_qint3(a: Qint3) -> bool:
     return not a[0]
 
 
-aer_simulator = Aer.get_backend("aer_simulator")
-# aer_simulator = Qrack.get_backend("qasm_simulator")
-
-
 def qiskit_measure_and_count(circ, shots=1):
     circ.measure_all()
-    circ = transpile(circ, aer_simulator)
-    result = aer_simulator.run(circ, shots=shots).result()
+    circ = transpile(circ, qsk_simulator)
+    result = qsk_simulator.run(circ, shots=shots).result()
     counts = result.get_counts(circ)
     return counts
 
