@@ -10,6 +10,10 @@ def qiskit_simulate(qc):
     qc.measure_all()
     print(qc.draw("text"))
 
+    # from pyqrack import qrack_simulator
+    # from qiskit.providers.qrack import Qrack
+    # simulator = Qrack.get_backend("qasm_simulator")
+    
     simulator = Aer.get_backend("aer_simulator")
     circ = transpile(qc, simulator)
     result = simulator.run(circ).result()

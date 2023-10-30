@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import math
+import sys
 from typing import List, Optional, Tuple, Union, get_args
 
 from ..qcircuit import QCircuit, gates
@@ -22,7 +23,7 @@ from .qalgorithm import QAlgorithm, format_outcome
 
 
 class Groover(QAlgorithm):
-    def __init__(
+    def __init__( # noqa: C901
         self,
         oracle: QlassF,
         element_to_search: Qtype,
@@ -58,9 +59,16 @@ class Groover(QAlgorithm):
         if element_to_search is not None:
             if hasattr(self.oracle.args[0].ttype, "__name__"):
                 argt_name = self.oracle.args[0].ttype.__name__  # type: ignore
+
+                args = get_args(self.oracle.args[0].ttype)
+                if len(args) > 0:
+                    argt_name += "["
+                    argt_name += ",".join([x.__name__ for x in args])
+                    argt_name += "]"
+
             elif self.oracle.args[0].ttype == bool:
                 argt_name = "bool"
-            else:
+            elif sys.version_info < (3, 8):
                 argt_name = "Tuple["
                 argt_name += ",".join(
                     [x.__name__ for x in get_args(self.oracle.args[0].ttype)]
