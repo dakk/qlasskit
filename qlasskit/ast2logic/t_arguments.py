@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ast
-import sys
 from typing import List, Tuple
 
 from ..types import *  # noqa: F401, F403
@@ -31,16 +30,10 @@ def translate_argument(ann, env, base="") -> Arg:
         ind = 0
         ttypes: List[TType] = []
 
-        if sys.version_info < (3, 9):
-            if hasattr(ann.slice, "value"):
-                _elts = ann.slice.value.elts  # type: ignore
-            else:
-                _elts = [ann.slice]
+        if hasattr(ann.slice, "elts"):
+            _elts = ann.slice.elts  # type: ignore
         else:
-            if hasattr(ann.slice, "elts"):
-                _elts = ann.slice.elts  # type: ignore
-            else:
-                _elts = [ann.slice]
+            _elts = [ann.slice]
 
         for i in _elts:  # type: ignore
             if isinstance(i, ast.Name) and to_name(i) == "bool":

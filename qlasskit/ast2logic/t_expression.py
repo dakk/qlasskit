@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ast
-import sys
 from typing import List, Tuple, get_args
 
 from sympy import Symbol
@@ -52,10 +51,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
     elif isinstance(expr, ast.Subscript):
 
         def unroll_subscripts(sub, st):
-            if sys.version_info < (3, 9):
-                _sval = sub.slice.value  # type: ignore
-            else:
-                _sval = sub.slice  # type: ignore
+            _sval = sub.slice  # type: ignore
 
             if isinstance(sub.value, ast.Subscript):
                 st = f"{_sval.value}{'.' if st else ''}{st}"
@@ -63,13 +59,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             elif isinstance(sub.value, ast.Name):
                 return f"{sub.value.id}.{_sval.value}.{st}"
 
-        if sys.version_info < (3, 9) and not isinstance(expr.slice, ast.Index):
-            raise exceptions.ExpressionNotHandledException(expr)
-
-        if sys.version_info < (3, 9):
-            _sval = expr.slice.value  # type: ignore
-        else:
-            _sval = expr.slice  # type: ignore
+        _sval = expr.slice  # type: ignore
 
         if not isinstance(_sval, ast.Constant):
             raise exceptions.ExpressionNotHandledException(expr)

@@ -18,6 +18,14 @@ import sys
 from .ast2logic import flatten
 
 
+class IndexReplacer(ast.NodeTransformer):
+    def generic_visit(self, node):
+        return super().generic_visit(node)
+
+    def visit_Index(self, node):
+        return self.visit(node.value)
+
+
 class NameValReplacer(ast.NodeTransformer):
     def __init__(self, name_id, val):
         self.name_id = name_id
@@ -48,15 +56,12 @@ class ASTRewriter(ast.NodeTransformer):
                 and isinstance(self.env[arg.id], ast.Subscript)
                 and self.env[arg.id].value.id == "Tuple"
             ):
-                if sys.version_info < (3, 9):
-                    _sval = self.env[arg.id].slice.value
-                else:
-                    _sval = self.env[arg.id].slice
+                _sval = self.env[arg.id].slice
 
                 return [
                     ast.Subscript(
                         value=ast.Name(id=arg.id, ctx=ast.Load()),
-                        slice=ast.Index(value=ast.Constant(value=i, kind=None)),
+                        slice=ast.Constant(value=i, kind=None),
                     )
                     for i in range(len(_sval.elts))
                 ]
@@ -66,20 +71,10 @@ class ASTRewriter(ast.NodeTransformer):
         return super().generic_visit(node)
 
     def visit_Subscript(self, node):
-        if sys.version_info < (3, 9):
-            _sval = node.slice.value
-        else:
-            _sval = node.slice
+        _sval = node.slice
 
-        if (
-            isinstance(node.slice, ast.Index)
-            and isinstance(_sval, ast.Name)
-            and _sval.id in self.const
-        ):
-            if sys.version_info < (3, 9):
-                node.slice.value = self.const[_sval.id]
-            else:
-                node.slice = self.const[_sval.id]
+        if isinstance(_sval, ast.Name) and _sval.id in self.const:
+            node.slice = self.const[_sval.id]
         return node
 
     def visit_Name(self, node):
@@ -95,15 +90,9 @@ class ASTRewriter(ast.NodeTransformer):
         def _replace_types(ann, arg=None):
             # Replace Qlist[T,n] with Tuple[(T,)*3]
             if isinstance(ann, ast.Subscript) and ann.value.id == "Qlist":
-                if sys.version_info < (3, 9):
-                    _elts = ann.slice.value.elts
-                else:
-                    _elts = ann.slice.elts
+                _elts = ann.slice.elts
 
                 _ituple = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[1].value)
-
-                if sys.version_info < (3, 9):
-                    _ituple = ast.Index(value=_ituple)
 
                 ann = ast.Subscript(
                     value=ast.Name(id="Tuple", ctx=ast.Load()),
@@ -138,10 +127,7 @@ class ASTRewriter(ast.NodeTransformer):
                     ast.Assign(
                         targets=[ast.Name(id=node.targets[0].elts[i].id)],
                         value=ast.Subscript(
-                            value=ast.Name(id="_temptup"),
-                            slice=ast.Index(
-                                value=ast.Constant(value=i), ctx=ast.Load()
-                            ),
+                            value=ast.Name(id="_temptup"), slice=ast.Constant(value=i)
                         ),
                     )
                 )
@@ -208,17 +194,12 @@ class ASTRewriter(ast.NodeTransformer):
                 iter = self.env[iter.id].elts
 
             elif isinstance(self.env[iter.id], ast.Subscript):
-                if sys.version_info < (3, 9):
-                    _elts = self.env[iter.id].slice.value.elts
-                else:
-                    _elts = self.env[iter.id].slice.elts
+                _elts = self.env[iter.id].slice.elts
 
                 iter = [
                     ast.Subscript(
                         value=ast.Name(id=iter.id, ctx=ast.Load()),
-                        slice=ast.Index(value=ast.Constant(value=e))
-                        if sys.version_info < (3, 9)
-                        else ast.Constant(value=e),
+                        slice=ast.Constant(value=e),
                         ctx=ast.Load(),
                     )
                     for e in range(len(_elts))
@@ -305,6 +286,9 @@ class ASTRewriter(ast.NodeTransformer):
 
 def ast2ast(a_tree):
     # print(ast.dump(a_tree))
+    if sys.version_info < (3, 9):
+        a_tree = IndexReplacer().visit(a_tree)
+
     a_tree = ASTRewriter().visit(a_tree)
     # print(ast.dump(a_tree))
     return a_tree

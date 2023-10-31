@@ -71,7 +71,7 @@ class Groover(QAlgorithm):
 
             elif self.oracle.args[0].ttype == bool:
                 argt_name = "bool"
-            elif sys.version_info < (3, 8):
+            elif sys.version_info < (3, 9):
                 argt_name = "Tuple["
                 argt_name += ",".join(
                     [x.__name__ for x in get_args(self.oracle.args[0].ttype)]
