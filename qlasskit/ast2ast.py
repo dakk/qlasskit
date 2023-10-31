@@ -41,6 +41,32 @@ class NameValReplacer(ast.NodeTransformer):
         return node
 
 
+def _replace_types_annotations(ann, arg=None):
+    if isinstance(ann, ast.Subscript) and ann.value.id == "Tuple":
+        _elts = ann.slice.elts
+        _ituple = ast.Tuple(elts=[_replace_types_annotations(el) for el in _elts])
+
+        ann = ast.Subscript(
+            value=ast.Name(id="Tuple", ctx=ast.Load()),
+            slice=_ituple,
+        )
+        
+    # Replace Qlist[T,n] with Tuple[(T,)*3]
+    if isinstance(ann, ast.Subscript) and ann.value.id == "Qlist":
+        _elts = ann.slice.elts
+        _ituple = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[1].value)
+
+        ann = ast.Subscript(
+            value=ast.Name(id="Tuple", ctx=ast.Load()),
+            slice=_ituple,
+        )
+
+    if arg is not None:
+        arg.annotation = ann
+        return arg
+    else:
+        return ann
+            
 class ASTRewriter(ast.NodeTransformer):
     def __init__(self, env={}, ret=None):
         self.env = {}
@@ -85,32 +111,21 @@ class ASTRewriter(ast.NodeTransformer):
 
     def visit_List(self, node):
         return ast.Tuple(elts=[self.visit(el) for el in node.elts])
+    
+    def visit_AnnAssign(self, node):       
+        node.annotation = _replace_types_annotations(node.annotation) 
+        node.value = self.visit(node.value) if node.value else node.value
+        self.env[node.target] = node.annotation
+        return node
+        
 
     def visit_FunctionDef(self, node):
-        def _replace_types(ann, arg=None):
-            # Replace Qlist[T,n] with Tuple[(T,)*3]
-            if isinstance(ann, ast.Subscript) and ann.value.id == "Qlist":
-                _elts = ann.slice.elts
-
-                _ituple = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[1].value)
-
-                ann = ast.Subscript(
-                    value=ast.Name(id="Tuple", ctx=ast.Load()),
-                    slice=_ituple,
-                )
-
-            if arg is not None:
-                arg.annotation = ann
-                return arg
-            else:
-                return ann
-
-        node.args.args = [_replace_types(x.annotation, arg=x) for x in node.args.args]
+        node.args.args = [_replace_types_annotations(x.annotation, arg=x) for x in node.args.args]
 
         for x in node.args.args:
             self.env[x.arg] = x.annotation
 
-        node.returns = _replace_types(node.returns)
+        node.returns = _replace_types_annotations(node.returns)
         self.ret = node.returns
 
         return super().generic_visit(node)

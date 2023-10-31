@@ -93,3 +93,28 @@ class TestAst2Logic_translate_argument(unittest.TestCase):
                 "a.1.1",
             ],
         )
+
+    def test_list_of_int2(self):
+        f = "a: Qlist[Qint2, 2]"
+        ann_ast = ast2ast(ast.parse(f)).body[0].annotation
+        c = ast2logic.translate_argument(ann_ast, ast2logic.Env(), "a")
+        self.assertEqual(c.name, "a")
+        self.assertEqual(c.ttype, Tuple[Qint2, Qint2])
+        self.assertEqual(
+            c.bitvec,
+            [
+                "a.0.0",
+                "a.0.1",
+                "a.1.0",
+                "a.1.1",
+            ],
+        )
+        
+
+    def test_tuple_of_list2(self):
+        f = "a: Tuple[bool, Qlist[bool, 2]]"
+        ann_ast = ast2ast(ast.parse(f)).body[0].annotation
+        c = ast2logic.translate_argument(ann_ast, ast2logic.Env(), "a")
+        self.assertEqual(c.name, "a")
+        self.assertEqual(c.ttype, Tuple[bool, Tuple[bool, bool]])
+        self.assertEqual(c.bitvec, ["a.0", "a.1.0", "a.1.1"])
