@@ -45,3 +45,18 @@ class TestQlassfList(unittest.TestCase):
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(qf.expressions[0][1], And(a_0, a_1))
         compute_and_compare_results(self, qf)
+
+    def test_list_item_swap(self):
+        f = "def swapf(a: Qlist[Qint2, 2]) -> Qlist[Qint2, 2]:\n\treturn [a[1], a[0]]"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_list_item_swap_bool(self):
+        f = "def swapf(a: Qlist[bool, 2]) -> Qlist[bool, 2]:\n\treturn [a[1], a[0]]"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_list_item_sum(self):
+        f = "def swapf(a: Qlist[Qint2, 2]) -> Qint2:\n\treturn a[0] + a[1]"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)

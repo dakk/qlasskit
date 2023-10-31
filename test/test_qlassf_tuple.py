@@ -46,6 +46,11 @@ class TestQlassfTuple(unittest.TestCase):
         self.assertEqual(qf.expressions[0][1], And(a_0, a_1))
         compute_and_compare_results(self, qf)
 
+    def test_tuple_item_swap(self):
+        f = "def swapf(a: Tuple[Qint2, Qint2]) -> Tuple[Qint2, Qint2]:\n\treturn (a[1], a[0])"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+        
     def test_tuple_ite(self):
         f = "def test(b: bool, a: Tuple[bool, bool]) -> Tuple[bool,bool]:\n\treturn (a[1],a[0]) if b else a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)

@@ -41,6 +41,11 @@ class InternalCompiler(Compiler):
             is_temp = sym.name[0:2] == "__"
             symp_exp = self._symplify_exp(exp)
 
+            # X = Y: perform a "copy"
+            # if isinstance(exp, Symbol):
+            #     iret = qc.get_free_ancilla()
+            #     qc.cx(qc[exp], iret)
+            # else:
             iret = self.compile_expr(qc, symp_exp)
 
             self.expqmap[sym] = iret
