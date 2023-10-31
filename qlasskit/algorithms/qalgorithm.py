@@ -17,12 +17,15 @@ from typing import Any, Dict, List, Union
 from ..qcircuit import QCircuit, SupportedFramework
 
 
-def format_outcome(out: Union[str, int, List[bool]]) -> List[bool]:
+def format_outcome(out: Union[str, int, List[bool]], out_len: int) -> List[bool]:
     if isinstance(out, str):
-        return [True if c == "1" else False for c in out]
+        return format_outcome([True if c == "1" else False for c in out], out_len)
     elif isinstance(out, int):
-        return format_outcome(str(bin(out))[2:])
+        return format_outcome(str(bin(out))[2:], out_len)
     elif isinstance(out, List):
+        if len(out) < out_len:
+            out += [False] * (out_len - len(out))
+
         return out
     raise Exception(f"Invalid format: {out}")
 

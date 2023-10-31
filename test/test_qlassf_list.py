@@ -75,3 +75,8 @@ class TestQlassfList(unittest.TestCase):
         f = "def test(a: Qint2) -> Qint2:\n\tc = [1,2,3]\n\tfor x in c:\n\t\ta += x\n\treturn a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
+
+    def test_list_len(self):
+        f = "def test(a: Qlist[Qint2, 2]) -> Qint2:\n\tc = 0\n\tfor x in range(len(a)):\n\t\tc += a[x]\n\treturn c"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)

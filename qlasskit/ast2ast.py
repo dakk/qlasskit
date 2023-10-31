@@ -281,6 +281,7 @@ class ASTRewriter(ast.NodeTransformer):
         return iterif(args)
 
     def visit_Call(self, node):
+        node.args = [self.visit(ar) for ar in node.args]
         if not hasattr(node.func, "id"):
             return node
 

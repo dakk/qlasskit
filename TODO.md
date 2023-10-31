@@ -112,7 +112,7 @@
 - [ ] Int arithmetic expressions (*, /, mod)
 - [ ] Parametrized qlassf
 - [ ] Lambda
-- [ ] FixedList type
+- [x] FixedList type
 - [ ] Builtin functions: map, count
 - [x] Ast2logic: fixed size loops unrolling
 - [ ] Builtin functions: sum(), all(), any()
@@ -125,7 +125,7 @@
 - [x] Integer comparators
 - [x] Integer constant
 - [ ] Integer operations
-- [ ] Datatype: List
+- [x] Datatype: List
 - [ ] Datatype: Dict
 - [ ] Datatype: Fixed
 - [ ] Datatype: Enum
@@ -136,7 +136,6 @@
 
 ### Abstraction support
 
-- [ ] Combine two QlassF (__add__)
 - [ ] Extract boolean expressions from quantum circuits
 
 ### Framwork support

@@ -16,6 +16,9 @@ import math
 import sys
 from typing import List, Optional, Tuple, Union, get_args
 
+from sympy import Symbol
+from sympy.logic.boolalg import BooleanFalse, BooleanTrue
+
 from ..qcircuit import QCircuit, gates
 from ..qlassf import QlassF
 from ..types import Qtype
@@ -82,6 +85,18 @@ def oracle_outer(v: {argt_name}) -> bool:
 """,
                 defs=[self.oracle.to_logicfun()],
             )
+
+            if (
+                len(oracle_outer.expressions) == 1
+                and oracle_outer.expressions[0][0] == Symbol("_ret")
+                and (
+                    isinstance(oracle_outer.expressions[0][1], BooleanTrue)
+                    or isinstance(oracle_outer.expressions[0][1], BooleanFalse)
+                )
+            ):
+                raise Exception(
+                    f"The oracle is constant: {oracle_outer.expressions[0][1]}"
+                )
         else:
             oracle_outer = self.oracle
 
@@ -133,13 +148,13 @@ def oracle_outer(v: {argt_name}) -> bool:
     def interpret_outcome(
         self, outcome: Union[str, int, List[bool]]
     ) -> Union[bool, Tuple, Qtype]:
-        out = format_outcome(outcome)
+        out = format_outcome(outcome, len(self.out_qubits()))
 
         len_a = len(self.oracle.args[0])
         if len_a == 1:
             return out[0]  # type: ignore
 
-        if hasattr(self.oracle.args[0].ttype, "__name__"):
+        if hasattr(self.oracle.args[0].ttype, "from_bool"):
             return self.oracle.args[0].ttype.from_bool(out[::-1][0:len_a])  # type: ignore
         elif self.oracle.args[0].ttype == bool:
             return out[::-1][0]
