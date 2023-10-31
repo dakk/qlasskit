@@ -216,7 +216,9 @@ class ASTRewriter(ast.NodeTransformer):
                 iter = [
                     ast.Subscript(
                         value=ast.Name(id=iter.id, ctx=ast.Load()),
-                        slice=ast.Constant(value=e),
+                        slice=ast.Index(value=ast.Constant(value=e))
+                        if sys.version_info < (3, 9)
+                        else ast.Constant(value=e),
                         ctx=ast.Load(),
                     )
                     for e in range(len(_elts))
