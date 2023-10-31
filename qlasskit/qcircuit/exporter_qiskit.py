@@ -51,12 +51,12 @@ class QiskitExporter(QCircuitExporter):
         if mode == "gate":
             qc.remove_final_measurements()
             gate = qc.to_gate()
-            
+
             gate.name = _selfqc.name
 
             if hasattr(QuantumCircuit, _selfqc.name):
-                gate.name += '_'
-                
+                gate.name += "_"
+
             return gate
         elif mode == "circuit":
             return qc

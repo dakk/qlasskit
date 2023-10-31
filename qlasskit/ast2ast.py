@@ -18,17 +18,17 @@ import sys
 from .ast2logic import flatten
 
 
-class NameConstantReplacer(ast.NodeTransformer):
-    def __init__(self, name_id, constant):
+class NameValReplacer(ast.NodeTransformer):
+    def __init__(self, name_id, val):
         self.name_id = name_id
-        self.constant = constant
+        self.val = val
 
     def generic_visit(self, node):
         return super().generic_visit(node)
 
     def visit_Name(self, node):
         if node.id == self.name_id:
-            return ast.Constant(value=self.constant)
+            return self.val
 
         return node
 
@@ -149,19 +149,22 @@ class ASTRewriter(ast.NodeTransformer):
             ]
             return [_temptup] + single_assigns
 
-        was_known = node.targets[0].id in self.env
+        target_0id = node.targets[0].id
+        was_known = target_0id in self.env
 
         if isinstance(node.value, ast.Name) and node.value.id in self.env:
-            self.env[node.targets[0].id] = self.env[node.value.id]
+            self.env[target_0id] = self.env[node.value.id]
+        elif isinstance(node.value, ast.Tuple) or isinstance(node.value, ast.List):
+            self.env[target_0id] = self.visit(node.value)
         else:
-            self.env[node.targets[0].id] = "Uknown"
+            self.env[target_0id] = "Unknown"
 
         # TODO: support unrolling tuple
         # TODO: if value is not self referencing, we can skip this (ie: a = b + 1)
 
         # Reassigning an already present variable (use a temp variable)
         if was_known and not isinstance(node.value, ast.Constant):
-            new_targ = ast.Name(id=f"__{node.targets[0].id}", ctx=ast.Load())
+            new_targ = ast.Name(id=f"__{target_0id}", ctx=ast.Load())
 
             return [
                 ast.Assign(
@@ -174,6 +177,7 @@ class ASTRewriter(ast.NodeTransformer):
                 ),
             ]
 
+        node.value = self.visit(node.value)
         return node
 
     def visit_AugAssign(self, node):
@@ -198,16 +202,42 @@ class ASTRewriter(ast.NodeTransformer):
     def visit_For(self, node):
         iter = self.visit(node.iter)
 
+        # Iterate over an object
+        if isinstance(iter, ast.Name) and iter.id in self.env:
+            if isinstance(self.env[iter.id], ast.Tuple):
+                iter = self.env[iter.id].elts
+
+            elif isinstance(self.env[iter.id], ast.Subscript):
+                if sys.version_info < (3, 9):
+                    _elts = self.env[iter.id].slice.value.elts
+                else:
+                    _elts = self.env[iter.id].slice.elts
+
+                iter = [
+                    ast.Subscript(
+                        value=ast.Name(id=iter.id, ctx=ast.Load()),
+                        slice=ast.Constant(value=e),
+                        ctx=ast.Load(),
+                    )
+                    for e in range(len(_elts))
+                ]
+        elif isinstance(iter, ast.Tuple):
+            iter = iter.elts
+
         rolls = []
         for i in iter:
-            self.const[node.target.id] = ast.Constant(value=i)
-            tar_assign = self.visit(
-                ast.Assign(targets=[node.target], value=ast.Constant(value=i))
-            )
+            if isinstance(i, ast.Subscript) or isinstance(i, ast.Constant):
+                _val = i
+            else:
+                _val = ast.Constant(value=i)
+
+            self.const[node.target.id] = _val
+
+            tar_assign = self.visit(ast.Assign(targets=[node.target], value=_val))
             rolls.extend(flatten([tar_assign]))
 
             new_body = [
-                NameConstantReplacer(node.target.id, i).visit(copy.deepcopy(b))
+                NameValReplacer(node.target.id, _val).visit(copy.deepcopy(b))
                 for b in node.body
             ]
             rolls.extend(flatten([self.visit(copy.deepcopy(b)) for b in new_body]))

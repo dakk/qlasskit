@@ -76,10 +76,10 @@ def compute_result_of_qcircuit(cls, qf, truth_line):
     circ = qf.circuit()
     gate = qf.gate()
     qc = QuantumCircuit(gate.num_qubits)
-    
+
     # Prepare inputs
     [qc.initialize(1 if truth_line[i] else 0, i) for i in range(qf.input_size)]
-    
+
     qc.append(gate, list(range(qf.num_qubits)))
 
     # print(qc.decompose().draw("text"))
@@ -102,7 +102,7 @@ def compute_result_of_qcircuit(cls, qf, truth_line):
         qf.input_size
         + len(qf.expressions)
         + sum([gateinputcount(compiler.optimizer(e[1])) for e in qf.expressions])
-    )    
+    )
 
     cls.assertLessEqual(qf.gate().num_qubits, max_qubits)
 

@@ -50,7 +50,7 @@ class TestQlassfTuple(unittest.TestCase):
         f = "def swapf(a: Tuple[Qint2, Qint2]) -> Tuple[Qint2, Qint2]:\n\treturn (a[1], a[0])"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
-        
+
     def test_tuple_ite(self):
         f = "def test(b: bool, a: Tuple[bool, bool]) -> Tuple[bool,bool]:\n\treturn (a[1],a[0]) if b else a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
@@ -162,5 +162,20 @@ class TestQlassfTuple(unittest.TestCase):
 
     def test_tuple_int_compare(self):
         f = "def test(a: Tuple[Qint2, Qint2], b: Tuple[Qint2, Qint2]) -> bool:\n\treturn a == b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_tuple_iterator_var(self):
+        f = "def test(a: Tuple[Qint2, Qint2]) -> Qint2:\n\tc = 0\n\tfor x in a:\n\t\tc += x\n\treturn c"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_tuple_iterator_tuple(self):
+        f = "def test(a: Qint2) -> Qint2:\n\tc = 0\n\tfor x in (1,2,3):\n\t\tc += x + a\n\treturn c"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_tuple_iterator_vartuple(self):
+        f = "def test(a: Qint2) -> Qint2:\n\tc = (1,2,3)\n\tfor x in c:\n\t\ta += x\n\treturn a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
