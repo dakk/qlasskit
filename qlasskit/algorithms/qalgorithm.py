@@ -80,7 +80,7 @@ def oraclize(qf: QlassF, element: Any, name="oracle"):
 
     elif qf.args[0].ttype == bool:
         argt_name = "bool"
-    elif sys.version_info < (3, 9):
+    else:
         argt_name = "Tuple["
         argt_name += ",".join([x.__name__ for x in get_args(qf.args[0].ttype)])
         argt_name += "]"
