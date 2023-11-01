@@ -3,7 +3,7 @@ How it works
 
 In order to translate python code to quantum circuit, qlasskit performs several transformations;
 
-1. it starts from the python *AST* (abstract synthax tree) rewriting it to a simplified version 
+1. it starts from the python *AST* (abstract syntax tree) rewriting it to a simplified version 
 by the _ast2ast_ module. 
 2. Then the simplified *AST* is translated to *boolean expressions* as intermediate
 form by the _ast2logic_ module. 
@@ -70,7 +70,7 @@ As we can see from the circuit drawings, qlasskit approach needs half the number
 
 AST Traslator
 -----------------
-Given a python function, the `qlasskit.ast2logic` module walks its synthax tree translating all the statements / 
+Given a python function, the `qlasskit.ast2logic` module walks its syntax tree translating all the statements / 
 expressions to boolean expressions.
 
 
