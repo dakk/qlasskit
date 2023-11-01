@@ -14,12 +14,58 @@
 
 import unittest
 
-from qlasskit import Qint2, Qint4, ast2logic, exceptions
+from qlasskit import Qint2, Qint4, qlassf
+from qlasskit.algorithms import Groover
+
+from .utils import qiskit_measure_and_count
 
 
 class TestAlgoGroover(unittest.TestCase):
-    # test interpret outcome
-    # test various combinations of input / output size
-    # test out_qubits
-    # test without element to search
-    pass
+    def test_groover(self):
+        f = """
+def hash(k: Qint4) -> bool:
+    h = True
+    for i in range(4):
+        h = h and k[i]
+    return h
+"""
+        qf = qlassf(f)
+        algo = Groover(qf, True)
+
+        qc = algo.circuit().export("circuit", "qiskit")
+        counts = qiskit_measure_and_count(qc, shots=1024)
+        counts_readable = algo.interpet_counts(counts)
+
+        self.assertEqual(15 in counts_readable, True)
+        self.assertEqual(algo.out_qubits(), [0, 1, 2, 3])
+        self.assertEqual(counts_readable[15] > 600, True)
+
+    def test_groover_without_element_to_search(self):
+        f = """
+def hash(k: Qint4) -> bool:
+    h = True
+    for i in range(4):
+        h = h and k[i]
+    return h
+"""
+        qf = qlassf(f)
+        algo = Groover(qf)
+
+        qc = algo.circuit().export("circuit", "qiskit")
+        counts = qiskit_measure_and_count(qc, shots=1024)
+        counts_readable = algo.interpet_counts(counts)
+
+        self.assertEqual(15 in counts_readable, True)
+        self.assertEqual(counts_readable[15] > 600, True)
+
+    def test_groover_too_many_args(self):
+        f = """
+def hash(k: Qint4, q: Qint4) -> bool:
+    h = True
+    for i in range(4):
+        h = h and (k[i] or q[i])
+    return h
+"""
+        qf = qlassf(f)
+
+        self.assertRaises(Exception, lambda x: Groover(x), qf)

@@ -25,14 +25,14 @@ class Groover(QAlgorithm):
     def __init__(
         self,
         oracle: QlassF,
-        element_to_search: Qtype,
+        element_to_search: Optional[Qtype] = None,
         n_iterations: Optional[int] = None,
     ):
         """
         Args:
             oracle (QlassF): our f(x) -> bool that returns True if x satisfies the function or
                 a generic function f(x) = y that we want to compare with element_to_search
-            element_to_search (Qtype): the element we want to search
+            element_to_search (Qtype, optional): the element we want to search
             n_iterations (int, optional): force a number of iterations (otherwise, pi/4*sqrt(N))
         """
         if len(oracle.args) != 1:

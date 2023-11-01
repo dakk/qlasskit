@@ -76,12 +76,10 @@
 - [x] Integrate qrack on test suite
 - [x] Test / support on multiple py version >= 3.8
 - [x] Fixed size list
-- [ ] Groover algorithm tests 
-- [ ] Slideshow for UF midterm
+- [x] Groover algorithm tests 
+- [x] Slideshow for UF midterm
 
 ### Week 3: (6 Nov 23)
-
-- [ ] Slideshow for UF midterm
 
 ### Week 4: (13 Nov 23)
 
