@@ -63,10 +63,7 @@ class TestForLoop(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
-
-# TODO: a test to do
-# def hash(k: Qint4) -> bool:
-#     z = 1
-#     for i in range(3):
-#         z += i
-#     return z == 3
+    def test_for_sum(self):
+        f = "def hash(k: Qint4) -> bool:\n\tz = 1\n\tfor i in range(3):\n\t\tz += i\n\treturn z == 3"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)

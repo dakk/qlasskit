@@ -80,9 +80,9 @@ class TestQlassfBuiltinFunctions(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
-    # TODO: fixed by cast
+    # TODO: fix cast
     # def test_max_const2(self):
-    #     f = "def test(a: Qint4) -> Qint2:\n\treturn max(a,3)"
+    #     f = "def test(a: Qint4) -> Qint4:\n\treturn max(a,3)"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)
 
@@ -95,3 +95,15 @@ class TestQlassfBuiltinFunctions(unittest.TestCase):
         f = "def test(a: Qint2, b: Qint2) -> Qint2:\n\treturn max((a, b))"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
+
+    # TODO:
+    # def test_len_of_range(self):
+    #     f = "def test() -> Qint4:\n\treturn len(range(4))"
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+    #     compute_and_compare_results(self, qf)
+
+    # TODO:
+    # def test_range_of_len(self):
+    #     f = "def test(a: Qlist[bool, 3]) -> Qint4:\n\treturn range(len(a))"
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+    #     compute_and_compare_results(self, qf)
