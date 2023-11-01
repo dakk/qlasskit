@@ -45,7 +45,7 @@ jobs:
       run: pip install tox
 
     - name: Run tests
-      run: tox -c tox_311.ini -e unit-tests
+      run: tox -c tox_no_tweedledum.ini -e unit-tests
 
   linters:
     runs-on: ubuntu-latest
