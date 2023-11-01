@@ -23,7 +23,7 @@ jobs:
       run: pip install tox
 
     - name: Run tests
-      run: tox -e unit-tests --override testenv.deps+=tweedledum --override testenv.extras=tweedledum
+      run: tox -e unit-tests #--override testenv.deps+=tweedledum --override testenv.extras=tweedledum
 
   unit-tests-notw:
     runs-on: ubuntu-latest
@@ -45,7 +45,7 @@ jobs:
       run: pip install tox
 
     - name: Run tests
-      run: tox -e unit-tests
+      run: tox -c tox_311.ini -e unit-tests
 
   linters:
     runs-on: ubuntu-latest
