@@ -11,3 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import unittest
+
+from qlasskit import Qint2, Qint4, ast2logic, exceptions
+
+
+class TestAlgoGroover(unittest.TestCase):
+    # test interpret outcome
+    # test various combinations of input / output size
+    # test out_qubits
+    # test without element to search
+    pass

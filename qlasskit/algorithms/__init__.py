@@ -13,5 +13,11 @@
 # limitations under the License.
 # isort:skip_file
 
-from .qalgorithm import QAlgorithm  # noqa: F401, E402
+from .qalgorithm import (  # noqa: F401, E402
+    QAlgorithm,
+    format_outcome,
+    interpret_as_qtype,
+    oraclize,
+    ConstantOracleException,
+)
 from .groover import Groover  # noqa: F401, E402

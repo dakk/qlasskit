@@ -224,7 +224,3 @@ class Qint12(Qint):
 
 class Qint16(Qint):
     BIT_SIZE = 16
-
-
-# class Qlist
-# class Qfixed

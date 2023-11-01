@@ -109,7 +109,6 @@ class TestAst2Logic_translate_argument(unittest.TestCase):
                 "a.1.1",
             ],
         )
-        
 
     def test_tuple_of_list2(self):
         f = "a: Tuple[bool, Qlist[bool, 2]]"

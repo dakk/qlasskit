@@ -13,20 +13,16 @@
 # limitations under the License.
 
 import math
-import sys
-from typing import List, Optional, Tuple, Union, get_args
-
-from sympy import Symbol
-from sympy.logic.boolalg import BooleanFalse, BooleanTrue
+from typing import List, Optional, Tuple, Union
 
 from ..qcircuit import QCircuit, gates
 from ..qlassf import QlassF
 from ..types import Qtype
-from .qalgorithm import QAlgorithm, format_outcome
+from .qalgorithm import QAlgorithm, interpret_as_qtype, oraclize
 
 
 class Groover(QAlgorithm):
-    def __init__(  # noqa: C901
+    def __init__(
         self,
         oracle: QlassF,
         element_to_search: Qtype,
@@ -34,15 +30,16 @@ class Groover(QAlgorithm):
     ):
         """
         Args:
-            oracle (QlassF): our f(x) -> bool that returns True if x satisfies the function
+            oracle (QlassF): our f(x) -> bool that returns True if x satisfies the function or
+                a generic function f(x) = y that we want to compare with element_to_search
             element_to_search (Qtype): the element we want to search
             n_iterations (int, optional): force a number of iterations (otherwise, pi/4*sqrt(N))
         """
         if len(oracle.args) != 1:
             raise Exception("the oracle should receive exactly one parameter")
 
-        self.oracle: QlassF = oracle
-        self.search_space_size = len(self.oracle.args[0])
+        self.oracle: QlassF
+        self.search_space_size = len(oracle.args[0])
 
         if n_iterations is None:
             n_iterations = math.ceil(
@@ -60,47 +57,11 @@ class Groover(QAlgorithm):
 
         # Prepare and add the quantum oracle
         if element_to_search is not None:
-            if hasattr(self.oracle.args[0].ttype, "__name__"):
-                argt_name = self.oracle.args[0].ttype.__name__  # type: ignore
-
-                args = get_args(self.oracle.args[0].ttype)
-                if len(args) > 0:
-                    argt_name += "["
-                    argt_name += ",".join([x.__name__ for x in args])
-                    argt_name += "]"
-
-            elif self.oracle.args[0].ttype == bool:
-                argt_name = "bool"
-            elif sys.version_info < (3, 9):
-                argt_name = "Tuple["
-                argt_name += ",".join(
-                    [x.__name__ for x in get_args(self.oracle.args[0].ttype)]
-                )
-                argt_name += "]"
-
-            oracle_outer = QlassF.from_function(
-                f"""
-def oracle_outer(v: {argt_name}) -> bool:
-    return {self.oracle.name}(v) == {element_to_search}
-""",
-                defs=[self.oracle.to_logicfun()],
-            )
-
-            if (
-                len(oracle_outer.expressions) == 1
-                and oracle_outer.expressions[0][0] == Symbol("_ret")
-                and (
-                    isinstance(oracle_outer.expressions[0][1], BooleanTrue)
-                    or isinstance(oracle_outer.expressions[0][1], BooleanFalse)
-                )
-            ):
-                raise Exception(
-                    f"The oracle is constant: {oracle_outer.expressions[0][1]}"
-                )
+            self.oracle = oraclize(oracle, element_to_search)
         else:
-            oracle_outer = self.oracle
+            self.oracle = oracle
 
-        oracle_qc = oracle_outer.circuit()
+        oracle_qc = self.oracle.circuit()
 
         # Add negative phase to result
         oracle_qc.add_qubit(name="_ret_phased")
@@ -148,22 +109,6 @@ def oracle_outer(v: {argt_name}) -> bool:
     def interpret_outcome(
         self, outcome: Union[str, int, List[bool]]
     ) -> Union[bool, Tuple, Qtype]:
-        out = format_outcome(outcome, len(self.out_qubits()))
-
-        len_a = len(self.oracle.args[0])
-        if len_a == 1:
-            return out[0]  # type: ignore
-
-        if hasattr(self.oracle.args[0].ttype, "from_bool"):
-            return self.oracle.args[0].ttype.from_bool(out[::-1][0:len_a])  # type: ignore
-        elif self.oracle.args[0].ttype == bool:
-            return out[::-1][0]
-        else:  # Tuple
-            idx_s = 0
-            values = []
-            for x in get_args(self.oracle.args[0].ttype):
-                len_a = x.BIT_SIZE
-                values.append(x.from_bool(out[::-1][idx_s : idx_s + len_a]))
-                idx_s += len_a
-
-            return tuple(values)
+        return interpret_as_qtype(
+            outcome, self.oracle.args[0].ttype, len(self.oracle.args[0])
+        )

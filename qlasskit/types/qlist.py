@@ -22,7 +22,7 @@ class QlistMeta(type):
         if isinstance(params, tuple) and len(params) == 2:
             T, n = params
             if isinstance(T, type) and isinstance(n, int) and n >= 0:
-                return Tuple[T, ...] if n > 0 else Tuple[T]
+                return Tuple[(T,) * n] if n > 0 else Tuple[T]
 
 
 class Qlist(metaclass=QlistMeta):
