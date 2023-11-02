@@ -78,7 +78,9 @@ class QlassF:
     def truth_table_header(self) -> List[str]:
         """Returns the list of string containing the truth table header"""
         header = flatten(list(map(lambda a: a.bitvec, self.args)))
-        header.extend([sym.name for (sym, retex) in self.expressions[-self.return_size :]])
+        header.extend(
+            [sym.name for (sym, retex) in self.expressions[-self.return_size :]]
+        )
         return header
 
     def truth_table(self, max=None) -> List[List[bool]]:
