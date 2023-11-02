@@ -68,7 +68,7 @@ class QlassF:
         return f"QlassF<{self.name}>({arg_str}) -> {ret_str}:\n\t{exp_str}"
 
     @property
-    def ret_size(self):
+    def return_size(self):
         return len(self.returns)
 
     def __add__(self, qf2) -> "QlassF":
@@ -78,7 +78,7 @@ class QlassF:
     def truth_table_header(self) -> List[str]:
         """Returns the list of string containing the truth table header"""
         header = flatten(list(map(lambda a: a.bitvec, self.args)))
-        header.extend([sym.name for (sym, retex) in self.expressions[-self.ret_size :]])
+        header.extend([sym.name for (sym, retex) in self.expressions[-self.return_size :]])
         return header
 
     def truth_table(self, max=None) -> List[List[bool]]:
@@ -91,9 +91,9 @@ class QlassF:
         arg_bits = flatten(list(map(lambda a: a.bitvec, self.args)))
         bits = len(arg_bits)
 
-        if not max and (bits + self.ret_size) > MAX_TRUTH_TABLE_SIZE:
+        if not max and (bits + self.return_size) > MAX_TRUTH_TABLE_SIZE:
             raise Exception(
-                f"Max truth table size reached: {bits + self.ret_size} > {MAX_TRUTH_TABLE_SIZE}"
+                f"Max truth table size reached: {bits + self.return_size} > {MAX_TRUTH_TABLE_SIZE}"
             )
 
         for i in range(
@@ -112,7 +112,7 @@ class QlassF:
                     (ename.name if isinstance(ename, Symbol) else ename, exp_sub)
                 )
 
-            res = list(zip(arg_bits, bin_arr)) + known[-self.ret_size :]
+            res = list(zip(arg_bits, bin_arr)) + known[-self.return_size :]
             res_clean = list(map(lambda y: y[1], res))
             truth.append(res_clean)
 
@@ -201,7 +201,7 @@ class QlassF:
         fun_name, args, fun_ret, exps = translate_ast(fun, types, defs)
         original_f = eval(fun_name) if isinstance(f, str) else f
 
-        # Remove unnecessary expressions
+        # Optimize the expression list
         exps = remove_const_exps(exps, fun_ret)
         exps = remove_unnecessary_assigns(exps)
         exps = merge_unnecessary_assigns(exps)

@@ -93,7 +93,7 @@ def compute_result_of_qcircuit(cls, qf, truth_line):
         res += "0" * (qc.num_qubits - len(res))
 
     res_str = ""
-    for qname in qf.truth_table_header()[-qf.ret_size :]:
+    for qname in qf.truth_table_header()[-qf.return_size :]:
         res_str += res[circ.qubit_map[qname]]
 
     cls.assertEqual(len(counts), 1)
@@ -154,7 +154,7 @@ def compute_result_of_originalf(cls, qf, truth_line):
     # print(args, res_original, res_original_str, truth_line)
     # print (qf.expressions)
 
-    cls.assertEqual(len(res_original_str), qf.ret_size)
+    cls.assertEqual(len(res_original_str), qf.return_size)
     return res_original_str
 
 
@@ -183,7 +183,7 @@ def compute_and_compare_results(cls, qf, test_original_f=True):
     for truth_line in truth_table:
         # Extract str of truthtable and result
         truth_str = "".join(
-            map(lambda x: "1" if x else "0", truth_line[-qf.ret_size :])
+            map(lambda x: "1" if x else "0", truth_line[-qf.return_size :])
         )
 
         # Calculate and compare the originalf result

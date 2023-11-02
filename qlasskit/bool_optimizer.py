@@ -20,8 +20,8 @@ from sympy.logic.boolalg import Boolean
 from .ast2logic import Arg, BoolExpList
 
 
-# Remove const exps
 def remove_const_exps(exps: BoolExpList, fun_ret: Arg) -> BoolExpList:
+    """Remove const exps (replace a = True, b = ~a or c with b = c)"""
     const: Dict[Symbol, Boolean] = {}
     n_exps: BoolExpList = []
     for i in range(len(exps)):
@@ -37,8 +37,8 @@ def remove_const_exps(exps: BoolExpList, fun_ret: Arg) -> BoolExpList:
     return n_exps
 
 
-# Subsitute exps (replace a = ~a, a = ~a, a = ~a => a = ~a)
 # def subsitute_exps(exps: BoolExpList, fun_ret: Arg) -> BoolExpList:
+#     """Subsitute exps (replace a = ~a, a = ~a, a = ~a => a = ~a)"""
 #     const: Dict[Symbol, Boolean] = {}
 #     n_exps: BoolExpList = []
 #     print(exps)
@@ -65,8 +65,8 @@ def remove_const_exps(exps: BoolExpList, fun_ret: Arg) -> BoolExpList:
 #     return n_exps
 
 
-# Remove exp like: __a.0 = a.0, ..., a.0 = __a.0
 def remove_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
+    """Remove exp like: __a.0 = a.0, ..., a.0 = __a.0"""
     n_exps: BoolExpList = []
 
     def should_add(s, e, n_exps2):
@@ -88,8 +88,8 @@ def remove_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
     return n_exps
 
 
-# Translate exp like: __a.0 = !a, a = __a.0 ===> a = !a
 def merge_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
+    """Translate exp like: __a.0 = !a, a = __a.0 ===> a = !a"""
     n_exps: BoolExpList = []
 
     for s, e in exps:
