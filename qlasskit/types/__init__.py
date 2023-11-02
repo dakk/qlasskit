@@ -13,7 +13,7 @@
 # limitations under the License.
 # isort:skip_file
 
-from typing import Any
+from typing import Any, get_args
 
 from sympy.logic import Not, Xor, And, Or
 
@@ -51,3 +51,16 @@ def const_to_qtype(value: Any):
         raise Exception(f"Constant value is too big: {value}")
 
     return None
+
+
+def type_repr(typ) -> str:
+    if hasattr(typ, "__name__"):
+        return typ.__name__
+    elif len(get_args(typ)) > 0:
+        args = [type_repr(a) for a in get_args(typ)]
+        if all([args[0] == a for a in args[1:]]):
+            return f"Qlist[{args[0]}, {len(args)}]"
+        else:
+            return f"Tuple[{','.join(args)}]"
+    else:
+        raise Exception(f"Unable to represent type: {typ}")

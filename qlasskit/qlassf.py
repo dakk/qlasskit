@@ -16,7 +16,7 @@ import ast
 import copy
 import inspect
 from functools import reduce
-from typing import Callable, Dict, List, Tuple, Union  # noqa: F401
+from typing import Callable, Dict, List, Tuple, Union, get_args  # noqa: F401
 
 from sympy import Symbol
 from sympy.logic.boolalg import Boolean
@@ -25,7 +25,7 @@ from .ast2ast import ast2ast
 from .ast2logic import Arg, Args, BoolExpList, LogicFun, flatten, translate_ast
 from .compiler import SupportedCompiler, to_quantum
 from .types import *  # noqa: F403, F401
-from .types import Qtype
+from .types import Qtype, type_repr
 
 MAX_TRUTH_TABLE_SIZE = 20
 
@@ -138,9 +138,9 @@ class QlassF:
         self._compiled_gate = None
 
     def __repr__(self):
-        ret_str = f"{self.returns.ttype.__name__}"
+        ret_str = type_repr(self.returns.ttype)
         arg_str = ", ".join(
-            map(lambda arg: f"{arg.name}:{arg.ttype.__name__}", self.args)
+            map(lambda arg: f"{arg.name}:{type_repr(arg.ttype)}", self.args)
         )
         exp_str = "\n\t".join(map(lambda exp: f"{exp[0]} = {exp[1]}", self.expressions))
         return f"QlassF<{self.name}>({arg_str}) -> {ret_str}:\n\t{exp_str}"

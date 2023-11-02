@@ -19,6 +19,7 @@ from sympy.logic.boolalg import BooleanFalse, BooleanTrue
 
 from ..qcircuit import QCircuit, SupportedFramework
 from ..qlassf import QlassF
+from ..types import type_repr
 
 
 def format_outcome(
@@ -68,21 +69,7 @@ class ConstantOracleException(Exception):
 
 def oraclize(qf: QlassF, element: Any, name="oracle"):
     """Transform a QlassF qf and an element to an oracle {f(x) = x == element}"""
-    if hasattr(qf.args[0].ttype, "__name__"):
-        argt_name = qf.args[0].ttype.__name__  # type: ignore
-
-        args = get_args(qf.args[0].ttype)
-        if len(args) > 0:
-            argt_name += "["
-            argt_name += ",".join([x.__name__ for x in args])
-            argt_name += "]"
-
-    elif qf.args[0].ttype == bool:
-        argt_name = "bool"
-    else:
-        argt_name = "Tuple["
-        argt_name += ",".join([x.__name__ for x in get_args(qf.args[0].ttype)])
-        argt_name += "]"
+    argt_name = type_repr(qf.args[0].ttype)
 
     if qf.name == name:
         qf.name = f"_{name}"

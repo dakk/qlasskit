@@ -107,28 +107,20 @@
 
 
 - [ ] Publish doc on github
-- [ ] Int arithmetic expressions (*, /, mod)
+- [ ] Int arithmetic expressions (*, /, %)
 - [ ] Parametrized qlassf
 - [ ] Lambda
-- [x] FixedList type
 - [ ] Builtin functions: map, count
-- [x] Ast2logic: fixed size loops unrolling
 - [ ] Builtin functions: sum(), all(), any()
 - [ ] First beta release
 
 ### Language support
 
 - [ ] Ast2logic: if-then-else statement
-- [x] Datatype: Integer
-- [x] Integer comparators
-- [x] Integer constant
-- [ ] Integer operations
-- [x] Datatype: List
 - [ ] Datatype: Dict
 - [ ] Datatype: Fixed
 - [ ] Datatype: Enum
 - [ ] While loop
-- [x] For loop
 - [ ] Recursion
 - [ ] Parameter bind
 
@@ -138,8 +130,6 @@
 
 ### Framwork support
 
-- [x] Qiskit
-- [x] QASM
 - [ ] PyQrack
 - [ ] QuTip
 - [ ] Pennylane
