@@ -19,97 +19,19 @@ from functools import reduce
 from typing import Callable, Dict, List, Tuple, Union, get_args  # noqa: F401
 
 from sympy import Symbol
-from sympy.logic.boolalg import Boolean
 
 from .ast2ast import ast2ast
 from .ast2logic import Arg, Args, BoolExpList, LogicFun, flatten, translate_ast
+from .bool_optimizer import (
+    merge_unnecessary_assigns,
+    remove_const_exps,
+    remove_unnecessary_assigns,
+)
 from .compiler import SupportedCompiler, to_quantum
 from .types import *  # noqa: F403, F401
 from .types import Qtype, type_repr
 
 MAX_TRUTH_TABLE_SIZE = 20
-
-
-# Remove const exps
-def remove_const_exps(exps: BoolExpList, fun_ret: Arg) -> BoolExpList:
-    const: Dict[Symbol, Boolean] = {}
-    n_exps: BoolExpList = []
-    for i in range(len(exps)):
-        (s, e) = exps[i]
-        e = e.subs(const)
-        if (e == False or e == True) and i < (len(exps) - len(fun_ret)):  # noqa: E712
-            const[s] = e
-        else:
-            if s in const:
-                del const[s]
-            n_exps.append((s, e))
-
-    return n_exps
-
-
-# Subsitute exps (replace a = ~a, a = ~a, a = ~a => a = ~a)
-# def subsitute_exps(exps: BoolExpList, fun_ret: Arg) -> BoolExpList:
-#     const: Dict[Symbol, Boolean] = {}
-#     n_exps: BoolExpList = []
-#     print(exps)
-
-#     for i in range(len(exps)):
-#         (s, e) = exps[i]
-#         e = e.subs(const)
-#         const[s] = e
-
-#         for x in e.free_symbols:
-#             if x in const:
-#                 n_exps.append((x, const[x]))
-#                 del const[x]
-
-#     for (s,e) in const.items():
-#         if s == e:
-#             continue
-
-#         n_exps.append((s,e))
-
-#     print(n_exps)
-#     print()
-#     print()
-#     return n_exps
-
-
-# Remove exp like: __a.0 = a.0, ..., a.0 = __a.0
-def remove_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
-    n_exps: BoolExpList = []
-
-    def should_add(s, e, n_exps2):
-        ename = f"__{s.name}"
-        if e.name == ename:
-            for s1, e1 in n_exps2[::-1]:
-                if s1.name == ename:
-                    if isinstance(e1, Symbol) and e1.name == s.name:
-                        n_exps2.remove((s1, e1))
-                        return False
-                    else:
-                        return True
-        return True
-
-    for s, e in exps:
-        if not isinstance(e, Symbol) or should_add(s, e, n_exps):
-            n_exps.append((s, e))
-
-    return n_exps
-
-
-# Translate exp like: __a.0 = !a, a = __a.0 ===> a = !a
-def merge_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
-    n_exps: BoolExpList = []
-
-    for s, e in exps:
-        if len(n_exps) >= 1 and n_exps[-1][0] == e:
-            old = n_exps.pop()
-            n_exps.append((s, old[1]))
-        else:
-            n_exps.append((s, e))
-
-    return n_exps
 
 
 class QlassF:
