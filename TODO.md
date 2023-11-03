@@ -79,11 +79,11 @@
 - [x] Groover algorithm tests 
 - [x] Slideshow for UF midterm
 - [x] Builtin functions: sum(), all(), any()
+- [x] Bool optimizers test
 
 ### Week 3: (6 Nov 23)
 
 - [ ] Midterm call
-- [ ] Bool optimizers test
 
 ### Week 4: (13 Nov 23)
 
@@ -114,7 +114,7 @@
 - [ ] Int arithmetic expressions (*, /, %)
 - [ ] Parametrized qlassf
 - [ ] Lambda
-- [ ] Builtin functions: map, count
+- [ ] Builtin function: map
 - [ ] First beta release
 
 ### Language support
@@ -133,7 +133,7 @@
 
 ### Framwork support
 
-- [ ] PyQrack
+- [ ] PyQrack (without qiskit provider)
 - [ ] QuTip
 - [ ] Pennylane
 - [ ] Cirq

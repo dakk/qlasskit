@@ -204,10 +204,10 @@ class QlassF:
         original_f = eval(fun_name) if isinstance(f, str) else f
 
         # Optimize the expression list
-        exps = remove_const_exps(exps, fun_ret)
+        exps = remove_const_exps(exps)
         exps = remove_unnecessary_assigns(exps)
         exps = merge_unnecessary_assigns(exps)
-        # exps = subsitute_exps(exps, fun_ret)
+        # exps = subsitute_exps(exps)
 
         # Return the qlassf object
         qf = QlassF(fun_name, original_f, args, fun_ret, exps)

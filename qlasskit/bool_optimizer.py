@@ -17,17 +17,17 @@ from typing import Dict
 from sympy import Symbol
 from sympy.logic.boolalg import Boolean
 
-from .ast2logic import Arg, BoolExpList
+from .ast2logic import BoolExpList
 
 
-def remove_const_exps(exps: BoolExpList, fun_ret: Arg) -> BoolExpList:
+def remove_const_exps(exps: BoolExpList) -> BoolExpList:
     """Remove const exps (replace a = True, b = ~a or c with b = c)"""
     const: Dict[Symbol, Boolean] = {}
     n_exps: BoolExpList = []
     for i in range(len(exps)):
         (s, e) = exps[i]
         e = e.subs(const)
-        if (e == False or e == True) and i < (len(exps) - len(fun_ret)):  # noqa: E712
+        if (e == False or e == True) and s.name[0:4] != "_ret":  # noqa: E712
             const[s] = e
         else:
             if s in const:
@@ -37,7 +37,7 @@ def remove_const_exps(exps: BoolExpList, fun_ret: Arg) -> BoolExpList:
     return n_exps
 
 
-# def subsitute_exps(exps: BoolExpList, fun_ret: Arg) -> BoolExpList:
+# def subsitute_exps(exps: BoolExpList) -> BoolExpList:
 #     """Subsitute exps (replace a = ~a, a = ~a, a = ~a => a = ~a)"""
 #     const: Dict[Symbol, Boolean] = {}
 #     n_exps: BoolExpList = []
@@ -72,11 +72,13 @@ def remove_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
     def should_add(s, e, n_exps2):
         ename = f"__{s.name}"
         if e.name == ename:
-            for s1, e1 in n_exps2[::-1]:
+            for s1, e1 in reversed(n_exps2):
                 if s1.name == ename:
                     if isinstance(e1, Symbol) and e1.name == s.name:
-                        n_exps2.remove((s1, e1))
-                        return False
+                        if all([s1 not in xe.free_symbols for (xs, xe) in n_exps]):
+                            n_exps2.remove((s1, e1))
+                            return False
+                        return True
                     else:
                         return True
         return True
@@ -86,6 +88,23 @@ def remove_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
             n_exps.append((s, e))
 
     return n_exps
+
+    # for s, e in exps:
+    #     n_exps2 = []
+    #     ename = f"__{s.name}"
+    #     n_exps.append((s, e))
+
+    #     for s_, e_ in reversed(n_exps):
+    #         if s_.name == ename:
+    #             continue
+    #         else:
+    #             _replaced = e_.subs(Symbol(ename), Symbol(s.name))
+    #             if s_ != _replaced:
+    #                 n_exps2.append((s_, _replaced))
+
+    #     n_exps = n_exps2[::-1]
+
+    # return n_exps
 
 
 def merge_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
