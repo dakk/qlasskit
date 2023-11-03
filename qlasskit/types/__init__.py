@@ -57,11 +57,11 @@ def type_repr(typ) -> str:
     if hasattr(typ, "__name__"):
         if len(get_args(typ)) == 0:
             return typ.__name__
-        
+
         args = [type_repr(a) for a in get_args(typ)]
         return f"{typ.__name__}[{','.join(args)}]"
-    
-    elif len(get_args(typ)) > 0: # This is for python = 3.8
+
+    elif len(get_args(typ)) > 0:  # This is for python = 3.8
         args = [type_repr(a) for a in get_args(typ)]
         if all([args[0] == a for a in args[1:]]):
             return f"Qlist[{args[0]}, {len(args)}]"

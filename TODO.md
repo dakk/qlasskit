@@ -78,6 +78,7 @@
 - [x] Fixed size list
 - [x] Groover algorithm tests 
 - [x] Slideshow for UF midterm
+- [x] Builtin functions: sum(), all(), any()
 
 ### Week 3: (6 Nov 23)
 
@@ -114,7 +115,6 @@
 - [ ] Parametrized qlassf
 - [ ] Lambda
 - [ ] Builtin functions: map, count
-- [ ] Builtin functions: sum(), all(), any()
 - [ ] First beta release
 
 ### Language support

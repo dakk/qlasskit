@@ -102,6 +102,8 @@ def merge_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
     return n_exps
 
 
-# [(h, a_list.0.0 & a_list.0.1), (h, a_list.1.0 & a_list.1.1 & h), (h, a_list.2.0 & a_list.2.1 & h), (_ret, a_list.3.0 & a_list.3.1 & h)]
+# [(h, a_list.0.0 & a_list.0.1), (h, a_list.1.0 & a_list.1.1 & h),
+# (h, a_list.2.0 & a_list.2.1 & h), (_ret, a_list.3.0 & a_list.3.1 & h)]
 # TO
-#(_ret, a_list_3_0 & a_list_3_1 & a_list_2_0 & a_list_2_1 & a_list_1_0 & a_list_1_1 & a_list_0_0 & a_list_0_1)
+# (_ret, a_list_3_0 & a_list_3_1 & a_list_2_0 & a_list_2_1 & a_list_1_0 & a_list_1_1 &
+# a_list_0_0 & a_list_0_1)

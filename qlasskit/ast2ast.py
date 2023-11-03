@@ -280,6 +280,29 @@ class ASTRewriter(ast.NodeTransformer):
 
         return iterif(args)
 
+    def __call_sum(self, node):
+        if len(node.args) == 1:
+            args = self.__unroll_arg(node.args[0])
+        else:
+            raise Exception(f"sum() takes at most 1 argument ({len(node.args)} given)")
+
+        def iterif(arg_l):
+            if len(arg_l) == 1:
+                return arg_l[0]
+            else:
+                return ast.BinOp(left=arg_l[0], op=ast.Add(), right=iterif(arg_l[1:]))
+
+        return iterif(args)
+
+    def __call_anyall(self, node):
+        if len(node.args) == 1:
+            args = self.__unroll_arg(node.args[0])
+        else:
+            raise Exception(f"any() takes exactly 1 argument ({len(node.args)} given)")
+
+        op = ast.Or() if node.func.id == "any" else ast.And()
+        return ast.BoolOp(op=op, values=args)
+
     def visit_Call(self, node):
         node.args = [self.visit(ar) for ar in node.args]
         if not hasattr(node.func, "id"):
@@ -294,6 +317,12 @@ class ASTRewriter(ast.NodeTransformer):
         elif node.func.id == "len":
             return self.__call_len(node)
 
+        elif node.func.id == "sum":
+            return self.__call_sum(node)
+
+        elif node.func.id in ["any", "all"]:
+            return self.__call_anyall(node)
+
         elif node.func.id in ["min", "max"]:
             return self.__call_minmax(node)
 
@@ -307,5 +336,4 @@ def ast2ast(a_tree):
         a_tree = IndexReplacer().visit(a_tree)
 
     a_tree = ASTRewriter().visit(a_tree)
-    # print(ast.dump(a_tree))
     return a_tree

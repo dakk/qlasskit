@@ -96,6 +96,41 @@ class TestQlassfBuiltinFunctions(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
+    def test_sum_const(self):
+        f = "def test() -> Qint2:\n\treturn sum([1,2,3])"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_sum_list(self):
+        f = "def test(a: Qlist[Qint2, 2]) -> Qint2:\n\treturn sum(a)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_sum_tuple(self):
+        f = "def test(a: Tuple[Qint2, Qint2]) -> Qint2:\n\treturn sum(a)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_any_list(self):
+        f = "def test(a: Qlist[bool, 3]) -> bool:\n\treturn any(a)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_any_const_list(self):
+        f = "def test() -> bool:\n\treturn any([True, True, False])"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_all_list(self):
+        f = "def test(a: Qlist[bool, 3]) -> bool:\n\treturn all(a)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_all_const_list(self):
+        f = "def test() -> bool:\n\treturn all([True, True, True])"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
     # TODO:
     # def test_len_of_range(self):
     #     f = "def test() -> Qint4:\n\treturn len(range(4))"

@@ -48,6 +48,7 @@ def hash(k: Qint4) -> bool:
         h = h and k[i]
     return h
 
+
 algo = Groover(hash, True)
 
 
