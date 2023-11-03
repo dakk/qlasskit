@@ -10,7 +10,6 @@ INTSIZ = 2
 def f1(b: bool, n: Qint2) -> Qint2:
     return n + (1 if b else 2)
 
-
 @qlassf
 def f_comp(b: bool, n: Qint2) -> Qint2:
     for i in range(3):

@@ -8,6 +8,10 @@ from qlasskit.algorithms import Groover
 
 def qiskit_simulate(qc):
     qc.measure_all()
+    qc.draw(
+        "mpl",
+        style={"textcolor": "#ffab40", "backgroundcolor": "black", "linecolor": "#444"},
+    )
     print(qc.draw("text"))
 
     # from pyqrack import qrack_simulator
@@ -37,6 +41,16 @@ def qiskit_simulate(qc):
 # algo = Groover(hash, True)
 
 
+@qlassf
+def hash(k: Qint4) -> bool:
+    h = True
+    for i in range(4):
+        h = h and k[i]
+    return h
+
+algo = Groover(hash, True)
+
+
 # @qlassf
 # def hash(k: Qint4) -> Qint4:
 #     def inner(q: Qint4) -> bool:
@@ -60,12 +74,12 @@ def qiskit_simulate(qc):
 # algo = Groover(hash, True)
 
 
-@qlassf
-def hash(k: Qint4) -> Qint4:
-    return (k << 1) + 2
+# @qlassf
+# def hash(k: Qint4) -> Qint4:
+#     return (k << 1) + 2
 
 
-algo = Groover(hash, Qint4(12))
+# algo = Groover(hash, Qint4(12))
 
 qc = algo.circuit().export("circuit", "qiskit")
 counts = qiskit_simulate(qc)
@@ -73,6 +87,13 @@ counts_readable = algo.interpet_counts(counts)
 plot_histogram(counts_readable)
 plt.show()
 
-
-print(hash.circuit().export("circuit", "qiskit").draw("text"))
-# plt.show()
+print(hash.expressions)
+print(
+    hash.circuit()
+    .export("circuit", "qiskit")
+    .draw(
+        "mpl",
+        style={"textcolor": "#ffab40", "backgroundcolor": "black", "linecolor": "#444"},
+    )
+)
+plt.show()

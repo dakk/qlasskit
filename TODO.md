@@ -81,6 +81,9 @@
 
 ### Week 3: (6 Nov 23)
 
+- [ ] Midterm call
+- [ ] Bool optimizers test
+
 ### Week 4: (13 Nov 23)
 
 ## Month 3:
