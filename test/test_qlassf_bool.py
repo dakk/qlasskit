@@ -184,20 +184,6 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(qf.expressions[-1][1], ITE(d & e, g, h))
         compute_and_compare_results(self, qf)
 
-    # def test_if(self):
-    #     f = (
-    #         "def test(a: bool, b: bool) -> bool:\n"
-    #         + "\td = False\n"
-    #         + "\tif a:\n"
-    #         + "\t\td = not d\n"
-    #         + "\telse:\n"
-    #         + "\t\td = True\n"
-    #         + "\treturn d"
-    #     )
-    #     qf = qlassf(f, to_compile=False)
-    #     self.assertEqual(len(qf.expressions), 2)
-    #     self.assertEqual(qf.expressions[-1][1], ITE(d & e, g, h))
-
 
 @parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfBoolBitwise(unittest.TestCase):
