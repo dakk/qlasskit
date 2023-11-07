@@ -131,6 +131,11 @@ class TestQlassfBuiltinFunctions(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
+    def test_max_in_list(self):
+        f = "def test() -> Qlist[Qint2, 3]:\n\treturn [max(0,1), max(1,2), max(2,3)]"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
     # TODO:
     # def test_len_of_range(self):
     #     f = "def test() -> Qint4:\n\treturn len(range(4))"

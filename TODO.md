@@ -148,3 +148,4 @@
 ### Experiments
 
 - [ ] Logic2FPGA backend
+- [ ] Allow quantum gates inside sympy expressions

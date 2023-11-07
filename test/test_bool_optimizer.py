@@ -61,10 +61,11 @@ class TestBoolOptimizer_remove_unnecessary_assigns(unittest.TestCase):
 
 
 @parameterized_class(
-    ("exps", "n_exps"), [
-        ([], []), 
+    ("exps", "n_exps"),
+    [
+        ([], []),
         ([(__a0, Not(a)), (a, __a0)], [(a, Not(a))]),
-    ]
+    ],
 )
 class TestBoolOptimizer_merge_unnecessary_assigns(unittest.TestCase):
     def test_merge_unnecessary_assigns(self):

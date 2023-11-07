@@ -42,7 +42,7 @@ from .qint import Qint, Qint2, Qint4, Qint8, Qint12, Qint16  # noqa: F401, E402
 BUILTIN_TYPES = [Qint2, Qint4, Qint8, Qint12, Qint16, Qlist]
 
 
-def const_to_qtype(value: Any):
+def const_to_qtype(value: Any) -> TExp:
     if isinstance(value, int):
         for det_type in [Qint2, Qint4, Qint8, Qint12, Qint16]:
             if value < 2**det_type.BIT_SIZE:
@@ -50,7 +50,7 @@ def const_to_qtype(value: Any):
 
         raise Exception(f"Constant value is too big: {value}")
 
-    return None
+    raise Exception(f"Unable to infer type of constant: {value}")
 
 
 def type_repr(typ) -> str:

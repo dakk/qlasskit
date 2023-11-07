@@ -136,7 +136,10 @@ def compute_result_of_originalf(cls, qf, truth_line):
             return "".join([res_to_str(x) for x in res])
         elif type(res) == int:
             qc = const_to_qtype(res)
-            qi = qf.returns.ttype.from_bool(qc[1])
+            try:
+                qi = qf.returns.ttype.from_bool(qc[1])
+            except:
+                qi = qc[0].from_bool(qc[1])
             return qi.to_bin()
         else:
             return res.to_bin()
