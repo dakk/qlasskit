@@ -22,8 +22,7 @@ from sympy import Symbol
 
 from .ast2ast import ast2ast
 from .ast2logic import Arg, Args, BoolExpList, LogicFun, flatten, translate_ast
-from .boolopt.bool_optimizer import bestWorkingOptimizer  # noqa: F401
-from .boolopt.bool_optimizer import experimentalOptimizer  # noqa: F401
+from .boolopt.bool_optimizer import bestWorkingOptimizer
 from .compiler import SupportedCompiler, to_quantum
 from .types import *  # noqa: F403, F401
 from .types import Qtype, type_repr
