@@ -43,120 +43,115 @@ class TestQlassfBoolean(unittest.TestCase):
     def test_bool_const(self):
         f = "def test(a: bool) -> bool:\n\tc=True\n\treturn c"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
-        # self.assertEqual(len(qf.expressions[0][0], _ret)
-        # self.assertEqual(len(qf.expressions[0][1], True)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], True)
         compute_and_compare_results(self, qf)
 
     def test_arg_identity(self):
         ex = a
         f = "def test(a: bool) -> bool:\n\treturn a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
-        # self.assertEqual(len(qf.expressions[0][0], _ret)
-        # # self.assertEqual(len(qf.expressions[0][1], ex)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], ex)
         compute_and_compare_results(self, qf)
 
     def test_not_arg(self):
         ex = Not(a)
         f = "def test(a: bool) -> bool:\n\treturn not a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
-        # self.assertEqual(len(qf.expressions[0][0], _ret)
-        # # self.assertEqual(len(qf.expressions[0][1], ex)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], ex)
         compute_and_compare_results(self, qf)
 
     def test_and(self):
         ex = And(Not(a), b)
         f = "def test(a: bool, b: bool) -> bool:\n\treturn not a and b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
-        # self.assertEqual(len(qf.expressions[0][0], _ret)
-        # # self.assertEqual(len(qf.expressions[0][1], ex)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], ex)
         compute_and_compare_results(self, qf)
 
     def test_bool_eq(self):
         f = "def test(a: bool, b: bool) -> bool:\n\treturn a == b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
-        # self.assertEqual(len(qf.expressions[0][0], _ret)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_bool_neq(self):
         f = "def test(a: bool, b: bool) -> bool:\n\treturn a != b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
-        # self.assertEqual(len(qf.expressions[0][0], _ret)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_or_not(self):
-        ex = Or(Not(a), b)
+        ex = Not(And(a, Not(b)))
         f = "def test(a: bool, b: bool) -> bool:\n\treturn not a or b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
-        # self.assertEqual(len(qf.expressions[0][0], _ret)
-        # # self.assertEqual(len(qf.expressions[0][1], ex)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], ex)
         compute_and_compare_results(self, qf)
 
     def test_multiple_arg(self):
         ex = And(a, And(Not(b), c))
         f = "def test(a: bool, b: bool, c: bool) -> bool:\n\treturn a and (not b) and c"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
-        # self.assertEqual(len(qf.expressions[0][0], _ret)
-        # # self.assertEqual(len(qf.expressions[0][1], ex)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], ex)
         compute_and_compare_results(self, qf)
 
     def test_multiple_arg2(self):
-        ex = And(a, And(Not(b), Or(a, c)))
+        ex = And(a, Not(b))
         f = "def test(a: bool, b: bool, c: bool) -> bool:\n\treturn a and (not b) and (a or c)"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
-        # self.assertEqual(len(qf.expressions[0][0], _ret)
-        # # self.assertEqual(len(qf.expressions[0][1], ex)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], ex)
         compute_and_compare_results(self, qf)
 
     def test_ifexp(self):
         ex = ITE(a, true, false)
         f = "def test(a: bool) -> bool:\n\treturn True if a else False"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
-        # self.assertEqual(len(qf.expressions[0][0], _ret)
-        # # self.assertEqual(len(qf.expressions[0][1], ex)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], ex)
         compute_and_compare_results(self, qf)
 
     def test_ifexp2(self):
         ex = ITE(And(a, And(Not(b), c)), true, false)
         f = "def test(a: bool, b: bool, c: bool) -> bool:\n\treturn True if a and (not b) and c else False"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
-        # self.assertEqual(len(qf.expressions[0][0], _ret)
-        # # self.assertEqual(len(qf.expressions[0][1], ex)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], ex)
         compute_and_compare_results(self, qf)
 
     def test_ifexp3(self):
-        exp = ITE(
-            And(a, And(Not(b), c)),
-            And(c, Not(b)),
-            And(a, Not(c)),
-        )
+        exp = And(a, Not(And(b, c)))
         f = (
             "def test(a: bool, b: bool, c: bool) -> bool:\n"
             + "\treturn (c and not b) if a and ((not b) and c) else (a and not c)"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
-        # # self.assertEqual(len(qf.expressions[0][0], _ret)
-        # # self.assertEqual(len(qf.expressions[0][1], exp)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], exp)
         compute_and_compare_results(self, qf)
 
     def test_assign(self):
         f = "def test(a: bool, b: bool) -> bool:\n\tc = a and b\n\treturn c"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        print(qf.expressions)
-        # self.assertEqual(len(qf.expressions), 1)
-        # self.assertEqual(len(qf.expressions[0][0], _ret)
-        # # self.assertEqual(len(qf.expressions[0][1], And(a, b))
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], And(a, b))
         compute_and_compare_results(self, qf)
 
     def test_assign2(self):
@@ -166,9 +161,9 @@ class TestQlassfBoolean(unittest.TestCase):
             + "\treturn True if d else False"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
-        # # self.assertEqual(len(qf.expressions[0][1], And(a, And(Not(b), c)))
-        # self.assertEqual(len(qf.expressions[0][0], _ret)
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][1], And(a, And(Not(b), c)))
+        self.assertEqual(qf.expressions[0][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_assign3(self):
@@ -181,8 +176,8 @@ class TestQlassfBoolean(unittest.TestCase):
             + "\treturn g if d and e else h"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 5)
-        # # self.assertEqual(len(qf.expressions[-1][1], ITE(d & e, g, h))
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][1], And(b, Not(a), Not(c)))
         compute_and_compare_results(self, qf)
 
 

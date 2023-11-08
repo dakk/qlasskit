@@ -29,30 +29,30 @@ class TestQlassfBuiltinFunctions(unittest.TestCase):
     def test_print_call(self):
         f = "def test(a: bool) -> bool:\n\tprint(a)\n\treturn a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(len(qf.expressions), 1)
         compute_and_compare_results(self, qf)
 
     def test_len(self):
         f = "def test(a: Tuple[bool, bool]) -> Qint2:\n\treturn len(a)"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions[0][1], False)
-        # self.assertEqual(len(qf.expressions[1][1], True)
+        self.assertEqual(qf.expressions[0][1], False)
+        self.assertEqual(qf.expressions[1][1], True)
         compute_and_compare_results(self, qf)
 
     def test_len2(self):
         f = "def test(a: Tuple[bool, bool]) -> Qint2:\n\tc=a\n\treturn len(c)"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions[-2][1], False)
-        # self.assertEqual(len(qf.expressions[-1][1], True)
+        self.assertEqual(qf.expressions[-2][1], False)
+        self.assertEqual(qf.expressions[-1][1], True)
         compute_and_compare_results(self, qf)
 
     def test_len4(self):
         f = "def test(a: Tuple[bool, bool, bool, bool]) -> Qint4:\n\treturn len(a)"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions[0][1], False)
-        # self.assertEqual(len(qf.expressions[1][1], False)
-        # self.assertEqual(len(qf.expressions[2][1], True)
-        # self.assertEqual(len(qf.expressions[3][1], False)
+        self.assertEqual(qf.expressions[0][1], False)
+        self.assertEqual(qf.expressions[1][1], False)
+        self.assertEqual(qf.expressions[2][1], True)
+        self.assertEqual(qf.expressions[3][1], False)
         compute_and_compare_results(self, qf)
 
     def test_min(self):

@@ -15,7 +15,7 @@
 from typing import Dict
 
 from sympy import Symbol
-from sympy.logic.boolalg import Boolean, simplify_logic
+from sympy.logic.boolalg import Boolean, simplify_logic, to_anf
 
 from ..ast2logic import BoolExpList
 
@@ -35,34 +35,6 @@ def remove_const_exps(exps: BoolExpList) -> BoolExpList:
             n_exps.append((s, e))
 
     return n_exps
-
-
-# def subsitute_exps(exps: BoolExpList) -> BoolExpList:
-#     """Subsitute exps (replace a = ~a, a = ~a, a = ~a => a = ~a)"""
-#     const: Dict[Symbol, Boolean] = {}
-#     n_exps: BoolExpList = []
-#     print(exps)
-
-#     for i in range(len(exps)):
-#         (s, e) = exps[i]
-#         e = e.subs(const)
-#         const[s] = e
-
-#         for x in e.free_symbols:
-#             if x in const:
-#                 n_exps.append((x, const[x]))
-#                 del const[x]
-
-#     for (s,e) in const.items():
-#         if s == e:
-#             continue
-
-#         n_exps.append((s,e))
-
-#     print(n_exps)
-#     print()
-#     print()
-#     return n_exps
 
 
 def remove_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
@@ -88,23 +60,6 @@ def remove_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
             n_exps.append((s, e))
 
     return n_exps
-
-    # for s, e in exps:
-    #     n_exps2 = []
-    #     ename = f"__{s.name}"
-    #     n_exps.append((s, e))
-
-    #     for s_, e_ in reversed(n_exps):
-    #         if s_.name == ename:
-    #             continue
-    #         else:
-    #             _replaced = e_.subs(Symbol(ename), Symbol(s.name))
-    #             if s_ != _replaced:
-    #                 n_exps2.append((s_, _replaced))
-
-    #     n_exps = n_exps2[::-1]
-
-    # return n_exps
 
 
 def merge_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
@@ -185,8 +140,5 @@ def exps_simplify(exps: BoolExpList) -> BoolExpList:
     return list(map(lambda e: (e[0], simplify_logic(e[1])), exps))
 
 
-# [(h, a_list.0.0 & a_list.0.1), (h, a_list.1.0 & a_list.1.1 & h),
-# (h, a_list.2.0 & a_list.2.1 & h), (_ret, a_list.3.0 & a_list.3.1 & h)]
-# TO
-# (_ret, a_list_3_0 & a_list_3_1 & a_list_2_0 & a_list_2_1 & a_list_1_0 & a_list_1_1 &
-# a_list_0_0 & a_list_0_1)
+def exps_to_anf(exps: BoolExpList) -> BoolExpList:
+    return list(map(lambda e: (e[0], to_anf(e[1])), exps))

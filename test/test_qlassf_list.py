@@ -41,9 +41,9 @@ class TestQlassfList(unittest.TestCase):
     def test_list(self):
         f = "def test(a: Qlist[bool, 2]) -> bool:\n\treturn a[0] and a[1]"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        # self.assertEqual(len(qf.expressions), 1)
-        # self.assertEqual(len(qf.expressions[0][0], _ret)
-        # self.assertEqual(len(qf.expressions[0][1], And(a_0, a_1))
+        self.assertEqual(len(qf.expressions), 1)
+        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[0][1], And(a_0, a_1))
         compute_and_compare_results(self, qf)
 
     def test_list_item_swap(self):
