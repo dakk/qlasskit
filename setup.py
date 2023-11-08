@@ -12,6 +12,7 @@ setup(
     author_email="gessadavide@gmail.com",
     packages=[
         "qlasskit",
+        "qlasskit.boolopt",
         "qlasskit.types",
         "qlasskit.ast2logic",
         "qlasskit.qcircuit",

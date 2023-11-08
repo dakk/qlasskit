@@ -11,24 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# isort:skip_file
 
-from .. import QCircuit
-from ..ast2logic.typing import Arg, Args, BoolExpList
-
-
-class CompilerException(Exception):
-    pass
-
-
-class Compiler:
-    def __init__(self):
-        pass
-
-    def _symplify_exp(self, exp):
-        # exp = to_anf(exp, deep=False)
-        return exp
-
-    def compile(
-        self, name: str, args: Args, returns: Arg, expr: BoolExpList
-    ) -> QCircuit:
-        raise Exception("abstract")
+from .sympytransformer import SympyTransformer  # noqa: F401

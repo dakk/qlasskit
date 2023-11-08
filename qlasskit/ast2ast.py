@@ -403,4 +403,5 @@ def ast2ast(a_tree):
         a_tree = IndexReplacer().visit(a_tree)
 
     a_tree = ASTRewriter().visit(a_tree)
+    # print(ast.dump(a_tree))
     return a_tree

@@ -15,9 +15,16 @@
 from typing import Dict
 
 from sympy import Symbol
-from sympy.logic.boolalg import Boolean
+from sympy.logic.boolalg import Boolean, simplify_logic
 
-from .ast2logic import BoolExpList
+from ..ast2logic import BoolExpList
+from . import SympyTransformer
+from .exp_transformers import (
+    remove_Implies,
+    remove_ITE,
+    transform_or2and,
+    transform_or2xor,
+)
 
 
 def remove_const_exps(exps: BoolExpList) -> BoolExpList:
@@ -110,15 +117,79 @@ def remove_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
 def merge_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
     """Translate exp like: __a.0 = !a, a = __a.0 ===> a = !a"""
     n_exps: BoolExpList = []
+    rep_d = {}
 
     for s, e in exps:
-        if len(n_exps) >= 1 and n_exps[-1][0] == e:
+        if len(n_exps) >= 1 and n_exps[-1][0] == e:  # and n_exps[-1][0].name[2:] == s:
             old = n_exps.pop()
-            n_exps.append((s, old[1]))
+            rep_d[old[0]] = old[1]
+            n_exps.append((s, e.subs(rep_d)))
         else:
+            n_exps.append((s, e.subs(rep_d)))
+
+    return n_exps
+
+
+def remove_unnecessary_aliases(exps: BoolExpList) -> BoolExpList:
+    """Translate exps like: (__d.0, a), (d.0, __d.0 & a) to => (d.0, a & a)"""
+    n_exps: BoolExpList = []
+    rep_d = {}
+
+    for s, e in exps:
+        if len(n_exps) >= 1 and n_exps[-1][0] in e.free_symbols:
+            old = n_exps.pop()
+            rep_d[old[0]] = old[1]
+            n_exps.append((s, e.subs(rep_d)))
+        else:
+            n_exps.append((s, e.subs(rep_d)))
+
+    return n_exps
+
+
+def remove_aliases(exps: BoolExpList) -> BoolExpList:
+    aliases = {}
+    n_exps = []
+    for s, e in exps:
+        if isinstance(e, Symbol):
+            aliases[s] = e
+        elif s in aliases:
+            del aliases[s]
+            n_exps.append((s, e.subs(aliases)))
+        else:
+            n_exps.append((s, e.subs(aliases)))
+
+    return n_exps
+
+
+def s2_mega(exps: BoolExpList) -> BoolExpList:
+    n_exps: BoolExpList = []
+    exp_d = {}
+
+    for s, e in exps:
+        exp_d[s] = e
+        n_exps.append((s, e.subs(exp_d)))
+
+    s_count = {}
+    exps = n_exps
+
+    for s, e in exps:
+        if s.name not in s_count:
+            s_count[s.name] = 0
+
+        for x in e.free_symbols:
+            if x.name in s_count:
+                s_count[x.name] += 1
+
+    n_exps = []
+    for s, e in exps:
+        if s_count[s.name] > 0 or s.name[0:4] == "_ret":
             n_exps.append((s, e))
 
     return n_exps
+
+
+def exps_simplify(exps: BoolExpList) -> BoolExpList:
+    return list(map(lambda e: (e[0], simplify_logic(e[1])), exps))
 
 
 # [(h, a_list.0.0 & a_list.0.1), (h, a_list.1.0 & a_list.1.1 & h),
@@ -126,3 +197,43 @@ def merge_unnecessary_assigns(exps: BoolExpList) -> BoolExpList:
 # TO
 # (_ret, a_list_3_0 & a_list_3_1 & a_list_2_0 & a_list_2_1 & a_list_1_0 & a_list_1_1 &
 # a_list_0_0 & a_list_0_1)
+
+
+class BoolOptimizerProfile:
+    def __init__(self, steps):
+        self.steps = steps
+
+    def apply(self, exps):
+        for opt in self.steps:
+            if isinstance(opt, SympyTransformer):
+                exps = list(map(lambda e: (e[0], opt.visit(e[1])), exps))
+            else:
+                exps = opt(exps)
+        return exps
+
+
+bestWorkingOptimizer = BoolOptimizerProfile(
+    [
+        remove_const_exps,
+        remove_unnecessary_assigns,
+        merge_unnecessary_assigns,
+        remove_ITE(),
+        remove_Implies(),
+        transform_or2xor(),
+        transform_or2and(),
+    ]
+)
+
+
+experimentalOptimizer = BoolOptimizerProfile(
+    [
+        remove_const_exps,
+        remove_unnecessary_assigns,
+        merge_unnecessary_assigns,
+        # remove_unnecessary_aliases,
+        # s2_mega,
+        # subsitute_exps,
+        # exps_simplify,
+        # remove_aliases,
+    ]
+)

@@ -101,7 +101,7 @@ def compute_result_of_qcircuit(cls, qf, truth_line):
     max_qubits = (
         qf.input_size
         + len(qf.expressions)
-        + sum([gateinputcount(compiler.optimizer(e[1])) for e in qf.expressions])
+        + sum([gateinputcount(e[1]) for e in qf.expressions])
     )
 
     cls.assertLessEqual(qf.gate().num_qubits, max_qubits)
