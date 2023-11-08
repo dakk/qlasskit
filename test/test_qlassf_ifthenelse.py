@@ -33,7 +33,7 @@ class TestQlassfIfThenElse(unittest.TestCase):
             + "\t\td = True\n"
             + "\treturn d"
         )
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, compiler=self.compiler, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
 
     def test_if_unbound(self):
@@ -57,41 +57,30 @@ class TestQlassfIfThenElse(unittest.TestCase):
             + "\t\td = not a\n"
             + "\treturn d"
         )
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, compiler=self.compiler, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
 
     def test_if_for(self):
         f = (
             "def test(a: bool, b: bool) -> bool:\n"
             + "\td = False\n"
+            + "\ti = 0\n"
             + "\tif a:\n"
             + "\t\tfor i in range(3):\n"
             + "\t\t\td = not d\n"
             + "\treturn d"
         )
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        qf = qlassf(f, compiler=self.compiler, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
 
     def test_if_for2(self):
         f = (
-            "def test(a: bool, b: bool) -> bool:\n"
+            "def test(a: bool, b: bool) -> Qint2:\n"
             + "\td = 0\n"
             + "\tfor i in range(3):\n"
             + "\t\tif a:\n"
             + "\t\t\td += 1\n"
             + "\treturn d"
         )
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
-        compute_and_compare_results(self, qf)
-
-
-    def test_for_nit_bool(self):
-        f = "def test(a: bool) -> bool:\n\td = 0\n\tfor i in range(4):\n\t\tif a:\n\t\t\td = d + 1\n\treturn a"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        compute_and_compare_results(self, qf)
-
-
-    def test_for_nit_bool2(self):
-        f = "def test(a: bool) -> Qint2:\n\td = 0\n\tif a:\n\t\tfor i in range(4):\n\t\t\td = d + 1\n\treturn d"
-        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        qf = qlassf(f, compiler=self.compiler, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)

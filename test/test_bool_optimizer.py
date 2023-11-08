@@ -18,7 +18,7 @@ from parameterized import parameterized_class
 from sympy import And, Not, Or, Symbol, symbols
 from sympy.logic.boolalg import BooleanTrue
 
-from qlasskit import bool_optimizer
+from qlasskit.boolopt import bool_optimizer
 
 a, b, c, d = symbols("a,b,c,d")
 __a0 = Symbol("__a.0")
