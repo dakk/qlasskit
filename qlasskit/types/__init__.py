@@ -13,7 +13,7 @@
 # limitations under the License.
 # isort:skip_file
 
-from typing import Any, get_args
+from typing import Any, List, Union, Optional, get_args
 
 from sympy.logic import Not, Xor, And, Or
 
@@ -69,3 +69,44 @@ def type_repr(typ) -> str:
             return f"Tuple[{','.join(args)}]"
     else:
         raise Exception(f"Unable to represent type: {typ}")
+
+
+def format_outcome(
+    out: Union[str, int, List[bool]], out_len: Optional[int] = None
+) -> List[bool]:
+    if isinstance(out, str):
+        return format_outcome([True if c == "1" else False for c in out], out_len)
+    elif isinstance(out, int):
+        return format_outcome(str(bin(out))[2:], out_len)
+    elif isinstance(out, List):
+        if out_len is None:
+            out_len = len(out)
+
+        if len(out) < out_len:
+            out += [False] * (out_len - len(out))
+
+        return out
+    raise Exception(f"Invalid format: {out}")
+
+
+def interpret_as_qtype(
+    out: Union[str, int, List[bool]], qtype, out_len: Optional[int] = None
+) -> Any:
+    out = list(reversed(format_outcome(out, out_len)))
+
+    def _interpret(out, qtype, out_len):
+        if hasattr(qtype, "from_bool"):
+            return qtype.from_bool(out[0:out_len])  # type: ignore
+        elif qtype == bool:
+            return out[0]
+        else:  # Tuple
+            idx_s = 0
+            values = []
+            for x in get_args(qtype):
+                len_a = x.BIT_SIZE if hasattr(x, "BIT_SIZE") else 1
+                values.append(_interpret(out[idx_s : idx_s + len_a], x, len_a))
+                idx_s += len_a
+
+            return tuple(values)
+
+    return _interpret(out, qtype, out_len)

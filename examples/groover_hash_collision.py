@@ -84,7 +84,7 @@ algo = Groover(hash, True)
 
 qc = algo.circuit().export("circuit", "qiskit")
 counts = qiskit_simulate(qc)
-counts_readable = algo.interpet_counts(counts)
+counts_readable = algo.decode_counts(counts)
 plot_histogram(counts_readable)
 plt.show()
 

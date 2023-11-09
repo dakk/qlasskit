@@ -24,23 +24,21 @@ def f_comp(n: Qint4) -> bool:
 
 
 print(f_comp.expressions)
-gate = f_comp.gate()
-qc = QuantumCircuit(gate.num_qubits)
+qc = QuantumCircuit(f_comp.num_qubits)
 qc.barrier(label="f_comp")
-qc.append(gate, list(range(gate.num_qubits)))
+qc.append(f_comp.gate(), f_comp.qubits)
 print(qc.decompose().draw("text"))
 print(qc.decompose().count_ops())
 
-
-gate1 = f1.gate()
-gate2 = f2.gate()
-gate3 = f3.gate()
 qc = QuantumCircuit(12)
 qc.barrier(label="=")
-qc.append(gate1, [0, 1, 2, 3, 4, 5])
+qc.append(f1.gate(), f1.qubits)
+
 qc.barrier(label=">")
-qc.append(gate2, [0, 1, 2, 3, 6, 7, 8, 9])
+qc.append(f2.gate(), f2.qubits)
+
 qc.barrier(label="|")
-qc.append(gate3, [5, 7, 9, 10, 11])
+qc.append(f3.gate(), g3.qubits)
+
 print(qc.decompose().draw("text"))
 print(qc.decompose().count_ops())

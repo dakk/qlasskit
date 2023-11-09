@@ -19,63 +19,10 @@ from parameterized import parameterized_class
 from sympy import And, Not, Symbol
 
 from qlasskit import Qint2, Qint4, Qlist, qlassf
-from qlasskit.algorithms import (
-    ConstantOracleException,
-    QAlgorithm,
-    format_outcome,
-    interpret_as_qtype,
-    oraclize,
-)
+from qlasskit.algorithms import ConstantOracleException, QAlgorithm, oraclize
+from qlasskit.types import format_outcome, interpret_as_qtype
 
 from .utils import ENABLED_COMPILERS
-
-
-class TestAlgo_format_outcome(unittest.TestCase):
-    def test_format_outcome_str(self):
-        out = "1011"
-        self.assertEqual(format_outcome(out), [True, False, True, True])
-
-    def test_format_outcome_str_with_out_len(self):
-        out = "1011"
-        self.assertEqual(format_outcome(out, 5), [True, False, True, True, False])
-
-    def test_format_outcome_int(self):
-        out = 15
-        self.assertEqual(format_outcome(out), [True, True, True, True])
-
-    def test_format_outcome_int_with_out_len(self):
-        out = 15
-        self.assertEqual(format_outcome(out, 5), [True, True, True, True, False])
-
-    def test_format_outcome_bool(self):
-        out = [True, True]
-        self.assertEqual(format_outcome(out), [True, True])
-
-    def test_format_outcome_bool_with_out_len(self):
-        out = [True, True]
-        self.assertEqual(format_outcome(out, 3), [True, True, False])
-
-
-class TestAlgo_interpret_as_type(unittest.TestCase):
-    def test_interpret_bool(self):
-        _out = interpret_as_qtype([False, True], bool, 1)
-        self.assertEqual(_out, True)
-
-    def test_interpret_qint2(self):
-        _out = interpret_as_qtype([False, True], Qint2, 2)
-        self.assertEqual(_out, 1)
-
-    def test_interpret_qint4(self):
-        _out = interpret_as_qtype([True, True, True, False], Qint4, 4)
-        self.assertEqual(_out, 14)
-
-    def test_interpret_qlist_bool_3(self):
-        _out = list(interpret_as_qtype([True, True, False], Qlist[bool, 3], 3))
-        self.assertEqual(_out, [False, True, True])
-
-    def test_interpret_tuple_bool(self):
-        _out = interpret_as_qtype([True, True, False], Tuple[bool, bool, bool], 3)
-        self.assertEqual(_out, (False, True, True))
 
 
 class QT(QAlgorithm):
@@ -83,19 +30,19 @@ class QT(QAlgorithm):
         self.tt = tt
         self.ll = ll
 
-    def interpret_outcome(self, oc):
+    def decode_output(self, oc):
         return interpret_as_qtype(oc, self.tt, self.ll)
 
 
 class TestAlgo_interpret_counts(unittest.TestCase):
     def test_interpret_counts(self):
         q = QT(bool, 1)
-        c = q.interpet_counts({"010": 3, "110": 2, "111": 1})
+        c = q.decode_counts({"010": 3, "110": 2, "111": 1})
         self.assertEqual(c, {False: 5, True: 1})
 
     def test_interpret_counts2(self):
         q = QT(Tuple[bool, bool], 2)
-        c = q.interpet_counts({"010": 3, "110": 2, "111": 1})
+        c = q.decode_counts({"010": 3, "110": 2, "111": 1})
         self.assertEqual(c, {(False, True): 5, (True, True): 1})
 
 

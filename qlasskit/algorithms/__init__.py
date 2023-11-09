@@ -15,8 +15,6 @@
 
 from .qalgorithm import (  # noqa: F401, E402
     QAlgorithm,
-    format_outcome,
-    interpret_as_qtype,
     oraclize,
     ConstantOracleException,
 )

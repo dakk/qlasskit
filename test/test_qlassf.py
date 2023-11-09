@@ -16,7 +16,7 @@ import unittest
 
 from parameterized import parameterized_class
 
-from qlasskit import Qint, Qint4, Qint12, QlassF, exceptions, qlassf
+from qlasskit import Qint, Qint4, Qint12, Qint2, QlassF, exceptions, qlassf
 
 from . import utils
 from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
@@ -48,6 +48,42 @@ class TestQlassfCustomTypes(unittest.TestCase):
             utils.test_qint3,
         )
 
+class TestQlassfEncodeInputDecodeOutput(unittest.TestCase):
+    def test_encode_decode_bool(self):
+        f = "def test(a: bool) -> bool:\n\treturn not a"
+        qf = qlassf(f, to_compile=False)
+        self.assertEqual(qf.encode_input(True), '1')
+        self.assertEqual(qf.decode_output('1'), True)
+        
+        self.assertEqual(qf.encode_input(False), '0')
+        self.assertEqual(qf.decode_output('0'), False)
+        
+    def test_encode_decode_qint(self):
+        f = "def test(a: Qint2) -> Qint2:\n\treturn a"
+        qf = qlassf(f, to_compile=False)
+        self.assertEqual(qf.encode_input(Qint2(2)), '01')
+        self.assertEqual(qf.decode_output('01'), Qint2(2))
+                
+        self.assertEqual(qf.encode_input(Qint2(0)), '00')
+        self.assertEqual(qf.decode_output('00'), Qint2(0))
+        
+    def test_encode_decode_tuple(self):
+        f = "def test(a: Tuple[Qint2, bool]) -> Tuple[Qint2, bool]:\n\treturn a"
+        qf = qlassf(f, to_compile=False)
+        self.assertEqual(qf.encode_input((Qint2(2), False)), '010')
+        self.assertEqual(qf.decode_output('010'), (Qint2(2), False))
+        
+        self.assertEqual(qf.encode_input((Qint2(0), True)), '001')
+        self.assertEqual(qf.decode_output('001'), (Qint2(0), True))
+        
+    def test_encode_decode_tuple2(self):
+        f = "def test(a: Tuple[Qint2, Qint4]) -> Tuple[Qint2, Qint4]:\n\treturn a"
+        qf = qlassf(f, to_compile=False)
+        self.assertEqual(qf.encode_input((Qint2(2), Qint4(3))), '011100')
+        self.assertEqual(qf.decode_output('011100'), (Qint2(2), Qint4(3)))
+        
+        self.assertEqual(qf.encode_input((Qint2(0), Qint4(2))), '000100')
+        self.assertEqual(qf.decode_output('000100'), (Qint2(0), Qint4(2)))
 
 class TestQlassfTruthTable(unittest.TestCase):
     def test_not_truth(self):

@@ -20,10 +20,9 @@ def f_comp(b: bool, n: Qint2) -> Qint2:
 
 print(f_comp.expressions)
 f_comp.compile("tweedledum")
-gate = f_comp.gate()
-qc = QuantumCircuit(gate.num_qubits)
+qc = QuantumCircuit(f_comp.num_qubits)
 qc.barrier(label="f_comp")
-qc.append(gate, list(range(gate.num_qubits)))
+qc.append(f_comp.gate(), f_comp.qubits)
 print(qc.decompose().draw("text"))
 print(qc.decompose().count_ops())
 
@@ -35,12 +34,11 @@ print(
 )
 
 f1.compile("tweedledum")
-gate1 = f1.gate()
-qc = QuantumCircuit(gate.num_qubits * 2)
+qc = QuantumCircuit(f_comp.num_qubits * 2)
 
 for i in range(3):
     qc.barrier(label=f"it_{i}")
-    qc.append(gate1, [0] + list(range(1 + i * INTSIZ, 1 + i * INTSIZ + INTSIZ * 2)))
+    qc.append(f1.gate(), [0] + list(range(1 + i * INTSIZ, 1 + i * INTSIZ + INTSIZ * 2)))
 
 print(qc.decompose().draw("text"))
 print(qc.decompose().count_ops())

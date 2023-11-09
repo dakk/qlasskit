@@ -24,14 +24,15 @@ from .ast2ast import ast2ast
 from .ast2logic import Arg, Args, BoolExpList, LogicFun, flatten, translate_ast
 from .boolopt import BoolOptimizerProfile, bestWorkingOptimizer
 from .compiler import SupportedCompiler, to_quantum
+from .qcircuit import QCircuitWrapper
 from .types import *  # noqa: F403, F401
-from .types import Qtype, type_repr
+from .types import Qtype, interpret_as_qtype, type_repr
 
 MAX_TRUTH_TABLE_SIZE = 20
 
 
-class QlassF:
-    """Class representing a quantum classical circuit"""
+class QlassF(QCircuitWrapper):
+    """Class representing a qlassf function"""
 
     name: str
     original_f: Callable
@@ -53,8 +54,6 @@ class QlassF:
         self.returns = returns
         self.expressions = exps
 
-        self._compiled_gate = None
-
     def __repr__(self):
         ret_str = type_repr(self.returns.ttype)
         arg_str = ", ".join(
@@ -63,9 +62,48 @@ class QlassF:
         exp_str = "\n\t".join(map(lambda exp: f"{exp[0]} = {exp[1]}", self.expressions))
         return f"QlassF<{self.name}>({arg_str}) -> {ret_str}:\n\t{exp_str}"
 
+    # @ovveride
     @property
-    def return_size(self):
+    def output_size(self):
+        """Return the size of the return type (in bits)"""
         return len(self.returns)
+
+    # @ovveride
+    @property
+    def input_qubits(self) -> List[int]:
+        """Returns the list of input qubits"""
+        return list(range(reduce(lambda a, b: a + len(b), self.args, 0)))
+
+    # @ovveride
+    @property
+    def output_qubits(self) -> List[int]:
+        """Returns the list of output qubits"""
+        return [self._qcircuit.qubit_map[i] for i in self.returns.bitvec]
+
+    # @ovveride
+    def encode_input(self, *qvals):
+        def val_to_bin(argt, val):
+            if argt == bool:
+                return "1" if val else "0"
+            elif inspect.isclass(argt) and issubclass(argt, Qtype):
+                return val.to_bin()
+            else:  # A tuple
+                al = ""
+                for a, i in zip(get_args(argt), val):
+                    v = val_to_bin(a, i)
+                    al += v
+                return al
+
+        vl = ""
+        for arg, val in zip(self.args, qvals):
+            vl += val_to_bin(arg.ttype, val)
+        return vl
+
+    # @ovveride
+    def decode_output(
+        self, istr: Union[str, int, List[bool]]
+    ) -> Union[bool, Tuple, Qtype]:
+        return interpret_as_qtype(istr[::-1], self.returns.ttype, len(self.returns))
 
     def __add__(self, qf2) -> "QlassF":
         """Adds two qlassf and return the combination f + g = f(g())"""
@@ -75,7 +113,7 @@ class QlassF:
         """Returns the list of string containing the truth table header"""
         header = flatten(list(map(lambda a: a.bitvec, self.args)))
         header.extend(
-            [sym.name for (sym, retex) in self.expressions[-self.return_size :]]
+            [sym.name for (sym, retex) in self.expressions[-self.output_size :]]
         )
         return header
 
@@ -89,9 +127,9 @@ class QlassF:
         arg_bits = flatten(list(map(lambda a: a.bitvec, self.args)))
         bits = len(arg_bits)
 
-        if not max and (bits + self.return_size) > MAX_TRUTH_TABLE_SIZE:
+        if not max and (bits + self.output_size) > MAX_TRUTH_TABLE_SIZE:
             raise Exception(
-                f"Max truth table size reached: {bits + self.return_size} > {MAX_TRUTH_TABLE_SIZE}"
+                f"Max truth table size reached: {bits + self.output_size} > {MAX_TRUTH_TABLE_SIZE}"
             )
 
         for i in range(
@@ -110,57 +148,20 @@ class QlassF:
                     (ename.name if isinstance(ename, Symbol) else ename, exp_sub)
                 )
 
-            res = list(zip(arg_bits, bin_arr)) + known[-self.return_size :]
+            res = list(zip(arg_bits, bin_arr)) + known[-self.output_size :]
             res_clean = list(map(lambda y: y[1], res))
             truth.append(res_clean)
 
         return truth
 
     def compile(self, compiler: SupportedCompiler = "internal"):
-        self._compiled_gate = to_quantum(
+        self._qcircuit = to_quantum(
             name=self.name,
             args=self.args,
             returns=self.returns,
             exprs=self.expressions,
             compiler=compiler,
         )
-
-    def circuit(self):
-        if self._compiled_gate is None:
-            raise Exception("Not yet compiled")
-        return self._compiled_gate
-
-    def gate(self, framework="qiskit"):
-        """Returns the gate for a specific framework"""
-        if self._compiled_gate is None:
-            raise Exception("Not yet compiled")
-
-        return self._compiled_gate.export(mode="gate", framework=framework)
-
-    # def qubits(self, index=0):
-    #     """List of qubits of the gate"""
-    #     if self._compiled_gate is None:
-    #         raise Exception("Not yet compiled")
-    #     return self._compiled_gate.qubit_map.values()
-
-    # @property
-    # def res_qubits(self) -> List[int]:
-    #     """Return the qubits holding the result"""
-    #     if self._compiled_gate is None:
-    #         raise Exception("Not yet compiled")
-    #     return [self._compiled_gate.res_qubit]
-
-    @property
-    def input_size(self) -> int:
-        """Return the size of the inputs (in bits)"""
-        return reduce(lambda a, b: a + len(b), self.args, 0)
-
-    @property
-    def num_qubits(self) -> int:
-        """Return the number of qubits"""
-        if self._compiled_gate is None:
-            raise Exception("Not yet compiled")
-        return self._compiled_gate.num_qubits
 
     def bind(self, **kwargs) -> "QlassF":
         """Returns a new QlassF with defined params"""

@@ -62,6 +62,7 @@ def update_statistics(q, g):
         statistics["gates"] += g
         f = open(".t_statistics", "w")
         f.write(json.dumps(old_statistics + [statistics], indent=4))
+        f.close()
 
 
 def inject_parameterized_compilers(params):
@@ -99,7 +100,7 @@ def compute_result_of_qcircuit(cls, qf, truth_line):
     gate = qf.gate()
     qc = QuantumCircuit(gate.num_qubits)
 
-    update_statistics(circ.num_qubits, circ.num_gates)
+    # update_statistics(circ.num_qubits, circ.num_gates)
 
     # Prepare inputs
     [qc.initialize(1 if truth_line[i] else 0, i) for i in range(qf.input_size)]
@@ -117,7 +118,7 @@ def compute_result_of_qcircuit(cls, qf, truth_line):
         res += "0" * (qc.num_qubits - len(res))
 
     res_str = ""
-    for qname in qf.truth_table_header()[-qf.return_size :]:
+    for qname in qf.truth_table_header()[-qf.output_size :]:
         res_str += res[circ.qubit_map[qname]]
 
     cls.assertEqual(len(counts), 1)
@@ -181,7 +182,7 @@ def compute_result_of_originalf(cls, qf, truth_line):
     # print(args, res_original, res_original_str, truth_line)
     # print (qf.expressions)
 
-    cls.assertEqual(len(res_original_str), qf.return_size)
+    cls.assertEqual(len(res_original_str), qf.output_size)
     return res_original_str
 
 
@@ -210,7 +211,7 @@ def compute_and_compare_results(cls, qf, test_original_f=True):
     for truth_line in truth_table:
         # Extract str of truthtable and result
         truth_str = "".join(
-            map(lambda x: "1" if x else "0", truth_line[-qf.return_size :])
+            map(lambda x: "1" if x else "0", truth_line[-qf.output_size :])
         )
 
         # Calculate and compare the originalf result

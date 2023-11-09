@@ -17,8 +17,8 @@ from typing import List, Optional, Tuple, Union
 
 from ..qcircuit import QCircuit, gates
 from ..qlassf import QlassF
-from ..types import Qtype
-from .qalgorithm import QAlgorithm, interpret_as_qtype, oraclize
+from ..types import Qtype, interpret_as_qtype
+from .qalgorithm import QAlgorithm, oraclize
 
 
 class Groover(QAlgorithm):
@@ -48,12 +48,12 @@ class Groover(QAlgorithm):
 
         self.n_iterations = n_iterations
 
-        self.qc = QCircuit(self.search_space_size)
+        self._qcircuit = QCircuit(self.search_space_size)
 
         # State preparation
-        self.qc.barrier(label="s")
+        self._qcircuit.barrier(label="s")
         for i in range(self.search_space_size):
-            self.qc.h(i)
+            self._qcircuit.h(i)
 
         # Prepare and add the quantum oracle
         if element_to_search is not None:
@@ -87,28 +87,29 @@ class Groover(QAlgorithm):
 
         # Apply for n_iterations
         [
-            self.qc.add_qubit()
+            self._qcircuit.add_qubit()
             for i in range(oracle_qc.num_qubits - self.search_space_size)
         ]
-        self.qc.h(oracle_qc["_ret_phased"])
+        self._qcircuit.h(oracle_qc["_ret_phased"])
 
         for i in range(n_iterations):
-            self.qc.barrier(label=f"g{i}")
-            self.qc += oracle_qc.copy()
+            self._qcircuit.barrier(label=f"g{i}")
+            self._qcircuit += oracle_qc.copy()
 
-            self.qc.barrier()
-            self.qc += diffuser_qc.copy()
+            self._qcircuit.barrier()
+            self._qcircuit += diffuser_qc.copy()
 
-    def circuit(self) -> QCircuit:
-        return self.qc
-
-    def out_qubits(self) -> List[int]:
+    # @override
+    @property
+    def output_qubits(self) -> List[int]:
+        """Returns the list of output qubits"""
         len_a = len(self.oracle.args[0])
         return list(range(len_a))
 
-    def interpret_outcome(
-        self, outcome: Union[str, int, List[bool]]
+    # @override
+    def decode_output(
+        self, istr: Union[str, int, List[bool]]
     ) -> Union[bool, Tuple, Qtype]:
         return interpret_as_qtype(
-            outcome, self.oracle.args[0].ttype, len(self.oracle.args[0])
+            istr, self.oracle.args[0].ttype, len(self.oracle.args[0])
         )

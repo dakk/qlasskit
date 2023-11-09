@@ -21,3 +21,4 @@ SupportedFrameworks = list(get_args(SupportedFramework))
 from . import gates  # noqa: F401, E402
 from .qcircuit import QCircuit  # noqa: F401, E402
 from .qcircuitenhanced import QCircuitEnhanced  # noqa: F401, E402
+from .qcircuitwrapper import QCircuitWrapper, reindex  # noqa: F401, E402

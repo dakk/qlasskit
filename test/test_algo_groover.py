@@ -34,10 +34,10 @@ def hash(k: Qint4) -> bool:
 
         qc = algo.circuit().export("circuit", "qiskit")
         counts = qiskit_measure_and_count(qc, shots=1024)
-        counts_readable = algo.interpet_counts(counts)
+        counts_readable = algo.decode_counts(counts)
 
         self.assertEqual(15 in counts_readable, True)
-        self.assertEqual(algo.out_qubits(), [0, 1, 2, 3])
+        self.assertEqual(algo.output_qubits, [0, 1, 2, 3])
         self.assertEqual(counts_readable[15] > 600, True)
 
     def test_groover_without_element_to_search(self):
@@ -53,7 +53,7 @@ def hash(k: Qint4) -> bool:
 
         qc = algo.circuit().export("circuit", "qiskit")
         counts = qiskit_measure_and_count(qc, shots=1024)
-        counts_readable = algo.interpet_counts(counts)
+        counts_readable = algo.decode_counts(counts)
 
         self.assertEqual(15 in counts_readable, True)
         self.assertEqual(counts_readable[15] > 600, True)

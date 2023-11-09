@@ -10,12 +10,12 @@ def f(a: bool, b: bool) -> bool:
 
 print(f"\n{f}\n")
 
-qc = QuantumCircuit(f.num_qubits, 1)
+qc = QuantumCircuit(f.num_qubits, f.num_qubits)
 qc.x(0)  # a = true
 qc.barrier()
-qc.append(f.gate(), f.qubits(0))
+qc.append(f.gate(), f.qubits)
 qc.barrier()
-qc.measure(f.res_qubits[0], 0)
+qc.measure(f.output_qubits, f.output_qubits)
 
 print(qc.draw())
 print(qc.decompose().draw())
@@ -24,7 +24,8 @@ simulator = Aer.get_backend("aer_simulator")
 circ = transpile(qc, simulator)
 result = simulator.run(circ).result()
 counts = result.get_counts(circ)
-print(counts)
+icounts = f.decode_counts(counts)
+print(icounts)
 
 
 # qc.save_unitary()

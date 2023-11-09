@@ -14,4 +14,4 @@ def f(n: Qint4, n_it: Param[int]) -> Qint8:
 f4 = f.bind(n_it=4)
 qc = QuantumCircuit(f4.num_qubits)
 
-qc.append(f4.gate(), f4.qubits(0))
+qc.append(f4.gate(), f4.qubits)
