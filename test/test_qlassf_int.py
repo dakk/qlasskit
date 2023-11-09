@@ -227,8 +227,8 @@ class TestQlassfInt(unittest.TestCase):
     def test_const_int4_compare_lt(self):
         f = "def test(a: Qint4) -> bool:\n\treturn a < 6"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        self.assertEqual(len(qf.expressions), 1)
-        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(len(qf.expressions), 2)
+        self.assertEqual(qf.expressions[-1][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_int_int_compare_gt(self):

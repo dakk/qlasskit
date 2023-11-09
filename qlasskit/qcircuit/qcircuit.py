@@ -40,6 +40,10 @@ class QCircuit:
 
         self.__native = native
 
+    @property
+    def num_gates(self):
+        return len(self.gates)
+
     def get_key_by_index(self, i: int):
         """Return the qubit name given its index"""
         for key in self.qubit_map:

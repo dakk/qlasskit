@@ -15,7 +15,7 @@
 from typing import Dict
 
 from sympy import Symbol, cse
-from sympy.logic.boolalg import Boolean, simplify_logic
+from sympy.logic.boolalg import And, Boolean, Not, Or, Xor, simplify_logic
 
 from ..ast2logic import BoolExpList
 from . import SympyTransformer, deprecated
@@ -27,17 +27,28 @@ from .exp_transformers import (
 )
 
 
+def custom_simplify_logic(expr):
+    if isinstance(expr, Xor):
+        return expr
+    elif isinstance(expr, (And, Or, Not)):
+        args = [custom_simplify_logic(arg) for arg in expr.args]
+        return type(expr)(*args)
+    else:
+        return simplify_logic(expr)
+
+
 def merge_expressions(exps: BoolExpList) -> BoolExpList:
     n_exps = []
     emap: Dict[Symbol, Boolean] = {}
 
     for s, e in exps:
         e = e.xreplace(emap)
+        e = custom_simplify_logic(e)
 
         if s.name[0:4] != "_ret":
-            emap[s] = simplify_logic(e)
+            emap[s] = e
         else:
-            n_exps.append((s, simplify_logic(e)))
+            n_exps.append((s, e))
 
     return n_exps
 
