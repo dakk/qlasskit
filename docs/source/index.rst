@@ -6,21 +6,13 @@ Python and translate them into unitary operators (gates) for use in quantum circ
 
 
 
-.. :doc:`howitworks`
-..     How qlasskit internally works
-
-.. :doc:`qlassf`
-..     QlassF class
-
-.. :doc:`qcircuit`
-..     QCircuit class
-
 .. toctree::
    :maxdepth: 2
    
    howitworks
    supported
    qlassf
+   algorithms
    types
    qcircuit
 

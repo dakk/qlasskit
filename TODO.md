@@ -84,9 +84,15 @@
 ### Week 3: (6 Nov 23)
 
 - [x] Ast2logic: if-then-else statement
-- [ ] Midterm call
+- [x] Midterm call
+- [x] Bool optimization refactoring
 
 ### Week 4: (13 Nov 23)
+
+- [ ] Cirq exporter
+- [ ] Improve exporting utilities
+- [ ] Use cases
+- [ ] Documentation
 
 ## Month 3:
 

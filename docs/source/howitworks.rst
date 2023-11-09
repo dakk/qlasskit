@@ -6,7 +6,8 @@ In order to translate python code to quantum circuit, qlasskit performs several 
 1. it starts from the python *AST* (abstract syntax tree) rewriting it to a simplified version 
 by the _ast2ast_ module. 
 2. Then the simplified *AST* is translated to *boolean expressions* as intermediate
-form by the _ast2logic_ module. 
+form by the _ast2logic_ module. In this step, boolean expression are simplified and optimized
+for the final transformation.
 3. Finally, these boolean expressions are compiled into a *quantum circuit* by the _compiler_ module.
 
 While other existing libraries translate individual operations into quantum circuits and then 
@@ -104,10 +105,11 @@ Result
 ------
 
 The result of the compiler is a quantum circuit represented with qlasskit `QCircuit`. This circuit
-can now be exported to one of the supported framework.
+can now be exported to one of the supported framework as a gate or as a standalone circuit.
 
 
-The previous example function `f`, is translated to the following quantum circuit:
+The previous example function `f`, is translated to the following quantum circuit: the 
+result is available at qubit `_re`.
 
 
 .. code-block:: text
@@ -120,10 +122,10 @@ The previous example function `f`, is translated to the following quantum circui
                 │  ├───┤  │  └───┘├───┤  │    │  └───┘
       n.3: ─────┼──┤ X ├──┼────■──┤ X ├──┼────┼───────
                 │  └───┘  │  ┌─┴─┐└───┘  │    │       
-      a_4: ─────┼─────────┼──┤ X ├───────┼────┼───────
+      _re: ─────┼─────────┼──┤ X ├───────┼────┼───────
               ┌─┴─┐       │  └─┬─┘       │  ┌─┴─┐     
-      a_5: ───┤ X ├───────■────┼─────────■──┤ X ├─────
+      a_4: ───┤ X ├───────■────┼─────────■──┤ X ├─────
               └───┘     ┌─┴─┐  │       ┌─┴─┐└───┘     
-      _re: ─────────────┤ X ├──■───────┤ X ├──────────
+      a_5: ─────────────┤ X ├──■───────┤ X ├──────────
                         └───┘          └───┘          
 

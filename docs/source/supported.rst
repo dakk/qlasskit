@@ -148,12 +148,12 @@ Function call
 
 Bultin functions:
 - `print()`: debug function, ignore by conversion
-- `len(Tuple)`: returns the length of a tuple
-- `max(a, b, ...)`, `max(Tuple)`: returns the max of a tuple
-- `min(a, b, ...)`, `min(Tuple)`: returns the min of a tuple
-.. - `sum(Tuple)`: returns the sum of the elemnts of a tuple
-.. - `all(a, b, ...)`, `all(Tuple)`:
-.. - `any(a, b, ...)`, `any(Tuple)`:
+- `len(Tuple)`, `len(Qlist)``: returns the length of a tuple
+- `max(a, b, ...)`, `max(Tuple)`, `max(Qlist)`: returns the max of a tuple
+- `min(a, b, ...)`, `min(Tuple)`, `min(Qlist)`: returns the min of a tuple
+- `sum(Tuple)`, `sum(Qlist)`: returns the sum of the elemnts of a tuple / list
+- `all(Tuple)`, `all(Qlist)`: returns True if all of the elemnts are True
+- `any(Tuple)`, `any(Qlist)`: returns True if any of the elemnts are True
 
 
 
@@ -192,3 +192,15 @@ Function def
 
    def f(t: Qlist[Qint4,2]) -> Qint4:
       return t[0] + t[1]
+
+
+If then else
+^^^^^^^^^^^^
+
+.. code-block:: python
+
+   c = 0
+   if cond:
+      c += 12
+   else:
+      c += 13
