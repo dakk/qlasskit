@@ -22,7 +22,7 @@ from sympy import Symbol
 
 from .ast2ast import ast2ast
 from .ast2logic import Arg, Args, BoolExpList, LogicFun, flatten, translate_ast
-from .boolopt.bool_optimizer import bestWorkingOptimizer
+from .boolopt import BoolOptimizerProfile, bestWorkingOptimizer
 from .compiler import SupportedCompiler, to_quantum
 from .types import *  # noqa: F403, F401
 from .types import Qtype, type_repr
@@ -180,6 +180,7 @@ class QlassF:
         defs: List[LogicFun] = [],
         to_compile: bool = True,
         compiler: SupportedCompiler = "internal",
+        bool_optimizer: BoolOptimizerProfile = bestWorkingOptimizer,
     ) -> "QlassF":
         """Create a QlassF from a function or a string containing a function
 
@@ -189,6 +190,8 @@ class QlassF:
             defs (List[LogicFun]): list of LogicFun to inject
             to_compile (boolean, optional): if True, compile to quantum circuit (default: True)
             compiler (SupportedCompiler, optional): override default compiler (default: internal)
+            bool_optimizer (BoolOptimizerProfile, optional): override default optimizer
+                (default: bestWorkingOptimizer)
         """
         if isinstance(f, str):
             exec(f)
@@ -199,7 +202,7 @@ class QlassF:
         fun_name, args, fun_ret, exps = translate_ast(fun, types, defs)
         original_f = eval(fun_name) if isinstance(f, str) else f
 
-        exps = bestWorkingOptimizer.apply(exps)
+        exps = bool_optimizer.apply(exps)
 
         # print(exps)
 
@@ -217,6 +220,7 @@ def qlassf(
     defs: List[QlassF] = [],
     to_compile: bool = True,
     compiler: SupportedCompiler = "internal",
+    bool_optimizer: BoolOptimizerProfile = bestWorkingOptimizer,
 ) -> QlassF:
     """Decorator / function creating a QlassF object
 
@@ -225,7 +229,9 @@ def qlassf(
         types (List[Qtype]): list of qtypes to inject
         defs (List[Qlassf]): list of qlassf to inject
         to_compile (boolean, optional): if True, compile to quantum circuit (default: True)
-            compiler (SupportedCompiler, optional): override default compiler (default: internal)
+        compiler (SupportedCompiler, optional): override default compiler (default: internal)
+        bool_optimizer (BoolOptimizerProfile, optional): override default optimizer
+            (default: bestWorkingOptimizer)
     """
     defs_fun = list(map(lambda q: q.to_logicfun(), defs))
 

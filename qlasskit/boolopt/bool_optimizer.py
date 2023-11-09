@@ -18,7 +18,7 @@ from sympy import Symbol, cse
 from sympy.logic.boolalg import And, Boolean, Not, Or, Xor, simplify_logic
 
 from ..ast2logic import BoolExpList
-from . import SympyTransformer, deprecated
+from . import SympyTransformer
 from .exp_transformers import (
     remove_Implies,
     remove_ITE,
@@ -75,21 +75,6 @@ class BoolOptimizerProfile:
 
 bestWorkingOptimizer = BoolOptimizerProfile(
     [
-        merge_expressions,
-        apply_cse,
-        remove_ITE(),
-        remove_Implies(),
-        transform_or2xor(),
-        transform_or2and(),
-    ]
-)
-
-
-deprecatedWorkingOptimizer = BoolOptimizerProfile(
-    [
-        deprecated.remove_const_exps,
-        deprecated.remove_unnecessary_assigns,
-        deprecated.merge_unnecessary_assigns,
         merge_expressions,
         apply_cse,
         remove_ITE(),

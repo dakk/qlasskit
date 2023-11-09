@@ -14,3 +14,4 @@
 # isort:skip_file
 
 from .sympytransformer import SympyTransformer  # noqa: F401
+from .bool_optimizer import BoolOptimizerProfile, bestWorkingOptimizer  # noqa: F401
