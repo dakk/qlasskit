@@ -69,7 +69,7 @@ class TestQlassfIntParametrized_2_4_8(unittest.TestCase):
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
             qf.expressions[0][1],
-            ITE(And(Symbol("a.0"), b), Symbol("a.1"), Symbol("a.0")),
+            And(Symbol("a.0"), Not(And(Symbol("b"), Not(Symbol("a.1"))))),
         )
         compute_and_compare_results(self, qf)
 
@@ -82,7 +82,7 @@ class TestQlassfIntParametrized_2_4_8(unittest.TestCase):
     def test_int_return_tuple(self):
         f = f"def test(a: {self.ttype_str}) -> Tuple[{self.ttype_str}, bool]:\n\tb = a[0] and a[1]\n\treturn (a, b)"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        self.assertEqual(len(qf.expressions), self.ttype_size + 2)
+        self.assertEqual(len(qf.expressions), self.ttype_size + 1)
         compute_and_compare_results(self, qf)
 
     def test_int_tuple(self):
@@ -137,8 +137,7 @@ class TestQlassfIntParametrized_2_4(unittest.TestCase):
     def test_const_int_compare_gt(self):
         f = f"def test(a: {self.ttype_str}) -> bool:\n\treturn a > 1"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        self.assertEqual(len(qf.expressions), 1)
-        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[-1][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_const_int_compare_lt(self):
@@ -202,31 +201,13 @@ class TestQlassfInt(unittest.TestCase):
     def test_const_int_compare_neq_different_type(self):
         f = "def test(a: Qint4) -> bool:\n\treturn 2 != a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        self.assertEqual(len(qf.expressions), 1)
-        self.assertEqual(qf.expressions[0][0], _ret)
-        self.assertEqual(
-            qf.expressions[0][1],
-            Or(
-                Not(Symbol("a.1")),
-                Symbol("a.0"),
-                Symbol("a.2"),
-                Symbol("a.3"),
-            ),
-        )
+        self.assertEqual(qf.expressions[-1][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_int_int_compare_neq(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a != b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        self.assertEqual(len(qf.expressions), 1)
-        self.assertEqual(qf.expressions[0][0], _ret)
-        self.assertEqual(
-            qf.expressions[0][1],
-            Or(
-                Xor(Symbol("a.0"), Symbol("b.0")),
-                Xor(Symbol("a.1"), Symbol("b.1")),
-            ),
-        )
+        self.assertEqual(qf.expressions[-1][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_const_int_compare_gt(self):
@@ -239,53 +220,46 @@ class TestQlassfInt(unittest.TestCase):
     # def test_int4_int4_compare_gt(self):
     #     f = "def test(a: Qint4, b: Qint4) -> bool:\n\treturn a > b"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-    #     self.assertEqual(len(qf.expressions), 1)
-    #     self.assertEqual(qf.expressions[0][0], _ret)
+    #     # self.assertEqual(len(qf.expressions), 1)
+    #     # self.assertEqual(len(qf.expressions[0][0], _ret)
     #     compute_and_compare_results(self, qf)
 
     def test_const_int4_compare_lt(self):
         f = "def test(a: Qint4) -> bool:\n\treturn a < 6"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        self.assertEqual(len(qf.expressions), 1)
-        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(len(qf.expressions), 2)
+        self.assertEqual(qf.expressions[-1][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_int_int_compare_gt(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a > b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        self.assertEqual(len(qf.expressions), 1)
-        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[-1][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_int_int_compare_lt(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a < b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        self.assertEqual(len(qf.expressions), 1)
-        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[-1][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_const_int_compare_gte(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a >= b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        self.assertEqual(len(qf.expressions), 1)
-        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[-1][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_const_int_compare_lte(self):
         f = "def test(a: Qint2, b: Qint2) -> bool:\n\treturn a <= b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        self.assertEqual(len(qf.expressions), 1)
-        self.assertEqual(qf.expressions[0][0], _ret)
+        self.assertEqual(qf.expressions[-1][0], _ret)
         compute_and_compare_results(self, qf)
 
     def test_ite_return_qint(self):
         f = "def test(a: bool, b: Qint2, c: Qint2) -> Qint2:\n\treturn b if a else c"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-        self.assertEqual(len(qf.expressions), 2)
-        self.assertEqual(qf.expressions[0][0], Symbol("_ret.0"))
-        self.assertEqual(qf.expressions[0][1], ITE(a, Symbol("b.0"), Symbol("c.0")))
-        self.assertEqual(qf.expressions[1][0], Symbol("_ret.1"))
-        self.assertEqual(qf.expressions[1][1], ITE(a, Symbol("b.1"), Symbol("c.1")))
+        self.assertEqual(qf.expressions[-2][0], Symbol("_ret.0"))
+        self.assertEqual(qf.expressions[-1][0], Symbol("_ret.1"))
         compute_and_compare_results(self, qf)
 
     def test_composed_comparators(self):

@@ -22,11 +22,7 @@ from sympy import Symbol
 
 from .ast2ast import ast2ast
 from .ast2logic import Arg, Args, BoolExpList, LogicFun, flatten, translate_ast
-from .bool_optimizer import (
-    merge_unnecessary_assigns,
-    remove_const_exps,
-    remove_unnecessary_assigns,
-)
+from .boolopt.bool_optimizer import bestWorkingOptimizer
 from .compiler import SupportedCompiler, to_quantum
 from .types import *  # noqa: F403, F401
 from .types import Qtype, type_repr
@@ -203,11 +199,9 @@ class QlassF:
         fun_name, args, fun_ret, exps = translate_ast(fun, types, defs)
         original_f = eval(fun_name) if isinstance(f, str) else f
 
-        # Optimize the expression list
-        exps = remove_const_exps(exps)
-        exps = remove_unnecessary_assigns(exps)
-        exps = merge_unnecessary_assigns(exps)
-        # exps = subsitute_exps(exps)
+        exps = bestWorkingOptimizer.apply(exps)
+
+        # print(exps)
 
         # Return the qlassf object
         qf = QlassF(fun_name, original_f, args, fun_ret, exps)

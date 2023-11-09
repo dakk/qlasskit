@@ -83,6 +83,7 @@
 
 ### Week 3: (6 Nov 23)
 
+- [x] Ast2logic: if-then-else statement
 - [ ] Midterm call
 
 ### Week 4: (13 Nov 23)
@@ -119,7 +120,6 @@
 
 ### Language support
 
-- [ ] Ast2logic: if-then-else statement
 - [ ] Datatype: Dict
 - [ ] Datatype: Fixed
 - [ ] Datatype: Enum

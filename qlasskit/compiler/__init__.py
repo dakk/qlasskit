@@ -16,7 +16,7 @@
 from typing import Literal, get_args
 
 from .expqmap import ExpQMap  # noqa: F401
-from .compiler import Compiler, CompilerException, optimizer  # noqa: F401
+from .compiler import Compiler, CompilerException  # noqa: F401
 
 try:
     import tweedledum  # noqa: F401

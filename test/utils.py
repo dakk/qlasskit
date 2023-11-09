@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import inspect
+import json
 import random
+import threading
 from typing import Tuple, get_args
 
 from qiskit import QuantumCircuit, transpile
@@ -40,6 +42,26 @@ try:
     qsk_simulator = Qrack.get_backend("qasm_simulator")
 except:
     qsk_simulator = Aer.get_backend("aer_simulator")
+
+
+statistics = {"tests": 0, "qubits": 0, "gates": 0}
+
+try:
+    old_statistics = json.loads(open(".t_statistics", "r").read())[-100:]
+except:
+    old_statistics = []
+
+statistics_lock = threading.Lock()
+
+
+def update_statistics(q, g):
+    with statistics_lock:
+        global statistics
+        statistics["tests"] += 1
+        statistics["qubits"] += q
+        statistics["gates"] += g
+        f = open(".t_statistics", "w")
+        f.write(json.dumps(old_statistics + [statistics], indent=4))
 
 
 def inject_parameterized_compilers(params):
@@ -77,6 +99,8 @@ def compute_result_of_qcircuit(cls, qf, truth_line):
     gate = qf.gate()
     qc = QuantumCircuit(gate.num_qubits)
 
+    update_statistics(circ.num_qubits, circ.num_gates)
+
     # Prepare inputs
     [qc.initialize(1 if truth_line[i] else 0, i) for i in range(qf.input_size)]
 
@@ -101,7 +125,7 @@ def compute_result_of_qcircuit(cls, qf, truth_line):
     max_qubits = (
         qf.input_size
         + len(qf.expressions)
-        + sum([gateinputcount(compiler.optimizer(e[1])) for e in qf.expressions])
+        + sum([gateinputcount(e[1]) for e in qf.expressions])
     )
 
     cls.assertLessEqual(qf.gate().num_qubits, max_qubits)

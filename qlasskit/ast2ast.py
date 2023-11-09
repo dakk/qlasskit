@@ -73,6 +73,13 @@ class ASTRewriter(ast.NodeTransformer):
         self.env = {}
         self.const = {}
         self.ret = None
+        self._uniqd = 1
+
+    @property
+    def uniqd(self):
+        """Return an unique identifier as str"""
+        self._uniqd += 1
+        return f"{hex(self._uniqd)[2:]}"
 
     def __unroll_arg(self, arg):
         if isinstance(arg, ast.Tuple):
@@ -109,6 +116,66 @@ class ASTRewriter(ast.NodeTransformer):
             raise Exception("invalid name starting with __")
 
         return node
+
+    def visit_If(self, node):
+        body = flatten([self.visit(n) for n in node.body])
+        orelse = flatten([self.visit(n) for n in node.orelse])
+        test_name = "_iftarg" + self.uniqd
+
+        if_l = [
+            ast.Assign(
+                targets=[ast.Name(id=test_name)],
+                value=self.visit(node.test),
+            )
+        ]
+
+        for b in body:
+            if not isinstance(b, ast.Assign):
+                raise Exception("if body only allows assigns: ", ast.dump(b))
+
+            if len(b.targets) != 1:
+                raise Exception("if targets only allow one: ", ast.dump(b))
+
+            target_0id = b.targets[0].id
+
+            if target_0id[0:2] == "__" and target_0id not in self.env:
+                orelse_inner = ast.Name(id=target_0id[2:])
+            else:
+                orelse_inner = ast.Name(id=target_0id)
+
+            if_l.append(
+                ast.Assign(
+                    targets=b.targets,
+                    value=ast.IfExp(
+                        test=ast.Name(id=test_name), body=b.value, orelse=orelse_inner
+                    ),
+                )
+            )
+
+        for b in orelse:
+            if not isinstance(b, ast.Assign):
+                raise Exception("if body only allows assigns: ", ast.dump(b))
+
+            if len(b.targets) != 1:
+                raise Exception("if targets only allow one: ", ast.dump(b))
+
+            target_0id = b.targets[0].id
+
+            if target_0id[0:2] == "__" and target_0id not in self.env:
+                orelse_inner = ast.Name(id=target_0id[2:])
+            else:
+                orelse_inner = ast.Name(id=target_0id)
+
+            if_l.append(
+                ast.Assign(
+                    targets=b.targets,
+                    value=ast.IfExp(
+                        test=ast.Name(id=test_name), orelse=b.value, body=orelse_inner
+                    ),
+                )
+            )
+
+        return if_l
 
     def visit_List(self, node):
         return ast.Tuple(elts=[self.visit(el) for el in node.elts])
@@ -336,4 +403,5 @@ def ast2ast(a_tree):
         a_tree = IndexReplacer().visit(a_tree)
 
     a_tree = ASTRewriter().visit(a_tree)
+    # print(ast.dump(a_tree))
     return a_tree
