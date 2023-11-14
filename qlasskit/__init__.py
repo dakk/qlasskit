@@ -13,10 +13,10 @@
 # limitations under the License.
 # isort:skip_file
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 from .qcircuit import QCircuit, SupportedFrameworks, SupportedFramework  # noqa: F401
-from .qlassf import QlassF, qlassf  # noqa: F401
+from .qlassfun import QlassF, qlassf  # noqa: F401
 from .ast2ast import ast2ast  # noqa: F401
 from .ast2logic import exceptions  # noqa: F401
 from .types import (  # noqa: F401, F403

@@ -18,6 +18,7 @@ author = "Davide Gessa (dakk)"
 
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.coverage",
     "sphinx.ext.napoleon",
     "sphinx_rtd_theme",
@@ -35,3 +36,7 @@ autodoc_source_dir = [
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
+
+
+# autosummary_imported_members = True
+autosummary_generate = True 

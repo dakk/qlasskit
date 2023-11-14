@@ -9,6 +9,8 @@ Qlasskit is a Python library that allows quantum developers to write classical a
 
 This tool will be useful for any algorithm that relies on a 'blackbox' function and for describing the classical components of a quantum algorithm.
 
+Qlasskit implements circuit / gate exporters for Qiskit, Cirq, Qasm and Sympy.
+
 
 
 ```python
@@ -39,22 +41,7 @@ And that's it:
 ![Groover](docs/source/_images/groover_circ.png)
 
 
-You can also define a function with parameters:
-```python
-@qlassf
-def f(n: Qint4, n_it: Param[int]) -> Qint8:
-  v = 0
-  for x in range(n_it):
-    v += n
-  return n     
-```
-
-And then, you can bind it with a value:
-```python
-f4 = f.bind(n_it=4)
-```
-
-Use other functions:
+You can also use other functions:
 
 ```python
 @qlassf
