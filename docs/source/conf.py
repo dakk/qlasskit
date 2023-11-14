@@ -39,4 +39,4 @@ html_static_path = ["_static"]
 
 
 # autosummary_imported_members = True
-autosummary_generate = True 
+autosummary_generate = True

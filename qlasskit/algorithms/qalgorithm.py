@@ -18,7 +18,7 @@ from sympy import Symbol
 from sympy.logic.boolalg import BooleanFalse, BooleanTrue
 
 from ..qcircuit import QCircuitWrapper
-from ..qlassf import QlassF
+from ..qlassfun import QlassF
 from ..types import type_repr
 
 

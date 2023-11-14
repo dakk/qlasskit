@@ -16,7 +16,7 @@ import math
 from typing import List, Optional, Tuple, Union
 
 from ..qcircuit import QCircuit, gates
-from ..qlassf import QlassF
+from ..qlassfun import QlassF
 from ..types import Qtype, interpret_as_qtype
 from .qalgorithm import QAlgorithm, oraclize
 
