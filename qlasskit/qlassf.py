@@ -26,7 +26,7 @@ from .boolopt import BoolOptimizerProfile, bestWorkingOptimizer
 from .compiler import SupportedCompiler, to_quantum
 from .qcircuit import QCircuitWrapper
 from .types import *  # noqa: F403, F401
-from .types import Qtype, interpret_as_qtype, type_repr
+from .types import Qtype, format_outcome, interpret_as_qtype, type_repr
 
 MAX_TRUTH_TABLE_SIZE = 20
 
@@ -103,7 +103,8 @@ class QlassF(QCircuitWrapper):
     def decode_output(
         self, istr: Union[str, int, List[bool]]
     ) -> Union[bool, Tuple, Qtype]:
-        return interpret_as_qtype(istr[::-1], self.returns.ttype, len(self.returns))
+        fcome = format_outcome(istr)
+        return interpret_as_qtype(fcome[::-1], self.returns.ttype, len(self.returns))
 
     def __add__(self, qf2) -> "QlassF":
         """Adds two qlassf and return the combination f + g = f(g())"""

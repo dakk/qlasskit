@@ -15,7 +15,7 @@
 
 from typing import Literal, get_args  # noqa: F401
 
-SupportedFramework = Literal["qiskit", "sympy", "qasm"]
+SupportedFramework = Literal["qiskit", "sympy", "cirq", "qasm"]
 SupportedFrameworks = list(get_args(SupportedFramework))
 
 from . import gates  # noqa: F401, E402

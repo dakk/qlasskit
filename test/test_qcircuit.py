@@ -176,3 +176,49 @@ class TestQCircuitExport(unittest.TestCase):
         circ = qc.export("circuit", "qiskit")
         counts = qiskit_measure_and_count(circ, shots=1)
         self.assertDictEqual(counts, {"111": 1})
+
+    def test_export_cirq_circuit(self):
+        qc = QCircuit()
+        a, b = qc.add_qubit(), qc.add_qubit()
+        qc.x(a)
+        qc.cx(a, b)
+        circ = qc.export("circuit", "cirq")
+
+        import cirq
+        import numpy as np
+
+        circ.append(cirq.measure_each(circ.all_qubits()))
+        simulator = cirq.Simulator()
+        result = simulator.run(circ)
+
+        self.assertDictEqual(
+            result.records,
+            {
+                "q(0)": np.array([[[1]]], dtype=np.int8),
+                "q(1)": np.array([[[1]]], dtype=np.int8),
+            },
+        )
+
+    def test_export_cirq_gate(self):
+        qc = QCircuit()
+        a, b = qc.add_qubit(), qc.add_qubit()
+        qc.x(a)
+        qc.cx(a, b)
+        gat = qc.export("gate", "cirq")
+
+        import cirq
+        import numpy as np
+
+        qreg = cirq.LineQubit.range(2)
+        circ = cirq.Circuit(gat().on(*qreg))
+
+        circ.append(cirq.measure_each(circ.all_qubits()))
+        simulator = cirq.Simulator()
+        result = simulator.run(circ)
+        self.assertDictEqual(
+            result.records,
+            {
+                "q(0)": np.array([[[1]]], dtype=np.int8),
+                "q(1)": np.array([[[1]]], dtype=np.int8),
+            },
+        )

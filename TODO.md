@@ -89,7 +89,7 @@
 
 ### Week 4: (13 Nov 23)
 
-- [ ] Cirq exporter
+- [x] Cirq exporter
 - [ ] Improve exporting utilities
 - [ ] Use cases
 - [ ] Documentation

@@ -209,7 +209,7 @@ class QCircuit:
             mode (Literal["circuit", "gate"], optional): The export mode, which can be "circuit"
                 or "gate". Defaults to "circuit".
             framework (SupportedFramework, optional): The target framework for export,
-                either "qiskit", "sympy", "qasm". Defaults to "qiskit".
+                either "qiskit", "sympy", "cirq", "qasm". Defaults to "qiskit".
 
         Returns:
             Any: The exported circuit or gate representation in the specified framework.
@@ -231,6 +231,10 @@ class QCircuit:
             from .exporter_qasm import QasmExporter
 
             return QasmExporter().export(self, mode)
+        elif framework == "cirq":
+            from .exporter_cirq import CirqExporter
+
+            return CirqExporter().export(self, mode)
         else:
             raise Exception(f"Framework {framework} not supported")
 
