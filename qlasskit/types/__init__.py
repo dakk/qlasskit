@@ -31,7 +31,8 @@ def _half_adder(a, b):  # Carry x Sum
 
 
 def _full_adder(c, a, b):  # Carry x Sum
-    return Or(And(a, b), And(b, c), And(a, c)), Xor(a, b, c)
+    return (a & b) ^ (a ^ b) & c, Xor(Xor(a, b), c)
+    #return Or(And(a, b), And(b, c), And(a, c)), Xor(Xor(a, b), c)
 
 
 from .qtype import Qtype, TExp, TType  # noqa: F401, E402
