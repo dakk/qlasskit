@@ -175,7 +175,7 @@ class Qint(int, Qtype):
         return (cls if cls.BIT_SIZE > tleft[0].BIT_SIZE else tleft[0], sums)  # type: ignore
 
     @classmethod
-    def mul(cls, tleft: TExp, tright: TExp) -> TExp:
+    def mul(cls, tleft: TExp, tright: TExp) -> TExp:  # noqa: C901
         # TODO: use RGQFT multiplier
         n = len(tleft[1])
         m = len(tright[1])
