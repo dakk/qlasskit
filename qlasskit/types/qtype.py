@@ -127,21 +127,25 @@ class Qtype:
         return (v[0], [False] * i + v[1])
 
     @staticmethod
-    def add(tleft: TExp, tcomp: TExp) -> TExp:
+    def add(tleft: TExp, tright: TExp) -> TExp:
         raise Exception("abstract")
 
     @staticmethod
-    def sub(tleft: TExp, tcomp: TExp) -> TExp:
+    def sub(tleft: TExp, tright: TExp) -> TExp:
         raise Exception("abstract")
 
     @staticmethod
-    def bitwsie_xor(tleft: TExp, tcomp: TExp) -> TExp:
+    def mul(tleft: TExp, tright: TExp) -> TExp:
         raise Exception("abstract")
 
     @staticmethod
-    def bitwsie_and(tleft: TExp, tcomp: TExp) -> TExp:
+    def bitwsie_xor(tleft: TExp, tright: TExp) -> TExp:
         raise Exception("abstract")
 
     @staticmethod
-    def bitwsie_or(tleft: TExp, tcomp: TExp) -> TExp:
+    def bitwsie_and(tleft: TExp, tright: TExp) -> TExp:
+        raise Exception("abstract")
+
+    @staticmethod
+    def bitwsie_or(tleft: TExp, tright: TExp) -> TExp:
         raise Exception("abstract")

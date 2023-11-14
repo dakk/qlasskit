@@ -43,6 +43,7 @@ try:
 except:
     qsk_simulator = Aer.get_backend("aer_simulator")
 
+qsk_simulator = Aer.get_backend("aer_simulator")
 
 statistics = {"tests": 0, "qubits": 0, "gates": 0}
 

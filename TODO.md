@@ -90,6 +90,7 @@
 ### Week 4: (13 Nov 23)
 
 - [x] Cirq exporter
+- [x] Qint multiplier
 - [ ] Improve exporting utilities
 - [ ] Use cases
 - [ ] Documentation
@@ -116,9 +117,9 @@
 
 ## Future features
 
-
+- [ ] Allow quantum gates inside sympy expressions, in order to define optimized parts
 - [ ] Publish doc on github
-- [ ] Int arithmetic expressions (*, /, %)
+- [ ] Int arithmetic expressions (/, %)
 - [ ] Parametrized qlassf
 - [ ] Lambda
 - [ ] Builtin function: map
@@ -154,4 +155,3 @@
 ### Experiments
 
 - [ ] Logic2FPGA backend
-- [ ] Allow quantum gates inside sympy expressions

@@ -383,3 +383,27 @@ class TestQlassfIntReassign(unittest.TestCase):
         f = "def test(a: Qint2) -> Qint2:\n\ta += 1\n\treturn a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
+
+
+@parameterized_class(("compiler"), ENABLED_COMPILERS)
+class TestQlassfIntMul(unittest.TestCase):
+    def test_mul(self):
+        f = "def test(a: Qint2, b: Qint2) -> Qint4: return a * b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    # def test_mul2(self):
+    #     f = "def test(a: Qint4, b: Qint4) -> Qint8: return a * b"
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+    #     compute_and_compare_results(self, qf)
+
+    def test_mul_and_sum(self):
+        f = "def test(a: Qint2, b: Qint2, c: Qint2) -> Qint2: return a * b + c"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    # def test_mul4(self):
+    #     f = "def test(a: Qint4, b: Qint4) -> Qint4: return a * b"
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+    #     print(qf.expressions)
+    #     compute_and_compare_results(self, qf)

@@ -175,6 +175,45 @@ class Qint(int, Qtype):
         return (cls if cls.BIT_SIZE > tleft[0].BIT_SIZE else tleft[0], sums)  # type: ignore
 
     @classmethod
+    def mul(cls, tleft: TExp, tright: TExp) -> TExp:
+        # TODO: use RGQFT multiplier
+        n = len(tleft[1])
+        m = len(tright[1])
+
+        if n != m:
+            raise Exception("Mul works only on same size Qint")
+
+        product = [False] * (n + m)
+
+        for i in range(n):
+            carry = False
+            for j in range(m):
+                partial_product = And(tleft[1][i], tright[1][j])
+
+                if i + j < n + m - 1:
+                    carry, sum_ = _full_adder(carry, partial_product, product[i + j])
+                else:
+                    sum_ = Xor(carry, partial_product)
+
+                product[i + j] = sum_
+
+            if i + m < n + m:
+                product[i + m] = carry
+
+        if (n + m) <= 2:
+            return Qint2, product
+        elif (n + m) > 2 and (n + m) <= 4:
+            return Qint4, product
+        elif (n + m) > 4 and (n + m) <= 8:
+            return Qint8, product
+        elif (n + m) > 8 and (n + m) <= 12:
+            return Qint12, product
+        elif (n + m) > 12 and (n + m) <= 16:
+            return Qint16, product
+
+        raise Exception(f"Mul result size is too big ({n+m})")
+
+    @classmethod
     def sub(cls, tleft: TExp, tright: TExp) -> TExp:
         """Subtract two Qint"""
         an = cls.bitwise_not(cls.fill(tleft))  # type: ignore

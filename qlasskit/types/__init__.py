@@ -29,10 +29,8 @@ def _eq(a, b):
 def _half_adder(a, b):  # Carry x Sum
     return And(a, b), Xor(a, b)
 
-
 def _full_adder(c, a, b):  # Carry x Sum
     return Or(And(a, b), And(b, c), And(a, c)), Xor(a, b, c)
-
 
 from .qtype import Qtype, TExp, TType  # noqa: F401, E402
 from .qbool import Qbool  # noqa: F401, E402
