@@ -91,8 +91,11 @@ class TweedledumCompiler(Compiler):
     """Compile using tweedledum synthesis library"""
 
     def compile(  # noqa: C901
-        self, name, args: Args, returns: Arg, exprs: BoolExpList
+        self, name, args: Args, returns: Arg, exprs: BoolExpList, uncompute: bool = True
     ) -> QCircuit:
+        if not uncompute:
+            raise Exception("Disabled uncompute not supported on tweedledum")
+
         exprs = [(symb, self._symplify_exp(exp)) for symb, exp in exprs]
         _logic_network = sympy_to_logic_network(name, args, returns, exprs)
 

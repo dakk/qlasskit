@@ -33,6 +33,15 @@ def _half_adder(a, b):  # Carry x Sum
 def _full_adder(c, a, b):  # Carry x Sum
     return (a & b) ^ (a ^ b) & c, Xor(Xor(a, b), c)
 
+    # from ..boolquant import H, CX, MCX
+    # from sympy import Symbol
+    # o = Symbol('new_qubit')
+    # o = MCX(a, b, o)
+    # b = CX(a, b)
+    # o = MCX(b, c, o)
+    # c = CX(b,c)
+    # return c, o
+
 
 from .qtype import Qtype, TExp, TType  # noqa: F401, E402
 from .qbool import Qbool  # noqa: F401, E402

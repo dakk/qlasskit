@@ -47,6 +47,16 @@ class X(QGate):
         super().__init__("X")
 
 
+class Y(QGate):
+    def __init__(self):
+        super().__init__("Y")
+
+
+class S(QGate):
+    def __init__(self):
+        super().__init__("S")
+
+
 class T(QGate):
     def __init__(self):
         super().__init__("T")

@@ -91,6 +91,7 @@
 
 - [x] Cirq exporter
 - [x] Qint multiplier
+- [x] Allow quantum gates inside sympy expressions
 - [ ] Improve exporting utilities
 - [ ] Use cases
 - [ ] Documentation
@@ -117,7 +118,6 @@
 
 ## Future features
 
-- [ ] Allow quantum gates inside sympy expressions, in order to define optimized parts
 - [ ] Publish doc on github
 - [ ] Int arithmetic expressions (/, %)
 - [ ] Parametrized qlassf

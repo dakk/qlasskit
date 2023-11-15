@@ -17,6 +17,7 @@ from sympy.logic import And, Not, Xor
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
 
 from ..ast2logic.typing import Arg, Args, BoolExpList
+from ..boolquant import QuantumBooleanGate
 from ..qcircuit import QCircuit, QCircuitEnhanced
 from . import Compiler, CompilerException, ExpQMap
 
@@ -24,7 +25,9 @@ from . import Compiler, CompilerException, ExpQMap
 class InternalCompiler(Compiler):
     """InternalCompiler translating an expression list to quantum circuit"""
 
-    def compile(self, name, args: Args, returns: Arg, exprs: BoolExpList) -> QCircuit:
+    def compile(
+        self, name, args: Args, returns: Arg, exprs: BoolExpList, uncompute=True
+    ) -> QCircuit:
         qc = QCircuitEnhanced(name=name)
         self.expqmap = ExpQMap()
 
@@ -43,12 +46,6 @@ class InternalCompiler(Compiler):
         for sym, exp in exprs:
             is_temp = sym.name[0:2] == "__"
             symp_exp = self._symplify_exp(exp)
-
-            # X = Y: perform a "copy"
-            # if isinstance(exp, Symbol):
-            #     iret = qc.get_free_ancilla()
-            #     qc.cx(qc[exp], iret)
-            # else:
 
             if isinstance(symp_exp, BooleanFalse):
                 if not a_false:
@@ -69,12 +66,8 @@ class InternalCompiler(Compiler):
             self.expqmap.remove(qc.uncompute())
 
         qc.remove_identities()
-        qc.uncompute_all(keep=[qc[r] for r in returns.bitvec])
-
-        # circ_qi = qc.export("circuit", "qiskit")
-        # print(circ_qi.draw("text"))
-        # print()
-        # print()
+        if uncompute:
+            qc.uncompute_all(keep=[qc[r] for r in returns.bitvec])
 
         return qc
 
@@ -134,14 +127,20 @@ class InternalCompiler(Compiler):
 
             return dest
 
-        # elif isinstance(expr, BooleanFalse):
-        #     return qc.get_free_ancilla()
+        # Hybrid Quantum-Boolean circuit
+        elif isinstance(expr, QuantumBooleanGate):
+            erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))  # type: ignore
+            gate = expr.__class__.__name__.lower()
+            
+            if hasattr(qc, gate):
+                if gate[0] == "m":
+                    getattr(qc, gate)(erets[0:-1], erets[-1])
+                else:
+                    getattr(qc, gate)(*erets)
 
-        # elif isinstance(expr, BooleanTrue):
-        #     if dest is None:
-        #         dest = qc.get_free_ancilla()
-        #     qc.x(dest)
-        #     return dest
+                return erets[-1]
+
+            raise Exception(f"Unknown gate: {gate}")
 
         else:
             raise CompilerException(expr)

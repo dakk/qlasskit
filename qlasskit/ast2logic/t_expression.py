@@ -17,6 +17,7 @@ from typing import List, Tuple, get_args
 from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, Xor, false, true
 
+from ..boolquant import QuantumBooleanGate
 from ..types import Qbool, Qtype, TExp, const_to_qtype
 from . import Env, exceptions
 
@@ -277,6 +278,23 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
     # Call
     elif isinstance(expr, ast.Call):
+        # Quantum hybrid
+        if (
+            isinstance(expr.func, ast.Attribute)
+            and isinstance(expr.func.value, ast.Name)
+            and expr.func.value.id == "Q"
+        ):
+            gate = expr.func.attr
+            args = [translate_expression(e, env) for e in expr.args]
+            args_v = [b for (a, b) in args]
+
+            q_gate = QuantumBooleanGate.build(gate)
+            
+            if len(args_v) == 1 and isinstance(args_v[0], list):
+                return args[0][0], [q_gate(a) for a in args_v[0]]
+            else:
+                return args[0][0], q_gate(*args_v)
+
         if not hasattr(expr.func, "id"):
             raise exceptions.ExpressionNotHandledException(expr)
 

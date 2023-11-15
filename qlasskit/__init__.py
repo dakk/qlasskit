@@ -30,3 +30,4 @@ from .types import (  # noqa: F401, F403
     Qint16,
     Qlist,
 )
+from .boolquant import Q  # noqa: F401

@@ -176,6 +176,21 @@ class QCircuit:
         w = self[w]
         self.append(gates.X(), [w])
 
+    def y(self, w: int):
+        """Y gate"""
+        w = self[w]
+        self.append(gates.Y(), [w])
+
+    def t(self, w: int):
+        """T gate"""
+        w = self[w]
+        self.append(gates.T(), [w])
+
+    def s(self, w: int):
+        """S gate"""
+        w = self[w]
+        self.append(gates.S(), [w])
+
     def cx(self, w1, w2):
         """CX gate"""
         w1, w2 = self[w1], self[w2]

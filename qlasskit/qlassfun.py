@@ -23,6 +23,7 @@ from sympy import Symbol
 from .ast2ast import ast2ast
 from .ast2logic import Arg, Args, BoolExpList, LogicFun, flatten, translate_ast
 from .boolopt import BoolOptimizerProfile, bestWorkingOptimizer
+from .boolquant import Q  # noqa: F403, F401
 from .compiler import SupportedCompiler, to_quantum
 from .qcircuit import QCircuitWrapper
 from .types import *  # noqa: F403, F401
