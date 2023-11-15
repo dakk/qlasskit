@@ -29,6 +29,6 @@ class Compiler:
         return exp
 
     def compile(
-        self, name: str, args: Args, returns: Arg, expr: BoolExpList
+        self, name: str, args: Args, returns: Arg, expr: BoolExpList, uncompute: bool
     ) -> QCircuit:
         raise Exception("abstract")

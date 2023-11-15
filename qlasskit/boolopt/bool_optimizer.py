@@ -60,6 +60,16 @@ def apply_cse(exps: BoolExpList) -> BoolExpList:
     return res
 
 
+def print_step(name: str):
+    def _print_step(exps: BoolExpList) -> BoolExpList:
+        print(name)
+        for s, e in exps:
+            print("\t", s, e)
+        return exps
+
+    return _print_step
+
+
 class BoolOptimizerProfile:
     def __init__(self, steps):
         self.steps = steps

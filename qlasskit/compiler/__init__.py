@@ -26,7 +26,6 @@ except:
     TWEEDLEDUM_ENABLED = False
 
 from .internalcompiler import InternalCompiler  # noqa: E402
-from .poccompiler3 import POCCompiler3  # noqa: E402
 
 if TWEEDLEDUM_ENABLED:
     from .tweedledumcompiler import TweedledumCompiler
@@ -39,13 +38,18 @@ if not TWEEDLEDUM_ENABLED:
     SupportedCompilers.remove("tweedledum")
 
 
-def to_quantum(name, args, returns, exprs, compiler: SupportedCompiler = "internal"):
+def to_quantum(
+    name,
+    args,
+    returns,
+    exprs,
+    compiler: SupportedCompiler = "internal",
+    uncompute: bool = True,
+):
     sel_compiler: Compiler
 
     if compiler == "internal":
         sel_compiler = InternalCompiler()
-    elif compiler == "poc3":
-        sel_compiler = POCCompiler3()
     elif compiler == "tweedledum" and TWEEDLEDUM_ENABLED:
         sel_compiler = TweedledumCompiler()
     else:
@@ -53,5 +57,5 @@ def to_quantum(name, args, returns, exprs, compiler: SupportedCompiler = "intern
             f"Compiler {compiler} not supported. Choose one between {SupportedCompilers}"
         )
 
-    circ = sel_compiler.compile(name, args, returns, exprs)
+    circ = sel_compiler.compile(name, args, returns, exprs, uncompute)
     return circ

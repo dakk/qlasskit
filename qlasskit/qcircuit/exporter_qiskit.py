@@ -27,7 +27,7 @@ class QiskitExporter(QCircuitExporter):
 
         for g, w, p in _selfqc.gates:
             g_name = g.__class__.__name__.lower()
-                
+
             if isinstance(g, gates.MCX):
                 qc.mcx(w[0:-1], w[-1])
             elif isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.X):
@@ -44,7 +44,7 @@ class QiskitExporter(QCircuitExporter):
 
             elif hasattr(qc, g_name):
                 getattr(qc, g_name)(*w)
-                
+
             else:
                 raise Exception(f"not handled {g}")
 

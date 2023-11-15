@@ -34,33 +34,39 @@ class CirqExporter(QCircuitExporter):
                 def _decompose_(self, qubits):
                     for g, w, p in _selfqc.gates:
                         g_name = g.__class__.__name__
-                        
-                        gate_mapping = {'CX': 'CNOT', 'CCX': 'CCNOT'}
-                        g_name = gate_mapping[g_name] if g_name in gate_mapping else g_name
-                                                    
+
+                        gate_mapping = {"CX": "CNOT", "CCX": "CCNOT"}
+                        g_name = (
+                            gate_mapping[g_name] if g_name in gate_mapping else g_name
+                        )
+
                         if isinstance(g, gates.MCX):
                             gg = cirq.ControlledGate(
                                 sub_gate=cirq.X, num_controls=len(w) - 1
                             )
                             yield gg(list(map(lambda wx: qubits[w], w)))
-                            
+
                         elif isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.X):
                             gg = cirq.ControlledGate(
                                 sub_gate=cirq.X, num_controls=len(w) - 1
                             )
                             yield gg(list(map(lambda wx: qubits[w], w)))
-                            
+
                         elif isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.Z):
                             gg = cirq.ControlledGate(
                                 sub_gate=cirq.Z, num_controls=len(w) - 1
                             )
                             yield gg(list(map(lambda wx: qubits[w], w)))
-                            
+
                         elif hasattr(cirq, g_name):
-                            yield getattr(cirq, g_name)(*list(map(lambda x: qubits[x], w)))
-                            
+                            yield getattr(cirq, g_name)(
+                                *list(map(lambda x: qubits[x], w))
+                            )
+
                         else:
-                            raise Exception(f"Gate not handled for cirq exporter: {g_name}")
+                            raise Exception(
+                                f"Gate not handled for cirq exporter: {g_name}"
+                            )
 
                 def _circuit_diagram_info_(self, args):
                     return [_selfqc.name] * self.num_qubits()

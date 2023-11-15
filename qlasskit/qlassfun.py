@@ -155,13 +155,14 @@ class QlassF(QCircuitWrapper):
 
         return truth
 
-    def compile(self, compiler: SupportedCompiler = "internal"):
+    def compile(self, compiler: SupportedCompiler = "internal", uncompute: bool = True):
         self._qcircuit = to_quantum(
             name=self.name,
             args=self.args,
             returns=self.returns,
             exprs=self.expressions,
             compiler=compiler,
+            uncompute=uncompute,
         )
 
     def bind(self, **kwargs) -> "QlassF":
@@ -183,6 +184,7 @@ class QlassF(QCircuitWrapper):
         to_compile: bool = True,
         compiler: SupportedCompiler = "internal",
         bool_optimizer: BoolOptimizerProfile = bestWorkingOptimizer,
+        uncompute: bool = True,
     ) -> "QlassF":
         """Create a QlassF from a function or a string containing a function
 
@@ -194,6 +196,8 @@ class QlassF(QCircuitWrapper):
             compiler (SupportedCompiler, optional): override default compiler (default: internal)
             bool_optimizer (BoolOptimizerProfile, optional): override default optimizer
                 (default: bestWorkingOptimizer)
+            uncompute (bool, optional): whenever uncompute input qubits during compilation
+                (default: True)
         """
         if isinstance(f, str):
             exec(f)
@@ -206,13 +210,11 @@ class QlassF(QCircuitWrapper):
 
         exps = bool_optimizer.apply(exps)
 
-        # print(exps)
-
         # Return the qlassf object
         qf = QlassF(fun_name, original_f, args, fun_ret, exps)
 
         if to_compile:
-            qf.compile(compiler)
+            qf.compile(compiler, uncompute=uncompute)
         return qf
 
 
@@ -223,6 +225,7 @@ def qlassf(
     to_compile: bool = True,
     compiler: SupportedCompiler = "internal",
     bool_optimizer: BoolOptimizerProfile = bestWorkingOptimizer,
+    uncompute: bool = True,
 ) -> QlassF:
     """Decorator / function creating a QlassF object
 
@@ -234,7 +237,11 @@ def qlassf(
         compiler (SupportedCompiler, optional): override default compiler (default: internal)
         bool_optimizer (BoolOptimizerProfile, optional): override default optimizer
             (default: bestWorkingOptimizer)
+        uncompute (bool, optional): whenever uncompute input qubits during compilation
+            (default: True)
     """
     defs_fun = list(map(lambda q: q.to_logicfun(), defs))
 
-    return QlassF.from_function(f, types, defs_fun, to_compile, compiler)
+    return QlassF.from_function(
+        f, types, defs_fun, to_compile, compiler, uncompute=uncompute
+    )
