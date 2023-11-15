@@ -101,8 +101,6 @@ def compute_result_of_qcircuit(cls, qf, truth_line):
     gate = qf.gate()
     qc = QuantumCircuit(gate.num_qubits)
 
-    # update_statistics(circ.num_qubits, circ.num_gates)
-
     # Prepare inputs
     [qc.initialize(1 if truth_line[i] else 0, i) for i in range(qf.input_size)]
 
@@ -205,6 +203,9 @@ def compute_and_compare_results(cls, qf, test_original_f=True):
         qc_truth = truth_table
 
     circ_qi = qf.circuit().export("circuit", "qiskit")
+
+    # update_statistics(qf.circuit().num_qubits, qf.circuit().num_gates)
+
     # print(qf.expressions)
     # print(circ_qi.draw("text"))
     # print(circ_qi.qasm())

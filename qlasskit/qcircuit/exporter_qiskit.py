@@ -26,15 +26,9 @@ class QiskitExporter(QCircuitExporter):
         qc = QuantumCircuit(_selfqc.num_qubits, 0)
 
         for g, w, p in _selfqc.gates:
-            if isinstance(g, gates.X):
-                qc.x(*w)
-            elif isinstance(g, gates.H):
-                qc.h(*w)
-            elif isinstance(g, gates.CX):
-                qc.cx(*w)
-            elif isinstance(g, gates.CCX):
-                qc.ccx(*w)
-            elif isinstance(g, gates.MCX):
+            g_name = g.__class__.__name__.lower()
+                
+            if isinstance(g, gates.MCX):
                 qc.mcx(w[0:-1], w[-1])
             elif isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.X):
                 qc.mcx(w[0:-1], w[-1])
@@ -45,7 +39,13 @@ class QiskitExporter(QCircuitExporter):
             elif isinstance(g, gates.Barrier) and mode != "gate":
                 qc.barrier(label=p)
 
-            elif not (isinstance(g, gates.NopGate)):
+            elif isinstance(g, gates.NopGate):
+                pass
+
+            elif hasattr(qc, g_name):
+                getattr(qc, g_name)(*w)
+                
+            else:
                 raise Exception(f"not handled {g}")
 
         if mode == "gate":
