@@ -15,7 +15,7 @@ Qlasskit implements circuit / gate exporters for Qiskit, Cirq, Qasm and Sympy.
 
 ```python
 @qlassf
-def hash(k: Qint4) -> bool:
+def h(k: Qint4) -> bool:
     h = True
     for i in range(4):
         h = h and k[i]
@@ -25,14 +25,14 @@ def hash(k: Qint4) -> bool:
 Qlasskit will take care of translating the function to boolean expressions, simplify them and
 translate to a quantum circuit.
 
-![Groover](docs/source/_images/hash_circ.png)
+![Groover](docs/source/_images/h_circ.png)
 
-Then, we can use groover to find which hash(k) returns True:
+Then, we can use groover to find which h(k) returns True:
 
 ```python
 from qlasskit.algorithms import Groover
 
-algo = Groover(hash, True)
+algo = Groover(h, True)
 qc = algo.circuit().export("circuit", "qiskit")
 ```
 
@@ -40,13 +40,21 @@ And that's it:
 
 ![Groover](docs/source/_images/groover_circ.png)
 
+Qlasskit also offers type abstraction for encoding inputs and decoding results:
 
-You can also use other functions:
+```python
+counts_readable = algo.decode_counts(counts)
+plot_histogram(counts_readable)
+```
+
+![Decoded counts](docs/source/_images/groover_decoded.png)
+
+You can also use other functions inside a qlassf:
 
 ```python
 @qlassf
 def equal_8(n: Qint4) -> bool:
-  return equal_8
+  return equal_8 == 8
 
 @qlassf
 def f(n: Qint4) -> bool:
@@ -64,7 +72,7 @@ def f(a: Tuple[Qint8, Qint8]) -> Tuple[bool, bool]:
 
 ```python
 @qlassf
-def search(alist: List4[Qint2], to_search: Qint2):
+def search(alist: Qlist[Qint2, 4], to_search: Qint2):
   for x in alist:
     if x == to_search:
       return True
@@ -100,5 +108,6 @@ This software is licensed with [Apache License 2.0](LICENSE).
 
 Davide Gessa (dakk)
 - https://twitter.com/dagide
+- https://mastodon.social/@dagide 
 - https://dakk.github.io/
 - https://medium.com/@dakk
