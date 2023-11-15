@@ -402,6 +402,16 @@ class TestQlassfIntMul(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
+    def test_mult_multconst(self):
+        f = "def test(a: Qint2, b: Qint2) -> Qint4:\n\treturn (a * b) * 5"
+        qf = qlassf(f, compiler=self.compiler, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_mul_const(self):
+        f = "def test(a: Qint2, b: Qint4) -> Qint4:\n\treturn (a * 3) + b"
+        qf = qlassf(f, compiler=self.compiler, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
     # def test_mul4(self):
     #     f = "def test(a: Qint4, b: Qint4) -> Qint4: return a * b"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
