@@ -15,7 +15,7 @@
 
 from typing import Any, List, Union, Optional, get_args
 
-from sympy.logic import Not, Xor, And, Or
+from sympy.logic import Not, Xor, And
 
 
 def _neq(a, b):
@@ -32,7 +32,6 @@ def _half_adder(a, b):  # Carry x Sum
 
 def _full_adder(c, a, b):  # Carry x Sum
     return (a & b) ^ (a ^ b) & c, Xor(Xor(a, b), c)
-    #return Or(And(a, b), And(b, c), And(a, c)), Xor(Xor(a, b), c)
 
 
 from .qtype import Qtype, TExp, TType  # noqa: F401, E402
