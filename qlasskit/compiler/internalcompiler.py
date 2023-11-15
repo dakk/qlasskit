@@ -37,6 +37,9 @@ class InternalCompiler(Compiler):
                 # TODO: this is redundant, since we also have qc[]
                 # self.expqmap[Symbol(arg_b)] = qi
 
+        a_true = None
+        a_false = None
+
         for sym, exp in exprs:
             is_temp = sym.name[0:2] == "__"
             symp_exp = self._symplify_exp(exp)
@@ -46,7 +49,18 @@ class InternalCompiler(Compiler):
             #     iret = qc.get_free_ancilla()
             #     qc.cx(qc[exp], iret)
             # else:
-            iret = self.compile_expr(qc, symp_exp)
+
+            if isinstance(symp_exp, BooleanFalse):
+                if not a_false:
+                    a_false = qc.add_qubit("FALSE")
+                iret = a_false
+            elif isinstance(symp_exp, BooleanTrue):
+                if not a_true:
+                    a_true = qc.add_qubit("TRUE")
+                    qc.x(a_true)
+                iret = a_true
+            else:
+                iret = self.compile_expr(qc, symp_exp)
 
             self.expqmap[sym] = iret
             qc.map_qubit(sym, iret, promote=not is_temp)
@@ -70,11 +84,26 @@ class InternalCompiler(Compiler):
         if isinstance(expr, Symbol):
             if expr.name in qc:
                 return qc[expr.name]
+            elif expr.name == "new_qubit":
+                return qc.get_free_ancilla()
             else:
                 raise CompilerException(f"Symbol not found in qc: {expr.name}")
 
         elif expr in self.expqmap:
             return self.expqmap[expr]
+
+        elif isinstance(expr, Xor):
+            d = qc.get_free_ancilla()
+            neg = False
+            for e in expr.args:
+                if isinstance(e, Symbol):
+                    qc.cx(qc[e], d)
+                else:
+                    d = self.compile_expr(qc, e, dest=d)
+            if neg:
+                qc.x(d)
+            self.expqmap[expr] = d
+            return d
 
         elif isinstance(expr, Not):
             eret = self.compile_expr(qc, expr.args[0])
@@ -105,35 +134,14 @@ class InternalCompiler(Compiler):
 
             return dest
 
-        elif isinstance(expr, Xor):
-            erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))
-            last = erets.pop()
+        # elif isinstance(expr, BooleanFalse):
+        #     return qc.get_free_ancilla()
 
-            if last in qc.ancilla_lst:
-                dest = last
-                self.expqmap[expr] = last
-            else:
-                if dest is None:
-                    dest = qc.get_free_ancilla()
-
-                qc.cx(last, dest)
-                qc.mark_ancilla(last)
-                self.expqmap[expr] = dest
-
-            for x in erets:
-                qc.cx(x, dest)
-
-            [qc.mark_ancilla(eret) for eret in erets]
-            return dest
-
-        elif isinstance(expr, BooleanFalse):
-            return qc.get_free_ancilla()
-
-        elif isinstance(expr, BooleanTrue):
-            if dest is None:
-                dest = qc.get_free_ancilla()
-            qc.x(dest)
-            return dest
+        # elif isinstance(expr, BooleanTrue):
+        #     if dest is None:
+        #         dest = qc.get_free_ancilla()
+        #     qc.x(dest)
+        #     return dest
 
         else:
             raise CompilerException(expr)
