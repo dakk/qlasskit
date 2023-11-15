@@ -131,7 +131,7 @@ class InternalCompiler(Compiler):
         elif isinstance(expr, QuantumBooleanGate):
             erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))  # type: ignore
             gate = expr.__class__.__name__.lower()
-            
+
             if hasattr(qc, gate):
                 if gate[0] == "m":
                     getattr(qc, gate)(erets[0:-1], erets[-1])

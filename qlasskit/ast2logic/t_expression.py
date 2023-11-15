@@ -289,7 +289,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             args_v = [b for (a, b) in args]
 
             q_gate = QuantumBooleanGate.build(gate)
-            
+
             if len(args_v) == 1 and isinstance(args_v[0], list):
                 return args[0][0], [q_gate(a) for a in args_v[0]]
             else:
