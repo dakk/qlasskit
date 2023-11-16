@@ -81,11 +81,11 @@ def test_not(a: bool) -> bool:
     return not a
 
 
-class Qint3(Qint):
-    BIT_SIZE = 3
+class Qint5(Qint):
+    BIT_SIZE = 5
 
 
-def test_qint3(a: Qint3) -> bool:
+def test_qint5(a: Qint5) -> bool:
     return not a[0]
 
 

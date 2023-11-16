@@ -53,7 +53,7 @@ BUILTIN_TYPES = [Qint2, Qint3, Qint4, Qint8, Qint12, Qint16, Qlist]
 
 def const_to_qtype(value: Any) -> TExp:
     if isinstance(value, int):
-        for det_type in [Qint2, Qint3, Qint4, Qint8, Qint12, Qint16]:
+        for det_type in [Qint2, Qint4, Qint8, Qint12, Qint16]:  # Qint3
             if value < 2**det_type.BIT_SIZE:
                 return det_type.const(value)
 
