@@ -135,7 +135,15 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             raise exceptions.TypeErrorException(te_test[0], bool)
 
         if te_true[0] != te_false[0]:
-            raise exceptions.TypeErrorException(te_false[0], te_true[0])
+            if not hasattr(te_true[0], "BIT_SIZE") or not hasattr(
+                te_false[0], "BIT_SIZE"
+            ):
+                raise exceptions.TypeErrorException(te_false[0], te_true[0])
+
+            if te_true[0].BIT_SIZE > te_false[0].BIT_SIZE:  # type: ignore
+                te_false = te_true[0].fill(te_false)  # type: ignore
+            elif te_true[0].BIT_SIZE < te_false[0].BIT_SIZE:  # type: ignore
+                te_true = te_false[0].fill(te_true)  # type: ignore
 
         if te_true[0] == bool:
             return (
