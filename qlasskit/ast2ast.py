@@ -69,6 +69,8 @@ def _replace_types_annotations(ann, arg=None):
 
 
 class ASTRewriter(ast.NodeTransformer):
+    """Rewrites the ast to a simplified version"""
+    
     def __init__(self, env={}, ret=None):
         self.env = {}
         self.const = {}
@@ -109,10 +111,13 @@ class ASTRewriter(ast.NodeTransformer):
 
         if isinstance(_sval, ast.Name) and _sval.id in self.const:
             node.slice = self.const[_sval.id]
-
+            
         # Unroll L[a] with (L[0] if a == 0 else L[1] if a == 1 ...)
-        elif isinstance(_sval, ast.Name) and _sval.id not in self.const:
+        elif (isinstance(_sval, ast.Name) and _sval.id not in self.const) or isinstance(_sval, ast.Subscript):
             if isinstance(node.value, ast.Name):
+                if node.value.id == 'Tuple':
+                    return node 
+                
                 tup = self.env[node.value.id]
             else:
                 tup = node.value

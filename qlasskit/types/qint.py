@@ -248,7 +248,9 @@ class Qint(int, Qtype):
 class Qint2(Qint):
     BIT_SIZE = 2
 
-
+class Qint3(Qint):
+    BIT_SIZE = 3
+    
 class Qint4(Qint):
     BIT_SIZE = 4
 

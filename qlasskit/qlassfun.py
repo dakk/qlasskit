@@ -247,5 +247,27 @@ def qlassf(
     defs_fun = list(map(lambda q: q.to_logicfun(), defs))
 
     return QlassF.from_function(
-        f, types, defs_fun, to_compile, compiler, uncompute=uncompute
+        f,
+        types,
+        defs_fun,
+        to_compile,
+        compiler,
+        uncompute=uncompute,
+        bool_optimizer=bool_optimizer,
     )
+
+
+def qlassf_a(
+    types: List[Qtype] = [],
+    defs: List[QlassF] = [],
+    to_compile: bool = True,
+    compiler: SupportedCompiler = "internal",
+    bool_optimizer: BoolOptimizerProfile = bestWorkingOptimizer,
+    uncompute: bool = True,
+):
+    """Decorator with parameters for qlassf"""
+
+    def _inner(fun):
+        return qlassf(fun, types, defs, to_compile, compiler, bool_optimizer, uncompute)
+
+    return _inner

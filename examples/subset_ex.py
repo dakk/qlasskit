@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from qiskit import Aer, QuantumCircuit, transpile
 from qiskit.visualization import plot_histogram
 
-from qlasskit import Qint2, qlassf
+from qlasskit import Qint2, Qint3, qlassf
 from qlasskit.algorithms import Grover
 
 
@@ -19,15 +19,12 @@ def qiskit_simulate(qc):
 
 
 @qlassf
-def subset_sum(ii: Tuple[Qint2, Qint2]) -> Qint2:
-    l = [0, 1, 2, 0]
-    ai, bi = ii
-    a = l[ai]
-    b = l[bi]
-    return a + b
+def subset_sum(ii: Tuple[Qint2, Qint2]) -> Qint3:
+    l = [0, 5, 2, 3]
+    return l[ii[0]] + l[ii[1]] if ii[0] != ii[1] else 0
 
 
-algo = Grover(subset_sum, Qint2(3))
+algo = Grover(subset_sum, Qint3(7))
 
 qc = algo.circuit().export("circuit", "qiskit")
 print(qc.draw("text"))

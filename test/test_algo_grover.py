@@ -74,10 +74,7 @@ def hash(k: Qint4, q: Qint4) -> bool:
         f = """
 def subset_sum(ii: Tuple[Qint2, Qint2]) -> Qint2:
     l = [0, 1, 2, 0]
-    ai, bi = ii
-    a = l[ai]
-    b = l[bi]
-    return a + b
+    return l[ii[0]] + l[ii[1]]
 """
         qf = qlassf(f)
         algo = Grover(qf, Qint2(3))
