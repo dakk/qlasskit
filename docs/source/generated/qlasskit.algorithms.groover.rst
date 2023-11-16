@@ -1,4 +1,4 @@
-qlasskit.algorithms.groover
+﻿qlasskit.algorithms.groover
 ===========================
 
 .. automodule:: qlasskit.algorithms.groover

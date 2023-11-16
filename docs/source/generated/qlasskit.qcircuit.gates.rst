@@ -32,9 +32,11 @@ qlasskit.qcircuit.gates
       NopGate
       QControlledGate
       QGate
+      S
       T
       Toffoli
       X
+      Y
       Z
    
    

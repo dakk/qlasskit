@@ -5,7 +5,7 @@ from qiskit import Aer, ClassicalRegister, QuantumCircuit, transpile
 from qiskit.visualization import plot_histogram
 
 from qlasskit import Qint2, Qint4, Qint8, Qint16, Qlist, qlassf
-from qlasskit.algorithms import Groover
+from qlasskit.algorithms import Grover
 
 
 def qiskit_simulate(qc, alog):
@@ -71,7 +71,7 @@ def md5_simp(m: Tuple[Qint2, Qint2]) -> Qint4:
 
 # print(md5_simp.expressions)
 # print(md5_simp.circuit().export('circuit', 'qiskit').draw('text'))
-algo = Groover(md5_simp, (Qint4(0)))
+algo = Grover(md5_simp, (Qint4(0)))
 
 # print(hex(md5_simp.original_f((2,3))))
 

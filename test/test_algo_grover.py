@@ -15,13 +15,13 @@
 import unittest
 
 from qlasskit import Qint2, Qint4, qlassf
-from qlasskit.algorithms import Groover
+from qlasskit.algorithms import Grover
 
 from .utils import qiskit_measure_and_count
 
 
-class TestAlgoGroover(unittest.TestCase):
-    def test_groover(self):
+class TestAlgoGrover(unittest.TestCase):
+    def test_grover(self):
         f = """
 def hash(k: Qint4) -> bool:
     h = True
@@ -30,7 +30,7 @@ def hash(k: Qint4) -> bool:
     return h
 """
         qf = qlassf(f)
-        algo = Groover(qf, True)
+        algo = Grover(qf, True)
 
         qc = algo.circuit().export("circuit", "qiskit")
         counts = qiskit_measure_and_count(qc, shots=1024)
@@ -40,7 +40,7 @@ def hash(k: Qint4) -> bool:
         self.assertEqual(algo.output_qubits, [0, 1, 2, 3])
         self.assertEqual(counts_readable[15] > 600, True)
 
-    def test_groover_without_element_to_search(self):
+    def test_grover_without_element_to_search(self):
         f = """
 def hash(k: Qint4) -> bool:
     h = True
@@ -49,7 +49,7 @@ def hash(k: Qint4) -> bool:
     return h
 """
         qf = qlassf(f)
-        algo = Groover(qf)
+        algo = Grover(qf)
 
         qc = algo.circuit().export("circuit", "qiskit")
         counts = qiskit_measure_and_count(qc, shots=1024)
@@ -58,7 +58,7 @@ def hash(k: Qint4) -> bool:
         self.assertEqual(15 in counts_readable, True)
         self.assertEqual(counts_readable[15] > 600, True)
 
-    def test_groover_too_many_args(self):
+    def test_grover_too_many_args(self):
         f = """
 def hash(k: Qint4, q: Qint4) -> bool:
     h = True
@@ -68,4 +68,4 @@ def hash(k: Qint4, q: Qint4) -> bool:
 """
         qf = qlassf(f)
 
-        self.assertRaises(Exception, lambda x: Groover(x), qf)
+        self.assertRaises(Exception, lambda x: Grover(x), qf)

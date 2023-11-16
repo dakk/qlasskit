@@ -49,13 +49,12 @@ class CNotSim:
         for g, w, p in qc.gates:
             if isinstance(g, X):
                 qubits[w[0]] = not qubits[w[0]]
-            elif isinstance(g, CX):
-                if qubits[w[0]]:
-                    qubits[w[1]] = not qubits[w[1]]
-            elif isinstance(g, CCX):
-                if qubits[w[0]] and qubits[w[1]]:
-                    qubits[w[2]] = not qubits[w[2]]
-            elif isinstance(g, MCX) or (isinstance(g, MCtrl) and isinstance(g.gate, X)):
+            elif (
+                isinstance(g, CX)
+                or isinstance(g, CCX)
+                or isinstance(g, MCX)
+                or (isinstance(g, MCtrl) and isinstance(g.gate, X))
+            ):
                 if all([qubits[x] for x in w[0:-1]]):
                     qubits[w[-1]] = not qubits[w[-1]]
             else:

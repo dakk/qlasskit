@@ -18,4 +18,4 @@ from .qalgorithm import (  # noqa: F401, E402
     oraclize,
     ConstantOracleException,
 )
-from .groover import Groover  # noqa: F401, E402
+from .grover import Grover  # noqa: F401, E402

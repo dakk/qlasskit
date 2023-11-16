@@ -26,7 +26,10 @@
       ~QCircuit.h
       ~QCircuit.mctrl
       ~QCircuit.mcx
+      ~QCircuit.s
+      ~QCircuit.t
       ~QCircuit.x
+      ~QCircuit.y
       ~QCircuit.z
    
    

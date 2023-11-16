@@ -25,20 +25,20 @@ def h(k: Qint4) -> bool:
 Qlasskit will take care of translating the function to boolean expressions, simplify them and
 translate to a quantum circuit.
 
-![Groover](docs/source/_images/h_circ.png)
+![Grover](docs/source/_images/h_circ.png)
 
-Then, we can use groover to find which h(k) returns True:
+Then, we can use grover to find which h(k) returns True:
 
 ```python
-from qlasskit.algorithms import Groover
+from qlasskit.algorithms import Grover
 
-algo = Groover(h, True)
+algo = Grover(h, True)
 qc = algo.circuit().export("circuit", "qiskit")
 ```
 
 And that's it:
 
-![Groover](docs/source/_images/groover_circ.png)
+![Grover](docs/source/_images/grover_circ.png)
 
 Qlasskit also offers type abstraction for encoding inputs and decoding results:
 
@@ -47,7 +47,7 @@ counts_readable = algo.decode_counts(counts)
 plot_histogram(counts_readable)
 ```
 
-![Decoded counts](docs/source/_images/groover_decoded.png)
+![Decoded counts](docs/source/_images/grover_decoded.png)
 
 You can also use other functions inside a qlassf:
 

@@ -3,7 +3,7 @@ from qiskit import Aer, QuantumCircuit, transpile
 from qiskit.visualization import plot_histogram
 
 from qlasskit import Qint2, Qint4, Qint8, Qlist, qlassf
-from qlasskit.algorithms import Groover
+from qlasskit.algorithms import Grover
 
 
 @qlassf

@@ -3,7 +3,7 @@ from qiskit import Aer, QuantumCircuit, transpile
 from qiskit.visualization import plot_histogram
 
 from qlasskit import Qint4, Qint8, qlassf
-from qlasskit.algorithms import Groover
+from qlasskit.algorithms import Grover
 
 
 def qiskit_simulate(qc):
@@ -29,7 +29,7 @@ def qiskit_simulate(qc):
 # def hash(k: Qint8) -> Qint8:
 #     return (k<<1)+2
 
-# algo = Groover(hash, Qint8(12))
+# algo = Grover(hash, Qint8(12))
 
 # @qlassf
 # def hash(k: Qint4) -> bool:
@@ -38,7 +38,7 @@ def qiskit_simulate(qc):
 #         h = h and k[i]
 #     return h
 
-# algo = Groover(hash, True)
+# algo = Grover(hash, True)
 
 
 @qlassf
@@ -49,7 +49,7 @@ def hash(k: Qint4) -> bool:
     return h
 
 
-algo = Groover(hash, True)
+algo = Grover(hash, True)
 
 
 # @qlassf
@@ -65,14 +65,14 @@ algo = Groover(hash, True)
 # @qlassf
 # def hash(k: Qint8) -> Tuple[bool, bool]:
 #     return k[0] and k[1] and not k[2] and not k[3], k[4] and not k[5] and k[6] and not k[7]
-# algo = Groover(hash, (True,True))
+# algo = Grover(hash, (True,True))
 
 
 # @qlassf
 # def hash(k: Qint8) -> bool:
 #     return k[0] and k[1] and not k[2] and not k[3] and k[4] and not k[5] and k[6] and not k[7]
 
-# algo = Groover(hash, True)
+# algo = Grover(hash, True)
 
 
 # @qlassf
@@ -80,7 +80,7 @@ algo = Groover(hash, True)
 #     return (k << 1) + 2
 
 
-# algo = Groover(hash, Qint4(12))
+# algo = Grover(hash, Qint4(12))
 
 qc = algo.circuit().export("circuit", "qiskit")
 counts = qiskit_simulate(qc)

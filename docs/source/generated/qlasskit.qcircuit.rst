@@ -1,4 +1,4 @@
-qlasskit.qcircuit
+﻿qlasskit.qcircuit
 =================
 
 .. automodule:: qlasskit.qcircuit
@@ -27,6 +27,7 @@ qlasskit.qcircuit
    :toctree:
    :recursive:
 
+   qlasskit.qcircuit.cnotsim
    qlasskit.qcircuit.exporter
    qlasskit.qcircuit.exporter_cirq
    qlasskit.qcircuit.exporter_qasm

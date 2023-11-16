@@ -21,7 +21,7 @@ from ..types import Qtype, interpret_as_qtype
 from .qalgorithm import QAlgorithm, oraclize
 
 
-class Groover(QAlgorithm):
+class Grover(QAlgorithm):
     def __init__(
         self,
         oracle: QlassF,

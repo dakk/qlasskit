@@ -1,4 +1,4 @@
-qlasskit.algorithms
+﻿qlasskit.algorithms
 ===================
 
 .. automodule:: qlasskit.algorithms
@@ -28,5 +28,6 @@ qlasskit.algorithms
    :recursive:
 
    qlasskit.algorithms.groover
+   qlasskit.algorithms.grover
    qlasskit.algorithms.qalgorithm
 

@@ -1,35 +1,6 @@
-qlasskit.qlassf
+﻿qlasskit.qlassf
 ===============
 
-.. automodule:: qlasskit.qlassf
+.. currentmodule:: qlasskit
 
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      qlassf
-   
-   
-
-   
-   
-   .. rubric:: Classes
-
-   .. autosummary::
-   
-      QlassF
-   
-   
-
-   
-   
-   
-
-
-
+.. autofunction:: qlassf

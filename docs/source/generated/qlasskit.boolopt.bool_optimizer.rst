@@ -1,4 +1,4 @@
-qlasskit.boolopt.bool\_optimizer
+﻿qlasskit.boolopt.bool\_optimizer
 ================================
 
 .. automodule:: qlasskit.boolopt.bool_optimizer
@@ -16,6 +16,7 @@ qlasskit.boolopt.bool\_optimizer
       apply_cse
       custom_simplify_logic
       merge_expressions
+      print_step
    
    
 

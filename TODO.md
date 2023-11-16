@@ -67,7 +67,7 @@
 - [x] Aggregate cascading expressions in for unrolling
 - [x] Rewrite qcircuit abstraction
 - [x] Inner function
-- [x] Groover algorithm
+- [x] Grover algorithm
 - [x] Tuple-tuple comparison
 - [x] Multi var assign
 
@@ -76,7 +76,7 @@
 - [x] Integrate qrack on test suite
 - [x] Test / support on multiple py version >= 3.8
 - [x] Fixed size list
-- [x] Groover algorithm tests 
+- [x] Grover algorithm tests 
 - [x] Slideshow for UF midterm
 - [x] Builtin functions: sum(), all(), any()
 - [x] Bool optimizers test
@@ -92,6 +92,7 @@
 - [x] Cirq exporter
 - [x] Qint multiplier
 - [x] Allow quantum gates inside sympy expressions
+- [x] CNotSim dummy simulator for circuit testing
 - [ ] Improve exporting utilities
 - [ ] Use cases
 - [ ] Documentation
