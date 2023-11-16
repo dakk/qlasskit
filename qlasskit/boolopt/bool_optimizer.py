@@ -93,3 +93,17 @@ bestWorkingOptimizer = BoolOptimizerProfile(
         transform_or2and(),
     ]
 )
+
+
+bestWorkingOptimizerDebug = BoolOptimizerProfile(
+    [
+        print_step("before"),
+        merge_expressions,
+        apply_cse,
+        remove_ITE(),
+        remove_Implies(),
+        transform_or2xor(),
+        transform_or2and(),
+        print_step("after"),
+    ]
+)
