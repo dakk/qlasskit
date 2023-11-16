@@ -9,9 +9,9 @@ from qlasskit.algorithms import Groover
 
 
 def qiskit_simulate(qc, alog):
-    c = ClassicalRegister(len(algo.out_qubits()))
+    c = ClassicalRegister(algo.output_size)
     qc.add_bits(c)
-    qc.measure(algo.out_qubits(), c)
+    qc.measure(algo.output_qubits, c)
     print(qc.draw("text"))
 
     # simulator = Aer.get_backend("aer_simulator")
