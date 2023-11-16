@@ -23,6 +23,7 @@ from sympy import Symbol
 from .ast2ast import ast2ast
 from .ast2logic import Arg, Args, BoolExpList, LogicFun, flatten, translate_ast
 from .boolopt import BoolOptimizerProfile, bestWorkingOptimizer
+from .boolopt.bool_optimizer import merge_expressions
 from .boolquant import Q  # noqa: F403, F401
 from .compiler import SupportedCompiler, to_quantum
 from .qcircuit import QCircuitWrapper
@@ -134,6 +135,8 @@ class QlassF(QCircuitWrapper):
                 f"Max truth table size reached: {bits + self.output_size} > {MAX_TRUTH_TABLE_SIZE}"
             )
 
+        exps = merge_expressions(self.expressions)
+
         for i in range(
             0, 2**bits, int(2**bits / max) if max and max < 2**bits else 1
         ):
@@ -142,7 +145,7 @@ class QlassF(QCircuitWrapper):
             bin_arr = list(map(lambda c: c == "1", bin_str))
             known = list(zip(arg_bits, bin_arr))
 
-            for ename, exp in self.expressions:
+            for ename, exp in exps:
                 exp_sub = exp.subs(known)
 
                 known = list(filter(lambda x: x[0] != ename.name, known))

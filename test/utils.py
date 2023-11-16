@@ -14,6 +14,7 @@
 
 import inspect
 import json
+import os
 import random
 import threading
 from typing import Tuple, get_args
@@ -23,6 +24,7 @@ from qiskit_aer import Aer
 from sympy.logic.boolalg import gateinputcount
 
 from qlasskit import Qint, QlassF, Qtype, compiler, const_to_qtype
+from qlasskit.qcircuit import CNotSim, GateNotSimulableException
 
 COMPILATION_ENABLED = True
 
@@ -122,13 +124,19 @@ def compute_result_of_qcircuit(cls, qf, truth_line):
 
     cls.assertEqual(len(counts), 1)
 
-    max_qubits = (
-        qf.input_size
-        + len(qf.expressions)
-        + sum([gateinputcount(e[1]) for e in qf.expressions])
-    )
+    return res_str
 
-    cls.assertLessEqual(qf.gate().num_qubits, max_qubits)
+
+def compute_result_of_qcircuit_using_cnotsim(cls, qf, truth_line):
+    qc = qf.circuit()
+
+    qinit = [True if truth_line[i] else False for i in range(qf.input_size)]
+
+    res = CNotSim().simulate(qc, initialize=qinit)
+
+    res_str = ""
+    for qname in qf.truth_table_header()[-qf.output_size :]:
+        res_str += "1" if res[qc[qname]] else "0"
 
     return res_str
 
@@ -202,7 +210,7 @@ def compute_and_compare_results(cls, qf, test_original_f=True):
     elif COMPILATION_ENABLED:
         qc_truth = truth_table
 
-    circ_qi = qf.circuit().export("circuit", "qiskit")
+    # circ_qi = qf.circuit().export("circuit", "qiskit")
 
     # update_statistics(qf.circuit().num_qubits, qf.circuit().num_gates)
 
@@ -223,5 +231,22 @@ def compute_and_compare_results(cls, qf, test_original_f=True):
 
         # Calculate and compare the gate result
         if qc_truth and truth_line in qc_truth and COMPILATION_ENABLED:
-            res_qc = compute_result_of_qcircuit(cls, qf, truth_line)
-            cls.assertEqual(truth_str, res_qc)
+            max_qubits = (
+                qf.input_size
+                + len(qf.expressions)
+                + sum([gateinputcount(e[1]) for e in qf.expressions])
+            )
+            cls.assertLessEqual(qf.num_qubits, max_qubits)
+
+            if os.getenv("GITHUB_ACTIONS"):
+                res_qc = compute_result_of_qcircuit(cls, qf, truth_line)
+                cls.assertEqual(truth_str, res_qc)
+            else:
+                try:
+                    res_qc2 = compute_result_of_qcircuit_using_cnotsim(
+                        cls, qf, truth_line
+                    )
+                    cls.assertEqual(truth_str, res_qc2)
+                except GateNotSimulableException:
+                    res_qc = compute_result_of_qcircuit(cls, qf, truth_line)
+                    cls.assertEqual(truth_str, res_qc)
