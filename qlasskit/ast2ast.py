@@ -109,6 +109,40 @@ class ASTRewriter(ast.NodeTransformer):
 
         if isinstance(_sval, ast.Name) and _sval.id in self.const:
             node.slice = self.const[_sval.id]
+
+        # Unroll L[a] with (L[0] if a == 0 else L[1] if a == 1 ...)
+        elif isinstance(_sval, ast.Name) and _sval.id not in self.const:
+            if isinstance(node.value, ast.Name):
+                tup = self.env[node.value.id]
+            else:
+                tup = node.value
+
+            if not isinstance(tup, ast.Tuple):
+                raise Exception(
+                    "Not a tuple in ast2ast visit subscript with not constant _sval"
+                )
+
+            elts = tup.elts
+
+            ifex = ast.IfExp(
+                test=ast.Compare(
+                    left=_sval, ops=[ast.Eq()], comparators=[ast.Constant(value=0)]
+                ),
+                body=elts[0],
+                orelse=ast.Constant(value=0),
+            )
+            for i, x in enumerate(elts[1:]):
+                ifex = ast.IfExp(
+                    test=ast.Compare(
+                        left=_sval,
+                        ops=[ast.Eq()],
+                        comparators=[ast.Constant(value=i + 1)],
+                    ),
+                    body=x,
+                    orelse=ifex,
+                )
+            return ifex
+
         return node
 
     def visit_Name(self, node):
@@ -202,6 +236,19 @@ class ASTRewriter(ast.NodeTransformer):
     def visit_Assign(self, node):
         # Transform multi-target assign to single target assigns
         if len(node.targets) == 1 and hasattr(node.targets[0], "elts"):
+            if isinstance(node.value, ast.Name):
+                return [
+                    self.visit(
+                        ast.Assign(
+                            targets=[ast.Name(id=node.targets[0].elts[i].id)],
+                            value=ast.Subscript(
+                                value=node.value, slice=ast.Constant(value=i)
+                            ),
+                        )
+                    )
+                    for i in range(len(node.targets[0].elts))
+                ]
+
             _temptup = self.visit(
                 ast.Assign(targets=[ast.Name(id="_temptup")], value=node.value)
             )
@@ -217,6 +264,7 @@ class ASTRewriter(ast.NodeTransformer):
                 )
                 for i in range(len(node.targets[0].elts))
             ]
+
             return [_temptup] + single_assigns
 
         target_0id = node.targets[0].id
@@ -229,7 +277,6 @@ class ASTRewriter(ast.NodeTransformer):
         else:
             self.env[target_0id] = "Unknown"
 
-        # TODO: support unrolling tuple
         # TODO: if value is not self referencing, we can skip this (ie: a = b + 1)
 
         # Reassigning an already present variable (use a temp variable)

@@ -69,3 +69,23 @@ def hash(k: Qint4, q: Qint4) -> bool:
         qf = qlassf(f)
 
         self.assertRaises(Exception, lambda x: Grover(x), qf)
+
+    def test_grover_subset_sum(self):
+        f = """
+def subset_sum(ii: Tuple[Qint2, Qint2]) -> Qint2:
+    l = [0, 1, 2, 0]
+    ai, bi = ii
+    a = l[ai]
+    b = l[bi]
+    return a + b
+"""
+        qf = qlassf(f)
+        algo = Grover(qf, Qint2(3))
+
+        qc = algo.circuit().export("circuit", "qiskit")
+        counts = qiskit_measure_and_count(qc, shots=1024)
+        counts_readable = algo.decode_counts(counts)
+
+        self.assertEqual((1, 2) in counts_readable, True)
+        self.assertEqual(counts_readable[(1, 2)] > 300, True)
+        self.assertEqual(counts_readable[(2, 1)] > 300, True)
