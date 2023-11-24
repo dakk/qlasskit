@@ -103,6 +103,11 @@
 - [x] Documentation
 
 ### Week 2: (27 Nov 23)
+
+- [ ] Move all examples to doc
+- [ ] Improve documentation
+- [ ] First stable release
+
 ### Week 3: (4 Dec 23)
 ### Week 4: (11 Dec 23)
 
@@ -113,8 +118,6 @@
 ### Week 3: (1 Jan 24)
 
 ### Week 4: (8 Jan 24)
-
-- [ ] First stable release
 
 
 
