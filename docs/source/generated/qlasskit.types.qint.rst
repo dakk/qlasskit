@@ -1,4 +1,4 @@
-qlasskit.types.qint
+﻿qlasskit.types.qint
 ===================
 
 .. automodule:: qlasskit.types.qint
@@ -21,6 +21,7 @@ qlasskit.types.qint
       Qint12
       Qint16
       Qint2
+      Qint3
       Qint4
       Qint8
    
