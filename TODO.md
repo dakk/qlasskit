@@ -93,11 +93,13 @@
 - [x] Qint multiplier
 - [x] Allow quantum gates inside sympy expressions
 - [x] CNotSim dummy simulator for circuit testing
-- [ ] Improve exporting utilities
+
+## Month 3:
+
+- [x] Improve exporting utilities
 - [ ] Use cases
 - [ ] Documentation
 
-## Month 3:
 
 ### Week 1: (20 Nov 23)
 ### Week 2: (27 Nov 23)
@@ -144,7 +146,6 @@
 - [ ] PyQrack (without qiskit provider)
 - [ ] QuTip
 - [ ] Pennylane
-- [ ] Cirq
 - [ ] Sympy quantum computing expressions
 
 ### Tools

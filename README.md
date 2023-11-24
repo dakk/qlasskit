@@ -22,6 +22,7 @@ def h(k: Qint4) -> bool:
     return h
 ```
 
+
 Qlasskit will take care of translating the function to boolean expressions, simplify them and
 translate to a quantum circuit.
 
@@ -36,7 +37,7 @@ algo = Grover(h, True)
 qc = algo.circuit().export("circuit", "qiskit")
 ```
 
-And that's it:
+And that's the result:
 
 ![Grover](docs/source/_images/grover_circ.png)
 

@@ -1,18 +1,18 @@
 How it works
 ============
 
-In order to translate python code to quantum circuit, qlasskit performs several transformations;
+To convert Python code into a quantum circuit, qlasskit implements a series of transformations:
 
-1. it starts from the python *AST* (abstract syntax tree) rewriting it to a simplified version 
-by the _ast2ast_ module. 
-2. Then the simplified *AST* is translated to *boolean expressions* as intermediate
-form by the _ast2logic_ module. In this step, boolean expression are simplified and optimized
-for the final transformation.
-3. Finally, these boolean expressions are compiled into a *quantum circuit* by the _compiler_ module.
+1. It begins with the Python *AST* (Abstract Syntax Tree), converting it into a more streamlined form using the _ast2ast_ module. 
+2. Next, the streamlined AST is translated into *boolean expressions* as an intermediate step by the _ast2logic_ module. 
+During this phase, boolean expressions are refined and optimized in preparation for the final transformation.
+3. Finally, the _compiler_ module takes these optimized boolean expressions and compiles them into a 
+*quantum circuit*.
 
-While other existing libraries translate individual operations into quantum circuits and then 
-combine them, qlasskit creates a single boolean expression for every output qubit of the entire 
-function. This approach allows for further optimization using boolean properties.
+Unlike other libraries that translate individual operations into quantum circuits before combining them, 
+qlasskit constructs a singular boolean expression for each output qubit of the entire function. 
+This unique approach facilitates advanced optimization leveraging boolean algebraic properties.
+
 
 For instance, let assume we have the following function:
 
@@ -91,7 +91,7 @@ Is translated to this boolean expression:
 
 Compiler
 ------------
-The boolean expressions are then being fed to the `qlasskit.compiler`` which translates boolean expressions
+The boolean expressions are then being fed to the `qlasskit.compiler`` which compiles boolean expressions
 to invertible circuits, introducing auxiliary qubits. In this step, the compiler will automatically uncompute 
 auxiliary qubits in order to reduce the number of qubits needed and the circuit footprint. 
 

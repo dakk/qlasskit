@@ -16,7 +16,7 @@
 __version__ = "0.0.2"
 
 from .qcircuit import QCircuit, SupportedFrameworks, SupportedFramework  # noqa: F401
-from .qlassfun import QlassF, qlassf, qlassf_a  # noqa: F401
+from .qlassfun import QlassF, qlassf, qlassfa  # noqa: F401
 from .ast2ast import ast2ast  # noqa: F401
 from .ast2logic import exceptions  # noqa: F401
 from .types import (  # noqa: F401, F403

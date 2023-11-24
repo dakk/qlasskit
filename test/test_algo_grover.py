@@ -40,6 +40,26 @@ def hash(k: Qint4) -> bool:
         self.assertEqual(algo.output_qubits, [0, 1, 2, 3])
         self.assertEqual(counts_readable[15] > 600, True)
 
+    def test_grover_list_search(self):
+        f = """
+def hash(k: Qint4) -> bool:
+    h = False
+    for i in [7]:
+        if i == k:
+            h = True
+    return h
+"""
+        qf = qlassf(f)
+        algo = Grover(qf, True)
+
+        qc = algo.circuit().export("circuit", "qiskit")
+        counts = qiskit_measure_and_count(qc, shots=1024)
+        counts_readable = algo.decode_counts(counts)
+
+        self.assertEqual(15 in counts_readable, True)
+        self.assertEqual(algo.output_qubits, [0, 1, 2, 3])
+        self.assertEqual(counts_readable[7] > 600, True)
+        
     def test_grover_without_element_to_search(self):
         f = """
 def hash(k: Qint4) -> bool:

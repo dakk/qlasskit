@@ -42,7 +42,9 @@ Container type holding different types.
 List
 ^^^^
 
-A fixed size list; its type is `Qlist[T, size]`.
+Qlist[T, size] denotes a fixed-size list in qlasskit. 
+For example, the list `[1,2,3]` is typed as `Qlist[Qint2,3]`.
+
 
 
 Expressions
@@ -110,7 +112,7 @@ Comparators
 
 .. code-block:: python
 
-   a > b or b <= c
+   a > b or b <= c and c == d or c != a
 
 
 Unary Op
@@ -140,6 +142,10 @@ Bin Op
 .. code-block:: python
 
    a - b
+
+.. code-block:: python
+
+   a * b
 
    
 
@@ -184,6 +190,10 @@ For loop
       a += i
 
 
+.. note::
+   Please note that in qlasskit, for loops are unrolled during compilation. Therefore, 
+   it is essential that the number of iterations for each for loop is known at the 
+   time of compilation.
 
 Function def
 ^^^^^^^^^^^^
@@ -204,3 +214,22 @@ If then else
       c += 12
    else:
       c += 13
+
+.. note::
+   At present, the if-then-else statement in qlasskit is designed to support branch bodies 
+   that exclusively contain assignment statements.
+
+
+
+Quantum Hybrid
+---------------
+
+In a qlassf function, you have the option to utilize quantum gates through the Q module. It's 
+important to keep in mind that incorporating quantum gates within a qlasskit function leads 
+to a Python function that exhibits distinct behaviors compared to its quantum counterpart.
+
+.. code-block:: python
+
+   def bell(a: bool, b: bool) -> bool:
+      return Q.CX(Q.H(a), b)
+

@@ -257,7 +257,7 @@ def qlassf(
     )
 
 
-def qlassf_a(
+def qlassfa(
     types: List[Qtype] = [],
     defs: List[QlassF] = [],
     to_compile: bool = True,
