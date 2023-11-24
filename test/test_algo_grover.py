@@ -59,7 +59,7 @@ def hash(k: Qint4) -> bool:
         self.assertEqual(15 in counts_readable, True)
         self.assertEqual(algo.output_qubits, [0, 1, 2, 3])
         self.assertEqual(counts_readable[7] > 600, True)
-        
+
     def test_grover_without_element_to_search(self):
         f = """
 def hash(k: Qint4) -> bool:

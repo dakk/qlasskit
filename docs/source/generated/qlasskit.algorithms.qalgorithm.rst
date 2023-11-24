@@ -1,4 +1,4 @@
-qlasskit.algorithms.qalgorithm
+﻿qlasskit.algorithms.qalgorithm
 ==============================
 
 .. automodule:: qlasskit.algorithms.qalgorithm

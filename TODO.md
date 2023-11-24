@@ -96,12 +96,12 @@
 
 ## Month 3:
 
-- [x] Improve exporting utilities
-- [ ] Use cases
-- [ ] Documentation
-
-
 ### Week 1: (20 Nov 23)
+
+- [x] Improve exporting utilities
+- [x] Publish doc on github
+- [x] Documentation
+
 ### Week 2: (27 Nov 23)
 ### Week 3: (4 Dec 23)
 ### Week 4: (11 Dec 23)
@@ -121,7 +121,7 @@
 
 ## Future features
 
-- [ ] Publish doc on github
+- [ ] Use cases
 - [ ] Int arithmetic expressions (/, %)
 - [ ] Parametrized qlassf
 - [ ] Lambda

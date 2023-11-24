@@ -99,13 +99,13 @@ class QlassF(QCircuitWrapper):
         vl = ""
         for arg, val in zip(self.args, qvals):
             vl += val_to_bin(arg.ttype, val)
-        return vl
+        return vl[::-1]  # TODO: we need an endianess paramter
 
     # @ovveride
     def decode_output(
         self, istr: Union[str, int, List[bool]]
     ) -> Union[bool, Tuple, Qtype]:
-        fcome = format_outcome(istr)
+        fcome = format_outcome(istr)[::-1]  # TODO: we need an endianess paramter
         return interpret_as_qtype(fcome[::-1], self.returns.ttype, len(self.returns))
 
     def __add__(self, qf2) -> "QlassF":

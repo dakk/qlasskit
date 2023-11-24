@@ -1,4 +1,4 @@
-qlasskit.qcircuit.gates
+﻿qlasskit.qcircuit.gates
 =======================
 
 .. automodule:: qlasskit.qcircuit.gates

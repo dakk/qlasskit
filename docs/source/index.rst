@@ -18,6 +18,8 @@ Python and translate them into unitary operators (gates) for use in quantum circ
    :maxdepth: 2
    :caption: Examples
 
+   example_grover_1.ipynb
+
 
 Indices and tables
 ==================
