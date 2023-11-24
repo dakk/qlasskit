@@ -18,7 +18,7 @@ tox
 ## Make docs
 
 ```
-pip install sphinx sphinx_rtd_theme nbsphinx
+pip install sphinx sphinx_rtd_theme myst_nb
 cd docs
 make html
 ```
