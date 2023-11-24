@@ -22,6 +22,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.napoleon",
     "sphinx_rtd_theme",
+    "myst_nb"
 ]
 
 templates_path = ["_templates"]

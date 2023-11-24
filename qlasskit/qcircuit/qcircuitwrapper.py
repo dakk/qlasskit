@@ -86,4 +86,4 @@ class QCircuitWrapper:
         return self._qcircuit.export(mode="circuit", framework=framework)
 
     def draw(self):
-        print(self._qcircuit.draw())
+        return self._qcircuit.draw()
