@@ -27,23 +27,26 @@ class Grover(QAlgorithm):
         oracle: QlassF,
         element_to_search: Optional[Qtype] = None,
         n_iterations: Optional[int] = None,
+        n_matching: int = 1
     ):
         """
         Args:
             oracle (QlassF): our f(x) -> bool that returns True if x satisfies the function or
                 a generic function f(x) = y that we want to compare with element_to_search
             element_to_search (Qtype, optional): the element we want to search
-            n_iterations (int, optional): force a number of iterations (otherwise, pi/4*sqrt(N))
+            n_iterations (int, optional): force a number of iterations (otherwise, pi/4*sqrt(N/n_matching))
+            n_matching (int): the number of expected matching values (default: 1)
         """
         if len(oracle.args) != 1:
             raise Exception("the oracle should receive exactly one parameter")
 
         self.oracle: QlassF
+        self.n_matching = n_matching
         self.search_space_size = len(oracle.args[0])
 
         if n_iterations is None:
             n_iterations = math.ceil(
-                math.pi / 4.0 * math.sqrt(2**self.search_space_size)
+                math.pi / 4.0 * math.sqrt(2**self.search_space_size / self.n_matching)
             )
 
         self.n_iterations = n_iterations

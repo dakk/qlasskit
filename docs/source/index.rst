@@ -19,6 +19,7 @@ Python and translate them into unitary operators (gates) for use in quantum circ
    :caption: Examples
 
    example_grover_1.ipynb
+   example_grover_2.ipynb
 
 
 Indices and tables
