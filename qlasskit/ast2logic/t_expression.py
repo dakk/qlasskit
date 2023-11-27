@@ -162,6 +162,14 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             return (bool, true)
         elif expr.value is False:
             return (bool, false)
+        elif isinstance(expr.value, ast.Tuple):
+            types = []
+            values = []
+            for x in expr.value.elts:  # type: ignore
+                t, e = const_to_qtype(x.value)  # type: ignore
+                types.append(t)
+                values.append(e)
+            return types, values
 
         q_value = const_to_qtype(expr.value)
 

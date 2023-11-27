@@ -51,10 +51,21 @@ def _replace_types_annotations(ann, arg=None):
             slice=_ituple,
         )
 
-    # Replace Qlist[T,n] with Tuple[(T,)*3]
+    # Replace Qlist[T,n] with Tuple[(T,)*n]
     if isinstance(ann, ast.Subscript) and ann.value.id == "Qlist":
         _elts = ann.slice.elts
         _ituple = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[1].value)
+
+        ann = ast.Subscript(
+            value=ast.Name(id="Tuple", ctx=ast.Load()),
+            slice=_ituple,
+        )
+
+    # Replace Qmatrix[T,n,m] with Tuple[(Tuple[(T,)*m],)*n]
+    if isinstance(ann, ast.Subscript) and ann.value.id == "Qmatrix":
+        _elts = ann.slice.elts
+        _ituple_row = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[2].value)
+        _ituple = ast.Tuple(elts=[copy.deepcopy(_ituple_row)] * _elts[1].value)
 
         ann = ast.Subscript(
             value=ast.Name(id="Tuple", ctx=ast.Load()),
@@ -323,7 +334,7 @@ class ASTRewriter(ast.NodeTransformer):
             ),
         ]
 
-    def visit_For(self, node):
+    def visit_For(self, node):  # noqa: C901
         iter = self.visit(node.iter)
 
         # Iterate over an object
@@ -344,6 +355,30 @@ class ASTRewriter(ast.NodeTransformer):
                 ]
         elif isinstance(iter, ast.Tuple):
             iter = iter.elts
+        elif isinstance(iter, ast.Subscript) and iter.value.id in self.env:
+            if isinstance(self.env[iter.value.id], ast.Tuple):
+                iter = self.env[iter.value.id].elts[iter.slice.value]
+
+            elif isinstance(self.env[iter.value.id], ast.Subscript):
+                _elts = self.env[iter.value.id].slice.elts[iter.slice.value]
+
+                if isinstance(_elts, ast.Tuple):
+                    _elts = _elts.elts
+
+                iter = [
+                    ast.Subscript(
+                        value=ast.Subscript(
+                            value=ast.Name(id=iter.value.id, ctx=ast.Load()),
+                            slice=ast.Constant(value=iter.slice.value),
+                            ctx=ast.Load(),
+                        ),
+                        slice=ast.Constant(value=e),
+                    )
+                    for e in range(len(_elts))
+                ]
+
+        if isinstance(iter, ast.Constant) and isinstance(iter.value, ast.Tuple):
+            iter = iter.value.elts
 
         rolls = []
         for i in iter:

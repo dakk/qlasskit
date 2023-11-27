@@ -20,20 +20,39 @@ from . import Env, exceptions
 from .typing import Arg, Args
 
 
-def translate_argument(ann, env, base="") -> Arg:
+def translate_argument(ann, env, base="") -> Arg:  # noqa: C901
     def to_name(a):
         return a.attr if isinstance(a, ast.Attribute) else a.id
+
+    ttypes: List[TType] = []
 
     # Tuple
     if isinstance(ann, ast.Subscript) and ann.value.id == "Tuple":  # type: ignore
         al = []
         ind = 0
-        ttypes: List[TType] = []
 
         if hasattr(ann.slice, "elts"):
             _elts = ann.slice.elts  # type: ignore
         else:
             _elts = [ann.slice]
+
+        for i in _elts:  # type: ignore
+            if isinstance(i, ast.Name) and to_name(i) == "bool":
+                al.append(f"{base}.{ind}")
+                ttypes.append(bool)
+            else:
+                inner_arg = translate_argument(i, env, base=f"{base}.{ind}")
+                ttypes.append(inner_arg.ttype)
+                al.extend(inner_arg.bitvec)
+            ind += 1
+        ttypes_t = tuple(ttypes)
+        return Arg(base, Tuple[ttypes_t], al)
+
+    elif isinstance(ann, ast.Tuple):
+        al = []
+        ind = 0
+
+        _elts = ann.elts  # type: ignore
 
         for i in _elts:  # type: ignore
             if isinstance(i, ast.Name) and to_name(i) == "bool":
