@@ -19,3 +19,4 @@ from .qalgorithm import (  # noqa: F401, E402
     ConstantOracleException,
 )
 from .grover import Grover  # noqa: F401, E402
+from .simon import Simon  # noqa: F401, E402

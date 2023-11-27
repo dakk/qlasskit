@@ -107,6 +107,7 @@
 - [x] Qmatrix
 - [x] Hash function preimage attack notebook
 - [x] Move all examples to doc
+- [x] Simon periodicity
 - [ ] Improve documentation
 - [ ] First stable release
 
@@ -132,6 +133,10 @@
 - [ ] Lambda
 - [ ] Builtin function: map
 - [ ] First beta release
+
+### Algorithms
+
+- [ ] Deutsch-Jozsa
 
 ### Language support
 
