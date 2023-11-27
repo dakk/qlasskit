@@ -103,6 +103,18 @@ def interpret_as_qtype(
     out: Union[str, int, List[bool]], qtype, out_len: Optional[int] = None
 ) -> Any:
     out = list(reversed(format_outcome(out, out_len)))
+    
+    def _getsize(x):
+        if hasattr(x, "BIT_SIZE"):
+            return x.BIT_SIZE             
+        elif len(get_args(x)) > 0:
+            size = 0
+            for x in get_args(x):
+                size += _getsize(x)           
+            return size     
+        else:
+            return 1
+        
 
     def _interpret(out, qtype, out_len):
         if hasattr(qtype, "from_bool"):
@@ -113,7 +125,7 @@ def interpret_as_qtype(
             idx_s = 0
             values = []
             for x in get_args(qtype):
-                len_a = x.BIT_SIZE if hasattr(x, "BIT_SIZE") else 1
+                len_a = _getsize(x)
                 values.append(_interpret(out[idx_s : idx_s + len_a], x, len_a))
                 idx_s += len_a
 
