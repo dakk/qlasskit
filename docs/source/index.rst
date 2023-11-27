@@ -18,9 +18,10 @@ Python and translate them into unitary operators (gates) for use in quantum circ
    :maxdepth: 2
    :caption: Examples
 
-   example_grover_1.ipynb
-   example_grover_2.ipynb
-   example_grover_3.ipynb
+   example_grover.ipynb
+   example_grover_subset.ipynb
+   example_grover_hash.ipynb
+   example_grover_sudoku.ipynb
    example_unitary_of_f.ipynb
 
 
