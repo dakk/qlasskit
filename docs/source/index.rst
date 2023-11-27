@@ -9,7 +9,7 @@ Python and translate them into unitary operators (gates) for use in quantum circ
    :caption: Qlasskit
 
    quickstart.ipynb   
-   howitworks
+   how_it_works.ipynb
    supported
    algorithms
    api
@@ -21,6 +21,7 @@ Python and translate them into unitary operators (gates) for use in quantum circ
    example_grover_1.ipynb
    example_grover_2.ipynb
    example_grover_3.ipynb
+   example_unitary_of_f.ipynb
 
 
 Indices and tables

@@ -105,7 +105,8 @@
 ### Week 2: (27 Nov 23)
 
 - [x] Qmatrix
-- [ ] Move all examples to doc
+- [x] Hash function preimage attack notebook
+- [x] Move all examples to doc
 - [ ] Improve documentation
 - [ ] First stable release
 
