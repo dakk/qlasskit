@@ -20,30 +20,36 @@ from ..types import Qtype, interpret_as_qtype
 from .qalgorithm import QAlgorithm
 
 
-class Simon(QAlgorithm):
+class DeutschJozsa(QAlgorithm):
     def __init__(
         self,
         f: QlassF,
     ):
         """
         Args:
-            f (QlassF): our f(x)
+            f (QlassF): our f(x) -> bool
         """
         if len(f.args) != 1:
             raise Exception("f should receive exactly one parameter")
+        if f.returns.ttype != bool:
+            raise Exception("f should returns bool")
 
         self.f: QlassF = f
         self.search_space_size = len(f.args[0])
         self._qcircuit = QCircuit(self.f.num_qubits)
 
+        self._f_circuit = self.f.circuit()
+
         # State preparation
         self._qcircuit.barrier(label="s")
         for i in range(self.search_space_size):
             self._qcircuit.h(i)
+        self._qcircuit.x(self._f_circuit["_ret"])
+        self._qcircuit.h(self._f_circuit["_ret"])
 
         # Prepare and add the f
         self._qcircuit.barrier(label="f")
-        self._qcircuit += self.f.circuit()
+        self._qcircuit += self._f_circuit
 
         # State preparation out
         self._qcircuit.barrier(label="s")
@@ -61,4 +67,8 @@ class Simon(QAlgorithm):
     def decode_output(
         self, istr: Union[str, int, List[bool]]
     ) -> Union[bool, Tuple, Qtype]:
-        return interpret_as_qtype(istr, self.f.args[0].ttype, len(self.f.args[0]))
+        iq = interpret_as_qtype(istr, self.f.args[0].ttype, len(self.f.args[0]))
+        if iq == 0:
+            return "Constant"
+        else:
+            return "Balanced"

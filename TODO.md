@@ -108,6 +108,7 @@
 - [x] Hash function preimage attack notebook
 - [x] Move all examples to doc
 - [x] Simon periodicity
+- [x] Deutsch-Jozsa
 - [ ] Improve documentation
 - [ ] First stable release
 
@@ -134,9 +135,11 @@
 - [ ] Builtin function: map
 - [ ] First beta release
 
-### Algorithms
+### Docs
 
-- [ ] Deutsch-Jozsa
+- [ ] Simon example
+- [ ] Deutsch-Jozsa example
+
 
 ### Language support
 
