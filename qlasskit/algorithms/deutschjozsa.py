@@ -66,9 +66,6 @@ class DeutschJozsa(QAlgorithm):
     # @override
     def decode_output(
         self, istr: Union[str, int, List[bool]]
-    ) -> Union[bool, Tuple, Qtype]:
+    ) -> Union[bool, Tuple, Qtype, str]:
         iq = interpret_as_qtype(istr, self.f.args[0].ttype, len(self.f.args[0]))
-        if iq == 0:
-            return "Constant"
-        else:
-            return "Balanced"
+        return "Constant" if iq == 0 else "Balanced"
