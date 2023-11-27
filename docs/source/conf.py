@@ -21,6 +21,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.coverage",
     "sphinx.ext.napoleon",
+    "sphinx_rtd_dark_mode",
     "sphinx_rtd_theme",
     "myst_nb",
 ]
@@ -30,7 +31,8 @@ exclude_patterns = []
 autodoc_source_dir = [
     "../qlasskit",
 ]
-
+pygments_style = "lightbulb"
+default_dark_mode = False
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
