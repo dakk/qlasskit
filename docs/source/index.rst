@@ -20,6 +20,7 @@ Python and translate them into unitary operators (gates) for use in quantum circ
 
    example_grover_1.ipynb
    example_grover_2.ipynb
+   example_grover_3.ipynb
 
 
 Indices and tables

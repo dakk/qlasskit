@@ -33,10 +33,8 @@ def oraclize(qf: QlassF, element: Any, name="oracle"):
     if qf.name == name:
         qf.name = f"_{name}"
 
-    oracle = QlassF.from_function(
-        f"def {name}(v: {argt_name}) -> bool:\n   return {qf.name}(v) == {element}",
-        defs=[qf.to_logicfun()],
-    )
+    fs = f"def {name}(v: {argt_name}) -> bool:\n   return {qf.name}(v) == {element}"
+    oracle = QlassF.from_function(fs, defs=[qf.to_logicfun()])
 
     if (
         len(oracle.expressions) == 1

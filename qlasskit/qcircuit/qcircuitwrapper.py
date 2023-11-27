@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from .qcircuit import QCircuit, SupportedFramework
 
@@ -63,7 +63,7 @@ class QCircuitWrapper:
     def decode_output(self, istr):
         raise Exception("Abstract")
 
-    def decode_counts(self, counts: Dict[str, int]) -> Dict[Any, int]:
+    def decode_counts(self, counts: Dict[str, int], discard_lower: Optional[int] = None) -> Dict[Any, int]:
         """Decode data from a circuit counts dict"""
         outcomes = [(self.decode_output(e), c) for (e, c) in counts.items()]
         int_counts: Dict[Any, int] = {}
@@ -72,6 +72,10 @@ class QCircuitWrapper:
                 int_counts[e] += c
             else:
                 int_counts[e] = c
+                
+        if discard_lower:
+            int_counts = dict(filter(lambda el: el[1] >= discard_lower, int_counts.items()))
+            
         return int_counts
 
     def circuit(self):
