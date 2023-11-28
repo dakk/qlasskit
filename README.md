@@ -15,6 +15,8 @@ Qlasskit implements circuit / gate exporters for Qiskit, Cirq, Qasm and Sympy.
 pip install qlasskit
 ```
 
+For a quickstart, read the _quickstart_ and _examples_ notebooks from the documentation: [https://dakk.github.io/qlasskit](https://dakk.github.io/qlasskit).
+
 ```python
 from qlasskit import qlassf, Qint4 
 

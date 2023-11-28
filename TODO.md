@@ -109,7 +109,7 @@
 - [x] Move all examples to doc
 - [x] Simon periodicity
 - [x] Deutsch-Jozsa
-- [ ] Improve documentation
+- [x] Improve documentation
 - [ ] First stable release
 
 ### Week 3: (4 Dec 23)
