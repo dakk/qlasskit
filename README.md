@@ -2,6 +2,7 @@
 
 [![Unitary Fund](https://img.shields.io/badge/supported_by-Unitary_Fund-ffff00.svg)](https://unitary.fund)
 ![CI Status](https://github.com/dakk/qlasskit/actions/workflows/ci.yaml/badge.svg)
+![PyPI - Version](https://img.shields.io/pypi/v/qlasskit)
 ![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-blue)
 
 

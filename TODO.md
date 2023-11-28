@@ -110,7 +110,8 @@
 - [x] Simon periodicity
 - [x] Deutsch-Jozsa
 - [x] Improve documentation
-- [ ] First stable release
+- [x] First stable release
+- [x] Use cases
 
 ### Week 3: (4 Dec 23)
 ### Week 4: (11 Dec 23)
@@ -128,7 +129,6 @@
 
 ## Future features
 
-- [ ] Use cases
 - [ ] Int arithmetic expressions (/, %)
 - [ ] Parametrized qlassf
 - [ ] Lambda

@@ -34,6 +34,9 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
+        "Development Status :: 5 - Production/Stable",
+        "Topic :: Scientific/Engineering :: Physics",
+        "Operating System :: OS Independent",
     ],
     url="https://github.com/dakk/qlasskit",
     project_urls={
