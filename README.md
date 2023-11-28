@@ -11,9 +11,13 @@ This tool will be useful for any algorithm that relies on a 'blackbox' function 
 
 Qlasskit implements circuit / gate exporters for Qiskit, Cirq, Qasm and Sympy.
 
-
+```bash
+pip install qlasskit
+```
 
 ```python
+from qlasskit import qlassf, Qint4 
+
 @qlassf
 def h(k: Qint4) -> bool:
     h = True
