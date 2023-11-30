@@ -50,6 +50,11 @@ class TestQlassfZXSimp(unittest.TestCase):
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     qf.circuit().zx_simplify()
     #     compute_and_compare_results(self, qf)
+    def test_int_const_compare_eq(self):
+        f = "def test(a: Qint2) -> bool:\n\treturn a == 2"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        qf.circuit().zx_simplify()
+        compute_and_compare_results(self, qf)
 
     # def test_const_int_compare_gt(self):
     #     f = f"def test(a: Qint2) -> bool:\n\treturn a > 2"
