@@ -35,7 +35,9 @@ class QiskitExporter(QCircuitExporter):
             elif isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.Z):
                 zg = ZGate().control(len(w[0:-1]))
                 qc.append(zg, w)
-
+            elif isinstance(g, gates.RZ):
+                qc.rz(p, w[0])
+                
             elif isinstance(g, gates.Barrier) and mode != "gate":
                 qc.barrier(label=p)
 
