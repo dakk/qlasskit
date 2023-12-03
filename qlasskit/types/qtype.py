@@ -139,13 +139,17 @@ class Qtype:
         raise Exception("abstract")
 
     @staticmethod
-    def bitwsie_xor(tleft: TExp, tright: TExp) -> TExp:
+    def mod(tleft: TExp, tright: TExp) -> TExp:
         raise Exception("abstract")
 
     @staticmethod
-    def bitwsie_and(tleft: TExp, tright: TExp) -> TExp:
+    def bitwise_xor(tleft: TExp, tright: TExp) -> TExp:
         raise Exception("abstract")
 
     @staticmethod
-    def bitwsie_or(tleft: TExp, tright: TExp) -> TExp:
+    def bitwise_and(tleft: TExp, tright: TExp) -> TExp:
+        raise Exception("abstract")
+
+    @staticmethod
+    def bitwise_or(tleft: TExp, tright: TExp) -> TExp:
         raise Exception("abstract")

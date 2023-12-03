@@ -271,6 +271,8 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             return tleft[0].sub(tleft, tright)
         elif isinstance(expr.op, ast.Mult) and hasattr(tleft[0], "mul"):
             return tleft[0].mul(tleft, tright)
+        elif isinstance(expr.op, ast.Mod):
+            return tleft[0].mod(tleft, tright)  # type: ignore
         elif isinstance(expr.op, ast.BitXor) and hasattr(tleft[0], "bitwise_xor"):
             return tleft[0].bitwise_xor(tleft, tright)
         elif isinstance(expr.op, ast.BitAnd) and hasattr(tleft[0], "bitwise_and"):

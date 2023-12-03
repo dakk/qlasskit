@@ -318,6 +318,30 @@ class TestQlassfIntAdd(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
 
+@parameterized_class(
+    ("val", "compiler"),
+    inject_parameterized_compilers(
+        [
+            (1,),
+            (2,),
+            (4,),
+            (8,),
+            (16,),
+        ]
+    ),
+)
+class TestQlassfIntMod(unittest.TestCase):
+    def test_mod_const(self):
+        f = f"def test(a: Qint4) -> Qint4: return a % {self.val}"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_mod_const_in_var(self):
+        f = f"def test(a: Qint4) -> Qint4:\n\tb = {self.val}\n\treturn a % b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+
 @parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfIntSub(unittest.TestCase):
     def test_sub_const(self):
