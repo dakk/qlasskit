@@ -165,6 +165,12 @@ Bin Op
 
    a * b
 
+.. code-block:: python
+
+   a % 2
+
+.. note::
+   Modulo operator only works with 2^n values.
    
 
 Function call

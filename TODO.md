@@ -114,6 +114,9 @@
 - [x] Use cases
 
 ### Week 3: (4 Dec 23)
+
+- [x] Int arithmetic: mod
+
 ### Week 4: (11 Dec 23)
 
 ## Month 4:
@@ -129,11 +132,9 @@
 
 ## Future features
 
-- [ ] Int arithmetic expressions (/, %)
-- [ ] Parametrized qlassf
+- [ ] Int arithmetic: div
 - [ ] Lambda
 - [ ] Builtin function: map
-- [ ] First beta release
 
 ### Docs
 

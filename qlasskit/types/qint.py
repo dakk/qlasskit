@@ -221,6 +221,12 @@ class Qint(int, Qtype):
         return cls.bitwise_not(su)  # type: ignore
 
     @classmethod
+    def mod(cls, tleft: TExp, tright: TExp) -> TExp:  # noqa: C901
+        # x mod y = x & (y - 1)
+        tval = tright[0].sub(tright, tright[0].const(1))  # type: ignore
+        return tleft[0].bitwise_and(tleft, tval)  # type: ignore
+
+    @classmethod
     def bitwise_generic(cls, op, tleft: TExp, tright: TExp) -> TExp:
         """Bitwise generic"""
         if len(tleft[1]) > len(tright[1]):
