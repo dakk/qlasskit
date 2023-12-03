@@ -56,6 +56,9 @@ class InternalCompiler(Compiler):
                     a_true = qc.add_qubit("TRUE")
                     qc.x(a_true)
                 iret = a_true
+            elif isinstance(symp_exp, Symbol):
+                iret = qc.add_qubit(sym.name)
+                qc.cx(qc[symp_exp.name], iret)
             else:
                 iret = self.compile_expr(qc, symp_exp)
 
@@ -67,7 +70,8 @@ class InternalCompiler(Compiler):
 
         qc.remove_identities()
         if uncompute:
-            qc.uncompute_all(keep=[qc[r] for r in returns.bitvec])
+            keep = [qc[r] for r in filter(lambda r: r in qc, returns.bitvec)]
+            qc.uncompute_all(keep=keep)
 
         return qc
 

@@ -14,24 +14,23 @@
 
 import unittest
 
+from parameterized import parameterized_class
+
 from qlasskit import Qint2, Qint4, qlassf
 from qlasskit.algorithms import Simon
 from qlasskit.compiler import SupportedCompilers
 
-from .utils import qiskit_measure_and_count
+from .utils import ENABLED_COMPILERS, qiskit_measure_and_count
 
 
+@parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestAlgoSimon(unittest.TestCase):
     def test_simon(self):
-        # TODO: fix this in internalcompiler
-        if "tweedledum" not in SupportedCompilers:
-            return
-
         f = """
 def hash(k: Qint4) -> Qint4:
     return k >> 3
 """
-        qf = qlassf(f, compiler="tweedledum")
+        qf = qlassf(f, compiler=self.compiler)
         algo = Simon(qf)
 
         qc = algo.circuit().export("circuit", "qiskit")
