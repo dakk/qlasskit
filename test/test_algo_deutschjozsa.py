@@ -14,20 +14,23 @@
 
 import unittest
 
+from parameterized import parameterized_class
+
 from qlasskit import Qint2, Qint4, qlassf
 from qlasskit.algorithms import DeutschJozsa
 from qlasskit.compiler import SupportedCompilers
 
-from .utils import qiskit_measure_and_count
+from .utils import ENABLED_COMPILERS, qiskit_measure_and_count
 
 
+@parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestAlgoDeutschJozsa(unittest.TestCase):
     def test_deutschjozsa_balanced(self):
         f = """
 def hash(k: Qint2) -> bool:
     return k[0] ^ k[1]
 """
-        qf = qlassf(f)
+        qf = qlassf(f, compiler=self.compiler)
         algo = DeutschJozsa(qf)
 
         qc_algo = algo.circuit().export("circuit", "qiskit")
@@ -36,15 +39,11 @@ def hash(k: Qint2) -> bool:
         self.assertEqual(counts_readable["Balanced"], 1024)
 
     def test_deutschjozsa_balanced2(self):
-        # TODO: fix this in internalcompiler
-        if "tweedledum" not in SupportedCompilers:
-            return
-
         f = """
 def hash(k: bool) -> bool:
     return k
 """
-        qf = qlassf(f, compiler="tweedledum")
+        qf = qlassf(f, compiler=self.compiler)
         algo = DeutschJozsa(qf)
 
         qc_algo = algo.circuit().export("circuit", "qiskit")
@@ -57,7 +56,7 @@ def hash(k: bool) -> bool:
 def hash(k: Qint2) -> bool:
     return False
 """
-        qf = qlassf(f)
+        qf = qlassf(f, compiler=self.compiler)
         algo = DeutschJozsa(qf)
 
         qc_algo = algo.circuit().export("circuit", "qiskit")
