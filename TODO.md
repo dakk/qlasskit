@@ -116,6 +116,8 @@
 ### Week 3: (4 Dec 23)
 
 - [x] Int arithmetic: mod
+- [x] Simon example
+- [x] Deutsch-Jozsa example
 
 ### Week 4: (11 Dec 23)
 
@@ -136,14 +138,9 @@
 - [ ] Lambda
 - [ ] Builtin function: map
 
-### Docs
-
-- [ ] Simon example
-- [ ] Deutsch-Jozsa example
-
-
 ### Language support
 
+- [ ] Datatype: Char
 - [ ] Datatype: Dict
 - [ ] Datatype: Fixed
 - [ ] Datatype: Enum
