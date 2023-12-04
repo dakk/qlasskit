@@ -13,7 +13,7 @@
 # limitations under the License.
 # isort:skip_file
 
-__version__ = "0.1.7"
+__version__ = "0.1.8"
 
 from .qcircuit import QCircuit, SupportedFrameworks, SupportedFramework  # noqa: F401
 from .qlassfun import QlassF, qlassf, qlassfa  # noqa: F401
