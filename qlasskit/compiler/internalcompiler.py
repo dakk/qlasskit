@@ -56,7 +56,8 @@ class InternalCompiler(Compiler):
                     a_true = qc.add_qubit("TRUE")
                     qc.x(a_true)
                 iret = a_true
-            elif isinstance(symp_exp, Symbol):
+            # Qubit mapped to another qubit (iff sym.name is a _ret)
+            elif isinstance(symp_exp, Symbol) and sym.name.startswith("_ret"):
                 iret = qc.add_qubit(sym.name)
                 qc.cx(qc[symp_exp.name], iret)
             else:
