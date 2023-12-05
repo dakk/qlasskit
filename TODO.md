@@ -142,11 +142,12 @@
 
 - [ ] Datatype: Char
 - [ ] Datatype: Dict
-- [ ] Datatype: Fixed
+- [ ] Datatype: Float
 - [ ] Datatype: Enum
 - [ ] While loop
 - [ ] Recursion
 - [ ] Parameter bind
+- [ ] Float arithmetic
 
 ### Abstraction support
 
