@@ -181,7 +181,7 @@ class Qint(int, Qtype):
         m = len(tright[1])
 
         if n != m:
-            raise Exception("Mul works only on same size Qint")
+            raise Exception(f"Mul works only on same size Qint: {n} != {m}")
 
         product = [False] * (n + m)
 
@@ -210,6 +210,8 @@ class Qint(int, Qtype):
             return Qint12, product
         elif (n + m) > 12 and (n + m) <= 16:
             return Qint16, product
+        elif (n + m) > 16:
+            return Qint16.crop((Qint16, product))
 
         raise Exception(f"Mul result size is too big ({n+m})")
 

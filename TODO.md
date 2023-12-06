@@ -118,6 +118,7 @@
 - [x] Int arithmetic: mod
 - [x] Simon example
 - [x] Deutsch-Jozsa example
+- [x] Improve performance on big circuits 
 
 ### Week 4: (11 Dec 23)
 
@@ -134,23 +135,23 @@
 
 ## Future features
 
-- [ ] Int arithmetic: div
-- [ ] Lambda
-- [ ] Builtin function: map
 
 ### Language support
 
+- [ ] Int arithmetic: div
+- [ ] Lambda
+- [ ] Builtin function: map
 - [ ] Datatype: Char
 - [ ] Datatype: Dict
 - [ ] Datatype: Float
 - [ ] Datatype: Enum
 - [ ] While loop
 - [ ] Recursion
-- [ ] Parameter bind
 - [ ] Float arithmetic
 
 ### Abstraction support
 
+- [ ] Parameter bind
 - [ ] Extract boolean expressions from quantum circuits
 
 ### Framwork support
