@@ -83,7 +83,7 @@ class BoolOptimizerProfile:
         return exps
 
 
-bestWorkingOptimizer = BoolOptimizerProfile(
+defaultOptimizer = BoolOptimizerProfile(
     [
         merge_expressions,
         apply_cse,
@@ -95,7 +95,7 @@ bestWorkingOptimizer = BoolOptimizerProfile(
 )
 
 
-bestWorkingOptimizerDebug = BoolOptimizerProfile(
+defaultOptimizerDebug = BoolOptimizerProfile(
     [
         print_step("before"),
         merge_expressions,
@@ -105,5 +105,15 @@ bestWorkingOptimizerDebug = BoolOptimizerProfile(
         transform_or2xor(),
         transform_or2and(),
         print_step("after"),
+    ]
+)
+
+
+fastOptimizer = BoolOptimizerProfile(
+    [
+        remove_ITE(),
+        remove_Implies(),
+        transform_or2xor(),
+        transform_or2and(),
     ]
 )

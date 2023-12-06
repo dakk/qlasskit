@@ -17,7 +17,7 @@ import unittest
 from parameterized import parameterized_class
 
 from qlasskit import Qint, Qint2, Qint4, Qint12, QlassF, exceptions, qlassf
-from qlasskit.boolopt.bool_optimizer import bestWorkingOptimizerDebug
+from qlasskit.boolopt.bool_optimizer import defaultOptimizerDebug
 
 from . import utils
 from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
@@ -34,7 +34,7 @@ class TestQlassfOptimizerSelection(unittest.TestCase):
         qf = qlassf(
             "def t(a: bool) -> bool: return a",
             to_compile=COMPILATION_ENABLED,
-            bool_optimizer=bestWorkingOptimizerDebug,
+            bool_optimizer=defaultOptimizerDebug,
         )
         compute_and_compare_results(self, qf)
 

@@ -25,6 +25,7 @@ Python and translate them into unitary operators (gates) for use in quantum circ
    example_simon.ipynb
    example_deutsch_jozsa.ipynb
    example_unitary_of_f.ipynb
+   example_big_circuit.ipynb
 
 
 Indices and tables

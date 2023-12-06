@@ -22,7 +22,7 @@ from sympy import Symbol
 
 from .ast2ast import ast2ast
 from .ast2logic import Arg, Args, BoolExpList, LogicFun, flatten, translate_ast
-from .boolopt import BoolOptimizerProfile, bestWorkingOptimizer
+from .boolopt import BoolOptimizerProfile, defaultOptimizer
 from .boolopt.bool_optimizer import merge_expressions
 from .boolquant import Q  # noqa: F403, F401
 from .compiler import SupportedCompiler, to_quantum
@@ -187,7 +187,7 @@ class QlassF(QCircuitWrapper):
         defs: List[LogicFun] = [],
         to_compile: bool = True,
         compiler: SupportedCompiler = "internal",
-        bool_optimizer: BoolOptimizerProfile = bestWorkingOptimizer,
+        bool_optimizer: BoolOptimizerProfile = defaultOptimizer,
         uncompute: bool = True,
     ) -> "QlassF":
         """Create a QlassF from a function or a string containing a function
@@ -199,7 +199,7 @@ class QlassF(QCircuitWrapper):
             to_compile (boolean, optional): if True, compile to quantum circuit (default: True)
             compiler (SupportedCompiler, optional): override default compiler (default: internal)
             bool_optimizer (BoolOptimizerProfile, optional): override default optimizer
-                (default: bestWorkingOptimizer)
+                (default: defaultOptimizer)
             uncompute (bool, optional): whenever uncompute input qubits during compilation
                 (default: True)
         """
@@ -228,7 +228,7 @@ def qlassf(
     defs: List[QlassF] = [],
     to_compile: bool = True,
     compiler: SupportedCompiler = "internal",
-    bool_optimizer: BoolOptimizerProfile = bestWorkingOptimizer,
+    bool_optimizer: BoolOptimizerProfile = defaultOptimizer,
     uncompute: bool = True,
 ) -> QlassF:
     """Decorator / function creating a QlassF object
@@ -240,7 +240,7 @@ def qlassf(
         to_compile (boolean, optional): if True, compile to quantum circuit (default: True)
         compiler (SupportedCompiler, optional): override default compiler (default: internal)
         bool_optimizer (BoolOptimizerProfile, optional): override default optimizer
-            (default: bestWorkingOptimizer)
+            (default: defaultOptimizer)
         uncompute (bool, optional): whenever uncompute input qubits during compilation
             (default: True)
     """
@@ -262,7 +262,7 @@ def qlassfa(
     defs: List[QlassF] = [],
     to_compile: bool = True,
     compiler: SupportedCompiler = "internal",
-    bool_optimizer: BoolOptimizerProfile = bestWorkingOptimizer,
+    bool_optimizer: BoolOptimizerProfile = defaultOptimizer,
     uncompute: bool = True,
 ):
     """Decorator with parameters for qlassf"""

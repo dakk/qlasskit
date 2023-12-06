@@ -50,6 +50,10 @@ class QCircuit:
             if self.qubit_map[key] == i:
                 return key
         raise Exception(f"Qubit with index {i} not found")
+    
+    def __repr__(self):
+        """ Return a string representation of the QCircuit """
+        return f'QCircuit {self.name}\t\tGates: {self.num_gates}\t\tQubits: {self.num_qubits}'
 
     def __contains__(self, key: Union[str, Symbol, int]):
         """Return True if the circuit contain a qubit with a given name/symbol"""
