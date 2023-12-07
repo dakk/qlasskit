@@ -52,7 +52,7 @@ class Grover(QAlgorithm):
 
         self.n_iterations = n_iterations
 
-        self._qcircuit = QCircuit(self.search_space_size, name=f"grover_" + oracle.name)
+        self._qcircuit = QCircuit(self.search_space_size, name=f"grover__{oracle.name}")
 
         # State preparation
         self._qcircuit.barrier(label="s")

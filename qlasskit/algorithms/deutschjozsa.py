@@ -36,7 +36,7 @@ class DeutschJozsa(QAlgorithm):
 
         self.f: QlassF = f
         self.search_space_size = len(f.args[0])
-        self._qcircuit = QCircuit(self.f.num_qubits, name=f"deutsch_" + f.name)
+        self._qcircuit = QCircuit(self.f.num_qubits, name=f"deutsch_{f.name}")
 
         self._f_circuit = self.f.circuit()
 
