@@ -53,7 +53,9 @@ class QCircuit:
 
     def __repr__(self):
         """Return a string representation of the QCircuit"""
-        return f"QCircuit<{self.name}>({self.num_gates} gates, {self.num_qubits} qubits)"
+        return (
+            f"QCircuit<{self.name}>({self.num_gates} gates, {self.num_qubits} qubits)"
+        )
 
     def __contains__(self, key: Union[str, Symbol, int]):
         """Return True if the circuit contain a qubit with a given name/symbol"""

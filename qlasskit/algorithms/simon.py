@@ -34,7 +34,7 @@ class Simon(QAlgorithm):
 
         self.f: QlassF = f
         self.search_space_size = len(f.args[0])
-        self._qcircuit = QCircuit(self.f.num_qubits, name=f"simon_" + f.name)
+        self._qcircuit = QCircuit(self.f.num_qubits, name=f"simon_{f.name}")
 
         # State preparation
         self._qcircuit.barrier(label="s")
