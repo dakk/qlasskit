@@ -92,14 +92,14 @@ class InternalCompiler(Compiler):
 
         elif isinstance(expr, Xor):
             d = qc.get_free_ancilla()
-            neg = False
+
             for e in expr.args:
                 if isinstance(e, Symbol):
                     qc.cx(qc[e], d)
                 else:
-                    d = self.compile_expr(qc, e, dest=d)
-            if neg:
-                qc.x(d)
+                    d2 = self.compile_expr(qc, e)
+                    qc.cx(d2, d)
+
             self.expqmap[expr] = d
             return d
 
