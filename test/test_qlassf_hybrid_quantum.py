@@ -40,3 +40,9 @@ class TestQlassfHybridQuantum(unittest.TestCase):
         count = qiskit_measure_and_count(qf.circuit().export(), 1024)
         [self.assertEqual(x in count, True) for x in ["00", "11"]]
         self.assertEqual(len(count.keys()), 2)
+
+    def test_h_and_add(self):
+        f = "def test(a: Qint2) -> Qint2:\n\ta = Q.H(a)\n\treturn a + 1"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, uncompute=False)
+        count = qiskit_measure_and_count(qf.circuit().export(), 128)
+        [self.assertEqual(x in count, True) for x in ["1110", "0011", "1001", "0100"]]

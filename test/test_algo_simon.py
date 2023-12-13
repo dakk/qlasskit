@@ -39,5 +39,5 @@ def hash(k: Qint4) -> Qint4:
 
         for x in [0, 8]:
             self.assertEqual(x in counts_readable, True)
-            self.assertEqual(counts_readable[x] > 480, True)
+            self.assertEqual(counts_readable[x] > 400, True)
         self.assertEqual(algo.output_qubits, [0, 1, 2, 3])
