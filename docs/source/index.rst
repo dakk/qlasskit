@@ -34,3 +34,16 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+Cite
+======
+
+```
+@software{qlasskit2023,
+  author = {Davide Gessa},
+  title = {qlasskit: a python-to-quantum circuit compiler},
+  url = {https://github.com/dakk/qlasskit},
+  year = {2023},
+}
+```
