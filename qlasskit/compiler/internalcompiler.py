@@ -96,9 +96,11 @@ class InternalCompiler(Compiler):
             for e in expr.args:
                 if isinstance(e, Symbol):
                     qc.cx(qc[e], d)
-                else:
+                elif isinstance(e, QuantumBooleanGate):
                     d2 = self.compile_expr(qc, e)
                     qc.cx(d2, d)
+                else:
+                    d = self.compile_expr(qc, e, dest=d)
 
             self.expqmap[expr] = d
             return d
