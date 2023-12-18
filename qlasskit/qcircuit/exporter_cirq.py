@@ -40,13 +40,9 @@ class CirqExporter(QCircuitExporter):
                             gate_mapping[g_name] if g_name in gate_mapping else g_name
                         )
 
-                        if isinstance(g, gates.MCX):
-                            gg = cirq.ControlledGate(
-                                sub_gate=cirq.X, num_controls=len(w) - 1
-                            )
-                            yield gg(list(map(lambda wx: qubits[w], w)))
-
-                        elif isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.X):
+                        if isinstance(g, gates.MCX) or (
+                            isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.X)
+                        ):
                             gg = cirq.ControlledGate(
                                 sub_gate=cirq.X, num_controls=len(w) - 1
                             )

@@ -18,47 +18,50 @@ from . import gates
 from .exporter import QCircuitExporter
 
 
-class QiskitExporter(QCircuitExporter):
+class PennyLaneExporter(QCircuitExporter):
     def export(self, _selfqc, mode: Literal["circuit", "gate"]):  # noqa: C901
-        from qiskit import QuantumCircuit
-        from qiskit.circuit.library.standard_gates import ZGate
+        import pennylane as qml
 
-        qc = QuantumCircuit(_selfqc.num_qubits, 0)
+        ops = []
 
         for g, w, p in _selfqc.gates:
-            g_name = g.__class__.__name__.lower()
+            g_name = g.__class__.__name__
+
+            gate_mapping = {
+                "CX": "CNOT",
+                "CCX": "Toffoli",
+                "H": "Hadamard",
+                "X": "PauliX",
+            }
+            g_name = gate_mapping[g_name] if g_name in gate_mapping else g_name
 
             if isinstance(g, gates.MCX) or (
                 isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.X)
             ):
-                qc.mcx(w[0:-1], w[-1])
-            elif isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.Z):
-                zg = ZGate().control(len(w[0:-1]))
-                qc.append(zg, w)
+                if len(w) == 2:
+                    ops.append(qml.CNOT(wires=w))
+                elif len(w) == 3:
+                    ops.append(qml.Toffoli(wires=w))
+                else:
+                    ops.append(
+                        qml.ControlledQubitUnitary(
+                            U=qml.PauliX, control_wires=w[0:-1], wires=[w[-1]]
+                        )
+                    )
 
-            elif isinstance(g, gates.Barrier) and mode != "gate":
-                qc.barrier(label=p)
+            elif isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.Z):
+                ops.append(qml.CZ(wires=w))
+
+            elif isinstance(g, gates.Barrier):
+                pass
 
             elif isinstance(g, gates.NopGate):
                 pass
 
-            elif hasattr(qc, g_name):
-                getattr(qc, g_name)(*w)
+            elif hasattr(qml, g_name):
+                ops.append(getattr(qml, g_name)(wires=w))
 
             else:
                 raise Exception(f"not handled {g}")
 
-        if mode == "gate":
-            qc.remove_final_measurements()
-            gate = qc.to_gate()
-
-            gate.name = _selfqc.name
-
-            if hasattr(QuantumCircuit, _selfqc.name):
-                gate.name += "_"
-
-            return gate
-        elif mode == "circuit":
-            return qc
-        else:
-            raise Exception(f"Uknown export mode: {mode}")
+        return qml.tape.QuantumTape(ops)

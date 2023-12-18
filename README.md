@@ -10,7 +10,7 @@ Qlasskit is a Python library that allows quantum developers to write classical a
 
 This tool will be useful for any algorithm that relies on a 'blackbox' function and for describing the classical components of a quantum algorithm.
 
-Qlasskit implements circuit / gate exporters for Qiskit, Cirq, Qasm and Sympy.
+Qlasskit implements circuit / gate exporters for Qiskit, Cirq, Qasm, Sympy and Pennylane.
 
 ```bash
 pip install qlasskit
