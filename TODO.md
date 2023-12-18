@@ -122,9 +122,16 @@
 
 ### Week 4: (11 Dec 23)
 
+- [x] Minor fixes and new release
+
 ## Month 4:
 
 ### Week 1: (18 Dec 23)
+- [x] Pennylane exporter
+- [x] Regression test for qubit number and gates
+- [ ] Sympy exporter
+
+
 ### Week 2: (25 Dec 23)
 ### Week 3: (1 Jan 24)
 
@@ -138,6 +145,9 @@
 
 ### Language support
 
+- [ ] QFT hybrid
+- [ ] Inverse QFT
+- [ ] QFT multiplier
 - [ ] Int arithmetic: div
 - [ ] Lambda
 - [ ] Builtin function: map
@@ -156,10 +166,7 @@
 
 ### Framwork support
 
-- [ ] PyQrack (without qiskit provider)
 - [ ] QuTip
-- [ ] Pennylane
-- [ ] Sympy quantum computing expressions
 
 ### Tools
 
