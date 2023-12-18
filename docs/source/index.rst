@@ -12,6 +12,7 @@ Python and translate them into unitary operators (gates) for use in quantum circ
    how_it_works.ipynb
    supported
    algorithms
+   exporter.ipynb
    api
 
 .. toctree::
