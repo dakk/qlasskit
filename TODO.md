@@ -129,7 +129,7 @@
 ### Week 1: (18 Dec 23)
 - [x] Pennylane exporter
 - [x] Regression test for qubit number and gates
-- [ ] Sympy exporter
+- [x] Sympy exporter
 
 
 ### Week 2: (25 Dec 23)

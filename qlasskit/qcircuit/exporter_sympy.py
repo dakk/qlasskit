@@ -14,49 +14,41 @@
 
 from typing import Literal
 
-from sympy.physics.quantum.gate import CNOT, H, T, X
+from sympy.physics.quantum.gate import CNOT, CGate, H, X, XGate
 from sympy.physics.quantum.qubit import Qubit
 
 from . import gates
 from .exporter import QCircuitExporter
 
 
+def mcx(w):
+    return CGate(tuple(w[0:-1]), XGate(w[-1]))
+
+
+def toffoli(q0, q1, q2):
+    return CGate((q0, q1), XGate(q2))
+
+
 class SympyExporter(QCircuitExporter):
     def export(self, _selfqc, mode: Literal["circuit", "gate"]):
-        def toffoli(q0, q1, q2):
-            # TODO: investigate why t**-1 raises max recursion on qapply
-            return (
-                H(q2)
-                * CNOT(q2, q1)
-                * T(q2) ** -1
-                * CNOT(q0, q2)
-                * T(q2)
-                * CNOT(q1, q2)
-                * T(q2) ** -1
-                * CNOT(q0, q2)
-                * T(q1)
-                * T(q2)
-                * H(q2)
-                * CNOT(q0, q1)
-                * T(q0)
-                * T(q1) ** -1
-                * CNOT(q0, q1)
-            )
-
         qstate = Qubit("0" * _selfqc.num_qubits)
 
         for g, w, p in _selfqc.gates:
             ga = None
             if isinstance(g, gates.X):
                 ga = X(w[0])
+            elif isinstance(g, gates.H):
+                ga = H(w[0])
             elif isinstance(g, gates.CX):
                 ga = CNOT(w[0], w[1])
-            elif isinstance(g, gates.CCX):
-                raise Exception("Not implemented yet")
-            elif isinstance(g, gates.MCX):
-                raise Exception("Not implemented yet")
-            elif g != "bar":
-                raise Exception(f"not handled {g}")
+            elif isinstance(g, gates.CCX) or isinstance(g, gates.MCX):
+                ga = mcx(w)
+            elif isinstance(g, gates.Barrier) and mode != "gate":
+                pass
+            elif isinstance(g, gates.NopGate):
+                pass
+            else:
+                raise Exception("not handled")
 
             if ga:
                 qstate = ga * qstate
