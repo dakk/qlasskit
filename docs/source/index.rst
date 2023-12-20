@@ -23,6 +23,7 @@ Python and translate them into unitary operators (gates) for use in quantum circ
    example_grover_subset.ipynb
    example_grover_hash.ipynb
    example_grover_sudoku.ipynb
+   example_grover_factorize.ipynb
    example_simon.ipynb
    example_deutsch_jozsa.ipynb
    example_unitary_of_f.ipynb

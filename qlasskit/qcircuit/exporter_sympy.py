@@ -31,7 +31,7 @@ def toffoli(q0, q1, q2):
 
 class SympyExporter(QCircuitExporter):
     def export(self, _selfqc, mode: Literal["circuit", "gate"]):
-        qstate = Qubit("0" * _selfqc.num_qubits)
+        qstate = Qubit("0" * _selfqc.num_qubits) if mode == 'circuit' else None
 
         for g, w, p in _selfqc.gates:
             ga = None
@@ -50,7 +50,9 @@ class SympyExporter(QCircuitExporter):
             else:
                 raise Exception("not handled")
 
-            if ga:
+            if ga and qstate:
                 qstate = ga * qstate
-
+            elif ga:
+                qstate = ga
+                
         return qstate
