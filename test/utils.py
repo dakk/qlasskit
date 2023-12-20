@@ -247,6 +247,6 @@ def compute_and_compare_results(cls, qf, test_original_f=True):
                         cls, qf, truth_line
                     )
                     cls.assertEqual(truth_str, res_qc2)
-                except GateNotSimulableException:
+                except GateNotSimulableException as e:
                     res_qc = compute_result_of_qcircuit(cls, qf, truth_line)
                     cls.assertEqual(truth_str, res_qc)

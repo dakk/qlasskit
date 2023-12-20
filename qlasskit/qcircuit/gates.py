@@ -70,12 +70,18 @@ class H(QGate):
 class Z(QGate):
     def __init__(self):
         super().__init__("Z")
-
+        
+class RZ(QGate):
+    def __init__(self):
+        super().__init__("RZ")
 
 class CX(QControlledGate):
     def __init__(self):
         super().__init__(X(), 1)
 
+class CZ(QControlledGate):
+    def __init__(self):
+        super().__init__(Z(), 1)
 
 class CCX(QControlledGate):
     def __init__(self):
