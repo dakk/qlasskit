@@ -80,9 +80,15 @@ class TestQCircuitExportQASM(unittest.TestCase):
     ],
 )
 class TestQCircuitExportSympy(unittest.TestCase):
-    def test_export_sympy(self):
+    def test_export_sympy_circuit(self):
         sym_circ = self.qc.export("circuit", "sympy")
         statev = qapply(sym_circ)
+        meas = measure_all(statev)
+        self.assertEqual(meas, self.result)
+
+    def test_export_sympy_gate(self):
+        sym_circ = self.qc.export("gate", "sympy")
+        statev = qapply(sym_circ * Qubit("0" * self.qc.num_qubits))
         meas = measure_all(statev)
         self.assertEqual(meas, self.result)
 
