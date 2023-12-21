@@ -70,6 +70,15 @@ class TestQCircuit(unittest.TestCase):
         b = qc.get_free_ancilla()
         self.assertEqual(a, b)
 
+    def test_repeat(self):
+        qc = QCircuit(2)
+        qc += gates.apply(gates.X(), [0])
+        qc += gates.apply(gates.Y(), [1])
+        qc.cx(0, 1)
+
+        qc = qc.repeat(4)
+        self.assertEqual(qc.num_gates, 3 * 4)
+
 
 class TestQCircuitUncomputing(unittest.TestCase):
     def test1(self):

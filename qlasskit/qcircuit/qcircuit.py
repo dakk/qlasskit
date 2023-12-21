@@ -98,6 +98,14 @@ class QCircuit:
         self.__native = None
         return copy.deepcopy(self)
 
+    def repeat(self, n: int) -> "QCircuit":
+        """Return a copy of the QCircuit repeated n times"""
+        o = self.copy()
+        n_qc = self.copy()
+        for i in range(n - 1):
+            n_qc += o.copy()
+        return n_qc
+
     def __iadd__(self, other: Union[gates.AppliedGate, "QCircuit"]):  # type: ignore
         """AugAssign between a qcircuit and a AppliedGate|QCircuit"""
         if isinstance(other, Tuple):  # type: ignore
