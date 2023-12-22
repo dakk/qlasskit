@@ -13,13 +13,11 @@
 # limitations under the License.
 
 import unittest
-from typing import Tuple
 
 from parameterized import parameterized_class
 from sympy import Symbol, symbols
-from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
 
-from qlasskit import QlassF, exceptions, qlassf
+from qlasskit import qlassf
 
 from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
@@ -44,7 +42,10 @@ class TestQlassfMatrix(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_matrix_const_3x2(self):
-        f = "def test() -> Qmatrix[bool, 3, 2]:\n\treturn [[True, True], [True, False], [True, False]]"
+        f = (
+            "def test() -> Qmatrix[bool, 3, 2]:\n\treturn [[True, True], [True, False], "
+            "[True, False]]"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
@@ -57,22 +58,34 @@ class TestQlassfMatrix(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_matrix_iterator_var(self):
-        f = "def test(a: Qmatrix[Qint2, 2, 2]) -> Qint2:\n\tc = 0\n\tfor x in a:\n\t\tfor y in x:\n\t\t\tc += y\n\treturn c"
+        f = (
+            "def test(a: Qmatrix[Qint2, 2, 2]) -> Qint2:\n\tc = 0\n\tfor x in a:\n"
+            "\t\tfor y in x:\n\t\t\tc += y\n\treturn c"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_matrix_iterator_list(self):
-        f = "def test(a: Qint2) -> Qint2:\n\tc = 0\n\tfor x in [[1,2],[3,4]]:\n\t\tfor y in x:\n\t\t\tc += y + a\n\treturn c"
+        f = (
+            "def test(a: Qint2) -> Qint2:\n\tc = 0\n\tfor x in [[1,2],[3,4]]:\n"
+            "\t\tfor y in x:\n\t\t\tc += y + a\n\treturn c"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_matrix_iterator_varlist(self):
-        f = "def test(a: Qint2) -> Qint2:\n\tc = [[1,2],[3,4]]\n\tfor x in c:\n\t\tfor y in x:\n\t\t\ta += y\n\treturn a"
+        f = (
+            "def test(a: Qint2) -> Qint2:\n\tc = [[1,2],[3,4]]\n\tfor x in c:\n"
+            "\t\tfor y in x:\n\t\t\ta += y\n\treturn a"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_matrix_len(self):
-        f = "def test(a: Qmatrix[Qint2, 2, 2]) -> Qint2:\n\tc = 0\n\tfor x in range(len(a)):\n\t\tc += a[x][0]\n\treturn c"
+        f = (
+            "def test(a: Qmatrix[Qint2, 2, 2]) -> Qint2:\n\tc = 0\n"
+            "\tfor x in range(len(a)):\n\t\tc += a[x][0]\n\treturn c"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
@@ -86,7 +99,8 @@ class TestQlassfMatrix(unittest.TestCase):
     #     if self.compiler == "internal":
     #         return
 
-    #     f = "def test(ab: Tuple[Qint2, Qint2]) -> Qint2:\n\tc = [1,2,3,2]\n\tai,bi = ab\n\td = c[ai] + c[bi]\n\treturn d"
+    #     f = ("def test(ab: Tuple[Qint2, Qint2]) -> Qint2:\n\tc = [1,2,3,2]\n\tai,bi = ab\n"
+    #       "\td = c[ai] + c[bi]\n\treturn d")
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)
 
@@ -95,6 +109,7 @@ class TestQlassfMatrix(unittest.TestCase):
     #     if self.compiler == "internal":
     #         return
 
-    #     f = "def test(ab: Tuple[Qint2, Qint2]) -> Qint2:\n\tc = [1,2,3,2]\n\td = c[ab[0]] + c[ab[1]]\n\treturn d"
+    #     f = ("def test(ab: Tuple[Qint2, Qint2]) -> Qint2:\n\tc = [1,2,3,2]\n"
+    #       "\td = c[ab[0]] + c[ab[1]]\n\treturn d")
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)

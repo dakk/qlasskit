@@ -17,13 +17,13 @@ import json
 import os
 import random
 import threading
-from typing import Tuple, get_args
+from typing import get_args
 
 from qiskit import QuantumCircuit, transpile
 from qiskit_aer import Aer
 from sympy.logic.boolalg import gateinputcount
 
-from qlasskit import Qint, QlassF, Qtype, compiler, const_to_qtype
+from qlasskit import Qint, Qtype, const_to_qtype
 from qlasskit.qcircuit import CNotSim, GateNotSimulableException
 
 COMPILATION_ENABLED = True
@@ -31,14 +31,14 @@ COMPILATION_ENABLED = True
 ENABLED_COMPILERS = [("internal",)]
 
 try:
-    import tweedledum
+    import tweedledum  # noqa: F401
 
     ENABLED_COMPILERS.append(("tweedledum",))
 except:
     pass
 
 try:
-    from pyqrack import qrack_simulator
+    from pyqrack import qrack_simulator  # noqa: F401
     from qiskit.providers.qrack import Qrack
 
     qsk_simulator = Qrack.get_backend("qasm_simulator")
@@ -97,20 +97,15 @@ def qiskit_measure_and_count(circ, shots=1):
     return counts
 
 
-def compute_result_of_qcircuit(cls, qf, truth_line):
+def compute_result_of_qcircuit(cls, qf, truth_line):  # noqa: C901
     """Simulate the quantum circuit for a given truth_line containing inputs"""
     circ = qf.circuit()
     gate = qf.gate()
     qc = QuantumCircuit(gate.num_qubits)
+    res_str = ""
 
-    # Prepare inputs
     [qc.initialize(1 if truth_line[i] else 0, i) for i in range(qf.input_size)]
-
     qc.append(gate, list(range(qf.num_qubits)))
-
-    # print(qc.decompose().draw("text"))
-
-    # Measure
     counts = qiskit_measure_and_count(qc)
 
     res = list(counts.keys())[0][::-1]
@@ -118,7 +113,6 @@ def compute_result_of_qcircuit(cls, qf, truth_line):
     if len(res) < qc.num_qubits:
         res += "0" * (qc.num_qubits - len(res))
 
-    res_str = ""
     for qname in qf.truth_table_header()[-qf.output_size :]:
         res_str += res[circ.qubit_map[qname]]
 
@@ -141,7 +135,7 @@ def compute_result_of_qcircuit_using_cnotsim(cls, qf, truth_line):
     return res_str
 
 
-def compute_result_of_originalf(cls, qf, truth_line):
+def compute_result_of_originalf(cls, qf, truth_line):  # noqa: C901
     """Compute the result of originalf for a given truth_line containing inputs"""
 
     def truth_to_arg(truth, i, argtt):
@@ -162,11 +156,11 @@ def compute_result_of_originalf(cls, qf, truth_line):
 
     def res_to_str(res):
         """Translate res to a binary string"""
-        if type(res) == bool:
+        if type(res) is bool:
             return "1" if res else "0"
-        elif type(res) == tuple or type(res) == list:
+        elif type(res) is tuple or type(res) is list:
             return "".join([res_to_str(x) for x in res])
-        elif type(res) == int:
+        elif type(res) is int:
             qc = const_to_qtype(res)
             try:
                 qi = qf.returns.ttype.from_bool(qc[1])

@@ -13,13 +13,12 @@
 # limitations under the License.
 
 import unittest
-from typing import Tuple
 
 from parameterized import parameterized_class
 from sympy import Symbol, symbols
-from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
+from sympy.logic import And
 
-from qlasskit import QlassF, exceptions, qlassf
+from qlasskit import qlassf
 
 from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
@@ -77,7 +76,10 @@ class TestQlassfList(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_list_len(self):
-        f = "def test(a: Qlist[Qint2, 2]) -> Qint2:\n\tc = 0\n\tfor x in range(len(a)):\n\t\tc += a[x]\n\treturn c"
+        f = (
+            "def test(a: Qlist[Qint2, 2]) -> Qint2:\n\tc = 0\n\tfor x in range(len(a)):\n"
+            "\t\tc += a[x]\n\treturn c"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
@@ -91,7 +93,10 @@ class TestQlassfList(unittest.TestCase):
         if self.compiler == "internal":
             return
 
-        f = "def test(ab: Tuple[Qint2, Qint2]) -> Qint2:\n\tc = [1,2,3,2]\n\tai,bi = ab\n\td = c[ai] + c[bi]\n\treturn d"
+        f = (
+            "def test(ab: Tuple[Qint2, Qint2]) -> Qint2:\n\tc = [1,2,3,2]\n\tai,bi = ab\n"
+            "\td = c[ai] + c[bi]\n\treturn d"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
@@ -100,6 +105,9 @@ class TestQlassfList(unittest.TestCase):
         if self.compiler == "internal":
             return
 
-        f = "def test(ab: Tuple[Qint2, Qint2]) -> Qint2:\n\tc = [1,2,3,2]\n\td = c[ab[0]] + c[ab[1]]\n\treturn d"
+        f = (
+            "def test(ab: Tuple[Qint2, Qint2]) -> Qint2:\n\tc = [1,2,3,2]\n"
+            "\td = c[ab[0]] + c[ab[1]]\n\treturn d"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)

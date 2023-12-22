@@ -13,13 +13,12 @@
 # limitations under the License.
 
 import unittest
-from typing import Tuple
 
 from parameterized import parameterized_class
-from sympy import Symbol, symbols, sympify
-from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
+from sympy import Symbol, symbols
+from sympy.logic import And
 
-from qlasskit import QlassF, exceptions, qlassf
+from qlasskit import qlassf
 
 from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
@@ -52,16 +51,19 @@ class TestQlassfTuple(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_tuple_ite(self):
-        f = "def test(b: bool, a: Tuple[bool, bool]) -> Tuple[bool,bool]:\n\treturn (a[1],a[0]) if b else a"
+        f = (
+            "def test(b: bool, a: Tuple[bool, bool]) -> Tuple[bool,bool]:\n"
+            "\treturn (a[1],a[0]) if b else a"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_tuple_arg_assign(self):
         f = (
             "def test(a: Tuple[bool, bool]) -> bool:\n"
-            + "\tb = a[0]\n"
-            + "\tc = a[1]\n"
-            + "\treturn b and c"
+            "\tb = a[0]\n"
+            "\tc = a[1]\n"
+            "\treturn b and c"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
@@ -70,7 +72,10 @@ class TestQlassfTuple(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_tuple_of_tuple_arg(self):
-        f = "def test(a: Tuple[Tuple[bool, bool], bool]) -> bool:\n\treturn a[0][0] and a[0][1] and a[1]"
+        f = (
+            "def test(a: Tuple[Tuple[bool, bool], bool]) -> bool:\n"
+            "\treturn a[0][0] and a[0][1] and a[1]"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
@@ -165,7 +170,10 @@ class TestQlassfTuple(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_tuple_iterator_var(self):
-        f = "def test(a: Tuple[Qint2, Qint2]) -> Qint2:\n\tc = 0\n\tfor x in a:\n\t\tc += x\n\treturn c"
+        f = (
+            "def test(a: Tuple[Qint2, Qint2]) -> Qint2:\n\tc = 0\n\tfor x in a:\n"
+            "\t\tc += x\n\treturn c"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 

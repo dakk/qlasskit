@@ -13,6 +13,6 @@
 # limitations under the License.
 
 try:
-    import utils  # needed by vscode
+    import utils  # noqa: F401 # needed by vscode
 except:
     pass

@@ -16,7 +16,7 @@ import unittest
 
 from parameterized import parameterized_class
 
-from qlasskit import QlassF, exceptions, qlassf
+from qlasskit import exceptions, qlassf
 
 from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 

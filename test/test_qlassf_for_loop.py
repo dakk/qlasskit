@@ -16,9 +16,8 @@ import unittest
 
 from parameterized import parameterized_class
 from sympy import Symbol, symbols
-from sympy.logic import ITE, And, Not, Or, Xor, false, simplify_logic, true
 
-from qlasskit import Qint2, Qint4, Qint8, QlassF, exceptions, qlassf
+from qlasskit import qlassf
 
 from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
@@ -54,21 +53,32 @@ class TestForLoop(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     # def test_for_nit_tbool_many(self):
-    #     f = "def test(a: Tuple[bool,bool]) -> Tuple[bool,bool]:\n\tfor i in range(32):\n\t\ta[0] = not a[0]\n\t\ta[1] = not a[1]\n\treturn a"
+    #     f = (
+    #       "def test(a: Tuple[bool,bool]) -> Tuple[bool,bool]:\n\tfor i in range(32):\n"
+    #       "\t\ta[0] = not a[0]\n\t\ta[1] = not a[1]\n\treturn a"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)
 
     def test_for_cond(self):
-        f = "def test(a: Qint2, b: bool) -> Qint2:\n\tfor i in range(2):\n\t\ta += (i if b else 1)\n\treturn a"
+        f = (
+            "def test(a: Qint2, b: bool) -> Qint2:\n\tfor i in range(2):\n"
+            "\t\ta += (i if b else 1)\n\treturn a"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_for_sum(self):
-        f = "def hash(k: Qint4) -> bool:\n\tz = 1\n\tfor i in range(3):\n\t\tz += i\n\treturn z == 3"
+        f = (
+            "def hash(k: Qint4) -> bool:\n\tz = 1\n\tfor i in range(3):\n"
+            "\t\tz += i\n\treturn z == 3"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_for_sum2(self):
-        f = "def hash(k: Qlist[bool, 4]) -> bool:\n\th = True\n\tfor i in range(len(k)):\n\t\th = h and k[i]\n\treturn h"
+        f = (
+            "def hash(k: Qlist[bool, 4]) -> bool:\n\th = True\n\tfor i in range(len(k)):"
+            "\n\t\th = h and k[i]\n\treturn h"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)

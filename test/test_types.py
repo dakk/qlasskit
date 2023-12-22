@@ -15,13 +15,8 @@
 import unittest
 from typing import Tuple
 
-from parameterized import parameterized_class
-from sympy import And, Not, Symbol
-
-from qlasskit import Qint2, Qint4, Qlist, qlassf
+from qlasskit import Qint2, Qint4, Qlist
 from qlasskit.types import format_outcome, interpret_as_qtype
-
-from .utils import ENABLED_COMPILERS
 
 
 class TestTypes_format_outcome(unittest.TestCase):
