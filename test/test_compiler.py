@@ -16,7 +16,7 @@ import unittest
 
 from parameterized import parameterized_class
 
-from qlasskit import compiler, qlassf
+from qlasskit import qlassf
 
 from .utils import ENABLED_COMPILERS, compute_and_compare_results
 
@@ -39,7 +39,10 @@ class TestCompiler(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_and_long_with_not(self):
-        f = "def test(a: bool, b: bool, c: bool, d: bool) -> bool:\n\treturn a and b and not c and d"
+        f = (
+            "def test(a: bool, b: bool, c: bool, d: bool) -> bool:\n\t"
+            "return a and b and not c and d"
+        )
         qf = qlassf(f, to_compile=True, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 

@@ -18,9 +18,9 @@ from typing import Tuple
 from parameterized import parameterized_class
 from sympy import And, Not, Symbol
 
-from qlasskit import Qint2, Qint4, Qlist, qlassf
+from qlasskit import qlassf
 from qlasskit.algorithms import ConstantOracleException, QAlgorithm, oraclize
-from qlasskit.types import format_outcome, interpret_as_qtype
+from qlasskit.types import interpret_as_qtype
 
 from .utils import ENABLED_COMPILERS
 

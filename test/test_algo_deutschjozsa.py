@@ -16,9 +16,8 @@ import unittest
 
 from parameterized import parameterized_class
 
-from qlasskit import Qint2, Qint4, qlassf
+from qlasskit import qlassf
 from qlasskit.algorithms import DeutschJozsa
-from qlasskit.compiler import SupportedCompilers
 
 from .utils import ENABLED_COMPILERS, qiskit_measure_and_count
 

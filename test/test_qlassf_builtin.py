@@ -13,13 +13,10 @@
 # limitations under the License.
 
 import unittest
-from typing import Tuple
 
 from parameterized import parameterized_class
-from sympy import Symbol, symbols
-from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
 
-from qlasskit import QlassF, exceptions, qlassf
+from qlasskit import qlassf
 
 from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 

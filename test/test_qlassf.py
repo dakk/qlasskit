@@ -16,7 +16,7 @@ import unittest
 
 from parameterized import parameterized_class
 
-from qlasskit import Qint, Qint2, Qint4, Qint12, QlassF, exceptions, qlassf
+from qlasskit import Qint2, Qint4, QlassF, exceptions, qlassf
 from qlasskit.boolopt.bool_optimizer import defaultOptimizerDebug
 
 from . import utils

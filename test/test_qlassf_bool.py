@@ -16,9 +16,9 @@ import unittest
 
 from parameterized import parameterized_class
 from sympy import Symbol, symbols
-from sympy.logic import ITE, And, Not, Or, false, simplify_logic, true
+from sympy.logic import ITE, And, Not, false, true
 
-from qlasskit import QlassF, exceptions, qlassf
+from qlasskit import exceptions, qlassf
 
 from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
@@ -127,7 +127,10 @@ class TestQlassfBoolean(unittest.TestCase):
 
     def test_ifexp2(self):
         ex = ITE(And(a, And(Not(b), c)), true, false)
-        f = "def test(a: bool, b: bool, c: bool) -> bool:\n\treturn True if a and (not b) and c else False"
+        f = (
+            "def test(a: bool, b: bool, c: bool) -> bool:\n"
+            "\treturn True if a and (not b) and c else False"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
@@ -138,7 +141,7 @@ class TestQlassfBoolean(unittest.TestCase):
         exp = And(a, Not(And(b, c)))
         f = (
             "def test(a: bool, b: bool, c: bool) -> bool:\n"
-            + "\treturn (c and not b) if a and ((not b) and c) else (a and not c)"
+            "\treturn (c and not b) if a and ((not b) and c) else (a and not c)"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
@@ -157,8 +160,8 @@ class TestQlassfBoolean(unittest.TestCase):
     def test_assign2(self):
         f = (
             "def test(a: bool, b: bool, c: bool) -> bool:\n"
-            + "\td = a and (not b) and c\n"
-            + "\treturn True if d else False"
+            "\td = a and (not b) and c\n"
+            "\treturn True if d else False"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
@@ -169,11 +172,11 @@ class TestQlassfBoolean(unittest.TestCase):
     def test_assign3(self):
         f = (
             "def test(a: bool, b: bool, c: bool) -> bool:\n"
-            + "\td = a and (not b) and c\n"
-            + "\te = a and b and c\n"
-            + "\tg = (not a) and b and c\n"
-            + "\th = (not a) and b and (not c)\n"
-            + "\treturn g if d and e else h"
+            "\td = a and (not b) and c\n"
+            "\te = a and b and c\n"
+            "\tg = (not a) and b and c\n"
+            "\th = (not a) and b and (not c)\n"
+            "\treturn g if d and e else h"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
@@ -184,16 +187,16 @@ class TestQlassfBoolean(unittest.TestCase):
 @parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfBoolBitwise(unittest.TestCase):
     def test_bitwise_and(self):
-        f = f"def test(a: bool, b: bool) -> bool:\n\treturn a & b"
+        f = "def test(a: bool, b: bool) -> bool:\n\treturn a & b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_bitwise_or(self):
-        f = f"def test(a: bool, b: bool) -> bool:\n\treturn a | b"
+        f = "def test(a: bool, b: bool) -> bool:\n\treturn a | b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_bitwise_xor(self):
-        f = f"def test(a: bool, b: bool) -> bool:\n\treturn a ^ b"
+        f = "def test(a: bool, b: bool) -> bool:\n\treturn a ^ b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)

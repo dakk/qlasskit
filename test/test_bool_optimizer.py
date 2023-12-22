@@ -12,10 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
-
-from parameterized import parameterized_class
-from sympy import And, Not, Or, Symbol, symbols
-from sympy.logic.boolalg import BooleanTrue
-
-from qlasskit.boolopt import bool_optimizer
+# import unittest
+# from qlasskit.boolopt import bool_optimizer

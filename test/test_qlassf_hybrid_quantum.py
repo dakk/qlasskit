@@ -14,11 +14,9 @@
 
 import unittest
 
-from parameterized import parameterized_class
+from qlasskit import qlassf
 
-from qlasskit import QlassF, exceptions, qlassf
-
-from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, qiskit_measure_and_count
+from .utils import COMPILATION_ENABLED, qiskit_measure_and_count
 
 
 class TestQlassfHybridQuantum(unittest.TestCase):

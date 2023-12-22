@@ -16,9 +16,9 @@ import unittest
 
 from parameterized import parameterized_class
 from sympy import Symbol, symbols
-from sympy.logic import ITE, And, Not, Or, Xor, false, simplify_logic, true
+from sympy.logic import And, Not
 
-from qlasskit import Qint2, Qint4, Qint8, QlassF, exceptions, qlassf
+from qlasskit import Qint2, Qint4, exceptions, qlassf
 
 from .utils import (
     COMPILATION_ENABLED,
@@ -63,7 +63,10 @@ class TestQlassfIntParametrized_2_4_8(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_int_arg2(self):
-        f = f"def test(a: {self.ttype_str}, b: bool) -> bool:\n\treturn a[1] if (a[0] and b) else a[0]"
+        f = (
+            f"def test(a: {self.ttype_str}, b: bool) -> bool:\n"
+            "\treturn a[1] if (a[0] and b) else a[0]"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
@@ -80,13 +83,19 @@ class TestQlassfIntParametrized_2_4_8(unittest.TestCase):
         )
 
     def test_int_return_tuple(self):
-        f = f"def test(a: {self.ttype_str}) -> Tuple[{self.ttype_str}, bool]:\n\tb = a[0] and a[1]\n\treturn (a, b)"
+        f = (
+            f"def test(a: {self.ttype_str}) -> Tuple[{self.ttype_str}, bool]:\n"
+            "\tb = a[0] and a[1]\n\treturn (a, b)"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), self.ttype_size + 1)
         compute_and_compare_results(self, qf)
 
     def test_int_tuple(self):
-        f = f"def test(a: Tuple[{self.ttype_str}, {self.ttype_str}]) -> bool:\n\treturn a[0][0] and a[1][1]"
+        f = (
+            f"def test(a: Tuple[{self.ttype_str}, {self.ttype_str}]) -> bool:\n"
+            "\treturn a[0][0] and a[1][1]"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
@@ -211,7 +220,7 @@ class TestQlassfInt(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_const_int_compare_gt(self):
-        f = f"def test(a: Qint4) -> bool:\n\treturn a > 6"
+        f = "def test(a: Qint4) -> bool:\n\treturn a > 6"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)
@@ -371,17 +380,26 @@ class TestQlassfIntSub(unittest.TestCase):
 )
 class TestQlassfIntBitwise(unittest.TestCase):
     def test_bitwise_and(self):
-        f = f"def test(a: {self.ttype_str}, b: {self.ttype_str}) -> {self.ttype_str}:\n\treturn a & b"
+        f = (
+            f"def test(a: {self.ttype_str}, b: {self.ttype_str}) -> {self.ttype_str}:\n"
+            "\treturn a & b"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_bitwise_or(self):
-        f = f"def test(a: {self.ttype_str}, b: {self.ttype_str}) -> {self.ttype_str}:\n\treturn a | b"
+        f = (
+            f"def test(a: {self.ttype_str}, b: {self.ttype_str}) -> {self.ttype_str}:\n"
+            "\treturn a | b"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_bitwise_xor(self):
-        f = f"def test(a: {self.ttype_str}, b: {self.ttype_str}) -> {self.ttype_str}:\n\treturn a ^ b"
+        f = (
+            f"def test(a: {self.ttype_str}, b: {self.ttype_str}) -> {self.ttype_str}:\n"
+            "\treturn a ^ b"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 

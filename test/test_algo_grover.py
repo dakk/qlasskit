@@ -14,7 +14,7 @@
 
 import unittest
 
-from qlasskit import Qint2, Qint4, qlassf
+from qlasskit import Qint2, qlassf
 from qlasskit.algorithms import Grover
 
 from .utils import qiskit_measure_and_count
