@@ -12,12 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import ast
 import unittest
 
 from sympy import Symbol
-from sympy.physics.quantum.qapply import qapply
-from sympy.physics.quantum.qubit import Qubit, measure_all
 
 from qlasskit.qcircuit import QCircuit, QCircuitEnhanced, gates
 
@@ -32,8 +29,13 @@ class TestQCircuit(unittest.TestCase):
 
     def test_base_mapping(self):
         qc = QCircuit()
-        a, b, c = qc.add_qubit("a"), qc.add_qubit("b"), qc.add_qubit(Symbol("c"))
+        a, b, c = (
+            qc.add_qubit("a"),
+            qc.add_qubit("b"),
+            qc.add_qubit(Symbol("c")),
+        )
         qc.ccx("a", Symbol("b"), c)
+        qc.ccx(a, b, c)
         self.assertEqual(qc.num_qubits, 3)
         self.assertTrue(isinstance(qc.gates[0][0], gates.CCX))
         self.assertEqual(qc.gates[0][1:], ([0, 1, 2], None))
@@ -60,7 +62,7 @@ class TestQCircuit(unittest.TestCase):
 
     def test_get_key_by_index(self):
         qc = QCircuit()
-        a, b = qc.add_qubit("a"), qc.add_qubit("b")
+        a, b = qc.add_qubit("a"), qc.add_qubit("b")  # noqa: F841
         self.assertRaises(Exception, lambda qc: qc.get_key_by_index(3), qc)
         self.assertEqual(qc.get_key_by_index(0), "a")
 
@@ -126,3 +128,26 @@ class TestQCircuitUncomputing(unittest.TestCase):
         qc.uncompute(a)
         qc.uncompute_all([r])
         # qc.draw()
+
+
+class TestQCircuitQFT(unittest.TestCase):
+    def test_qft(self):
+        qc = QCircuit(3)
+        qc.qft([0, 1, 2])
+        self.assertEqual(qc.num_gates, 7)
+
+        qc.iqft([0, 1, 2])
+        self.assertEqual(qc.num_gates, 14)
+
+        for i in range(int(qc.num_gates / 2)):
+            a = qc.gates[i]
+            b = qc.gates[qc.num_gates - i - 1]
+
+            self.assertEqual(a[0].__name__, b[0].__name__)
+            self.assertEqual(a[1], b[1])
+
+            if a[2]:
+                self.assertEqual(a[2], -b[2])
+
+        counts = qiskit_measure_and_count(qc.export("circuit", "qiskit"), shots=1024)
+        self.assertEqual(counts, {"000": 1024})

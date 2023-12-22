@@ -45,10 +45,13 @@ class QiskitExporter(QCircuitExporter):
                 pass
 
             elif hasattr(qc, g_name):
-                getattr(qc, g_name)(*w)
+                if p:
+                    getattr(qc, g_name)(p, *w)
+                else:
+                    getattr(qc, g_name)(*w)
 
             else:
-                raise Exception(f"not handled {g}")
+                raise Exception(f"Gate not handled for qiskit exporter: {g_name}")
 
         if mode == "gate":
             qc.remove_final_measurements()

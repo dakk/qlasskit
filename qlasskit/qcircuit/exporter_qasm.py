@@ -28,7 +28,10 @@ class QasmExporter(QCircuitExporter):
                 continue
 
             qbs = list(map(lambda gq: _selfqc.get_key_by_index(gq), ws))
-            gate_qasm += f'\t{g.__name__.lower()} {" ".join(qbs)}\n'
+            if p:
+                gate_qasm += f'\t{g.__name__.lower()}({p:.2f}) {" ".join(qbs)}\n'
+            else:
+                gate_qasm += f'\t{g.__name__.lower()} {" ".join(qbs)}\n'
         gate_qasm += "}\n\n"
 
         if mode == "gate":

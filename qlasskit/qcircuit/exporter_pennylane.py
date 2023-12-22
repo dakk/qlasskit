@@ -52,6 +52,12 @@ class PennyLaneExporter(QCircuitExporter):
             elif isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.Z):
                 ops.append(qml.CZ(wires=w))
 
+            elif isinstance(g, gates.Swap):
+                ops.append(qml.SWAP(wires=w))
+
+            elif isinstance(g, gates.CP):
+                ops.append(qml.CPhase(p, wires=w))
+
             elif isinstance(g, gates.Barrier):
                 pass
 
@@ -62,6 +68,6 @@ class PennyLaneExporter(QCircuitExporter):
                 ops.append(getattr(qml, g_name)(wires=w))
 
             else:
-                raise Exception(f"not handled {g}")
+                raise Exception(f"Gate not handled for pennylane exporter: {g_name}")
 
         return qml.tape.QuantumTape(ops)
