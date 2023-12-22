@@ -72,9 +72,24 @@ class Z(QGate):
         super().__init__("Z")
 
 
+class P(QGate):
+    def __init__(self):
+        super().__init__("P")
+
+
+class Swap(QGate):
+    def __init__(self):
+        super().__init__("SWAP", 2)
+
+
 class CX(QControlledGate):
     def __init__(self):
         super().__init__(X(), 1)
+
+
+class CP(QControlledGate):
+    def __init__(self):
+        super().__init__(P(), 1)
 
 
 class CCX(QControlledGate):

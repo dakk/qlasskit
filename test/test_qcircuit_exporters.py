@@ -11,19 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import ast
 import unittest
 
 import cirq
 import numpy as np
 import pennylane as qml
 from parameterized import parameterized_class
-from sympy import Symbol
 from sympy.physics.quantum.qapply import qapply
 from sympy.physics.quantum.qubit import Qubit, measure_all
 
-from qlasskit.qcircuit import QCircuit, QCircuitEnhanced, gates
+from qlasskit.qcircuit import QCircuit
 
 from .utils import qiskit_measure_and_count
 
@@ -53,12 +50,28 @@ def bell_circuit():
     return qc
 
 
+def qft_circuit():
+    qc = QCircuit()
+    a, b, c = qc.add_qubit("a"), qc.add_qubit("b"), qc.add_qubit("c")
+    qc.qft([a, b, c])
+    qc.iqft([a, b, c])
+    return qc
+
+
 @parameterized_class(
     ("qc", "result"),
     [
         (cx_circuit(), "gate qc q0 q1 {\n\tx q0\n\tcx q0 q1\n}\n\n"),
         (ccx_circuit(), "gate qc a b c {\n\tx a\n\tx b\n\tccx a b c\n}\n\n"),
         (bell_circuit(), "gate qc a b {\n\th a\n\tcx a b\n}\n\n"),
+        (
+            qft_circuit(),
+            (
+                "gate qc a b c {\n\th a\n\tcp(1.57) b a\n\tcp(0.79) c a\n\th b\n"
+                "\tcp(1.57) c b\n\th c\n\tswap a c\n\tswap a c\n\th c\n"
+                "\tcp(-1.57) c b\n\th b\n\tcp(-0.79) c a\n\tcp(-1.57) b a\n\th a\n}\n\n"
+            ),
+        ),
     ],
 )
 class TestQCircuitExportQASM(unittest.TestCase):
@@ -77,6 +90,7 @@ class TestQCircuitExportQASM(unittest.TestCase):
         (cx_circuit(), [(Qubit("11"), 1)]),
         (ccx_circuit(), [(Qubit("111"), 1)]),
         (bell_circuit(), [(Qubit("00"), 1 / 2), (Qubit("11"), 1 / 2)]),
+        # (qft_circuit(), [(Qubit("000"), 1)]),
     ],
 )
 class TestQCircuitExportSympy(unittest.TestCase):
@@ -98,6 +112,7 @@ class TestQCircuitExportSympy(unittest.TestCase):
     [
         (cx_circuit(), {"11": 1}),
         (ccx_circuit(), {"111": 1}),
+        (qft_circuit(), {"000": 1}),
     ],
 )
 class TestQCircuitExportQiskit(unittest.TestCase):
@@ -123,6 +138,14 @@ class TestQCircuitExportQiskit(unittest.TestCase):
                 "q(0)": np.array([[[1]]], dtype=np.int8),
                 "q(1)": np.array([[[1]]], dtype=np.int8),
                 "q(2)": np.array([[[1]]], dtype=np.int8),
+            },
+        ),
+        (
+            qft_circuit(),
+            {
+                "q(0)": np.array([[[0]]], dtype=np.int8),
+                "q(1)": np.array([[[0]]], dtype=np.int8),
+                "q(2)": np.array([[[0]]], dtype=np.int8),
             },
         ),
     ],
@@ -161,6 +184,7 @@ class TestQCircuitExportCirq(unittest.TestCase):
         (cx_circuit(), [0, 0, 0, 1]),
         (ccx_circuit(), [0, 0, 0, 0, 0, 0, 0, 1]),
         (bell_circuit(), [0.5, 0, 0, 0.5]),
+        (qft_circuit(), [1, 0, 0, 0, 0, 0, 0, 0]),
     ],
 )
 class TestQCircuitExportPennylane(unittest.TestCase):

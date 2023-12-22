@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
 from typing import Literal
 
 from . import gates
@@ -53,6 +54,13 @@ class CirqExporter(QCircuitExporter):
                                 sub_gate=cirq.Z, num_controls=len(w) - 1
                             )
                             yield gg(list(map(lambda wx: qubits[w], w)))
+
+                        elif isinstance(g, gates.Swap):
+                            yield cirq.SWAP(qubits[w[0]], qubits[w[1]])
+
+                        elif isinstance(g, gates.CP):
+                            cphase_gate = cirq.CZPowGate(exponent=p / math.pi)
+                            yield cphase_gate(qubits[w[0]], qubits[w[1]])
 
                         elif hasattr(cirq, g_name):
                             yield getattr(cirq, g_name)(

@@ -14,11 +14,14 @@
 
 from typing import Literal
 
-from sympy.physics.quantum.gate import CNOT, CGate, H, X, XGate
+from sympy.physics.quantum.gate import CNOT, SWAP, CGate, H, X, XGate
 from sympy.physics.quantum.qubit import Qubit
 
 from . import gates
 from .exporter import QCircuitExporter
+
+# def cp(theta, q0, q1):
+#     return CGate((q0,), Z(q1)**(theta))
 
 
 def mcx(w):
@@ -30,10 +33,11 @@ def toffoli(q0, q1, q2):
 
 
 class SympyExporter(QCircuitExporter):
-    def export(self, _selfqc, mode: Literal["circuit", "gate"]):
-        qstate = Qubit("0" * _selfqc.num_qubits) if mode == 'circuit' else None
+    def export(self, _selfqc, mode: Literal["circuit", "gate"]):  # noqa: C901
+        qstate = Qubit("0" * _selfqc.num_qubits) if mode == "circuit" else None
 
         for g, w, p in _selfqc.gates:
+            g_name = g.__class__.__name__
             ga = None
             if isinstance(g, gates.X):
                 ga = X(w[0])
@@ -41,6 +45,10 @@ class SympyExporter(QCircuitExporter):
                 ga = H(w[0])
             elif isinstance(g, gates.CX):
                 ga = CNOT(w[0], w[1])
+            # elif isinstance(g, gates.CP):
+            #     ga = cp(p, w[0], w[1])
+            elif isinstance(g, gates.Swap):
+                ga = SWAP(w[0], w[1])
             elif isinstance(g, gates.CCX) or isinstance(g, gates.MCX):
                 ga = mcx(w)
             elif isinstance(g, gates.Barrier) and mode != "gate":
@@ -48,11 +56,11 @@ class SympyExporter(QCircuitExporter):
             elif isinstance(g, gates.NopGate):
                 pass
             else:
-                raise Exception("not handled")
+                raise Exception(f"Gate not handled for sympy exporter: {g_name}")
 
             if ga and qstate:
                 qstate = ga * qstate
             elif ga:
                 qstate = ga
-                
+
         return qstate

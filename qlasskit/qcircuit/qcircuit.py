@@ -6,13 +6,14 @@
 
 # http://www.apache.org/licenses/LICENSE-2.0
 
-import copy
-
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import copy
+import math
 from typing import Any, List, Literal, Tuple, Union
 
 from sympy import Symbol
@@ -226,6 +227,52 @@ class QCircuit:
         target = self[target]
         wl = list(map(lambda w: self[w], wl))
         self.append(gates.MCX(len(wl)), wl + [target])
+
+    def swap(self, w1, w2):
+        w1, w2 = self[w1], self[w2]
+        self.append(gates.Swap(), [w1, w2])
+
+    def cp(self, phase, w1, w2):
+        """CP gate"""
+        w1, w2 = self[w1], self[w2]
+        self.append(gates.CP(), [w1, w2], phase)
+
+    def qft(self, wl: List[int]):
+        """Apply the quantum fourier transform"""
+        n = len(wl)
+        wl = list(map(lambda w: self[w], wl))
+
+        for i in range(n):
+            # Apply the Hadamard gate on the qubit at index i
+            self.h(wl[i])
+
+            # Apply the controlled phase rotation gates
+            for j in range(i + 1, n):
+                phase = 2 * math.pi / (2 ** (j - i + 1))
+                self.cp(phase, wl[j], wl[i])
+
+        # Swap the qubits to get them in the correct order
+        for i in range(n // 2):
+            self.swap(wl[i], wl[n - i - 1])
+
+    def iqft(self, wl: List[int]):
+        """Apply the inverse quantum fourier transform"""
+        n = len(wl)
+        wl = list(map(lambda w: self[w], wl))
+
+        # Swap the qubits to get them in the reverse order for IQFT
+        for i in range(n // 2):
+            self.swap(wl[i], wl[n - i - 1])
+
+        # Apply the IQFT
+        for i in reversed(range(n)):
+            # Apply the controlled phase rotation gates in reverse order
+            for j in reversed(range(i + 1, n)):
+                angle = -2 * math.pi / (2 ** (j - i + 1))
+                self.cp(angle, wl[j], wl[i])
+
+            # Apply the Hadamard gate on the qubit at index i
+            self.h(wl[i])
 
     def export(
         self,
