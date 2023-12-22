@@ -55,7 +55,6 @@ class Grover(QAlgorithm):
         self._qcircuit = QCircuit(self.search_space_size, name=f"grover__{oracle.name}")
 
         # State preparation
-        self._qcircuit.barrier(label="s")
         for i in range(self.search_space_size):
             self._qcircuit.h(i)
 
@@ -96,12 +95,8 @@ class Grover(QAlgorithm):
         ]
         self._qcircuit.h(oracle_qc["_ret_phased"])
 
-        for i in range(n_iterations):
-            self._qcircuit.barrier(label=f"g{i}")
-            self._qcircuit += oracle_qc.copy()
-
-            self._qcircuit.barrier()
-            self._qcircuit += diffuser_qc.copy()
+        # Repeat oracle and diffuser for n_iterations
+        self._qcircuit += (oracle_qc + diffuser_qc).repeat(n_iterations)
 
     # @override
     @property
