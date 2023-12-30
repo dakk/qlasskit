@@ -45,7 +45,7 @@ class QControlledGate(QGate):
         self.gate = gate
 
 
-class I(NopGate):
+class I(NopGate):  # noqa: E742
     def __init__(self):
         super().__init__("I", 1)
 
