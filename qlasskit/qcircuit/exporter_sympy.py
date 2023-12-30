@@ -53,7 +53,7 @@ class SympyExporter(QCircuitExporter):
                 ga = mcx(w)
             elif isinstance(g, gates.Barrier) and mode != "gate":
                 pass
-            elif isinstance(g, gates.NopGate):
+            elif issubclass(g.__class__, gates.NopGate):
                 pass
             else:
                 raise Exception(f"Gate not handled for sympy exporter: {g_name}")

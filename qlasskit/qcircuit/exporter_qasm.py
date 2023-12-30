@@ -24,7 +24,7 @@ class QasmExporter(QCircuitExporter):
         gate_qasm += " ".join(_selfqc.qubit_map.keys())
         gate_qasm += " {\n"
         for g, ws, p in _selfqc.gates:
-            if isinstance(g, gates.NopGate):
+            if issubclass(g.__class__, gates.NopGate):
                 continue
 
             qbs = list(map(lambda gq: _selfqc.get_key_by_index(gq), ws))

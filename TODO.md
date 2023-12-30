@@ -130,9 +130,13 @@
 - [x] Pennylane exporter
 - [x] Regression test for qubit number and gates
 - [x] Sympy exporter
+- [x] QFT and IQFT
 
 
 ### Week 2: (25 Dec 23)
+
+- [ ] Circuit decompilation 
+
 ### Week 3: (1 Jan 24)
 
 ### Week 4: (8 Jan 24)
@@ -142,11 +146,11 @@
 
 ## Future features
 
+- [ ] Separate tests in directories
+
 
 ### Language support
 
-- [ ] QFT hybrid
-- [ ] Inverse QFT
 - [ ] QFT multiplier
 - [ ] Int arithmetic: div
 - [ ] Lambda
