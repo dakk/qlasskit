@@ -47,7 +47,7 @@ class QCircuit:
 
     def get_key_by_index(self, i: int):
         """Return the qubit name given its index"""
-        for key in self.qubit_map:
+        for key in reversed(self.qubit_map.keys()):
             if self.qubit_map[key] == i:
                 return key
         raise Exception(f"Qubit with index {i} not found")
@@ -112,18 +112,37 @@ class QCircuit:
         if isinstance(other, Tuple):  # type: ignore
             self.append(other[0], other[1], other[2])
         elif isinstance(other, QCircuit):  # type: ignore
-            if other.num_qubits > self.num_qubits:
-                raise Exception(
-                    f"Other circuit has too many qubits {other.num_qubits} > {self.num_qubits}"
-                )
+            self.append_circuit(other, list(range(other.num_qubits)))
+        return self
 
-            self.gates.extend(other.gates)
-            self.gates_computed.extend(other.gates_computed)
+    def append_circuit(self, other: "QCircuit", qubits: List[int] = []):
+        """Add a qcircuit, remapping to qubits"""
+        if other.num_qubits > self.num_qubits:
+            raise Exception(
+                f"Other circuit has too many qubits {other.num_qubits} > {self.num_qubits}"
+            )
+        if len(qubits) != other.num_qubits:
+            raise Exception(
+                f"Other circuit and qubits list mismatch {other.num_qubits} != {len(qubits)}"
+            )
 
-            for s, q in other.qubit_map.items():
-                if s not in self.qubit_map:
-                    self.qubit_map[s] = q
+        ogates = []
+        ogates_computed = []
 
+        for g, w, p in other.gates:
+            wn = [qubits[ww] for ww in w]
+            ogates.append((g, wn, p))
+
+        for g, w, p in other.gates_computed:
+            wn = [qubits[ww] for ww in w]
+            ogates_computed.append((g, wn, p))
+
+        # for s, q in other.qubit_map.items():
+        #     if s not in self.qubit_map and q < len(qubits):
+        #         self.qubit_map[s] = qubits[q]
+
+        self.gates.extend(ogates)
+        self.gates_computed.extend(ogates_computed)
         return self
 
     def add_qubit(self, name=None):
