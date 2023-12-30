@@ -79,8 +79,6 @@ class InternalCompiler(Compiler):
     def compile_expr(  # noqa: C901
         self, qc: QCircuitEnhanced, expr: Boolean, dest=None
     ) -> int:
-        print(expr, self.expqmap.exp_map, qc.gates)
-        print()
         if isinstance(expr, Symbol):
             if expr.name in qc:
                 return qc[expr.name]
