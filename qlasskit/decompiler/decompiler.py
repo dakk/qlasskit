@@ -80,7 +80,7 @@ class Decompiler:
             elif issubclass(g.__class__, gates.NopGate):
                 continue
             else:
-                raise Exception("Not handled", g)
+                raise Exception(f"Gate not handled for decompilation: {g.__name__}")
 
         exps_l = list(filter(lambda e: e[0] != e[1], exps.items()))
         return exps_l
