@@ -91,7 +91,7 @@ class Decompiler:
         """
         results = []
         current_section = []
-        for g, w, p in qc.gates + [(gates.NopGate(), [0], None)]:
+        for g, w, p in qc.gates + [(None, [0], None)]:
             if any(isinstance(g, zb_g) for zb_g in ZB_GATES) or issubclass(
                 g.__class__, gates.NopGate
             ):
