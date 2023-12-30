@@ -79,6 +79,8 @@ class InternalCompiler(Compiler):
     def compile_expr(  # noqa: C901
         self, qc: QCircuitEnhanced, expr: Boolean, dest=None
     ) -> int:
+        print(expr, self.expqmap.exp_map, qc.gates)
+        print()
         if isinstance(expr, Symbol):
             if expr.name in qc:
                 return qc[expr.name]
@@ -91,7 +93,10 @@ class InternalCompiler(Compiler):
             return self.expqmap[expr]
 
         elif isinstance(expr, Xor):
-            d = qc.get_free_ancilla()
+            if dest is None:
+                d = qc.get_free_ancilla()
+            else:
+                d = dest
 
             for e in expr.args:
                 if isinstance(e, Symbol):
@@ -99,6 +104,11 @@ class InternalCompiler(Compiler):
                 elif isinstance(e, QuantumBooleanGate):
                     d2 = self.compile_expr(qc, e)
                     qc.cx(d2, d)
+                elif isinstance(e, Not) and not isinstance(
+                    e.args[0], Symbol
+                ):  # fixes edge case
+                    d = self.compile_expr(qc, e.args[0], dest=d)
+                    qc.x(d)
                 else:
                     d = self.compile_expr(qc, e, dest=d)
 
