@@ -19,8 +19,8 @@ from parameterized import parameterized_class
 from qlasskit import Qint2, Qint4, QlassF, exceptions, qlassf
 from qlasskit.boolopt.bool_optimizer import defaultOptimizerDebug
 
-from . import utils
-from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
+from .. import utils
+from ..utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
 
 class TestQlassfDecorator(unittest.TestCase):

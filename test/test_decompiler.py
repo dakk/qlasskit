@@ -24,7 +24,7 @@ from qlasskit.ast2logic.typing import BoolExpList
 from qlasskit.boolopt.bool_optimizer import custom_simplify_logic
 from qlasskit.decompiler import Decompiler
 
-from .utils import ENABLED_COMPILERS, compute_and_compare_results
+from .utils import ENABLED_COMPILERS
 
 
 def _merge_expressions(

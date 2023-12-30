@@ -20,7 +20,7 @@ from sympy.logic import And, Not
 
 from qlasskit import Qint2, Qint4, exceptions, qlassf
 
-from .utils import (
+from ..utils import (
     COMPILATION_ENABLED,
     ENABLED_COMPILERS,
     compute_and_compare_results,

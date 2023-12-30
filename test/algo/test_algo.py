@@ -22,7 +22,7 @@ from qlasskit import qlassf
 from qlasskit.algorithms import ConstantOracleException, QAlgorithm, oraclize
 from qlasskit.types import interpret_as_qtype
 
-from .utils import ENABLED_COMPILERS
+from ..utils import ENABLED_COMPILERS
 
 
 class QT(QAlgorithm):
