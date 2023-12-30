@@ -20,7 +20,7 @@ from sympy.logic import ITE, And, Not, false, true
 
 from qlasskit import exceptions, qlassf
 
-from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
+from ..utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
 a, b, c, d, e, g, h = symbols("a,b,c,d,e,g,h")
 _ret = Symbol("_ret")

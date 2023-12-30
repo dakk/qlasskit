@@ -16,7 +16,7 @@ import unittest
 
 from qlasskit import qlassf
 
-from .utils import COMPILATION_ENABLED, qiskit_measure_and_count
+from ..utils import COMPILATION_ENABLED, qiskit_measure_and_count
 
 
 class TestQlassfHybridQuantum(unittest.TestCase):
@@ -26,8 +26,8 @@ class TestQlassfHybridQuantum(unittest.TestCase):
         count = qiskit_measure_and_count(qf.circuit().export(), 128)
         [self.assertEqual(x in count, True) for x in ["0", "1"]]
 
-    # THIS IS NOT ALLOWED, since hybrid quantum is applicable only with gates that operates on 1 qubit
-    # a possible solution is to implement QFT directly as hybrid function.
+    # THIS IS NOT ALLOWED, since hybrid quantum is applicable only with gates that
+    # operates on 1 qubit a possible solution is to implement QFT directly as hybrid function.
     # def test_qft(self):
     #     f = "def test(a: Qint2) -> Qint2:\n\treturn Q.QFT(a)"
     #     qf = qlassf(f, to_compile=False, uncompute=False)

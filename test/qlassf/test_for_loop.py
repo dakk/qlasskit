@@ -19,7 +19,7 @@ from sympy import Symbol, symbols
 
 from qlasskit import qlassf
 
-from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
+from ..utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
 a, b, c, d = symbols("a,b,c,d")
 _ret = Symbol("_ret")

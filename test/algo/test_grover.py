@@ -17,7 +17,7 @@ import unittest
 from qlasskit import Qint2, qlassf
 from qlasskit.algorithms import Grover
 
-from .utils import qiskit_measure_and_count
+from ..utils import qiskit_measure_and_count
 
 
 class TestAlgoGrover(unittest.TestCase):
