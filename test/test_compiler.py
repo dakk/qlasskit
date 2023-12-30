@@ -55,3 +55,17 @@ class TestCompiler(unittest.TestCase):
         f = "def test(a: bool, b: bool) -> bool:\n\treturn not a or b"
         qf = qlassf(f, to_compile=True, compiler=self.compiler)
         compute_and_compare_results(self, qf)
+
+    def test_edge_case_not_inside_xor(self):
+        f = "def f1(a: bool, b: bool, c: bool) -> bool:\n\treturn (b and a) ^ (not (c))"
+        qf = qlassf(f, to_compile=True, compiler=self.compiler)
+        self.assertEqual(qf.circuit().num_qubits, 4)
+        self.assertEqual(qf.circuit().num_gates, 3)
+        compute_and_compare_results(self, qf)
+
+    def test_edge_case_not_inside_xor2(self):
+        f = "def f1(a: bool, b: bool, c: bool) -> bool:\n\treturn (b and a) ^ (not (b ^ c))"
+        qf = qlassf(f, to_compile=True, compiler=self.compiler)
+        self.assertEqual(qf.circuit().num_qubits, 4)
+        self.assertEqual(qf.circuit().num_gates, 4)
+        compute_and_compare_results(self, qf)
