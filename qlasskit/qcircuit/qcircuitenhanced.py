@@ -47,6 +47,12 @@ class QCircuitEnhanced(QCircuit):
         if promote and index in self.ancilla_lst:
             self.ancilla_lst.remove(index)
 
+            # Remove the old name if present
+            try:
+                del self[self.get_key_by_index(index)]
+            except:
+                pass
+
         self[name] = index
 
     def remove_identities(self):
@@ -103,7 +109,7 @@ class QCircuitEnhanced(QCircuit):
 
         for g, qbs, p in reversed(scopy):
             if (
-                isinstance(g, gates.NopGate)
+                issubclass(g.__class__, gates.NopGate)
                 or qbs[-1] in keep
                 or qbs[-1] in self.free_ancilla_lst
             ):
