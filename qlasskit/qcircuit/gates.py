@@ -20,6 +20,9 @@ class QGate:
         self.__name__ = name
         self.n_qubits = n_qubits
 
+    def __repr__(self):
+        return f"{self.__name__}"
+
     @classmethod
     def invert(cls):
         return cls
@@ -40,6 +43,11 @@ class QControlledGate(QGate):
         super().__init__(("C" * n_controls) + gate.__name__, n_controls + gate.n_qubits)
         self.n_controls = n_controls
         self.gate = gate
+
+
+class I(NopGate):
+    def __init__(self):
+        super().__init__("I", 1)
 
 
 class X(QGate):
