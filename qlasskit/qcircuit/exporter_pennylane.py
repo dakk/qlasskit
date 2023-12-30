@@ -58,10 +58,7 @@ class PennyLaneExporter(QCircuitExporter):
             elif isinstance(g, gates.CP):
                 ops.append(qml.CPhase(p, wires=w))
 
-            elif isinstance(g, gates.Barrier):
-                pass
-
-            elif isinstance(g, gates.NopGate):
+            elif issubclass(g.__class__, gates.NopGate):
                 pass
 
             elif hasattr(qml, g_name):
