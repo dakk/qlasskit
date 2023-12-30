@@ -41,7 +41,7 @@ class QiskitExporter(QCircuitExporter):
             elif isinstance(g, gates.Barrier) and mode != "gate":
                 qc.barrier(label=p)
 
-            elif isinstance(g, gates.NopGate):
+            elif issubclass(g.__class__, gates.NopGate):
                 pass
 
             elif hasattr(qc, g_name):

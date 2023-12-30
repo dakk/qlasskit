@@ -169,7 +169,7 @@ class QCircuit:
         applied = gates.apply(gate, qubits, param)
         self.gates.append(applied)
 
-        if not isinstance(gate, gates.NopGate):
+        if not issubclass(gate.__class__, gates.NopGate):
             self.gates_computed.append(applied)
 
     def barrier(self, label=None):
