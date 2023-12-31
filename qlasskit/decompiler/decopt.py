@@ -11,3 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from .. import QCircuit
+
+# from . import Decompiler
+
+
+def circuit_boolean_optimizer(qc: QCircuit) -> QCircuit:
+    """Decompile the quantum circuit, optimize boolean sections, and recreate an
+    optimized quantum circuit"""
+    raise Exception("Not implemented yet")
+    # dc = Decompiler().decompile(qc)
