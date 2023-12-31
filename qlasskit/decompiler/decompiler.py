@@ -24,6 +24,7 @@ class DecompilerException(Exception):
     pass
 
 
+# TODO: this may be useless
 class DecompilerResult:
     def __init__(self, section, exps):
         self.section = section
@@ -37,7 +38,31 @@ class DecompilerResult:
         return s
 
 
-DecompilerResults = List[DecompilerResult]
+class DecompilerResults:
+    def __init__(self, sections=[]):
+        self.sections: List[DecompilerResult] = []
+
+    def __repr__(self):
+        s = "DecompiledResults["
+
+        for sec in self.sections:
+            s += "\n\t("
+            s += "\n\t\t" + ", ".join(map(str, sec.section))
+            s += "\n\t\t" + ", ".join(map(str, sec.expressions))
+            s += "\n\t)"
+
+        s += "\n]"
+        return s
+
+    def __getitem__(self, i: int):
+        return self.sections[i]
+
+    def __len__(self):
+        return len(self.sections)
+
+    def append(self, section: DecompilerResult):
+        self.sections.append(section)
+
 
 ZB_GATES = [
     gates.I,
@@ -74,9 +99,9 @@ class Decompiler:
             elif isinstance(g, gates.CX):
                 exps[wn[1]] = Xor(exps[wn[0]], exps[wn[1]])
             elif isinstance(g, gates.CCX):
-                exps[wn[2]] = And(exps[wn[0]], exps[wn[1]], exps[wn[2]])
+                exps[wn[2]] = Xor(And(exps[wn[0]], exps[wn[1]]), exps[wn[2]])
             elif isinstance(g, gates.MCX):
-                exps[wn[-1]] = And(*[exps[ww] for ww in wn[0:-1]])
+                exps[wn[-1]] = Xor(And(*[exps[ww] for ww in wn[0:-1]]), exps[wn[-1]])
             elif issubclass(g.__class__, gates.NopGate):
                 continue
             else:
@@ -89,7 +114,7 @@ class Decompiler:
         """Decompile a quantum circuit, searching for circuit sections that apply transformations
         on the z-basis on the same qubits, and return boolean expressions representing them
         """
-        results = []
+        results = DecompilerResults()
         current_section = []
         for g, w, p in qc.gates + [(None, [0], None)]:
             if any(isinstance(g, zb_g) for zb_g in ZB_GATES) or issubclass(

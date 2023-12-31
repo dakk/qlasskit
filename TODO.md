@@ -135,7 +135,8 @@
 
 ### Week 2: (25 Dec 23)
 
-- [ ] Circuit decompilation 
+- [x] Separate tests in directories
+- [x] Circuit decompilation 
 
 ### Week 3: (1 Jan 24)
 
@@ -146,8 +147,7 @@
 
 ## Future features
 
-- [ ] Separate tests in directories
-
+- [ ] Simplification of circuits using boolean expressions decompilation
 
 ### Language support
 
@@ -166,7 +166,6 @@
 ### Abstraction support
 
 - [ ] Parameter bind
-- [ ] Extract boolean expressions from quantum circuits
 
 ### Framwork support
 
