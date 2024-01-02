@@ -14,6 +14,7 @@
 
 import copy
 import math
+import random
 from typing import Any, List, Literal, Tuple, Union
 
 from sympy import Symbol
@@ -43,7 +44,34 @@ class QCircuit:
 
     @property
     def num_gates(self):
-        return len(self.gates)
+        return len(list(filter(lambda x: not x[0].is_nop(), self.gates)))
+
+    @staticmethod
+    def random(qubits_n: int, depth: int, gate_list=None) -> "QCircuit":
+        qc = QCircuit(qubits_n)
+
+        if gate_list is None:
+            gate_list = [
+                gates.I,
+                gates.X,
+                gates.Z,
+                gates.Y,
+                gates.CX,
+                gates.CCX,
+                gates.H,
+                gates.S,
+                gates.T,
+                gates.P,
+                gates.Swap,
+            ]
+
+        for x in range(depth):
+            g = random.choice(gate_list)()
+            w = random.sample(range(qubits_n), k=g.n_qubits)
+
+            qc.append(g, w)
+
+        return qc
 
     def get_key_by_index(self, i: int):
         """Return the qubit name given its index"""
