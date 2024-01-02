@@ -27,10 +27,16 @@ class QGate:
     def invert(cls):
         return cls
 
+    def is_nop(self):
+        return False
+
 
 class NopGate(QGate):
     def __init__(self, name="nop"):
         super().__init__(name, 0)
+
+    def is_nop(self):
+        return True
 
 
 class Barrier(NopGate):
@@ -45,7 +51,7 @@ class QControlledGate(QGate):
         self.gate = gate
 
 
-class I(NopGate):  # noqa: E742
+class I(QGate):  # noqa: E742
     def __init__(self):
         super().__init__("I", 1)
 

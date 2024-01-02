@@ -25,7 +25,7 @@ from . import Compiler, CompilerException, ExpQMap
 class InternalCompiler(Compiler):
     """InternalCompiler translating an expression list to quantum circuit"""
 
-    def compile(
+    def compile(  # noqa: C901
         self, name, args: Args, returns: Arg, exprs: BoolExpList, uncompute=True
     ) -> QCircuit:
         qc = QCircuitEnhanced(name=name)
@@ -60,6 +60,14 @@ class InternalCompiler(Compiler):
             elif isinstance(symp_exp, Symbol) and sym.name.startswith("_ret"):
                 iret = qc.add_qubit(sym.name)
                 qc.cx(qc[symp_exp.name], iret)
+            # Self-not
+            elif (
+                isinstance(symp_exp, Not)
+                and isinstance(symp_exp.args[0], Symbol)
+                and symp_exp.args[0].name == sym.name
+            ):
+                iret = qc[sym.name]
+                qc.x(iret)
             else:
                 iret = self.compile_expr(qc, symp_exp)
 
@@ -70,7 +78,7 @@ class InternalCompiler(Compiler):
             self.expqmap.remove(qc.uncompute())
 
         qc.remove_identities()
-        if uncompute:
+        if uncompute and (returns is not None):
             keep = [qc[r] for r in filter(lambda r: r in qc, returns.bitvec)]
             qc.uncompute_all(keep=keep)
 

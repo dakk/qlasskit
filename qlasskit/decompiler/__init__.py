@@ -16,6 +16,8 @@
 from .decompiler import (  # noqa: F401
     Decompiler,
     DecompilerException,
-    DecompilerResult,
+    DecompiledSection,
     DecompilerResults,
 )
+
+from .decopt import circuit_boolean_optimizer  # noqa: F401
