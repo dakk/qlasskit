@@ -17,9 +17,9 @@ from typing import Dict
 
 from parameterized import parameterized, parameterized_class
 from sympy import Symbol
-from sympy.logic.boolalg import Boolean
+from sympy.logic.boolalg import Boolean  # , simplify_logic
 
-from qlasskit import qlassf  # QCircuit,
+from qlasskit import QCircuit, qlassf  # noqa: F401
 from qlasskit.ast2logic.typing import BoolExpList
 
 # from qlasskit.boolopt import defaultOptimizer
@@ -44,6 +44,22 @@ def _merge_expressions(
             n_exps.append((s, e))
 
     return n_exps
+
+
+# class TestCircuitDecompiler(unittest.TestCase):
+#     def test_decompilation_of_circuit(self):
+#         qc = QCircuit(3)
+#         qc.x(0)
+#         qc.cx(0, 1)
+#         qc.x(0)
+#         qc.cx(0, 1)
+#         qc.draw()
+
+#         dc = Decompiler().decompile(qc)
+#         print(dc)
+
+#         for e in dc[0].expressions:
+#             print(simplify_logic(e[1]))
 
 
 # TODO: fix for tweedledum

@@ -21,6 +21,7 @@ setup(
         "qlasskit.qcircuit",
         "qlasskit.compiler",
         "qlasskit.algorithms",
+        "qlasskit.decompiler",
     ],
     zip_safe=False,
     install_requires=["sympy==1.12"],
