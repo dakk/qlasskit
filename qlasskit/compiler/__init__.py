@@ -13,10 +13,11 @@
 # limitations under the License.
 # isort:skip_file
 
-from typing import Literal, get_args
+from typing import Literal, List, get_args
 
 from .expqmap import ExpQMap  # noqa: F401
 from .compiler import Compiler, CompilerException  # noqa: F401
+from ..ast2logic.typing import Arg
 
 try:
     import tweedledum  # noqa: F401
@@ -59,3 +60,19 @@ def to_quantum(
 
     circ = sel_compiler.compile(name, args, returns, exprs, uncompute)
     return circ
+
+
+def exprs_to_quantum(
+    exprs, symbols: List[str], compiler: SupportedCompiler = "internal"
+):
+    args = []
+    for s in symbols:
+        args.append(Arg(s, "bool", [s]))
+    return to_quantum(
+        name="",
+        args=args,
+        returns=None,
+        exprs=exprs,
+        compiler=compiler,
+        uncompute=False,
+    )

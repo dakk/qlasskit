@@ -24,16 +24,15 @@ class DecompilerException(Exception):
     pass
 
 
-# TODO: this may be useless
-class DecompilerResult:
-    def __init__(self, section, exps, sec_index):
-        self.section = section
+class DecompiledSection:
+    def __init__(self, gates, exps, sec_index):
+        self.gates = gates
         self.expressions: BoolExpList = exps
-        self.section_index: Tuple[int, int] = sec_index
+        self.index: Tuple[int, int] = sec_index
 
     def __repr__(self):
-        s = f"DecompiledResult[{self.section_index}](\n\t"
-        s += ", ".join(map(str, self.section))
+        s = f"DecompiledResult[{self.index}](\n\t"
+        s += ", ".join(map(str, self.gates))
         s += "\n\t" + ", ".join(map(str, self.expressions))
         s += "\n)"
         return s
@@ -41,15 +40,15 @@ class DecompilerResult:
 
 class DecompilerResults:
     def __init__(self, sections=[]):
-        self.sections: List[DecompilerResult] = []
+        self.sections: List[DecompiledSection] = []
 
     def __repr__(self):
         s = "DecompiledResults["
 
         for sec in self.sections:
             s += "\n\t("
-            s += f"\n\t\t({sec.section_index})"
-            s += "\n\t\t" + ", ".join(map(str, sec.section))
+            s += f"\n\t\t{sec.index}"
+            s += "\n\t\t" + ", ".join(map(str, sec.gates))
             s += "\n\t\t" + ", ".join(map(str, sec.expressions))
             s += "\n\t)"
 
@@ -62,7 +61,10 @@ class DecompilerResults:
     def __len__(self):
         return len(self.sections)
 
-    def append(self, section: DecompilerResult):
+    def __iter__(self):
+        return self.sections.__iter__()
+
+    def append(self, section: DecompiledSection):
         self.sections.append(section)
 
 
@@ -123,16 +125,20 @@ class Decompiler:
 
         i = 0
         for g, w, p in qc.gates + [(None, [0], None)]:
-            if any(isinstance(g, zb_g) for zb_g in ZB_GATES) or issubclass(
-                g.__class__, gates.NopGate
-            ):
+            if any(isinstance(g, zb_g) for zb_g in ZB_GATES):
                 if current_section_start_index is None:
                     current_section_start_index = i
                 current_section.append((g, w, p))
+            elif issubclass(g.__class__, gates.NopGate):
+                pass
             elif len(current_section) > 0:
+                end = i
+                if issubclass(qc.gates[i - 1][0].__class__, gates.NopGate):
+                    end -= 1
+
                 exps = self.__exps_of_section(qc, current_section)
-                res = DecompilerResult(
-                    current_section, exps, (current_section_start_index, i + 1)
+                res = DecompiledSection(
+                    current_section, exps, (current_section_start_index, end)
                 )
                 results.append(res)
                 current_section = []

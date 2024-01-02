@@ -12,13 +12,65 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+from sympy import Symbol
+from sympy.logic.boolalg import And, Not, Or, Xor, simplify_logic
+
 from .. import QCircuit
 
-# from . import Decompiler
+# from ..boolopt import custom_simplify_logic
+from ..compiler import SupportedCompiler, exprs_to_quantum
+from . import Decompiler
 
 
-def circuit_boolean_optimizer(qc: QCircuit) -> QCircuit:
-    """Decompile the quantum circuit, optimize boolean sections, and recreate an
+# This differs from the bool_optimizer version
+def custom_simplify_logic2(expr):
+    if isinstance(expr, Xor):
+        se = simplify_logic(expr)
+        if isinstance(se, Xor) or isinstance(se, Not) or isinstance(se, Symbol):
+            return se
+        else:
+            args = [custom_simplify_logic2(arg) for arg in expr.args]
+            return type(expr)(*args)
+    elif isinstance(expr, (And, Or, Not)):
+        args = [custom_simplify_logic2(arg) for arg in expr.args]
+        return type(expr)(*args)
+    else:
+        return simplify_logic(expr)
+
+
+def circuit_boolean_optimizer(
+    qc: QCircuit, compiler: SupportedCompiler = "internal"
+) -> QCircuit:
+    """Decompile the quantum circuit, simplify boolean sections, and recreate an
     optimized quantum circuit"""
-    raise Exception("Not implemented yet")
-    # dc = Decompiler().decompile(qc)
+    dc = Decompiler().decompile(qc)
+
+    # print(dc)
+
+    qc_new = qc.copy()
+
+    for section in reversed(dc):
+        n_exps = []
+
+        # Simplify expressions
+
+        for s, e in section.expressions:
+            e_symp = custom_simplify_logic2(e)
+            # print(s, ":", e, "=>", e_symp)
+            n_exps.append((s, e_symp))
+
+        # Create new circuit section using the compiler
+        qc_sec = exprs_to_quantum(
+            exprs=n_exps, symbols=qc.qubit_map.keys(), compiler=compiler
+        )
+
+        # print(qc_sec.gates)
+        if len(qc_sec.gates) > len(section.gates):
+            # print("skipped")
+            continue
+
+        # Replace the circuit section with the new one
+        qc_new.gates[section.index[0] : section.index[1]] = qc_sec.gates
+
+    return qc_new

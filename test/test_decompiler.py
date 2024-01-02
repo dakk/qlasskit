@@ -17,13 +17,11 @@ from typing import Dict
 
 from parameterized import parameterized, parameterized_class
 from sympy import Symbol
-from sympy.logic.boolalg import Boolean  # , simplify_logic
+from sympy.logic.boolalg import Boolean
 
 from qlasskit import QCircuit, qlassf  # noqa: F401
 from qlasskit.ast2logic.typing import BoolExpList
-
-# from qlasskit.boolopt import defaultOptimizer
-from qlasskit.boolopt.bool_optimizer import custom_simplify_logic  # apply_cse,
+from qlasskit.boolopt.bool_optimizer import custom_simplify_logic
 from qlasskit.decompiler import Decompiler
 
 from .utils import ENABLED_COMPILERS, compute_and_compare_results
@@ -46,22 +44,6 @@ def _merge_expressions(
     return n_exps
 
 
-# class TestCircuitDecompiler(unittest.TestCase):
-#     def test_decompilation_of_circuit(self):
-#         qc = QCircuit(3)
-#         qc.x(0)
-#         qc.cx(0, 1)
-#         qc.x(0)
-#         qc.cx(0, 1)
-#         qc.draw()
-
-#         dc = Decompiler().decompile(qc)
-#         print(dc)
-
-#         for e in dc[0].expressions:
-#             print(simplify_logic(e[1]))
-
-
 # TODO: fix for tweedledum
 @parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestDecompiler(unittest.TestCase):
@@ -81,6 +63,7 @@ class TestDecompiler(unittest.TestCase):
         if exact:
             self.assertEqual(len(dc), 1)
             self.assertEqual(len(dc[0].expressions), len(qf.expressions))
+            self.assertEqual(dc[0].index, (0, qf.circuit().num_gates))
 
         # Set False values for initialization
         _rets = {}
@@ -101,71 +84,3 @@ class TestDecompiler(unittest.TestCase):
         qf2.compile(compiler=self.compiler)
         compute_and_compare_results(self, qf2)
         compute_and_compare_results(self, qf)
-
-        # print(dc0_exps, qf.expressions)
-        # qf2.circuit().draw()
-        # qf.circuit().draw()
-
-
-def _merge_expressions2(
-    exps: BoolExpList, emap: Dict[Symbol, Boolean] = {}
-) -> BoolExpList:
-    n_exps = []
-
-    for s, e in exps:
-        e = e.xreplace(emap)
-
-        emap[s] = e
-        n_exps.append((s, e))
-
-    return n_exps
-
-
-# class TestDecopt(unittest.TestCase):
-#     def test_wip(self):
-#         f = "def f1(b: bool, n: Qint2) -> Qint2:\n\treturn n + (1 if b else 2)"
-#         qf = qlassf(f, to_compile=True)
-
-#         qc = QCircuit(qf.num_qubits * 2 - 1)
-#         for i in range(3):
-#             qc.append_circuit(qf.circuit(), [0] + list(range(1 + i * 2, 5 + i * 2)))
-
-#         qc["b"] = 0
-#         qc["n.0"] = 1
-#         qc["n.1"] = 2
-#         qc["_ret.0"] = qf.num_qubits * 2 - 3
-#         qc["_ret.1"] = qf.num_qubits * 2 - 2
-
-#         init_set = {Symbol("_ret.0"): False, Symbol("_ret.1"): False}
-#         for i in range(3, qf.num_qubits * 2 - 3):
-#             init_set[Symbol(f"q{i}")] = False
-
-#         print(init_set, qc.qubit_map)
-
-#         dc = Decompiler().decompile(qc)
-#         qc.draw()
-#         # print(dc)
-#         exps = dc[0].expressions
-#         exps = _merge_expressions2(exps, init_set)
-#         print(exps)
-#         #exps = apply_cse(exps)
-#         exps = defaultOptimizer.apply(exps)
-#         print(exps)  # , qf.expressions)
-
-#         # exps = list(filter(lambda se: se[0].name[0:4] == "_ret", exps))
-#         print(exps)
-
-#         print("original was", qf.expressions)
-
-#         qf.expressions = exps
-#         qf.compile(uncompute=False)
-#         qf.circuit().draw()
-#         # compute_and_compare_results(self, qf)
-
-
-#         f = ("def f_comp(b: bool, n: Qint2) -> Qint2:\n\tfor i in range(3):"
-#              "\n\t\tn += (1 if b else 2)\n\treturn n")
-#         qf = qlassf(f, to_compile=True)
-#         qf.circuit().draw()
-#         compute_and_compare_results(self, qf)
-#         print("original was", qf.expressions)

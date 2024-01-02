@@ -151,7 +151,6 @@
 
 ### Language support
 
-- [ ] QFT multiplier
 - [ ] Int arithmetic: div
 - [ ] Lambda
 - [ ] Builtin function: map
@@ -162,6 +161,7 @@
 - [ ] While loop
 - [ ] Recursion
 - [ ] Float arithmetic
+- [ ] QFT multiplier
 
 ### Abstraction support
 
