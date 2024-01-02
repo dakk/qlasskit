@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
+from typing import List, Tuple
 
 from sympy import And, Not, Symbol, Xor
 
@@ -26,12 +26,13 @@ class DecompilerException(Exception):
 
 # TODO: this may be useless
 class DecompilerResult:
-    def __init__(self, section, exps):
+    def __init__(self, section, exps, sec_index):
         self.section = section
         self.expressions: BoolExpList = exps
+        self.section_index: Tuple[int, int] = sec_index
 
     def __repr__(self):
-        s = "DecompiledResult(\n\t"
+        s = f"DecompiledResult[{self.section_index}](\n\t"
         s += ", ".join(map(str, self.section))
         s += "\n\t" + ", ".join(map(str, self.expressions))
         s += "\n)"
@@ -47,6 +48,7 @@ class DecompilerResults:
 
         for sec in self.sections:
             s += "\n\t("
+            s += f"\n\t\t({sec.section_index})"
             s += "\n\t\t" + ", ".join(map(str, sec.section))
             s += "\n\t\t" + ", ".join(map(str, sec.expressions))
             s += "\n\t)"
@@ -116,17 +118,28 @@ class Decompiler:
         """
         results = DecompilerResults()
         current_section = []
+        current_section_start_index = None
+        # current_section_qb = []  # TODO: populate this
+
+        i = 0
         for g, w, p in qc.gates + [(None, [0], None)]:
             if any(isinstance(g, zb_g) for zb_g in ZB_GATES) or issubclass(
                 g.__class__, gates.NopGate
             ):
+                if current_section_start_index is None:
+                    current_section_start_index = i
                 current_section.append((g, w, p))
             elif len(current_section) > 0:
                 exps = self.__exps_of_section(qc, current_section)
-                res = DecompilerResult(current_section, exps)
+                res = DecompilerResult(
+                    current_section, exps, (current_section_start_index, i + 1)
+                )
                 results.append(res)
                 current_section = []
+                current_section_start_index = None
             else:
                 current_section = []
+
+            i += 1
 
         return results
