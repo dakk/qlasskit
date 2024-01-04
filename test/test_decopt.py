@@ -68,9 +68,45 @@ class TestCircuitBooleanOptimizer(unittest.TestCase):
             qc_n = circuit_boolean_optimizer(qc)
             self.assertLessEqual(qc_n.num_gates, 3)
 
-    # def test_circuit_boolean_optimizer_random_x_cx(self):
-    #     qc = QCircuit.random(3, 8, [gates.X, gates.CX])
-    #     qc.draw()
+            qc_un = qiskit_unitary(qc.export())
+            qc_n_un = qiskit_unitary(qc_n.export())
+            self.assertEqual(qc_un, qc_n_un)
 
-    #     qc_n = circuit_boolean_optimizer(qc)
-    #     qc_n.draw()
+    def test_circuit_boolean_optimizer_random_2(self):
+        qc = QCircuit(3)
+        qc.x(2)
+        qc.cx(1, 0)
+        qc.x(0)
+        qc.cx(1, 0)
+        qc.x(0)
+        qc.x(1)
+        qc.x(0)
+        qc.cx(2, 1)
+        # qc.ccx(0,1,2)
+        # qc.draw()
+
+        qc_n = circuit_boolean_optimizer(qc)
+        # print(qc_n, qc_n.gates)
+        # qc_n.draw()
+
+        qc_un = qiskit_unitary(qc.export())
+        qc_n_un = qiskit_unitary(qc_n.export())
+        self.assertEqual(qc_un, qc_n_un)
+
+    def test_circuit_boolean_optimizer_random_x_cx(self):
+        g_total = 0
+        g_simp = 0
+
+        for i in range(12):
+            qc = QCircuit.random(3, 8, [gates.X, gates.CX])
+            g_total += 8
+
+            qc_n = circuit_boolean_optimizer(qc)
+            g_simp += qc_n.num_gates
+
+            qc_un = qiskit_unitary(qc.export())
+
+            qc_n_un = qiskit_unitary(qc_n.export())
+            self.assertEqual(qc_un, qc_n_un)
+
+        # print(g_total, g_simp)

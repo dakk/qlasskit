@@ -97,7 +97,7 @@ def qiskit_measure_and_count(circ, shots=1):
     return counts
 
 
-def qiskit_unitary(circ, shots=8192):
+def qiskit_unitary(circ, shots=128):
     simulator = AerSimulator(method="unitary")
     circ.save_state()
     job = execute(circ, simulator, shots=shots)

@@ -46,6 +46,14 @@ class QCircuit:
     def num_gates(self):
         return len(list(filter(lambda x: not x[0].is_nop(), self.gates)))
 
+    @property
+    def used_qubits(self):
+        _used_qubits = set()
+        for g, w, p in self.gates:
+            for i in w:
+                _used_qubits.add(i)
+        return _used_qubits
+
     @staticmethod
     def random(qubits_n: int, depth: int, gate_list=None) -> "QCircuit":
         qc = QCircuit(qubits_n)

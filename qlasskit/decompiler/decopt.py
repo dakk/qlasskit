@@ -53,8 +53,13 @@ def circuit_boolean_optimizer(
     for section in reversed(dc):
         n_exps = []
 
-        # Simplify expressions
+        # Get the involved qubit set
+        section_qubits = set()
+        for g, w, p in section.gates:
+            for i in w:
+                section_qubits.add(i)
 
+        # Simplify expressions
         for s, e in section.expressions:
             e_symp = custom_simplify_logic2(e)
             # print(s, ":", e, "=>", e_symp)
@@ -62,12 +67,13 @@ def circuit_boolean_optimizer(
 
         # Create new circuit section using the compiler
         qc_sec = exprs_to_quantum(
-            exprs=n_exps, symbols=qc.qubit_map.keys(), compiler=compiler
+            exprs=n_exps, symbols=qc.qubit_map.keys(), compiler="internal"
         )
 
-        # print(qc_sec.gates)
-        if len(qc_sec.gates) > len(section.gates):
-            # print("skipped")
+        if (
+            len(qc_sec.gates) > len(section.gates)
+            or (qc_sec.used_qubits - section_qubits) != set()
+        ):
             continue
 
         # Replace the circuit section with the new one
