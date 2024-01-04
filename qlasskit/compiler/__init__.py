@@ -27,12 +27,13 @@ except:
     TWEEDLEDUM_ENABLED = False
 
 from .internalcompiler import InternalCompiler  # noqa: E402
+from .recompiler import ReCompiler  # noqa: E402
 
 if TWEEDLEDUM_ENABLED:
     from .tweedledumcompiler import TweedledumCompiler
 
 
-SupportedCompiler = Literal["internal", "poc3", "tweedledum"]
+SupportedCompiler = Literal["internal", "recompiler", "tweedledum"]
 SupportedCompilers = list(get_args(SupportedCompiler))
 
 if not TWEEDLEDUM_ENABLED:
@@ -51,6 +52,8 @@ def to_quantum(
 
     if compiler == "internal":
         sel_compiler = InternalCompiler()
+    elif compiler == "recompiler":
+        sel_compiler = ReCompiler()
     elif compiler == "tweedledum" and TWEEDLEDUM_ENABLED:
         sel_compiler = TweedledumCompiler()
     else:
