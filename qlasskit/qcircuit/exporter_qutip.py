@@ -11,15 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# isort:skip_file
 
-from typing import Literal, get_args  # noqa: F401
+from typing import Literal
 
-SupportedFramework = Literal["qiskit", "sympy", "cirq", "qasm", "pennylane", "qutip"]
-SupportedFrameworks = list(get_args(SupportedFramework))
+from .exporter import QCircuitExporter
+from .exporter_qasm import QasmExporter
 
-from . import gates  # noqa: F401, E402
-from .qcircuit import QCircuit  # noqa: F401, E402
-from .qcircuitenhanced import QCircuitEnhanced  # noqa: F401, E402
-from .qcircuitwrapper import QCircuitWrapper, reindex  # noqa: F401, E402
-from .cnotsim import CNotSim, GateNotSimulableException  # noqa: F401, E402
+
+class QutipExporter(QCircuitExporter):
+    def export(self, _selfqc, mode: Literal["circuit", "gate"]):
+        from qutip_qip.qasm import read_qasm
+
+        qasm = QasmExporter(version=2).export(_selfqc, mode)
+        qc = read_qasm(qasm, mode="qiskit", version="2.0", strmode=True)
+        return qc

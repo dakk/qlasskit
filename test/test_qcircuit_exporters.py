@@ -17,6 +17,7 @@ import cirq
 import numpy as np
 import pennylane as qml
 from parameterized import parameterized_class
+from qutip import basis, tensor
 from sympy.physics.quantum.qapply import qapply
 from sympy.physics.quantum.qubit import Qubit, measure_all
 
@@ -81,7 +82,10 @@ class TestQCircuitExportQASM(unittest.TestCase):
 
     def test_export_qasm_circuit(self):
         qasm_c = self.qc.export("circuit", "qasm")
-        self.assertEqual(qasm_c, f"OPENQASM 3.0;\n\n{self.result}")
+
+        call = "qc "
+        call += ",".join([f"q[{x}]" for x in range(self.qc.num_qubits)])
+        self.assertEqual(qasm_c, f"OPENQASM 3.0;\n\n{self.result}{call};\n")
 
 
 @parameterized_class(
@@ -199,3 +203,27 @@ class TestQCircuitExportPennylane(unittest.TestCase):
 
         for a, b in zip(r[0], self.result):
             self.assertAlmostEqual(a, b)
+
+
+@parameterized_class(
+    ("qc", "result"),
+    [
+        (cx_circuit(), [0, 0, 0, 1]),
+        (ccx_circuit(), [0, 0, 0, 0, 0, 0, 0, 1]),
+        (bell_circuit(), [0.70710678, 0, 0, 0.70710678]),
+        (qft_circuit(), [1, 0, 0, 0, 0, 0, 0, 0]),
+    ],
+)
+class TestQCircuitExportQutip(unittest.TestCase):
+    def test_export_qutip_circuit(self):
+        qc = self.qc.export("circuit", "qutip")
+        zero_state = tensor(*[basis(2, 0) for i in range(self.qc.num_qubits)])
+
+        result = qc.run_statistics(state=zero_state)
+        states = result.get_final_states()
+        probabilities = result.get_probabilities()
+
+        self.assertEqual(probabilities, [1])
+
+        for i in zip(states[0].data.toarray(), self.result):
+            self.assertAlmostEqual(float(i[0][0]), i[1])
