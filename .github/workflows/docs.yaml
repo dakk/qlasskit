@@ -16,7 +16,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install sphinx sphinx_rtd_theme sphinx_rtd_dark_mode myst_nb
-          pip install sympy qiskit-terra qiskit-aer matplotlib pylatexenc pennylane cirq qutip qutip_qip
+          pip install pennylane==0.32 pennylane-lightning==0.32
+          pip install sympy qiskit-terra qiskit-aer matplotlib pylatexenc cirq qutip qutip_qip
           python setup.py install
       - name: Sphinx build
         run: |
