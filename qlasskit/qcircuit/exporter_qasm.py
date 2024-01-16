@@ -19,7 +19,10 @@ from .exporter import QCircuitExporter
 
 
 class QasmExporter(QCircuitExporter):
-    def export(self, _selfqc, mode: Literal["circuit", "gate"]):
+    def __init__(self, version=3):
+        self.version = version
+
+    def export_v3(self, _selfqc, mode: Literal["circuit", "gate"]):
         gate_qasm = f"gate {_selfqc.name} "
         gate_qasm += " ".join(_selfqc.qubit_map.keys())
         gate_qasm += " {\n"
@@ -39,5 +42,48 @@ class QasmExporter(QCircuitExporter):
 
         qasm = "OPENQASM 3.0;\n\n"
         qasm += gate_qasm
+        qasm += (
+            _selfqc.name
+            + " "
+            + ",".join(map(lambda c: f"q[{c}]", range(_selfqc.num_qubits)))
+            + ";\n"
+        )
 
         return qasm
+
+    def export_v2(self, _selfqc, mode: Literal["circuit", "gate"]):
+        gate_qasm = f"gate {_selfqc.name} "
+        gate_qasm += " ".join(_selfqc.qubit_map.keys())
+        gate_qasm += " {\n"
+        for g, ws, p in _selfqc.gates:
+            if issubclass(g.__class__, gates.NopGate):
+                continue
+
+            qbs = list(map(lambda gq: _selfqc.get_key_by_index(gq), ws))
+            if p:
+                gate_qasm += f'\t{g.__name__.lower()}({p:.2f}) {" ".join(qbs)}\n'
+            else:
+                gate_qasm += f'\t{g.__name__.lower()} {" ".join(qbs)}\n'
+        gate_qasm += "}\n\n"
+
+        if mode == "gate":
+            return gate_qasm
+
+        qasm = "OPENQASM 2.0;\n\n"
+        qasm += 'include "qelib1.inc";\n\n'
+        qasm += "qreg q[" + str(_selfqc.num_qubits) + "];\n"
+        qasm += gate_qasm
+        qasm += (
+            _selfqc.name
+            + " "
+            + ",".join(map(lambda c: f"q[{c}]", range(_selfqc.num_qubits)))
+            + ";\n"
+        )
+
+        return qasm
+
+    def export(self, _selfqc, mode: Literal["circuit", "gate"]):
+        if self.version == 3:
+            return self.export_v3(_selfqc, mode)
+        else:
+            return self.export_v2(_selfqc, mode)
