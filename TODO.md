@@ -112,7 +112,7 @@
 
 ### Abstraction support
 
-- [ ] Parameter bind
+- [ ] Parameter bind (https://github.com/dakk/qlasskit/issues/10)
 
 ### Tools
 
