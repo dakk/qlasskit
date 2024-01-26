@@ -16,7 +16,7 @@ import ast
 import copy
 import inspect
 from functools import reduce
-from typing import Callable, Dict, List, Tuple, Union, get_args  # noqa: F401
+from typing import Any, Callable, Dict, List, Tuple, Union, get_args  # noqa: F401
 
 from sympy import Symbol
 
@@ -31,6 +31,65 @@ from .types import *  # noqa: F403, F401
 from .types import Qtype, format_outcome, interpret_as_qtype, type_repr
 
 MAX_TRUTH_TABLE_SIZE = 20
+
+
+class UnboundQlassf:
+    """Class representing a qlassf function with unbound parameters"""
+
+    def __init__(self, fun_ast, _do_translate, parameters: Dict[str, Any]):
+        self.fun_ast = fun_ast
+        self._do_translate = _do_translate
+        self.parameters: Dict[str, Any] = parameters
+
+    @property
+    def expressions(self):
+        raise Exception("Cannot access expressions of an unbound qlassf")
+
+    def bind(self, **kwargs):
+        fun_ast = copy.deepcopy(self.fun_ast)
+
+        if len(kwargs.items()) != len(self.parameters.items()):
+            raise Exception("Parameter length mismatch")
+
+        new_body = []
+
+        for k, w in kwargs.items():
+
+            def to_val(w):
+                if hasattr(w, "__iter__"):
+                    return ast.Tuple(ctx=ast.Load(), elts=list(map(to_val, w)))
+                else:
+                    return ast.Constant(value=w)
+
+            if k not in self.parameters:
+                raise Exception(f"Unknown parameter {k}")
+
+            new_body.append(
+                ast.Assign(
+                    targets=[ast.Name(id=k, ctx=ast.Store())],
+                    value=to_val(w),
+                )
+            )
+
+        fun_ast.body[0].args.args = list(
+            filter(
+                lambda arg: not (
+                    isinstance(arg.annotation, ast.Subscript)
+                    and arg.annotation.value.id == "Parameter"
+                ),
+                fun_ast.body[0].args.args,
+            )
+        )
+
+        fun_ast.body[0].body = new_body + fun_ast.body[0].body
+
+        f_ast2 = ast.fix_missing_locations(fun_ast)
+        c = compile(f_ast2, "<string>", "exec")
+        exec(c)
+
+        original_f = eval(fun_ast.body[0].name)
+
+        return self._do_translate(fun_ast, original_f)
 
 
 class QlassF(QCircuitWrapper):
@@ -137,9 +196,7 @@ class QlassF(QCircuitWrapper):
 
         exps = merge_expressions(self.expressions)
 
-        for i in range(
-            0, 2**bits, int(2**bits / max) if max and max < 2**bits else 1
-        ):
+        for i in range(0, 2**bits, int(2**bits / max) if max and max < 2**bits else 1):
             bin_str = bin(i)[2:]
             bin_str = "0" * (bits - len(bin_str)) + bin_str
             bin_arr = list(map(lambda c: c == "1", bin_str))
@@ -189,7 +246,7 @@ class QlassF(QCircuitWrapper):
         compiler: SupportedCompiler = "internal",
         bool_optimizer: BoolOptimizerProfile = defaultOptimizer,
         uncompute: bool = True,
-    ) -> "QlassF":
+    ) -> Union["QlassF", UnboundQlassf]:
         """Create a QlassF from a function or a string containing a function
 
         Args:
@@ -203,23 +260,42 @@ class QlassF(QCircuitWrapper):
             uncompute (bool, optional): whenever uncompute input qubits during compilation
                 (default: True)
         """
-        if isinstance(f, str):
-            exec(f)
-
         fun_ast = ast.parse(f if isinstance(f, str) else inspect.getsource(f))
-        fun = ast2ast(fun_ast.body[0])
+        assert isinstance(fun_ast.body[0], ast.FunctionDef)
 
-        fun_name, args, fun_ret, exps = translate_ast(fun, types, defs)
-        original_f = eval(fun_name) if isinstance(f, str) else f
+        def _do_translate(fun_ast, original_f=None):
+            fun = ast2ast(fun_ast.body[0])
+            fun_name, args, fun_ret, exps = translate_ast(fun, types, defs)
 
-        exps = bool_optimizer.apply(exps)
+            exps = bool_optimizer.apply(exps)
 
-        # Return the qlassf object
-        qf = QlassF(fun_name, original_f, args, fun_ret, exps)
+            if original_f is None:
+                if isinstance(f, str):
+                    exec(f)
+                original_f = eval(fun_name) if isinstance(f, str) else f
 
-        if to_compile:
-            qf.compile(compiler, uncompute=uncompute)
-        return qf
+            # Return the qlassf object
+            qf = QlassF(fun_name, original_f, args, fun_ret, exps)
+
+            if to_compile:
+                qf.compile(compiler, uncompute=uncompute)
+            return qf
+
+        # If it has parameters return the unboundqlassf
+        params = {}
+        for arg in fun_ast.body[0].args.args:
+            if (
+                isinstance(arg.annotation, ast.Subscript)
+                and isinstance(arg.annotation.value, ast.Name)
+                and arg.annotation.value.id == "Parameter"
+            ):
+                params[arg.arg] = arg.annotation.slice
+
+        if len(params.items()) > 0:
+            return UnboundQlassf(fun_ast, _do_translate, params)
+        else:
+            # Else, return the translation
+            return _do_translate(fun_ast)
 
 
 def qlassf(
@@ -230,7 +306,7 @@ def qlassf(
     compiler: SupportedCompiler = "internal",
     bool_optimizer: BoolOptimizerProfile = defaultOptimizer,
     uncompute: bool = True,
-) -> QlassF:
+) -> Union["QlassF", UnboundQlassf]:
     """Decorator / function creating a QlassF object
 
     Args:
