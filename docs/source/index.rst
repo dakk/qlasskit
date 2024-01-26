@@ -11,6 +11,7 @@ Python and translate them into unitary operators (gates) for use in quantum circ
    quickstart.ipynb   
    how_it_works.ipynb
    supported
+   parameters.ipynb
    algorithms
    exporter.ipynb
    api

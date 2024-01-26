@@ -32,6 +32,9 @@ from .types import Qtype, format_outcome, interpret_as_qtype, type_repr
 
 MAX_TRUTH_TABLE_SIZE = 20
 
+def in_ipynb():
+    import sys
+    return 'ipykernel' in sys.modules
 
 class UnboundQlassf:
     """Class representing a qlassf function with unbound parameters"""
@@ -83,11 +86,15 @@ class UnboundQlassf:
 
         fun_ast.body[0].body = new_body + fun_ast.body[0].body
 
-        f_ast2 = ast.fix_missing_locations(fun_ast)
-        c = compile(f_ast2, "<string>", "exec")
-        exec(c)
+        if not in_ipynb():
+            f_ast2 = ast.fix_missing_locations(fun_ast)
+            c = compile(f_ast2, "<string>", "exec")
+            exec(c)
 
-        original_f = eval(fun_ast.body[0].name)
+            original_f = eval(fun_ast.body[0].name)
+        else:
+            print('Warning, I cannot create original_f in python notebooks!')
+            original_f = None
 
         return self._do_translate(fun_ast, original_f)
 
