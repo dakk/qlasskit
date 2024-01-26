@@ -11,26 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# isort:skip_file
 
-__version__ = "0.1.11"
+from typing import TypeVar
 
-from .qcircuit import QCircuit, SupportedFrameworks, SupportedFramework  # noqa: F401
-from .qlassfun import QlassF, qlassf, qlassfa  # noqa: F401
-from .ast2ast import ast2ast  # noqa: F401
-from .ast2logic import exceptions  # noqa: F401
-from .types import (  # noqa: F401, F403
-    const_to_qtype,
-    Qtype,
-    Qint,
-    Qint2,
-    Qint3,
-    Qint4,
-    Qint8,
-    Qint12,
-    Qint16,
-    Qlist,
-    Qmatrix,
-    Parameter,
-)
-from .boolquant import Q  # noqa: F401
+T = TypeVar("T")
+
+
+class ParameterMeta(type):
+    def __getitem__(cls, params):
+        return params
+
+
+class Parameter(metaclass=ParameterMeta):
+    pass
+
+
+# a: Parameter[Qint2]

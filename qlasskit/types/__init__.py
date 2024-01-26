@@ -48,6 +48,7 @@ from .qbool import Qbool  # noqa: F401, E402
 from .qlist import Qlist  # noqa: F401, E402
 from .qmatrix import Qmatrix  # noqa: F401, E402
 from .qint import Qint, Qint2, Qint3, Qint4, Qint8, Qint12, Qint16  # noqa: F401, E402
+from .parameter import Parameter  # noqa: F401, E402
 
 BUILTIN_TYPES = [Qint2, Qint3, Qint4, Qint8, Qint12, Qint16, Qlist, Qmatrix]
 
