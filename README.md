@@ -88,6 +88,17 @@ def search(alist: Qlist[Qint2, 4], to_search: Qint2):
 ```
 
 
+Qlasskit function can be parameterized, and the parameter can be bind before compilation:
+
+```python
+@qlassf
+def test(a: Parameter[bool], b: bool) -> bool:
+    return a and b
+
+qf = test.bind(a=True)
+```
+
+
 ## Roadmap
 
 Read [TODO](TODO.md) for details about the roadmap and TODOs.
