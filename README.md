@@ -64,7 +64,7 @@ You can also use other functions inside a qlassf:
 def equal_8(n: Qint4) -> bool:
   return equal_8 == 8
 
-@qlassf
+@qlassfa(defs=[equal_8])
 def f(n: Qint4) -> bool:
   n = n+1 if equal_8(n) else n
   return n
