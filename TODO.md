@@ -108,6 +108,7 @@
 - [ ] While loop
 - [ ] Recursion
 - [ ] Float arithmetic
+- [ ] Class support
 - [ ] QFT multiplier
 
 ### Abstraction support
@@ -123,3 +124,4 @@
 ### Experiments
 
 - [ ] Logic2FPGA backend
+- [ ] Logic2QUBO / Logic2ISING
