@@ -1,4 +1,4 @@
-# Copyright 2023 Davide Gessa
+# Copyright 2023-2024 Davide Gessa
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ from .compiler import SupportedCompiler, to_quantum
 from .qcircuit import QCircuitWrapper
 from .types import *  # noqa: F403, F401
 from .types import Qtype, format_outcome, interpret_as_qtype, type_repr
+from .bqm import BQMFormat, to_bqm
 
 MAX_TRUTH_TABLE_SIZE = 20
 
@@ -243,6 +244,13 @@ class QlassF(QCircuitWrapper):
 
     def to_logicfun(self) -> LogicFun:
         return copy.deepcopy((self.name, self.args, self.returns, self.expressions))
+    
+    def to_bqm(self, fmt: BQMFormat = 'bqm'):
+        return to_bqm(
+            args=self.args,
+            returns=self.returns,
+            exprs=self.expressions,
+            format=fmt)
 
     @staticmethod
     def from_function(
