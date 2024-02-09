@@ -14,6 +14,7 @@ Python and translate them into unitary operators (gates) for use in quantum circ
    parameters.ipynb
    algorithms
    exporter.ipynb
+   bqm.ipynb
    api
 
 .. toctree::
