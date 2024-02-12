@@ -14,11 +14,28 @@
 
 import unittest
 
-
 from qlasskit import Qint2, Qint4, QlassF, exceptions, qlassf
 
 
+
 class TestQlassfToBQM(unittest.TestCase):
-    def test_encode_decode_bool(self):
+    def test_to_bqm_1(self):
         f = "def test(a: bool) -> bool:\n\treturn not a"
-        qf = qlassf(f, to_compile=False)
+        qf = qlassf(f, to_compile=False)        
+        bqm = qf.to_bqm()
+
+    def test_to_bqm_2(self):
+        f = "def test(a: Qint2) -> bool:\n\treturn a == 2"
+        qf = qlassf(f, to_compile=False)        
+        bqm = qf.to_bqm()
+        print(bqm)
+
+    def test_to_bqm_3(self):
+        f = "def test(a: Qint2) -> Qint2:\n\treturn a + 1"
+        qf = qlassf(f, to_compile=False)        
+        bqm = qf.to_bqm()
+
+    def test_to_bqm_4(self):
+        f = "def test(a: Qint4) -> Qint4:\n\treturn a + 2"
+        qf = qlassf(f, to_compile=False)        
+        bqm = qf.to_bqm()
