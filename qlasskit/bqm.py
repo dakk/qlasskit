@@ -84,7 +84,7 @@ def to_bqm(args, returns, exprs, fmt: BQMFormat):
     # e = AndConst(al[0], And(Not(al[1]), And(al[2], Not(al[3]))), Binary("_ret"), '_ret')
     
     model = e.compile()
-    print(e)
+    # print(e)
 
     if fmt == "bqm":
         return model.to_bqm()
@@ -98,5 +98,6 @@ def to_bqm(args, returns, exprs, fmt: BQMFormat):
         raise Exception(f"Unknown format `{fmt}")
 
 
-# TODO: utility for samples decoding
-# def decode_samples():
+def decode_samples(qf, sampleset):
+    model = qf.to_bqm('pq_model')
+    return model.decode_sampleset(sampleset)
