@@ -77,8 +77,12 @@ def to_bqm(args, returns, exprs, fmt: BQMFormat):  # noqa: C901
     for sym, exp in exprs:
         a_vars[sym.name] = Binary(sym.name)
         stbqm = SympyToBQM(a_vars)
+
         if isinstance(exp, Symbol):
             arg = stbqm.visit(exp)
+            new_e = AndConst(
+                a_vars[exp.name], a_vars[exp.name], a_vars[sym.name], sym.name
+            )
         elif sym.name[0:4] == "_ret":
             new_e = SympyToBQM(a_vars).visit(exp)
         elif isinstance(exp, Not):
@@ -93,6 +97,8 @@ def to_bqm(args, returns, exprs, fmt: BQMFormat):  # noqa: C901
         elif isinstance(exp, And):
             args = [stbqm.visit(a) for a in exp.args]
             new_e = AndConst(args[0], args[1], a_vars[sym.name], sym.name)
+        else:
+            raise Exception(f"Expression not handled: {e}")
 
         # new_e = SympyToBQM(a_vars).visit(exp)
 
