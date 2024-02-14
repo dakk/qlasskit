@@ -14,8 +14,11 @@
 
 import unittest
 
-from qlasskit import Qint2, Qint4, QlassF, exceptions, qlassf
+import dimod
 import neal
+
+from qlasskit import qlassf
+from qlasskit.bqm import decode_samples
 
 
 def sample_bqm(bqm, reads=10):
@@ -25,40 +28,92 @@ def sample_bqm(bqm, reads=10):
     # best_sample = min(decoded_samples, key=lambda x: x.energy)
 
 
+def sample_qubo(qubo):
+    return dimod.ExactSolver().sample_qubo(qubo)
+
 
 class TestQlassfToBQM(unittest.TestCase):
     def test_to_bqm_1(self):
         f = "def test(a: bool) -> bool:\n\treturn not a"
-        qf = qlassf(f, to_compile=False)        
+        qf = qlassf(f, to_compile=False)
         bqm = qf.to_bqm()
         ss = sample_bqm(bqm)
-        ds = qf.to_bqm('pq_model').decode_sampleset(ss)
+        ds = decode_samples(qf, ss)
         print(ss, ds)
 
     def test_to_bqm_2(self):
         f = "def test(a: Qint2) -> bool:\n\treturn a != 2"
-        qf = qlassf(f, to_compile=False)        
+        qf = qlassf(f, to_compile=False)
         bqm = qf.to_bqm()
         ss = sample_bqm(bqm)
-        ds = qf.to_bqm('pq_model').decode_sampleset(ss)
+        ds = decode_samples(qf, ss)
         print(ss, ds)
 
     def test_to_bqm_3(self):
         f = "def test(a: Qint2) -> Qint2:\n\treturn a + 1"
-        qf = qlassf(f, to_compile=False)        
+        qf = qlassf(f, to_compile=False)
         bqm = qf.to_bqm()
         ss = sample_bqm(bqm)
-        ds = qf.to_bqm('pq_model').decode_sampleset(ss)
+        ds = decode_samples(qf, ss)
         print(ss, ds)
 
     def test_to_bqm_4(self):
         f = "def test(a: Qint4) -> Qint4:\n\treturn a + 2"
-        qf = qlassf(f, to_compile=False)        
+        qf = qlassf(f, to_compile=False)
         bqm = qf.to_bqm()
         ss = sample_bqm(bqm)
-        ds = qf.to_bqm('pq_model').decode_sampleset(ss)
+        ds = decode_samples(qf, ss)
         print(ss, ds)
 
+    def test_to_bqm_5(self):
+        f = "def test(a: Qint2, b: Qint2) -> Qint4:\n\treturn Qint4(0) + a + b"
+        qf = qlassf(f, to_compile=False)
+        qubo, offset = qf.to_bqm("qubo")
+        ss = sample_qubo(qubo)
+        ds = decode_samples(qf, ss)
+        print("\n".join(map(str, reversed(ds))))
+
+        print()
+        bqm = qf.to_bqm()
+        ss = sample_bqm(bqm)
+        ds = decode_samples(qf, ss)
+        print("\n".join(map(str, ds)))
+
+    def test_to_bqm_subset_sum_problem(self):
+        f = (
+            "def subset_sum(ii: Tuple[Qint2, Qint2]) -> Qint3:\n\tl = [0, 5, 2, 3]\n\t"
+            "return l[ii[0]] + l[ii[1]] - 7"
+        )
+        qf = qlassf(f, to_compile=False)
+        qubo, offset = qf.to_bqm("qubo")
+        ss = sample_qubo(qubo)
+        ds = decode_samples(qf, ss)
+        print("\n".join(map(str, reversed(ds))))
+
+        print()
+        bqm = qf.to_bqm()
+        print(bqm.num_variables, bqm.num_interactions)
+        ss = sample_bqm(bqm)
+        ds = decode_samples(qf, ss)
+        print("\n".join(map(str, ds)))
+
+    def test_to_bqm_factoring(self):
+        f = "def test(a: Qint3, b: Qint3) -> bool:\n\treturn Qint3(3) != a * b"
+        qf = qlassf(f, to_compile=False)
+        # qubo, offset = qf.to_bqm('qubo')
+        # ss = sample_qubo(qubo)
+        # ds = decode_samples(qf, ss)
+        # print('\n'.join(map(str, reversed(ds))))
+        # print()
+        print(qf.expressions)
+
+        bqm = qf.to_bqm()
+
+        print(bqm.num_variables, bqm.num_interactions)
+
+        ss = sample_bqm(bqm, 100)
+        ds = decode_samples(qf, ss)
+        print("\n".join(map(str, ds)))
 
 
 # class TestQlassfToBQMSamples(unittest.TestCase):
