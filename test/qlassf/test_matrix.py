@@ -88,10 +88,9 @@ class TestQlassfMatrix(unittest.TestCase):
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
-        
 
-    # TODO: this raises Not a tuple in ast2ast visit subscript with not constant _sval: Subscript(value=
-    # Name(id='a', ctx=Load()), slice=Name(id='i', ctx=Load()), ctx=Load())
+    # TODO: this raises Not a tuple in ast2ast visit subscript with not constant _sval: Subscript
+    # (value=Name(id='a', ctx=Load()), slice=Name(id='i', ctx=Load()), ctx=Load())
     # def test_matrix_access2(self):
     #     f = (
     #         "def test(a: Qmatrix[Qint2, 2, 2]) -> Qint2:\n\ti = 1\n\tj = i + 1\n\treturn a[i][i]"

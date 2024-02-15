@@ -137,8 +137,8 @@ class ASTRewriter(ast.NodeTransformer):
 
             if not isinstance(tup, ast.Tuple):
                 raise Exception(
-                    "Not a tuple in ast2ast visit subscript with not constant _sval: "+
-                    ast.dump(tup)
+                    "Not a tuple in ast2ast visit subscript with not constant _sval: "
+                    + ast.dump(tup)
                 )
 
             elts = tup.elts
