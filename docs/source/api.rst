@@ -13,3 +13,4 @@ API
    qlasskit.qcircuit.qcircuit.QCircuit
    qlasskit.qcircuit.qcircuitwrapper.QCircuitWrapper
    qlasskit.qcircuit.gates
+   qlasskit.bqm.decode_samples

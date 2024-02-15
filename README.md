@@ -12,6 +12,9 @@ This tool will be useful for any algorithm that relies on a 'blackbox' function 
 
 Qlasskit implements circuit / gate exporters for Qiskit, Cirq, Qasm, Sympy and Pennylane.
 
+Qlasskit also support exporting to Binary Quadratic Models (bqm, ising and qubo) ready to be used in
+quantum annealers, ising machines, simulators, etc.
+
 ```bash
 pip install qlasskit
 ```

@@ -1,4 +1,4 @@
-# Copyright 2023 Davide Gessa
+# Copyright 2023-2024 Davide Gessa
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ from .ast2logic import Arg, Args, BoolExpList, LogicFun, flatten, translate_ast
 from .boolopt import BoolOptimizerProfile, defaultOptimizer
 from .boolopt.bool_optimizer import merge_expressions
 from .boolquant import Q  # noqa: F403, F401
+from .bqm import BQMFormat, to_bqm
 from .compiler import SupportedCompiler, to_quantum
 from .qcircuit import QCircuitWrapper
 from .types import *  # noqa: F403, F401
@@ -32,9 +33,12 @@ from .types import Qtype, format_outcome, interpret_as_qtype, type_repr
 
 MAX_TRUTH_TABLE_SIZE = 20
 
+
 def in_ipynb():
     import sys
-    return 'ipykernel' in sys.modules
+
+    return "ipykernel" in sys.modules
+
 
 class UnboundQlassf:
     """Class representing a qlassf function with unbound parameters"""
@@ -93,8 +97,11 @@ class UnboundQlassf:
 
             original_f = eval(fun_ast.body[0].name)
         else:
-            print('Warning, I cannot create original_f in python notebooks!')
-            original_f = None
+
+            def orig(*args, **kwargs):
+                raise Exception("original_f is not available in python notebooks!")
+
+            original_f = orig
 
         return self._do_translate(fun_ast, original_f)
 
@@ -243,6 +250,11 @@ class QlassF(QCircuitWrapper):
 
     def to_logicfun(self) -> LogicFun:
         return copy.deepcopy((self.name, self.args, self.returns, self.expressions))
+
+    def to_bqm(self, fmt: BQMFormat = "bqm"):
+        return to_bqm(
+            args=self.args, returns=self.returns, exprs=self.expressions, fmt=fmt
+        )
 
     @staticmethod
     def from_function(

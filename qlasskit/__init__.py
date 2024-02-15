@@ -1,4 +1,4 @@
-# Copyright 2023 Davide Gessa
+# Copyright 2023-2024 Davide Gessa
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # limitations under the License.
 # isort:skip_file
 
-__version__ = "0.1.12"
+__version__ = "0.1.15"
 
 from .qcircuit import QCircuit, SupportedFrameworks, SupportedFramework  # noqa: F401
 from .qlassfun import QlassF, qlassf, qlassfa  # noqa: F401
@@ -21,6 +21,7 @@ from .ast2ast import ast2ast  # noqa: F401
 from .ast2logic import exceptions  # noqa: F401
 from .types import (  # noqa: F401, F403
     const_to_qtype,
+    interpret_as_qtype,
     Qtype,
     Qint,
     Qint2,

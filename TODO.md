@@ -90,6 +90,8 @@
 - [x] Separate tests in directories
 - [x] Circuit decompilation 
 - [x] QuTip Support
+- [x] Parameter bind (https://github.com/dakk/qlasskit/issues/10)
+- [x] QUBO, Ising and BQM exporter
 
 
 ## Future features
@@ -113,7 +115,6 @@
 
 ### Abstraction support
 
-- [ ] Parameter bind (https://github.com/dakk/qlasskit/issues/10)
 
 ### Tools
 
@@ -124,4 +125,3 @@
 ### Experiments
 
 - [ ] Logic2FPGA backend
-- [ ] Logic2QUBO / Logic2ISING
