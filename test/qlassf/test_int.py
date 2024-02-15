@@ -453,3 +453,9 @@ class TestQlassfIntMul(unittest.TestCase):
         f = "def test(a: Qint4, b: Qint4) -> Qint8: return a * b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
+
+    def test_mul5(self):
+        f = "def test(a: Qint3, b: Qint3) -> bool: return 3*2==6"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+        self.assertEqual(qf.expressions[0][1], True)

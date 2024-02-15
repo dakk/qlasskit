@@ -27,6 +27,7 @@ setup(
     install_requires=["sympy==1.12"],
     extras_require={
         "tweedledum": ["tweedledum==1.1.1"],
+        "bqm": ["pyqubo==1.0.5"],
     },
     classifiers=[
         "Programming Language :: Python",
