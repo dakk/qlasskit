@@ -39,7 +39,11 @@ class TestQlassfToBQM(unittest.TestCase):
         bqm = qf.to_bqm()
         ss = sample_bqm(bqm)
         ds = decode_samples(qf, ss)
-        print(ss, ds)
+
+        filtered = list(filter(lambda x: x.energy == 0.0, ds))
+        self.assertTrue(len(filtered) > 0)
+        for x in filtered:
+            self.assertEqual(x.sample["a"], True)
 
     def test_to_bqm_2(self):
         f = "def test(a: Qint2) -> bool:\n\treturn a != 2"
@@ -47,7 +51,11 @@ class TestQlassfToBQM(unittest.TestCase):
         bqm = qf.to_bqm()
         ss = sample_bqm(bqm)
         ds = decode_samples(qf, ss)
-        print(ss, ds)
+
+        filtered = list(filter(lambda x: x.energy == 0.0, ds))
+        self.assertTrue(len(filtered) > 0)
+        for x in filtered:
+            self.assertEqual(x.sample["a"], 2)
 
     def test_to_bqm_3(self):
         f = "def test(a: Qint2) -> Qint2:\n\treturn a + 1"
@@ -55,65 +63,84 @@ class TestQlassfToBQM(unittest.TestCase):
         bqm = qf.to_bqm()
         ss = sample_bqm(bqm)
         ds = decode_samples(qf, ss)
-        print(ss, ds)
+
+        filtered = list(filter(lambda x: x.energy == 0.0, ds))
+        self.assertTrue(len(filtered) > 0)
+        for x in filtered:
+            self.assertEqual(x.sample["a"] + 1 % 16, 0)
 
     def test_to_bqm_4(self):
-        f = "def test(a: Qint4) -> Qint4:\n\treturn a + 2"
-        qf = qlassf(f, to_compile=False)
-        bqm = qf.to_bqm()
-        ss = sample_bqm(bqm)
-        ds = decode_samples(qf, ss)
-        print(ss, ds)
-
-    def test_to_bqm_5(self):
         f = "def test(a: Qint2, b: Qint2) -> Qint4:\n\treturn Qint4(0) + a + b"
         qf = qlassf(f, to_compile=False)
         qubo, offset = qf.to_bqm("qubo")
         ss = sample_qubo(qubo)
         ds = decode_samples(qf, ss)
-        print("\n".join(map(str, reversed(ds))))
 
-        print()
+        filtered = list(filter(lambda x: x.energy == 0.0, ds))
+        self.assertTrue(len(filtered) > 0)
+        for x in filtered:
+            self.assertEqual(x.sample["a"] + x.sample["b"] % 16, 0)
+
         bqm = qf.to_bqm()
         ss = sample_bqm(bqm)
         ds = decode_samples(qf, ss)
-        print("\n".join(map(str, ds)))
+
+        filtered = list(filter(lambda x: x.energy == 0.0, ds))
+        self.assertTrue(len(filtered) > 0)
+        for x in filtered:
+            self.assertEqual(x.sample["a"] + x.sample["b"] % 16, 0)
 
     def test_to_bqm_subset_sum_problem(self):
+        lst = [0, 5, 2, 3]
         f = (
-            "def subset_sum(ii: Tuple[Qint2, Qint2]) -> Qint3:\n\tl = [0, 5, 2, 3]\n\t"
+            f"def subset_sum(ii: Tuple[Qint2, Qint2]) -> Qint3:\n\tl = {lst}\n\t"
             "return l[ii[0]] + l[ii[1]] - 7"
         )
         qf = qlassf(f, to_compile=False)
+
         qubo, offset = qf.to_bqm("qubo")
         ss = sample_qubo(qubo)
         ds = decode_samples(qf, ss)
-        print("\n".join(map(str, reversed(ds))))
 
-        print()
+        filtered = list(filter(lambda x: x.energy == 0.0, ds))
+        self.assertTrue(len(filtered) > 0)
+        for x in filtered:
+            self.assertEqual(sum(map(lambda i: lst[i], x.sample["ii"])), 7)
+
         bqm = qf.to_bqm()
-        print(bqm.num_variables, bqm.num_interactions)
         ss = sample_bqm(bqm)
         ds = decode_samples(qf, ss)
-        print("\n".join(map(str, ds)))
 
-    def test_to_bqm_factoring(self):
-        f = "def test(a: Qint3, b: Qint3) -> bool:\n\treturn Qint3(3) != a * b"
+        filtered = list(filter(lambda x: x.energy == 0.0, ds))
+        self.assertTrue(len(filtered) > 0)
+        for x in filtered:
+            self.assertEqual(sum(map(lambda i: lst[i], x.sample["ii"])), 7)
+
+    def test_to_bqm_addends(self):
+        f = "def test(a: Qint4, b: Qint4) -> Qint4:\n\treturn a + b - 12"
         qf = qlassf(f, to_compile=False)
-        # qubo, offset = qf.to_bqm('qubo')
-        # ss = sample_qubo(qubo)
-        # ds = decode_samples(qf, ss)
-        # print('\n'.join(map(str, reversed(ds))))
-        # print()
-        print(qf.expressions)
-
         bqm = qf.to_bqm()
-
-        print(bqm.num_variables, bqm.num_interactions)
 
         ss = sample_bqm(bqm, 100)
         ds = decode_samples(qf, ss)
-        print("\n".join(map(str, ds)))
+
+        filtered = list(filter(lambda x: x.energy == 0.0, ds))
+        self.assertTrue(len(filtered) > 0)
+        for x in filtered:
+            self.assertEqual(x.sample["a"] + x.sample["b"], 12)
+
+    def test_to_bqm_factoring(self):
+        f = "def test(a: Qint3, b: Qint3) -> Qint4:\n\treturn Qint4(15) - (a * b)"
+        qf = qlassf(f, to_compile=False)
+        bqm = qf.to_bqm()
+
+        ss = sample_bqm(bqm, 100)
+        ds = decode_samples(qf, ss)
+
+        filtered = list(filter(lambda x: x.energy == 0.0, ds))
+        self.assertTrue(len(filtered) > 0)
+        for x in filtered:
+            self.assertEqual(x.sample["a"] * x.sample["b"], 15)
 
 
 # class TestQlassfToBQMSamples(unittest.TestCase):

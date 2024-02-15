@@ -154,5 +154,5 @@ def decode_samples(qf, sampleset):
         # args['_ret'] = interpret_as_qtype(bitstr, qf.returns.ttype, len(qf.returns))
 
         new_dec.append(DecodedSample(el.energy, args))
-        
+
     return new_dec
