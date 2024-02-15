@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import random
 from typing import Literal, get_args
 
 from sympy import Symbol
 from sympy.logic import And, Not, Or, Xor
-from sympy.logic.boolalg import BooleanFalse
+from sympy.logic.boolalg import BooleanFalse, BooleanTrue
 
 from .boolopt.bool_optimizer import merge_expressions
 from .types import interpret_as_qtype
@@ -36,6 +37,8 @@ class SympyToBQM:
             return self.a_vars[e.name]
         elif isinstance(e, BooleanFalse):
             return False
+        elif isinstance(e, BooleanTrue):
+            return True
         elif isinstance(e, Not):
             args = [self.visit(a) for a in e.args]
             return pyqubo.Not(*args)
@@ -141,11 +144,15 @@ def decode_samples(qf, sampleset):
     for el in decoded:
         args = {}
         for arg in qf.args:
-            bitstr = [el.sample[bv] for bv in arg.bitvec]
-            args[arg.name] = interpret_as_qtype(bitstr, arg.ttype, len(arg))
+            bitstr = [
+                el.sample[bv] if bv in el.sample else random.randint(0, 1)
+                for bv in arg.bitvec
+            ]
+            args[arg.name] = interpret_as_qtype(bitstr[::-1], arg.ttype, len(arg))
 
         # bitstr = [ el.sample[bv] for bv in qf.returns.bitvec ]
         # args['_ret'] = interpret_as_qtype(bitstr, qf.returns.ttype, len(qf.returns))
 
         new_dec.append(DecodedSample(el.energy, args))
+        
     return new_dec
