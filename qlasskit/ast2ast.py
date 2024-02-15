@@ -1,4 +1,4 @@
-# Copyright 2023 Davide Gessa
+# Copyright 2023-2024 Davide Gessa
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -402,7 +402,7 @@ class ASTRewriter(ast.NodeTransformer):
 
     def __call_range(self, node):
         if not all([isinstance(a, ast.Constant) for a in node.args]):
-            raise Exception("not handled")
+            raise Exception("Range call on not constant arguments is not handled")
 
         args = [a.value for a in node.args]
         it = list(range(*args))
@@ -410,7 +410,7 @@ class ASTRewriter(ast.NodeTransformer):
 
     def __call_len(self, node):
         if len(node.args) != 1:
-            raise Exception("not handled")
+            raise Exception("Len only receives one argument")
 
         args = self.__unroll_arg(node.args[0])
         return ast.Constant(value=len(args))

@@ -1,4 +1,4 @@
-# Copyright 2023 Davide Gessa
+# Copyright 2023-2024 Davide Gessa
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ def sympy_to_logic_network(  # noqa: C901
             return _logic_network.get_constant(0)
 
         else:
-            raise Exception("not handled")
+            raise Exception(f"Expression {expr} not handled by the tweedledum compiler")
 
     for arg in args:
         for bv in arg.bitvec:

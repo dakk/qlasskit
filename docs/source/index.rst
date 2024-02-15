@@ -2,7 +2,11 @@ Qlasskit
 ====================================
 
 Qlasskit is a Python library that allows quantum developers to write classical algorithms in pure 
-Python and translate them into unitary operators (gates) for use in quantum circuits.
+Python and translate them into unitary operators (gates) for use in quantum circuits supporting a wide 
+range of quantum frameworks.
+
+Qlasskit also support exporting to Binary Quadratic Models (bqm, ising and qubo) ready to be used in
+quantum annealers, ising machines, simulators, etc.
 
 .. toctree::
    :maxdepth: 2
@@ -30,6 +34,7 @@ Python and translate them into unitary operators (gates) for use in quantum circ
    example_deutsch_jozsa.ipynb
    example_unitary_of_f.ipynb
    example_big_circuit.ipynb
+   example_bqm_tsp.ipynb
 
 
 Indices and tables

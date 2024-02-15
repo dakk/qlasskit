@@ -60,7 +60,7 @@ class SympyToBQM:
             args = [self.visit(a) for a in e.args]
             return pyqubo.Or(*args)
         else:
-            raise Exception(f"{e}: not handled")
+            raise Exception(f"{e}: unable to translate to BQM")
 
 
 def to_bqm(args, returns, exprs, fmt: BQMFormat):  # noqa: C901
