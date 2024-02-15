@@ -97,8 +97,10 @@ class UnboundQlassf:
 
             original_f = eval(fun_ast.body[0].name)
         else:
-            print("Warning, I cannot create original_f in python notebooks!")
-            original_f = None
+            def orig(*args, **kwargs):
+                raise Exception("original_f is not available in python notebooks!")
+            
+            original_f = orig
 
         return self._do_translate(fun_ast, original_f)
 
