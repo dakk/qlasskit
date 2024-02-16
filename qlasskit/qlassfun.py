@@ -15,7 +15,7 @@
 import ast
 import copy
 import inspect
-from functools import reduce
+from functools import partial, reduce
 from typing import Any, Callable, Dict, List, Tuple, Union, get_args  # noqa: F401
 
 from sympy import Symbol
@@ -43,10 +43,11 @@ def in_ipynb():
 class UnboundQlassf:
     """Class representing a qlassf function with unbound parameters"""
 
-    def __init__(self, fun_ast, _do_translate, parameters: Dict[str, Any]):
+    def __init__(self, fun_ast, _do_translate, parameters: Dict[str, Any], original_f):
         self.fun_ast = fun_ast
         self._do_translate = _do_translate
         self.parameters: Dict[str, Any] = parameters
+        self.original_f = original_f
 
     @property
     def expressions(self):
@@ -93,9 +94,11 @@ class UnboundQlassf:
         if not in_ipynb():
             f_ast2 = ast.fix_missing_locations(fun_ast)
             c = compile(f_ast2, "<string>", "exec")
-            exec(c)
-
-            original_f = eval(fun_ast.body[0].name)
+            try:
+                exec(c)
+                original_f = eval(fun_ast.body[0].name)
+            except:
+                original_f = partial(self.original_f, **kwargs)
         else:
 
             def orig(*args, **kwargs):
@@ -282,16 +285,15 @@ class QlassF(QCircuitWrapper):
         fun_ast = ast.parse(f if isinstance(f, str) else inspect.getsource(f))
         assert isinstance(fun_ast.body[0], ast.FunctionDef)
 
-        def _do_translate(fun_ast, original_f=None):
+        if isinstance(f, str):
+            exec(f)
+        original_f = eval(fun_ast.body[0].name) if isinstance(f, str) else f
+
+        def _do_translate(fun_ast, original_f):
             fun = ast2ast(fun_ast.body[0])
             fun_name, args, fun_ret, exps = translate_ast(fun, types, defs)
 
             exps = bool_optimizer.apply(exps)
-
-            if original_f is None:
-                if isinstance(f, str):
-                    exec(f)
-                original_f = eval(fun_name) if isinstance(f, str) else f
 
             # Return the qlassf object
             qf = QlassF(fun_name, original_f, args, fun_ret, exps)
@@ -311,10 +313,10 @@ class QlassF(QCircuitWrapper):
                 params[arg.arg] = arg.annotation.slice
 
         if len(params.items()) > 0:
-            return UnboundQlassf(fun_ast, _do_translate, params)
+            return UnboundQlassf(fun_ast, _do_translate, params, original_f)
         else:
             # Else, return the translation
-            return _do_translate(fun_ast)
+            return _do_translate(fun_ast, original_f)
 
 
 def qlassf(
