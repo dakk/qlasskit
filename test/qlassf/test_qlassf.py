@@ -41,22 +41,22 @@ class TestQlassfOptimizerSelection(unittest.TestCase):
 
 @parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfCustomTypes(unittest.TestCase):
-    def test_custom_qint5(self):
+    def test_custom_qint14(self):
         qf = qlassf(
-            utils.test_qint5,
-            types=[utils.Qint5],
+            utils.test_qint14,
+            types=[utils.Qint14],
             to_compile=COMPILATION_ENABLED,
             compiler=self.compiler,
         )
         compute_and_compare_results(self, qf)
 
-    def test_custom_qint5_notfound(self):
+    def test_custom_qint14_notfound(self):
         self.assertRaises(
             exceptions.UnknownTypeException,
             lambda f: qlassf(
                 f, types=[], to_compile=COMPILATION_ENABLED, compiler=self.compiler
             ),
-            utils.test_qint5,
+            utils.test_qint14,
         )
 
 

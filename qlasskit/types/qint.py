@@ -204,7 +204,9 @@ class Qint(int, Qtype):
             return Qint2, product
         elif (n + m) > 2 and (n + m) <= 4:
             return Qint4, product
-        elif (n + m) > 4 and (n + m) <= 8:
+        elif (n + m) > 4 and (n + m) <= 6:
+            return Qint6, product
+        elif (n + m) > 6 and (n + m) <= 8:
             return Qint8, product
         elif (n + m) > 8 and (n + m) <= 12:
             return Qint12, product
@@ -263,6 +265,14 @@ class Qint3(Qint):
 
 class Qint4(Qint):
     BIT_SIZE = 4
+
+
+class Qint5(Qint):
+    BIT_SIZE = 5
+
+
+class Qint6(Qint):
+    BIT_SIZE = 6
 
 
 class Qint8(Qint):
