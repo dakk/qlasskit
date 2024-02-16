@@ -112,6 +112,7 @@ def to_bqm(args, returns, exprs, fmt: BQMFormat):  # noqa: C901
 
     if e is None:
         raise Exception(f"Problem is empty, cannot be compiled to {fmt}")
+
     model = e.compile()
 
     if fmt == "bqm":

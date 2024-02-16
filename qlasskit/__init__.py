@@ -27,6 +27,8 @@ from .types import (  # noqa: F401, F403
     Qint2,
     Qint3,
     Qint4,
+    Qint5,
+    Qint6,
     Qint8,
     Qint12,
     Qint16,
