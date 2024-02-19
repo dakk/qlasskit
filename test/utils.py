@@ -19,7 +19,7 @@ import random
 import threading
 from typing import get_args
 
-from qiskit import QuantumCircuit, execute, transpile
+from qiskit import QuantumCircuit, transpile
 from qiskit_aer import Aer, AerSimulator
 from sympy.logic.boolalg import gateinputcount
 
@@ -98,11 +98,11 @@ def qiskit_measure_and_count(circ, shots=1):
 
 
 def qiskit_unitary(circ, shots=128):
-    simulator = AerSimulator(method="unitary")
     circ.save_state()
-    job = execute(circ, simulator, shots=shots)
-    result = job.result()
-    return result.get_unitary(circ, 3)
+    simulator = AerSimulator(method="unitary")
+    tcirc = transpile(circ, simulator)
+    result = simulator.run(tcirc, shots=shots).result()
+    return result.get_unitary(tcirc, 3)
 
 
 def compute_result_of_qcircuit(cls, qf, truth_line):  # noqa: C901
