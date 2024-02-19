@@ -47,6 +47,7 @@ from .qtype import Qtype, TExp, TType  # noqa: F401, E402
 from .qbool import Qbool  # noqa: F401, E402
 from .qlist import Qlist  # noqa: F401, E402
 from .qmatrix import Qmatrix  # noqa: F401, E402
+from .qchar import Qchar  # noqa: F401, E402
 from .qint import (  # noqa: F401, E402
     Qint,
     Qint2,
@@ -54,6 +55,7 @@ from .qint import (  # noqa: F401, E402
     Qint4,
     Qint5,
     Qint6,
+    Qint7,
     Qint8,
     Qint12,
     Qint16,
@@ -66,9 +68,11 @@ BUILTIN_TYPES = [
     Qint4,
     Qint5,
     Qint6,
+    Qint7,
     Qint8,
     Qint12,
     Qint16,
+    Qchar,
     Qlist,
     Qmatrix,
 ]
