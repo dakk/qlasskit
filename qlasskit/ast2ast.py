@@ -461,12 +461,16 @@ class ASTRewriter(ast.NodeTransformer):
         return ast.BoolOp(op=op, values=args)
 
     def __call_chr(self, node):
-        # TODO
-        raise Exception()
+        if len(node.args) != 1:
+            raise Exception(f"chr() takes exactly 1 argument ({len(node.args)} given)")
+        args = self.__unroll_arg(node.args[0])
+        return args[0]
 
     def __call_ord(self, node):
-        # TODO
-        raise Exception()
+        if len(node.args) != 1:
+            raise Exception(f"ord() takes exactly 1 argument ({len(node.args)} given)")
+        args = self.__unroll_arg(node.args[0])
+        return args[0]
 
     def visit_Call(self, node):
         node.args = [self.visit(ar) for ar in node.args]

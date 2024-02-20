@@ -86,6 +86,9 @@ def const_to_qtype(value: Any) -> TExp:
 
         raise Exception(f"Constant value is too big: {value}")
 
+    elif isinstance(value, str):
+        return Qchar.const(value)
+
     raise Exception(f"Unable to infer type of constant: {value}")
 
 
