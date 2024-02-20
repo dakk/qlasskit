@@ -33,6 +33,11 @@ Unsigned integers; this type has subtypes for different Qint sizes (Qint2, Qint4
 Single bit of the Qint are accessible by the subscript operator `[]`.
 
 
+Qchar
+^^^^^
+
+A character.
+
 Tuple
 ^^^^^
 
@@ -184,7 +189,8 @@ Bultin functions:
 - `sum(Tuple)`, `sum(Qlist)`: returns the sum of the elemnts of a tuple / list
 - `all(Tuple)`, `all(Qlist)`: returns True if all of the elemnts are True
 - `any(Tuple)`, `any(Qlist)`: returns True if any of the elemnts are True
-
+- `ord(Qchar)`: returns the integer value of the given Qchar
+- `chr(Qint)`: returns the char given its ascii code
 
 
 Statements 

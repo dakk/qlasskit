@@ -275,6 +275,10 @@ class Qint6(Qint):
     BIT_SIZE = 6
 
 
+class Qint7(Qint):
+    BIT_SIZE = 7
+
+
 class Qint8(Qint):
     BIT_SIZE = 8
 

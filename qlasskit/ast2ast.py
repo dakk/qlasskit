@@ -460,6 +460,18 @@ class ASTRewriter(ast.NodeTransformer):
         op = ast.Or() if node.func.id == "any" else ast.And()
         return ast.BoolOp(op=op, values=args)
 
+    def __call_chr(self, node):
+        if len(node.args) != 1:
+            raise Exception(f"chr() takes exactly 1 argument ({len(node.args)} given)")
+        args = self.__unroll_arg(node.args[0])
+        return args[0]
+
+    def __call_ord(self, node):
+        if len(node.args) != 1:
+            raise Exception(f"ord() takes exactly 1 argument ({len(node.args)} given)")
+        args = self.__unroll_arg(node.args[0])
+        return args[0]
+
     def visit_Call(self, node):
         node.args = [self.visit(ar) for ar in node.args]
         if not hasattr(node.func, "id"):
@@ -476,6 +488,12 @@ class ASTRewriter(ast.NodeTransformer):
 
         elif node.func.id == "sum":
             return self.__call_sum(node)
+
+        elif node.func.id == "ord":
+            return self.__call_ord(node)
+
+        elif node.func.id == "chr":
+            return self.__call_chr(node)
 
         elif node.func.id in ["any", "all"]:
             return self.__call_anyall(node)

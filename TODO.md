@@ -92,6 +92,7 @@
 - [x] QuTip Support
 - [x] Parameter bind (https://github.com/dakk/qlasskit/issues/10)
 - [x] QUBO, Ising and BQM exporter
+- [x] Datatype: Char
 
 
 ## Future features
@@ -103,7 +104,6 @@
 - [ ] Int arithmetic: div
 - [ ] Lambda
 - [ ] Builtin function: map
-- [ ] Datatype: Char
 - [ ] Datatype: Dict
 - [ ] Datatype: Float
 - [ ] Datatype: Enum
