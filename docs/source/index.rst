@@ -16,7 +16,7 @@ quantum annealers, ising machines, simulators, etc.
    how_it_works.ipynb
    supported
    parameters.ipynb
-   algorithms
+   algorithms.ipynb
    exporter.ipynb
    bqm.ipynb
    api
