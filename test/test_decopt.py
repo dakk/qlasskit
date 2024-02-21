@@ -14,7 +14,7 @@
 
 import unittest
 
-from qlasskit import QCircuit
+from qlasskit import QCircuit, qlassf
 from qlasskit.decompiler import circuit_boolean_optimizer
 from qlasskit.qcircuit import gates
 
@@ -110,3 +110,18 @@ class TestCircuitBooleanOptimizer(unittest.TestCase):
             self.assertEqual(qc_un, qc_n_un)
 
         # print(g_total, g_simp)
+
+    def test_circuit_boolean_optimizer_duplicate_qubit_bug(self):
+        s = "def qf(a: Qint4) -> Qint4:\n\treturn a * a"
+        qf = qlassf(s)
+        qc = qf.circuit()
+        nc = circuit_boolean_optimizer(qc)
+        self.assertEqual(qc.num_gates, nc.num_gates)
+        self.assertEqual(qc.num_qubits, nc.num_qubits)
+
+        s = "def qf(a: Qint4) -> Qint4:\n\treturn a + 2 + 1 + 3"
+        qf = qlassf(s)
+        qc = qf.circuit()
+        nc = circuit_boolean_optimizer(qc)
+        self.assertEqual(qc.num_gates, nc.num_gates)
+        self.assertEqual(qc.num_qubits, nc.num_qubits)

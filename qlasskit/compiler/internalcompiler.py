@@ -105,14 +105,16 @@ class InternalCompiler(Compiler):
                 d = dest
 
             for e in expr.args:
-                if isinstance(e, Symbol):
+                if isinstance(e, Symbol) and qc[e] == d:
+                    continue
+                elif isinstance(e, Symbol):
                     qc.cx(qc[e], d)
                 elif isinstance(e, QuantumBooleanGate):
                     d2 = self.compile_expr(qc, e)
                     qc.cx(d2, d)
                 elif isinstance(e, Not) and not isinstance(
                     e.args[0], Symbol
-                ):  # fixes edge case
+                ):  # fixes edge case:
                     d = self.compile_expr(qc, e.args[0], dest=d)
                     qc.x(d)
                 else:
@@ -142,6 +144,11 @@ class InternalCompiler(Compiler):
             erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))
             if dest is None:
                 dest = qc.get_free_ancilla()
+
+            if dest in erets:
+                erets.remove(dest)
+
+            erets = list(set(erets))
 
             qc.mcx(erets, dest)
 

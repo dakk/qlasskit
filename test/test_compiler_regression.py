@@ -14,7 +14,7 @@
 
 import unittest
 
-from qlasskit import qlassf
+from qlasskit import boolopt, qlassf
 
 
 class TestCompilerRegression(unittest.TestCase):
@@ -40,3 +40,12 @@ class TestCompilerRegression(unittest.TestCase):
         qc = qlassf(f, to_compile=True, compiler="internal").circuit()
         self.assertEqual(qc.num_gates, 11)
         self.assertEqual(qc.num_qubits, 16)
+
+    def test_4_dupqubit(self):
+        f = """def test(a_list: Qlist[Qint8, 8]) -> Qint16:
+    h_val = Qint16(0)
+    for c in a_list:
+        h_val = h_val + c
+    return h_val"""
+
+        qlassf(f, bool_optimizer=boolopt.fastOptimizer)
