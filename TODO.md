@@ -97,7 +97,8 @@
 
 ## Future features
 
-- [ ] Simplification of circuits using boolean expressions decompilation
+- [ ] Simplification of circuits using boolean expressions decompilation (example notebook)
+- [ ] Single statement compilation mode
 
 ### Language support
 
