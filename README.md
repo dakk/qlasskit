@@ -4,7 +4,7 @@
 ![CI Status](https://github.com/dakk/qlasskit/actions/workflows/ci.yaml/badge.svg)
 ![PyPI - Version](https://img.shields.io/pypi/v/qlasskit)
 ![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-blue)
-[![Discord](https://img.shields.io/badge/qlasskit-Discord-yellow?logo=discord&logoColor=f5f5f55)](https://discord.com/channels/764231928676089909/1210279373865754624)
+[![Discord](https://img.shields.io/badge/qlasskit-Discord-yellow?logo=discord&logoColor=f5f5f5)](https://discord.com/channels/764231928676089909/1210279373865754624)
 
 
 Qlasskit is a Python library that allows quantum developers to write classical algorithms in pure Python and translate them into unitary operators (gates) for use in quantum circuits, using boolean expressions as intermediate form.
