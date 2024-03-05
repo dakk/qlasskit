@@ -19,6 +19,7 @@ quantum annealers, ising machines, simulators, etc.
    algorithms.ipynb
    exporter.ipynb
    bqm.ipynb
+   decompiler_and_optimizer.ipynb
    api
 
 .. toctree::

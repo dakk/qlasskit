@@ -122,6 +122,7 @@ class Decompiler:
         current_section = []
         current_section_start_index = None
         # current_section_qb = []  # TODO: populate this
+        qc = qc.copy(True)
 
         i = 0
         for g, w, p in qc.gates + [(None, [0], None)]:

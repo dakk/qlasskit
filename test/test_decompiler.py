@@ -19,7 +19,7 @@ from parameterized import parameterized, parameterized_class
 from sympy import Symbol
 from sympy.logic.boolalg import Boolean
 
-from qlasskit import QCircuit, qlassf  # noqa: F401
+from qlasskit import QCircuit, boolopt, qlassf  # noqa: F401
 from qlasskit.ast2logic.typing import BoolExpList
 from qlasskit.boolopt.bool_optimizer import custom_simplify_logic
 from qlasskit.decompiler import Decompiler
@@ -49,30 +49,77 @@ def _merge_expressions(
 class TestDecompiler(unittest.TestCase):
     @parameterized.expand(
         [
-            ("def test(a: bool) -> bool:\n\treturn not a", True),
-            ("def test(a: bool) -> bool:\n\treturn True if a else False", True),
-            ("def test(a: bool, b: bool) -> bool:\n\tc = a and b\n\treturn c", True),
-            ("def test(a: bool, b: bool) -> bool:\n\treturn a | b", True),
+            (
+                "def test(a: bool) -> bool:\n\treturn not a",
+                True,
+                boolopt.defaultOptimizer,
+            ),
+            (
+                "def test(a: bool) -> bool:\n\treturn True if a else False",
+                True,
+                boolopt.defaultOptimizer,
+            ),
+            (
+                "def test(a: bool, b: bool) -> bool:\n\tc = a and b\n\treturn c",
+                True,
+                boolopt.defaultOptimizer,
+            ),
+            (
+                "def test(a: bool, b: bool) -> bool:\n\treturn a | b",
+                True,
+                boolopt.defaultOptimizer,
+            ),
+            (
+                "def test(a: bool, b: bool) -> bool:\n\treturn a | b",
+                True,
+                boolopt.defaultOptimizer,
+            ),
+            (
+                (
+                    "def test(a: Qlist[bool, 2]) -> bool:\n\ts = True\n\tfor i in a:\n"
+                    "\t\ts = s and i\n\treturn s"
+                ),
+                False,
+                boolopt.fastOptimizer,
+            ),
         ]
     )
-    def test_decompilation(self, f, exact):
-        qf = qlassf(f, to_compile=True)  # , compiler=self.compiler)
-
-        dc = Decompiler().decompile(qf.circuit())
+    def test_decompilation(self, f, exact, optimizer):
+        qf = qlassf(
+            f, to_compile=True, bool_optimizer=optimizer
+        )  # , compiler=self.compiler)
+        circ = qf.circuit()
+        dc = Decompiler().decompile(circ)
 
         if exact:
             self.assertEqual(len(dc), 1)
             self.assertEqual(len(dc[0].expressions), len(qf.expressions))
             self.assertEqual(dc[0].index, (0, qf.circuit().num_gates))
 
+        # Restore symbol mapping
+        n_exps = []
+        emap = {}
+
+        for b in qf.returns.bitvec:
+            emap[Symbol(f"q{circ[b]}")] = Symbol(b)
+
+        for a in qf.args:
+            for b in a.bitvec:
+                emap[Symbol(f"q{circ[b]}")] = Symbol(b)
+
+        for s, e in dc[0].expressions:
+            n_exps.append((emap[s], e.xreplace(emap)))
+
         # Set False values for initialization
         _rets = {}
         for s in qf.returns.bitvec:
             _rets[Symbol(s)] = False
-        for s in ["anc_0", "anc_1"]:
-            _rets[Symbol(s)] = False
+        for i in range(circ.num_qubits):
+            _rets[Symbol(f"q{i}")] = False
 
-        dc0_exps = _merge_expressions(dc[0].expressions, _rets)
+        dc0_exps = _merge_expressions(n_exps, _rets)
+
+        self.assertTrue(len(dc0_exps) > 0)
 
         if exact:
             for orig, decomp in zip(qf.expressions, dc0_exps):
@@ -81,6 +128,7 @@ class TestDecompiler(unittest.TestCase):
         # Test functionality
         qf2 = qlassf(f, to_compile=False)
         qf2.expressions = dc0_exps
+
         qf2.compile(compiler=self.compiler)
-        compute_and_compare_results(self, qf2)
         compute_and_compare_results(self, qf)
+        compute_and_compare_results(self, qf2)

@@ -93,17 +93,17 @@
 - [x] Parameter bind (https://github.com/dakk/qlasskit/issues/10)
 - [x] QUBO, Ising and BQM exporter
 - [x] Datatype: Char
-
+- [x] Simplification of circuits using boolean expressions decompilation (example notebook)
 
 ## Future features
 
-- [ ] Simplification of circuits using boolean expressions decompilation (example notebook)
-- [ ] Single statement compilation mode
+- [ ] Single statement compilation mode starting from ast2ast
 
 ### Language support
 
 - [ ] Int arithmetic: div
 - [ ] Lambda
+- [ ] Exponential
 - [ ] Builtin function: map
 - [ ] Datatype: Dict
 - [ ] Datatype: Float
