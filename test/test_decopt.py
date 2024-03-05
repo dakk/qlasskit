@@ -14,7 +14,7 @@
 
 import unittest
 
-from qlasskit import QCircuit, qlassf
+from qlasskit import QCircuit, boolopt, qlassf
 from qlasskit.decompiler import circuit_boolean_optimizer
 from qlasskit.qcircuit import gates
 
@@ -125,3 +125,17 @@ class TestCircuitBooleanOptimizer(unittest.TestCase):
         nc = circuit_boolean_optimizer(qc)
         self.assertEqual(qc.num_gates, nc.num_gates)
         self.assertEqual(qc.num_qubits, nc.num_qubits)
+
+    def test_decopt_preserve_output_qubit(self):
+        f = (
+            "def test(a: Qlist[bool, 2]) -> bool:\n\ts = True\n\tfor i in a:\n"
+            "\t\ts = s and i\n\treturn s"
+        )
+
+        qf = qlassf(f, to_compile=True, bool_optimizer=boolopt.fastOptimizer)
+        qc = circuit_boolean_optimizer(qf.circuit(), preserve=[0, 1])
+
+        self.assertEqual(len(qc.gates), 1)
+        
+        # TODO: fix this, we need to detect output during compilation
+        # self.assertEqual(qc.gates[0][1], [0, 1, 6])

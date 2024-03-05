@@ -195,21 +195,22 @@ def compute_result_of_originalf(cls, qf, truth_line):  # noqa: C901
     return res_original_str
 
 
-def compute_and_compare_results(cls, qf, test_original_f=True):
+def compute_and_compare_results(cls, qf, test_original_f=True, test_qcircuit=True):
     """Create and simulate the qcircuit, and compare the result with the
     truthtable and with the original_f"""
     MAX_Q_SIM = 64
     MAX_C_SIM = 2**9
     qc_truth = None
+    test_qcircuit = test_qcircuit and COMPILATION_ENABLED
 
     truth_table = qf.truth_table(MAX_C_SIM)
 
     if len(truth_table) > MAX_C_SIM:
         truth_table = [random.choice(truth_table) for x in range(MAX_C_SIM)]
 
-    if len(truth_table) > MAX_Q_SIM and COMPILATION_ENABLED:
+    if len(truth_table) > MAX_Q_SIM and test_qcircuit:
         qc_truth = [random.choice(truth_table) for x in range(MAX_Q_SIM)]
-    elif COMPILATION_ENABLED:
+    elif test_qcircuit:
         qc_truth = truth_table
 
     # circ_qi = qf.circuit().export("circuit", "qiskit")
@@ -232,7 +233,7 @@ def compute_and_compare_results(cls, qf, test_original_f=True):
             cls.assertEqual(truth_str, res_original)
 
         # Calculate and compare the gate result
-        if qc_truth and truth_line in qc_truth and COMPILATION_ENABLED:
+        if qc_truth and truth_line in qc_truth and test_qcircuit:
             max_qubits = (
                 qf.input_size
                 + len(qf.expressions)

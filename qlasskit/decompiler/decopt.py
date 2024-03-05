@@ -40,15 +40,24 @@ def custom_simplify_logic2(expr):
 
 
 def circuit_boolean_optimizer(
-    qc: QCircuit, compiler: SupportedCompiler = "internal"
+    qc: QCircuit, compiler: SupportedCompiler = "internal", preserve=None
 ) -> QCircuit:
     """Decompile the quantum circuit, simplify boolean sections, and recreate an
-    optimized quantum circuit"""
+    optimized quantum circuit. If preserve is set, the given list of qubits are preserved,
+    while others are initialized to False."""
+    qc = qc.copy(True)
     dc = Decompiler().decompile(qc)
 
     # print(dc)
 
-    qc_new = qc.copy()
+    qc_new = qc.copy(True)
+
+    # Set not-preserved qubits to False
+    emap = {}
+    for i in range(qc.num_qubits) if preserve else []:
+        if i in preserve:
+            continue
+        emap[Symbol(f"q{i}")] = False
 
     for section in reversed(dc):
         n_exps = []
@@ -63,12 +72,15 @@ def circuit_boolean_optimizer(
         for s, e in section.expressions:
             e_symp = custom_simplify_logic2(e)
             # print(s, ":", e, "=>", e_symp)
-            n_exps.append((s, e_symp))
+            n_exps.append((s, e_symp.xreplace(emap)))
 
         # Create new circuit section using the compiler
-        qc_sec = exprs_to_quantum(
-            exprs=n_exps, symbols=qc.qubit_map.keys(), compiler="internal"
-        )
+        symbols = qc.qubit_map.keys()
+
+        if preserve:
+            symbols = list(map(lambda x: f"q{x}", preserve))
+
+        qc_sec = exprs_to_quantum(exprs=n_exps, symbols=symbols, compiler=compiler)
 
         if (
             len(qc_sec.gates) > len(section.gates)

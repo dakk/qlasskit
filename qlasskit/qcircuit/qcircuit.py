@@ -131,8 +131,15 @@ class QCircuit:
         nqc += qc
         return nqc
 
-    def copy(self) -> "QCircuit":
+    def copy(self, vanilla=False) -> "QCircuit":
+        """Create a copy of the quantum circuit; if vanilla is True, reset all mapping info"""
         self.__native = None
+        if vanilla:
+            circ = QCircuit(self.num_qubits)
+            circ.gates = copy.deepcopy(self.gates)
+
+            return circ
+
         return copy.deepcopy(self)
 
     def repeat(self, n: int) -> "QCircuit":
