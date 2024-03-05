@@ -47,9 +47,6 @@ def circuit_boolean_optimizer(
     while others are initialized to False."""
     qc = qc.copy(True)
     dc = Decompiler().decompile(qc)
-
-    # print(dc)
-
     qc_new = qc.copy(True)
 
     # Set not-preserved qubits to False
