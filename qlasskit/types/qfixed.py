@@ -14,12 +14,8 @@
 
 from typing import Any, Tuple, TypeVar
 
-from sympy import Symbol
-from sympy.logic import And, Not, Or, Xor, false, true
-
-from . import _eq, _full_adder, _neq
 from .qint import Qint
-from .qtype import Qtype, TExp
+from .qtype import TExp
 
 TI = TypeVar("TI")  # integer part
 TF = TypeVar("TF")  # fractional part

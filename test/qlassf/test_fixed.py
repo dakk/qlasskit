@@ -15,8 +15,6 @@
 import unittest
 
 from parameterized import parameterized_class
-from sympy import Symbol, symbols
-from sympy.logic import And
 
 from qlasskit import qlassf
 

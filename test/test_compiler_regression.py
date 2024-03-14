@@ -18,7 +18,7 @@ from parameterized import parameterized_class
 
 from qlasskit import boolopt, qlassf
 
-from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
+from .utils import ENABLED_COMPILERS, compute_and_compare_results
 
 
 class TestCompilerRegression(unittest.TestCase):

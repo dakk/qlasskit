@@ -136,6 +136,6 @@ class TestCircuitBooleanOptimizer(unittest.TestCase):
         qc = circuit_boolean_optimizer(qf.circuit(), preserve=[0, 1])
 
         self.assertEqual(len(qc.gates), 1)
-        
+
         # TODO: fix this, we need to detect output during compilation
         # self.assertEqual(qc.gates[0][1], [0, 1, 6])

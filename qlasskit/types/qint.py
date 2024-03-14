@@ -34,6 +34,10 @@ class Qint(int, Qtype):
     def __sub__(self, b):
         return (self.value - b) % 2**self.BIT_SIZE
 
+    @staticmethod
+    def _const(value: Any) -> TExp:
+        return (None, [])
+
     @classmethod
     def from_bool(cls, v: List[bool]):
         return cls(int("".join(map(lambda x: "1" if x else "0", v[::-1])), 2))
@@ -299,4 +303,4 @@ def const_to_qint(value: Any) -> TExp:
     raise Exception(f"Constant value is too big: {value}")
 
 
-Qint._const = const_to_qint
+Qint._const = const_to_qint  # type: ignore
