@@ -175,6 +175,10 @@ def compute_result_of_originalf(cls, qf, truth_line):  # noqa: C901
             except:
                 qi = qc[0].from_bool(qc[1])
             return qi.to_bin()
+        elif type(res) is float:
+            qc = const_to_qtype(res)
+            vbin = "".join(map(res_to_str, qc[1]))
+            return vbin
         else:
             return res.to_bin()
 
@@ -188,8 +192,8 @@ def compute_result_of_originalf(cls, qf, truth_line):  # noqa: C901
 
     res_original = qf.original_f(*args)
     res_original_str = res_to_str(res_original)
-    # print(args, res_original, res_original_str, truth_line)
-    # print (qf.expressions)
+    print(args, res_original, res_original_str, truth_line)
+    print(qf.expressions)
 
     cls.assertEqual(len(res_original_str), qf.output_size)
     return res_original_str
@@ -213,12 +217,12 @@ def compute_and_compare_results(cls, qf, test_original_f=True, test_qcircuit=Tru
     elif test_qcircuit:
         qc_truth = truth_table
 
-    # circ_qi = qf.circuit().export("circuit", "qiskit")
+    circ_qi = qf.circuit().export("circuit", "qiskit")
 
     # update_statistics(qf.circuit().num_qubits, qf.circuit().num_gates)
 
     # print(qf.expressions)
-    # print(circ_qi.draw("text"))
+    print(circ_qi.draw("text"))
     # print(circ_qi.qasm())
 
     for truth_line in truth_table:

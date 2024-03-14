@@ -14,7 +14,11 @@
 
 import unittest
 
+from parameterized import parameterized_class
+
 from qlasskit import boolopt, qlassf
+
+from .utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
 
 class TestCompilerRegression(unittest.TestCase):
@@ -49,3 +53,11 @@ class TestCompilerRegression(unittest.TestCase):
     return h_val"""
 
         qlassf(f, bool_optimizer=boolopt.fastOptimizer)
+
+
+@parameterized_class(("compiler"), ENABLED_COMPILERS)
+class TestCompilerRegression_Multicomp(unittest.TestCase):
+    def test_1_const_return(self):
+        f = "def test() -> Tuple[Qint2, Qint2]:\n\treturn [0, 1]"
+        qf = qlassf(f, to_compile=True, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
