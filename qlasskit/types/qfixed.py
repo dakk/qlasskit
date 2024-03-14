@@ -54,4 +54,4 @@ class Qfixed(metaclass=QfixedMeta):
 
         a = Qint._const(int(val_s[0]))
         b = Qint._const(int(val_s[1]))
-        return Tuple[a[0], b[0]], a[1] + b[1]
+        return Tuple[a[0], b[0]], [a[1], b[1]]
