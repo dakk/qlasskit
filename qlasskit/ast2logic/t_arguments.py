@@ -15,14 +15,19 @@ import ast
 from typing import List, Tuple
 
 from ..types import *  # noqa: F401, F403
-from ..types import TType
+from ..types import TType, qint_by_bitsize
 from . import Env, exceptions
 from .typing import Arg, Args
 
 
 def translate_argument(ann, env, base="") -> Arg:  # noqa: C901
     def to_name(a):
-        return a.attr if isinstance(a, ast.Attribute) else a.id
+        if isinstance(a, ast.Attribute):
+            return a.attr
+        elif isinstance(a, ast.Constant):
+            return qint_by_bitsize(a.value).__name__
+        else:
+            return a.id
 
     ttypes: List[TType] = []
 

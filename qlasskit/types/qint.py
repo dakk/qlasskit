@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
+from typing import Any, List
 
 from sympy import Symbol
 from sympy.logic import And, Not, Or, Xor, false, true
@@ -289,3 +289,14 @@ class Qint12(Qint):
 
 class Qint16(Qint):
     BIT_SIZE = 16
+
+
+def const_to_qint(value: Any) -> TExp:
+    for det_type in [Qint2, Qint4, Qint6, Qint8, Qint12, Qint16]:  # Qint3, Qint5
+        if value < 2**det_type.BIT_SIZE:
+            return det_type.const(value)
+
+    raise Exception(f"Constant value is too big: {value}")
+
+
+Qint._const = const_to_qint

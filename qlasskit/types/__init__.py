@@ -1,4 +1,4 @@
-# Copyright 2023 Davide Gessa
+# Copyright 2023-2024 Davide Gessa
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ from .qbool import Qbool  # noqa: F401, E402
 from .qlist import Qlist  # noqa: F401, E402
 from .qmatrix import Qmatrix  # noqa: F401, E402
 from .qchar import Qchar  # noqa: F401, E402
+from .qfixed import Qfixed  # noqa: F401, E402
 from .qint import (  # noqa: F401, E402
     Qint,
     Qint2,
@@ -75,16 +76,35 @@ BUILTIN_TYPES = [
     Qchar,
     Qlist,
     Qmatrix,
+    Qfixed,
 ]
+
+BUILTIN_INT_TYPES = [
+    Qint2,
+    Qint3,
+    Qint4,
+    Qint5,
+    Qint6,
+    Qint7,
+    Qint8,
+    Qint12,
+    Qint16,
+]
+
+
+def qint_by_bitsize(bs: int):
+    for t in BUILTIN_INT_TYPES:
+        if t.BIT_SIZE == bs:
+            return t
+    raise Exception(f"Unknown int type for size {bs}")
 
 
 def const_to_qtype(value: Any) -> TExp:
     if isinstance(value, int):
-        for det_type in [Qint2, Qint4, Qint6, Qint8, Qint12, Qint16]:  # Qint3, Qint5
-            if value < 2**det_type.BIT_SIZE:
-                return det_type.const(value)
+        return Qint._const(value)
 
-        raise Exception(f"Constant value is too big: {value}")
+    elif isinstance(value, float):
+        return Qfixed.const(value)
 
     elif isinstance(value, str):
         return Qchar.const(value)
