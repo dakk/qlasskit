@@ -52,19 +52,9 @@ def _replace_types_annotations(ann, arg=None):
         )
 
     # Replace Qlist[T,n] with Tuple[(T,)*n]
-    if isinstance(ann, ast.Subscript) and ann.value.id == "Qlist":
+    elif isinstance(ann, ast.Subscript) and ann.value.id == "Qlist":
         _elts = ann.slice.elts
         _ituple = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[1].value)
-
-        ann = ast.Subscript(
-            value=ast.Name(id="Tuple", ctx=ast.Load()),
-            slice=_ituple,
-        )
-
-    # Replace Qfixed[TI,TF] with Tuple[(TI,TF)]
-    elif isinstance(ann, ast.Subscript) and ann.value.id == "Qfixed":
-        _elts = ann.slice.elts
-        _ituple = ast.Tuple(elts=[copy.deepcopy(_elts[0]), copy.deepcopy(_elts[1])])
 
         ann = ast.Subscript(
             value=ast.Name(id="Tuple", ctx=ast.Load()),

@@ -12,40 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Tuple, TypeVar
+from typing import Any, Tuple, TypeVar, Generic
 
 from .qint import Qint
-from .qtype import TExp
+from .qtype import Qtype, TExp
 
 TI = TypeVar("TI")  # integer part
 TF = TypeVar("TF")  # fractional part
 
 
-class QfixedMeta(type):
-    def __getitem__(cls, params):
-        if isinstance(params, tuple) and len(params) == 2:
-            TI, TF = params
 
-            if isinstance(TI, int):
-                bs = TI
-                TI = Qint
-                TI.BIT_SIZE = bs
-
-            if isinstance(TF, int):
-                bs = TF
-                TF = Qint
-                TF.BIT_SIZE = bs
-
-            assert issubclass(TI, Qint)
-            assert issubclass(TF, Qint)
-
-            return (
-                TI,
-                TF,
-            )
-
-
-class Qfixed(metaclass=QfixedMeta):
+class Qfixed(float, Qtype, Generic[TI, TF]):
+    def __init__(self, value):
+        super().__init__()
+        self.value = value
+    
     @classmethod
     def const(cls, value: Any) -> TExp:
         val_s = str(value).split(".")
@@ -54,4 +35,12 @@ class Qfixed(metaclass=QfixedMeta):
 
         a = Qint._const(int(val_s[0]))
         b = Qint._const(int(val_s[1]))
-        return Tuple[a[0], b[0]], [a[1], b[1]]
+        return Qfixed[a[0], b[0]], [a[1], b[1]]
+
+
+    # Operations
+
+    @classmethod
+    def add(cls, tleft: TExp, tright: TExp) -> TExp:
+        """Add two Qfixed"""
+        pass

@@ -53,6 +53,29 @@ def translate_argument(ann, env, base="") -> Arg:  # noqa: C901
         ttypes_t = tuple(ttypes)
         return Arg(base, Tuple[ttypes_t], al)
 
+    # Qfixed
+    if isinstance(ann, ast.Subscript) and ann.value.id == "Qfixed":  # type: ignore
+        al = []
+        ind = 0
+
+        if hasattr(ann.slice, "elts"):
+            _elts = ann.slice.elts  # type: ignore
+        else:
+            _elts = [ann.slice]
+
+        for i in _elts:  # type: ignore
+            if isinstance(i, ast.Name) and to_name(i) == "bool":
+                al.append(f"{base}.{ind}")
+                ttypes.append(bool)
+            else:
+                inner_arg = translate_argument(i, env, base=f"{base}.{ind}")
+                ttypes.append(inner_arg.ttype)
+                al.extend(inner_arg.bitvec)
+            ind += 1
+        ttypes_t = tuple(ttypes)
+        return Arg(base, Qfixed[ttypes_t], al)
+        
+        
     elif isinstance(ann, ast.Tuple):
         al = []
         ind = 0

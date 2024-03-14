@@ -24,11 +24,11 @@ from ..utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_
 @parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfFixed2(unittest.TestCase):
     def test_fixed_const(self):
-        f = "def test() -> Qfixed[2, 2]:\n\treturn 0.1"
+        f = "def test() -> Qfixed[Qint2, Qint2]:\n\treturn 0.1"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
-    # def test_sum(self):
-    #     f = "def test(a: Qfixed[2,2]) -> Qfixed[2, 2]:\n\treturn 0.1 + a"
-    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-    #     compute_and_compare_results(self, qf)
+    def test_sum_const(self):
+        f = "def test(a: Qfixed[2,2]) -> Qfixed[2, 2]:\n\treturn 0.1 + a"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
