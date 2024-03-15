@@ -17,17 +17,17 @@ import unittest
 from parameterized import parameterized_class
 
 from qlasskit import qlassf
-from qlasskit.types.qfixed import Qfixed1_3, Qfixed2_3
+from qlasskit.types.qfixed import Qfixed1_3, Qfixed1_4, Qfixed2_3
 
 from ..utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
 
 class TestQfixedEncoding(unittest.TestCase):
-    # def test_fixed_to_bin(self):
-    #     self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(0.75)), "0110")
-    #     self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(0.1)), "0100")
-    #     self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(0.2)), "0010")
-    #     self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(1.0)), "1000")
+    def test_fixed_to_bin(self):
+        self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(0.75)), "0110")
+        self.assertEqual(Qfixed1_3.to_bin(Qfixed1_4(0.1)), "00001")
+        self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(0.2)), "0001")
+        self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(1.0)), "1000")
 
     def test_fixed_from_bool(self):
         def fb(b):

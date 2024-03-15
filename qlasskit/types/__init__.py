@@ -93,14 +93,12 @@ def const_to_qtype(value: Any) -> TExp:
         return Qchar.const(value)
 
     elif isinstance(value, float):
-        for det_type in QFIXED_TYPES:
+        for det_type in QFIXED_TYPES:  # type: ignore
             v_s = str(value).split(".")
 
-            if (
-                int(v_s[0]) < 2**det_type.BIT_SIZE_INTEGER  # type: ignore
-                and int(v_s[1]) < 2**det_type.BIT_SIZE_FRACTIONAL  # type: ignore
-            ):
-                return det_type.const(value)
+            # TODO: check also for the fractional part
+            if int(v_s[0]) < 2**det_type.BIT_SIZE_INTEGER:  # type: ignore
+                return det_type.const(value)  # type: ignore
 
     raise Exception(f"Unable to infer type of constant: {value}")
 

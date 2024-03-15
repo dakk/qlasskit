@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from typing import List
-from math import frexp, ldexp
 
 from sympy.logic import And, Or, false, true
 
@@ -24,7 +23,23 @@ from .qtype import Qtype, TExp
 
 class QfixedImp(float, Qtype):
     """Implementation of the Qfixed type
-    A number i.f is encoded in a Qfixed_2_4 as iiffff in little endian
+    A number i.f is encoded in a Qfixed_2_4 as iiffff.
+    The interger part is in little endian like Qint
+    Fractional part is obtained as binary fractions, by multiplying for
+    2 and getting the integer part at each step.
+
+    0.1:
+    -> 0.1 x 2 = 0.2 (0)
+    -> 0.2 x 2 = 0.4 (0)
+    -> 0.4 x 2 = 0.8 (0)
+    -> 0.8 x 2 = 1.6 (1)
+    -> 0.6 x 2 = 1.2 (1)
+    -> and so on
+
+    so we get 0.00011 (this is an approximation)
+
+    if we want to get again the number in deciaml we multiply each binary
+    position by 2 ** -i.
     """
 
     BIT_SIZE = 4
@@ -37,41 +52,35 @@ class QfixedImp(float, Qtype):
 
     @classmethod
     def from_bool(cls, v: List[bool]):
-        # Dividi la lista in parte intera e frazionaria.
-        integer_part = v[:cls.BIT_SIZE_INTEGER]
-        fractional_part = v[cls.BIT_SIZE_INTEGER:]
+        integer_part = v[: cls.BIT_SIZE_INTEGER]
+        fractional_part = v[cls.BIT_SIZE_INTEGER :]
 
-        # Converti la parte intera in un numero intero.
-        integer_value = int("".join(
-            map(lambda x: "1" if x else "0", v[0 : cls.BIT_SIZE_INTEGER])
-        )[::-1], 2)
+        # Integer part
+        integer_value = int(
+            "".join(map(lambda x: "1" if x else "0", integer_part))[::-1],
+            2,
+        )
 
-        # Converti la parte frazionaria in un numero decimale.
+        # Fractional part
         fractional_value = 0
         for i, bit in enumerate(fractional_part):
             if bit:
-                fractional_value += 2**(-(i + 1))
+                fractional_value += 2 ** (-(i + 1))
 
-        # Combina la parte intera e frazionaria in un float.
-        return integer_value + fractional_value
-
+        return cls(integer_value + fractional_value)
 
     def to_bin(self) -> str:
-        # Ottieni l'esponente e la mantissa del float.
-        exponent, mantissa = frexp(self.value)
+        s = bin(int(self.value))[2:][0 : self.BIT_SIZE_INTEGER]
+        integer_part = ("0" * (self.BIT_SIZE_INTEGER - len(s)) + s)[::-1]
 
-        # Converti l'esponente in binario.
-        exponent_bin = bin(exponent + (2**self.BIT_SIZE_INTEGER - 1))[2:].zfill(self.BIT_SIZE_INTEGER)
-
-        # Converti la mantissa in binario.
-        mantissa_bin = "1"
+        fractional_part = ""
+        c_val = self.value
         for i in range(self.BIT_SIZE_FRACTIONAL):
-            mantissa *= 2
-            mantissa_bin += str(int(mantissa))
-            mantissa -= int(mantissa)
+            c_val = c_val % 1
+            c_val *= 2
+            fractional_part += str(int(c_val))
 
-        # Combina l'esponente e la mantissa in una stringa binaria.
-        return exponent_bin + mantissa_bin[:self.BIT_SIZE_FRACTIONAL]
+        return integer_part + fractional_part
 
     def to_amplitudes(self) -> List[float]:
         ampl = [0.0] * 2**self.BIT_SIZE
@@ -98,8 +107,8 @@ class QfixedImp(float, Qtype):
     @classmethod
     def const(cls, v: float) -> TExp:
         """Return the list of bool representing a fixed"""
-        v = cls(v).to_bin()
-        return (cls, list(map(lambda c: True if c == "1" else False, v)))
+        v_bin = cls(v).to_bin()
+        return (cls, list(map(lambda c: True if c == "1" else False, v_bin)))
 
     # Comparators
 
