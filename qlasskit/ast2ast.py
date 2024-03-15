@@ -26,6 +26,27 @@ class IndexReplacer(ast.NodeTransformer):
         return self.visit(node.value)
 
 
+class IsNamePresent(ast.NodeTransformer):
+    """Check if a tree contains a specific name_id"""
+
+    def __init__(self, name_id):
+        self.name_id = name_id
+        self.present = False
+
+    @property
+    def is_present(self):
+        return self.present
+
+    def generic_visit(self, node):
+        return super().generic_visit(node)
+
+    def visit_Name(self, node):
+        if node.id == self.name_id:
+            self.present = True
+
+        return node
+
+
 class NameValReplacer(ast.NodeTransformer):
     def __init__(self, name_id, val):
         self.name_id = name_id
@@ -95,9 +116,12 @@ class ASTRewriter(ast.NodeTransformer):
         return f"{hex(self._uniqd)[2:]}"
 
     def __unroll_arg(self, arg):
+        """Argument unrolling for visita_call()"""
         if isinstance(arg, ast.Tuple):
+            # If it's a tuple, return elts
             return arg.elts
         elif isinstance(arg, ast.Name):
+            # If it's a name, is in env and is a Tuple, return elements
             if (
                 arg.id in self.env
                 and isinstance(self.env[arg.id], ast.Subscript)
@@ -120,6 +144,7 @@ class ASTRewriter(ast.NodeTransformer):
     def visit_Subscript(self, node):
         _sval = node.slice
 
+        # Replace L[a] with const a, to L[const]
         if isinstance(_sval, ast.Name) and _sval.id in self.const:
             node.slice = self.const[_sval.id]
 
@@ -165,12 +190,14 @@ class ASTRewriter(ast.NodeTransformer):
         return node
 
     def visit_Name(self, node):
+        # __ prefix is reserved for internal use
         if node.id[0:2] == "__":
             raise Exception("invalid name starting with __")
 
         return node
 
     def visit_If(self, node):
+        """Replace if(c,t,e) with if(c,t1), if(c,t2), ..., if(!c, e1), ..."""
         body = flatten([self.visit(n) for n in node.body])
         orelse = flatten([self.visit(n) for n in node.orelse])
         test_name = "_iftarg" + self.uniqd
@@ -231,6 +258,7 @@ class ASTRewriter(ast.NodeTransformer):
         return if_l
 
     def visit_List(self, node):
+        """Converts List to Tuple"""
         return ast.Tuple(elts=[self.visit(el) for el in node.elts])
 
     def visit_AnnAssign(self, node):
@@ -296,10 +324,12 @@ class ASTRewriter(ast.NodeTransformer):
         else:
             self.env[target_0id] = "Unknown"
 
-        # TODO: if value is not self referencing, we can skip this (ie: a = b + 1)
+        # If value is not self referencing, we can skip this (ie: a = b + 1)
+        ip = IsNamePresent(target_0id)
+        ip.visit(node.value)
 
         # Reassigning an already present variable (use a temp variable)
-        if was_known and not isinstance(node.value, ast.Constant):
+        if ip.is_present and was_known and not isinstance(node.value, ast.Constant):
             new_targ = ast.Name(id=f"__{target_0id}", ctx=ast.Load())
 
             return [
@@ -336,9 +366,10 @@ class ASTRewriter(ast.NodeTransformer):
         ]
 
     def visit_For(self, node):  # noqa: C901
+        """Unroll for loops to single iterations"""
         iter = self.visit(node.iter)
 
-        # Iterate over an object
+        # Get the list to iterate (should be defined with a fixed size)
         if isinstance(iter, ast.Name) and iter.id in self.env:
             if isinstance(self.env[iter.id], ast.Tuple):
                 iter = self.env[iter.id].elts
@@ -381,6 +412,7 @@ class ASTRewriter(ast.NodeTransformer):
         if isinstance(iter, ast.Constant) and isinstance(iter.value, ast.Tuple):
             iter = iter.value.elts
 
+        # Unroll each for iteration
         rolls = []
         for i in iter:
             if isinstance(i, ast.Subscript) or isinstance(i, ast.Constant):
