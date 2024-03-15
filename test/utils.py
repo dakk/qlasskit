@@ -168,7 +168,7 @@ def compute_result_of_originalf(cls, qf, truth_line):  # noqa: C901
             return "1" if res else "0"
         elif type(res) is tuple or type(res) is list:
             return "".join([res_to_str(x) for x in res])
-        elif type(res) is int or type(res) is str:
+        elif type(res) is int or type(res) is str or type(res) is float:
             qc = const_to_qtype(res)
             try:
                 qi = qf.returns.ttype.from_bool(qc[1])
