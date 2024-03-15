@@ -63,6 +63,7 @@ class NameValReplacer(ast.NodeTransformer):
 
 
 def _replace_types_annotations(ann, arg=None):
+    """Replaces type annotations, translating high level types"""
     if isinstance(ann, ast.Subscript) and ann.value.id == "Tuple":
         _elts = ann.slice.elts
         _ituple = ast.Tuple(elts=[_replace_types_annotations(el) for el in _elts])
@@ -116,7 +117,7 @@ class ASTRewriter(ast.NodeTransformer):
         return f"{hex(self._uniqd)[2:]}"
 
     def __unroll_arg(self, arg):
-        """Argument unrolling for visita_call()"""
+        """Argument unrolling for visit_call()"""
         if isinstance(arg, ast.Tuple):
             # If it's a tuple, return elts
             return arg.elts
