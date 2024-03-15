@@ -96,18 +96,19 @@ class QfixedImp(float, Qtype):
 
     @classmethod
     def fill(cls, v: TExp) -> TExp:
-        if len(v[1]) < cls.BIT_SIZE:  # type: ignore
-            v = (
-                cls,
-                v[1] + (cls.BIT_SIZE - len(v[1])) * [False],  # type: ignore
-            )
-        return v
+        if len(v[1]) >= cls.BIT_SIZE:  # type: ignore
+            return v
+
+        return (
+            cls,
+            v[1] + (cls.BIT_SIZE - len(v[1])) * [False],  # type: ignore
+        )
 
     @classmethod
     def const(cls, v: float) -> TExp:
         """Return the list of bool representing a fixed"""
-        v_bin = cls(v).to_bin()
-        return (cls, list(map(lambda c: True if c == "1" else False, v_bin)))
+        v_bool = cls(v).to_bool()
+        return (cls, v_bool)
 
     # Comparators
 

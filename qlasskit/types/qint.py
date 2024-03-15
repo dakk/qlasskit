@@ -57,28 +57,30 @@ class Qint(int, Qtype):
     @classmethod
     def const(cls, v: int) -> TExp:
         """Return the list of bool representing an int"""
-        cval = list(map(lambda c: True if c == "1" else False, bin(v)[2:]))[::-1]
-        return cls.fill((cls, cval))
+        cval = list(map(lambda c: True if c == "1" else False, bin(v)[2:]))
+        return cls.fill((cls, cval[::-1]))
 
     @classmethod
     def fill(cls, v: TExp) -> TExp:
         """Fill a Qint to reach its bit_size"""
-        if len(v[1]) < cls.BIT_SIZE:  # type: ignore
-            v = (
-                cls,
-                v[1] + (cls.BIT_SIZE - len(v[1])) * [False],  # type: ignore
-            )
-        return v
+        if len(v[1]) >= cls.BIT_SIZE:  # type: ignore
+            return v
+
+        return (
+            cls,
+            v[1] + (cls.BIT_SIZE - len(v[1])) * [False],  # type: ignore
+        )
 
     @classmethod
     def crop(cls, v: TExp) -> TExp:
         """Crop a Qint to reach its bit_size"""
-        if len(v[1]) > cls.BIT_SIZE:  # type: ignore
-            v = (
-                cls,
-                v[1][0 : cls.BIT_SIZE],  # type: ignore
-            )
-        return v
+        if len(v[1]) <= cls.BIT_SIZE:  # type: ignore
+            return v
+
+        return (
+            cls,
+            v[1][: cls.BIT_SIZE],
+        )  # type: ignore
 
     # Comparators
 

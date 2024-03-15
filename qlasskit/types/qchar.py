@@ -47,12 +47,13 @@ class Qchar(str, Qtype):
 
     @classmethod
     def fill(cls, v: TExp) -> TExp:
-        if len(v[1]) < cls.BIT_SIZE:  # type: ignore
-            v = (
-                cls,
-                v[1] + (cls.BIT_SIZE - len(v[1])) * [False],  # type: ignore
-            )
-        return v
+        if len(v[1]) >= cls.BIT_SIZE:  # type: ignore
+            return v
+
+        return (
+            cls,
+            v[1] + (cls.BIT_SIZE - len(v[1])) * [False],  # type: ignore
+        )
 
     @classmethod
     def const(cls, value: Any) -> TExp:
