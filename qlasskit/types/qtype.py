@@ -38,11 +38,11 @@ class Qtype:
 
     def to_bin(self) -> str:
         """Return the binary representation of the value"""
-        raise Exception("abstract")
+        raise Exception("abstract to_bin")
 
     def to_amplitudes(self) -> List[float]:
         """Return amplitudes to initialize the current value on a quantum circuit"""
-        raise Exception("abstract")
+        raise Exception("abstract to_amplitudes")
 
     def export(self, mode: Literal["amplitudes", "binary"] = "binary"):
         if mode == "amplitudes":
@@ -55,13 +55,13 @@ class Qtype:
     @classmethod
     def from_bool(cls, v: List[bool]) -> "Qtype":
         """Return the Qtype object from a list of booleans"""
-        raise Exception("abstract")
+        raise Exception("abstract from_bool")
 
     @classmethod
     def comparable(cls, other_type=None) -> bool:
         """Return true if the type is comparable with itself or
         with [other_type]"""
-        raise Exception("abstract")
+        raise Exception("abstract comparable")
 
     @classmethod
     def size(cls) -> int:
@@ -71,43 +71,43 @@ class Qtype:
     @classmethod
     def const(cls, value: Any) -> TExp:
         """Return a list of bool representing the value"""
-        raise Exception("abstract")
+        raise Exception("abstract const")
 
     @staticmethod
     def fill(v: TExp) -> TExp:
         """Fill with leading false"""
-        raise Exception("abstract")
+        raise Exception("abstract fill")
 
     @staticmethod
     def crop(v: TExp) -> TExp:
         """Crop to right size"""
-        raise Exception("abstract")
+        raise Exception("abstract crop")
 
     # Comparators
 
     @staticmethod
     def eq(tleft: TExp, tcomp: TExp) -> TExp:
-        raise Exception("abstract")
+        raise Exception("abstract eq")
 
     @staticmethod
     def neq(tleft: TExp, tcomp: TExp) -> TExp:
-        raise Exception("abstract")
+        raise Exception("abstract neq")
 
     @staticmethod
     def gt(tleft: TExp, tcomp: TExp) -> TExp:
-        raise Exception("abstract")
+        raise Exception("abstract gt")
 
     @staticmethod
     def gte(tleft: TExp, tcomp: TExp) -> TExp:
-        raise Exception("abstract")
+        raise Exception("abstract gte")
 
     @staticmethod
     def lt(tleft: TExp, tcomp: TExp) -> TExp:
-        raise Exception("abstract")
+        raise Exception("abstract lt")
 
     @staticmethod
     def lte(tleft: TExp, tcomp: TExp) -> TExp:
-        raise Exception("abstract")
+        raise Exception("abstract lte")
 
     # Operations
 
@@ -128,28 +128,28 @@ class Qtype:
 
     @staticmethod
     def add(tleft: TExp, tright: TExp) -> TExp:
-        raise Exception("abstract")
+        raise Exception("abstract add")
 
     @staticmethod
     def sub(tleft: TExp, tright: TExp) -> TExp:
-        raise Exception("abstract")
+        raise Exception("abstract sub")
 
     @staticmethod
     def mul(tleft: TExp, tright: TExp) -> TExp:
-        raise Exception("abstract")
+        raise Exception("abstract mul")
 
     @staticmethod
     def mod(tleft: TExp, tright: TExp) -> TExp:
-        raise Exception("abstract")
+        raise Exception("abstract mod")
 
     @staticmethod
     def bitwise_xor(tleft: TExp, tright: TExp) -> TExp:
-        raise Exception("abstract")
+        raise Exception("abstract bitwise_xor")
 
     @staticmethod
     def bitwise_and(tleft: TExp, tright: TExp) -> TExp:
-        raise Exception("abstract")
+        raise Exception("abstract bitwise_and")
 
     @staticmethod
     def bitwise_or(tleft: TExp, tright: TExp) -> TExp:
-        raise Exception("abstract")
+        raise Exception("abstract bitwise_or")

@@ -46,8 +46,10 @@ def _full_adder(c, a, b):  # Carry x Sum
 from .qtype import Qtype, TExp, TType  # noqa: F401, E402
 from .qbool import Qbool  # noqa: F401, E402
 from .qlist import Qlist  # noqa: F401, E402
+
 from .qmatrix import Qmatrix  # noqa: F401, E402
 from .qchar import Qchar  # noqa: F401, E402
+from .qfixed import Qfixed, Qfixed1_3  # noqa: F401, E402
 from .qint import (  # noqa: F401, E402
     Qint,
     Qint2,
@@ -75,6 +77,8 @@ BUILTIN_TYPES = [
     Qchar,
     Qlist,
     Qmatrix,
+    Qfixed,
+    Qfixed1_3,
 ]
 
 
@@ -88,6 +92,16 @@ def const_to_qtype(value: Any) -> TExp:
 
     elif isinstance(value, str):
         return Qchar.const(value)
+
+    elif isinstance(value, float):
+        for det_type in [Qfixed1_3]:  # TODO: add all
+            v_s = str(value).split(".")
+
+            if (
+                int(v_s[0]) < 2**det_type.BIT_SIZE_INTEGER
+                and int(v_s[1]) < 2**det_type.BIT_SIZE_FACTORIAL
+            ):
+                return det_type.const(value)
 
     raise Exception(f"Unable to infer type of constant: {value}")
 
