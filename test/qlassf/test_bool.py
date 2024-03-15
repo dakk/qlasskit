@@ -183,6 +183,18 @@ class TestQlassfBoolean(unittest.TestCase):
         self.assertEqual(qf.expressions[0][1], And(b, Not(a), Not(c)))
         compute_and_compare_results(self, qf)
 
+    def test_assign4(self):
+        f = "def test(a: bool, b: bool) -> bool:\n\tb = b and a\n\treturn b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        self.assertEqual(len(qf.expressions), 1)
+        compute_and_compare_results(self, qf)
+
+    def test_assign5(self):
+        f = "def test(a: bool, b: bool) -> bool:\n\tb = a and a\n\treturn b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        self.assertEqual(len(qf.expressions), 1)
+        compute_and_compare_results(self, qf)
+
 
 @parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestQlassfBoolBitwise(unittest.TestCase):
