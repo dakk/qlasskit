@@ -53,7 +53,22 @@ class TestQfixed(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
+    # def test_equal_const(self):
+    #     f = "def test(a: Qfixed[1,4]) -> bool:\n\treturn a == 0.1"
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+    #     compute_and_compare_results(self, qf)
+
+    def test_equal(self):
+        f = "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> bool:\n\treturn a == b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_not_equal(self):
+        f = "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> bool:\n\treturn a != b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
     # def test_sum_const(self):
-    #     f = "def test(a: Qfixed[1,3]) -> Qfixed[1, 3]:\n\treturn 0.1 + a"
+    #     f = "def test(a: Qfixed[1,4]) -> Qfixed[1, 3]:\n\treturn 0.1 + a"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)
