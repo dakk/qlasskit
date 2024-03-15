@@ -18,7 +18,7 @@ from sympy.logic import And, Or, false, true
 
 from . import _eq, _neq
 from .qint import Qint
-from .qtype import Qtype, TExp
+from .qtype import Qtype, TExp, bin_to_bool_list, bool_list_to_bin
 
 
 class QfixedImp(float, Qtype):
@@ -57,7 +57,7 @@ class QfixedImp(float, Qtype):
 
         # Integer part
         integer_value = int(
-            "".join(map(lambda x: "1" if x else "0", integer_part))[::-1],
+            bool_list_to_bin(integer_part[::-1]),
             2,
         )
 
@@ -69,16 +69,15 @@ class QfixedImp(float, Qtype):
 
         return cls(integer_value + fractional_value)
 
-    def to_bin(self) -> str:
-        s = bin(int(self.value))[2:][0 : self.BIT_SIZE_INTEGER]
-        integer_part = ("0" * (self.BIT_SIZE_INTEGER - len(s)) + s)[::-1]
+    def to_bool(self) -> List[bool]:
+        integer_part = bin_to_bool_list(bin(int(self.value)), self.BIT_SIZE_INTEGER)
 
-        fractional_part = ""
+        fractional_part = []
         c_val = self.value
         for i in range(self.BIT_SIZE_FRACTIONAL):
             c_val = c_val % 1
             c_val *= 2
-            fractional_part += str(int(c_val))
+            fractional_part += [int(c_val) == 1]
 
         return integer_part + fractional_part
 

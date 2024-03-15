@@ -26,6 +26,26 @@ TType: TypeAlias = object
 TExp: TypeAlias = Tuple[TType, Boolean]
 
 
+def bin_to_bool_list(b: str, bit_size=None) -> List[bool]:
+    if b[0:2] == "0b":
+        b = b[2:]
+
+    if bit_size is None:
+        bit_size = len(b)
+
+    s = list(
+        map(
+            lambda b: True if b == "1" else False,
+            b[0:bit_size],
+        )
+    )
+    return [False] * (bit_size - len(s)) + s
+
+
+def bool_list_to_bin(b_lst: List[bool]) -> str:
+    return "".join(map(lambda x: "1" if x else "0", b_lst))
+
+
 class Qtype:
     BIT_SIZE = 0
 
@@ -38,7 +58,12 @@ class Qtype:
 
     def to_bin(self) -> str:
         """Return the binary representation of the value"""
-        raise Exception("abstract to_bin")
+        bool_lst = self.to_bool()
+        return "".join(map(lambda b: "1" if b else "0", bool_lst))
+
+    def to_bool(self) -> List[bool]:
+        """Return the bool representation of the value"""
+        raise Exception("abstract to_bool")
 
     def to_amplitudes(self) -> List[float]:
         """Return amplitudes to initialize the current value on a quantum circuit"""
@@ -56,6 +81,12 @@ class Qtype:
     def from_bool(cls, v: List[bool]) -> "Qtype":
         """Return the Qtype object from a list of booleans"""
         raise Exception("abstract from_bool")
+
+    @classmethod
+    def from_bin(cls, v: str) -> "Qtype":
+        """Return the Qtype object from a binary string"""
+        bool_lst = list(map(lambda b: True if b == "1" else False, v))
+        return cls.from_bool(bool_lst)
 
     @classmethod
     def comparable(cls, other_type=None) -> bool:

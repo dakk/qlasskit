@@ -18,7 +18,7 @@ from sympy import Symbol
 from sympy.logic import And, Not, Or, Xor, false, true
 
 from . import _eq, _full_adder, _neq
-from .qtype import Qtype, TExp
+from .qtype import Qtype, TExp, bin_to_bool_list, bool_list_to_bin
 
 
 class Qint(int, Qtype):
@@ -36,11 +36,10 @@ class Qint(int, Qtype):
 
     @classmethod
     def from_bool(cls, v: List[bool]):
-        return cls(int("".join(map(lambda x: "1" if x else "0", v[::-1])), 2))
+        return cls(int(bool_list_to_bin(v[::-1]), 2))
 
-    def to_bin(self) -> str:
-        s = bin(self.value)[2:][0 : self.BIT_SIZE]
-        return ("0" * (self.BIT_SIZE - len(s)) + s)[::-1]
+    def to_bool(self) -> List[bool]:
+        return bin_to_bool_list(bin(self.value), self.BIT_SIZE)[::-1]
 
     def to_amplitudes(self) -> List[float]:
         ampl = [0.0] * 2**self.BIT_SIZE
