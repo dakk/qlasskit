@@ -18,7 +18,7 @@ from typing import Tuple
 
 from qlasskit import Qint2, Qint4, ast2logic, exceptions
 from qlasskit.ast2ast import ast2ast
-from qlasskit.types import Qfixed1_3
+from qlasskit.types.qfixed import Qfixed1_3
 
 
 class TestAst2Logic_translate_argument(unittest.TestCase):

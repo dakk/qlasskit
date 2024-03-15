@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from typing import List
+from math import frexp, ldexp
 
 from sympy.logic import And, Or, false, true
 
@@ -22,9 +23,13 @@ from .qtype import Qtype, TExp
 
 
 class QfixedImp(float, Qtype):
+    """Implementation of the Qfixed type
+    A number i.f is encoded in a Qfixed_2_4 as iiffff in little endian
+    """
+
     BIT_SIZE = 4
     BIT_SIZE_INTEGER = 2
-    BIT_SIZE_FACTORIAL = 2
+    BIT_SIZE_FRACTIONAL = 2
 
     def __init__(self, value: float):
         super().__init__()
@@ -32,28 +37,41 @@ class QfixedImp(float, Qtype):
 
     @classmethod
     def from_bool(cls, v: List[bool]):
-        i = "".join(
-            map(lambda x: "1" if x else "0", v[::-1][0 : cls.BIT_SIZE_INTEGER])
-        )[::-1]
-        f = "".join(
-            map(
-                lambda x: "1" if x else "0",
-                v[::-1][cls.BIT_SIZE_INTEGER : cls.BIT_SIZE_FACTORIAL],
-            )
-        )[::-1]
-        print(int(i,2),int(f,2))
-        return cls(float(f"{int(i,2)}.{int(f,2)}"))
+        # Dividi la lista in parte intera e frazionaria.
+        integer_part = v[:cls.BIT_SIZE_INTEGER]
+        fractional_part = v[cls.BIT_SIZE_INTEGER:]
+
+        # Converti la parte intera in un numero intero.
+        integer_value = int("".join(
+            map(lambda x: "1" if x else "0", v[0 : cls.BIT_SIZE_INTEGER])
+        )[::-1], 2)
+
+        # Converti la parte frazionaria in un numero decimale.
+        fractional_value = 0
+        for i, bit in enumerate(fractional_part):
+            if bit:
+                fractional_value += 2**(-(i + 1))
+
+        # Combina la parte intera e frazionaria in un float.
+        return integer_value + fractional_value
+
 
     def to_bin(self) -> str:
-        v_s = str(self.value).split(".")
-        i = bin(int(v_s[0]) % 2**self.BIT_SIZE_INTEGER)[2:][0 : self.BIT_SIZE_INTEGER]
-        f = bin(int(v_s[1]) % 2**self.BIT_SIZE_FACTORIAL)[2:][
-            0 : self.BIT_SIZE_FACTORIAL
-        ]
-        v = ("0" * (self.BIT_SIZE_INTEGER - len(i)) + i) + (
-            f + "0" * (self.BIT_SIZE_FACTORIAL - len(f))
-        )
-        return v[::-1]
+        # Ottieni l'esponente e la mantissa del float.
+        exponent, mantissa = frexp(self.value)
+
+        # Converti l'esponente in binario.
+        exponent_bin = bin(exponent + (2**self.BIT_SIZE_INTEGER - 1))[2:].zfill(self.BIT_SIZE_INTEGER)
+
+        # Converti la mantissa in binario.
+        mantissa_bin = "1"
+        for i in range(self.BIT_SIZE_FRACTIONAL):
+            mantissa *= 2
+            mantissa_bin += str(int(mantissa))
+            mantissa -= int(mantissa)
+
+        # Combina l'esponente e la mantissa in una stringa binaria.
+        return exponent_bin + mantissa_bin[:self.BIT_SIZE_FRACTIONAL]
 
     def to_amplitudes(self) -> List[float]:
         ampl = [0.0] * 2**self.BIT_SIZE
@@ -81,7 +99,7 @@ class QfixedImp(float, Qtype):
     def const(cls, v: float) -> TExp:
         """Return the list of bool representing a fixed"""
         v = cls(v).to_bin()
-        return (cls, list(map(lambda c: True if c == '1' else False, v)))
+        return (cls, list(map(lambda c: True if c == "1" else False, v)))
 
     # Comparators
 
@@ -102,10 +120,64 @@ class QfixedImp(float, Qtype):
         return (bool, ex)
 
 
+class Qfixed1_2(QfixedImp):
+    BIT_SIZE = 3
+    BIT_SIZE_INTEGER = 1
+    BIT_SIZE_FRACTIONAL = 2
+
+
 class Qfixed1_3(QfixedImp):
     BIT_SIZE = 4
     BIT_SIZE_INTEGER = 1
-    BIT_SIZE_FACTORIAL = 3
+    BIT_SIZE_FRACTIONAL = 3
+
+
+class Qfixed1_4(QfixedImp):
+    BIT_SIZE = 5
+    BIT_SIZE_INTEGER = 1
+    BIT_SIZE_FRACTIONAL = 4
+
+
+class Qfixed1_6(QfixedImp):
+    BIT_SIZE = 7
+    BIT_SIZE_INTEGER = 1
+    BIT_SIZE_FRACTIONAL = 6
+
+
+class Qfixed2_2(QfixedImp):
+    BIT_SIZE = 4
+    BIT_SIZE_INTEGER = 2
+    BIT_SIZE_FRACTIONAL = 2
+
+
+class Qfixed2_3(QfixedImp):
+    BIT_SIZE = 5
+    BIT_SIZE_INTEGER = 2
+    BIT_SIZE_FRACTIONAL = 3
+
+
+class Qfixed2_4(QfixedImp):
+    BIT_SIZE = 6
+    BIT_SIZE_INTEGER = 2
+    BIT_SIZE_FRACTIONAL = 4
+
+
+class Qfixed2_6(QfixedImp):
+    BIT_SIZE = 8
+    BIT_SIZE_INTEGER = 2
+    BIT_SIZE_FRACTIONAL = 6
+
+
+QFIXED_TYPES = [
+    Qfixed1_2,
+    Qfixed1_3,
+    Qfixed1_4,
+    Qfixed1_6,
+    Qfixed2_2,
+    Qfixed2_3,
+    Qfixed2_4,
+    Qfixed2_6,
+]
 
 
 class QfixedMeta(type):

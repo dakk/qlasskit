@@ -49,7 +49,7 @@ from .qlist import Qlist  # noqa: F401, E402
 
 from .qmatrix import Qmatrix  # noqa: F401, E402
 from .qchar import Qchar  # noqa: F401, E402
-from .qfixed import Qfixed, Qfixed1_3  # noqa: F401, E402
+from .qfixed import Qfixed, QFIXED_TYPES  # noqa: F401, E402
 from .qint import (  # noqa: F401, E402
     Qint,
     Qint2,
@@ -78,8 +78,7 @@ BUILTIN_TYPES = [
     Qlist,
     Qmatrix,
     Qfixed,
-    Qfixed1_3,
-]
+] + QFIXED_TYPES
 
 
 def const_to_qtype(value: Any) -> TExp:
@@ -94,12 +93,12 @@ def const_to_qtype(value: Any) -> TExp:
         return Qchar.const(value)
 
     elif isinstance(value, float):
-        for det_type in [Qfixed1_3]:  # TODO: add all
+        for det_type in QFIXED_TYPES:
             v_s = str(value).split(".")
 
             if (
-                int(v_s[0]) < 2**det_type.BIT_SIZE_INTEGER
-                and int(v_s[1]) < 2**det_type.BIT_SIZE_FACTORIAL
+                int(v_s[0]) < 2**det_type.BIT_SIZE_INTEGER  # type: ignore
+                and int(v_s[1]) < 2**det_type.BIT_SIZE_FRACTIONAL  # type: ignore
             ):
                 return det_type.const(value)
 

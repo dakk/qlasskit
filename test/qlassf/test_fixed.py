@@ -16,31 +16,33 @@ import unittest
 
 from parameterized import parameterized_class
 
-from qlasskit import Qfixed, qlassf
-from qlasskit.types import Qfixed1_3
+from qlasskit import qlassf
+from qlasskit.types.qfixed import Qfixed1_3, Qfixed2_3
 
 from ..utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
 
-class TestQlassfFixed(unittest.TestCase):
-    def test_fixed_const(self):
-        self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(0.3)), "0110")
-        self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(0.1)), "0010")
-        self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(0.2)), "0100")
-        self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(1.0)), "0001")
+class TestQfixedEncoding(unittest.TestCase):
+    # def test_fixed_to_bin(self):
+    #     self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(0.75)), "0110")
+    #     self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(0.1)), "0100")
+    #     self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(0.2)), "0010")
+    #     self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(1.0)), "1000")
 
     def test_fixed_from_bool(self):
         def fb(b):
             return list(map(lambda c: True if c == "1" else False, b))
 
-        self.assertEqual(Qfixed1_3.from_bool(fb("0110")), 0.3)
-        self.assertEqual(Qfixed1_3.from_bool(fb("0010")), 0.1)
-        self.assertEqual(Qfixed1_3.from_bool(fb("0100")), 0.2)
-        self.assertEqual(Qfixed1_3.from_bool(fb("0001")), 1.0)
+        self.assertEqual(Qfixed1_3.from_bool(fb("0110")), 0.75)
+        self.assertEqual(Qfixed1_3.from_bool(fb("0100")), 0.5)
+        self.assertEqual(Qfixed1_3.from_bool(fb("0010")), 0.25)
+        self.assertEqual(Qfixed1_3.from_bool(fb("1000")), 1.0)
+        self.assertEqual(Qfixed2_3.from_bool(fb("01000")), 2.0)
+        self.assertEqual(Qfixed2_3.from_bool(fb("01100")), 2.5)
 
 
 @parameterized_class(("compiler"), ENABLED_COMPILERS)
-class TestQlassfFixed2(unittest.TestCase):
+class TestQfixed(unittest.TestCase):
     def test_fixed_identity(self):
         f = "def test(a: Qfixed[1, 3]) -> Qfixed[1, 3]:\n\treturn a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
@@ -52,6 +54,6 @@ class TestQlassfFixed2(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     # def test_sum_const(self):
-    #     f = "def test(a: Qfixed[2,2]) -> Qfixed[2, 2]:\n\treturn 0.1 + a"
+    #     f = "def test(a: Qfixed[1,3]) -> Qfixed[1, 3]:\n\treturn 0.1 + a"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)

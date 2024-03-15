@@ -188,8 +188,8 @@ def compute_result_of_originalf(cls, qf, truth_line):  # noqa: C901
 
     res_original = qf.original_f(*args)
     res_original_str = res_to_str(res_original)
-    # print(args, res_original, res_original_str, truth_line)
-    # print (qf.expressions)
+    print('\n\n', args, res_original, res_original_str, truth_line)
+    print (qf.expressions)
 
     cls.assertEqual(len(res_original_str), qf.output_size)
     return res_original_str
