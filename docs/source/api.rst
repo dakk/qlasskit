@@ -17,5 +17,6 @@ API
    qlasskit.qcircuit.gates
    qlasskit.bqm.decode_samples
    qlasskit.decompiler.Decompiler
+   qlasskit.types
 
    .. qlasskit.decompiler.circuit_boolean_optimizer

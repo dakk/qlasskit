@@ -33,6 +33,11 @@ Unsigned integers; this type has subtypes for different Qint sizes (Qint2, Qint4
 Single bit of the Qint are accessible by the subscript operator `[]`.
 
 
+Qfixed
+^^^^^^
+
+Fixed point rational number; `Qfixed[2,3]` has 2 bits for the integer part and 3 bits for the fractional.
+
 Qchar
 ^^^^^
 
@@ -75,6 +80,14 @@ Constants
 
    42
 
+.. code-block:: python
+
+   3.14
+
+.. code-block:: python
+
+   'a'
+   
 
 Tuple
 ^^^^^
