@@ -14,7 +14,8 @@
 
 from typing import List
 
-from sympy.logic import And, Or, false, true
+from sympy import Symbol
+from sympy.logic import And, Not, Or, false, true
 
 from . import _eq, _neq
 from .qint import Qint
@@ -70,7 +71,9 @@ class QfixedImp(float, Qtype):
         return cls(integer_value + fractional_value)
 
     def to_bool(self) -> List[bool]:
-        integer_part = bin_to_bool_list(bin(int(self.value)), self.BIT_SIZE_INTEGER)
+        integer_part = bin_to_bool_list(bin(int(self.value)), self.BIT_SIZE_INTEGER)[
+            ::-1
+        ]
 
         fractional_part = []
         c_val = self.value
@@ -113,6 +116,16 @@ class QfixedImp(float, Qtype):
     # Comparators
 
     @staticmethod
+    def integer_part(v: TExp):
+        """Return the integer part of a TExp"""
+        return v[1][: v[0].BIT_SIZE_INTEGER]  # type: ignore
+
+    @staticmethod
+    def fractional_part(v: TExp):
+        """Return the fractional part of a TExp"""
+        return v[1][v[0].BIT_SIZE_INTEGER :]  # type: ignore
+
+    @staticmethod
     def eq(tleft: TExp, tcomp: TExp) -> TExp:
         ex = true
         for x in zip(tleft[1], tcomp[1]):
@@ -127,6 +140,46 @@ class QfixedImp(float, Qtype):
             ex = Or(ex, _neq(x[0], x[1]))
 
         return (bool, ex)
+
+    @staticmethod
+    def gt(tleft: TExp, tcomp: TExp) -> TExp:
+        tl_v = tleft[0].fractional_part(tleft)[::-1] + tleft[0].integer_part(tleft)  # type: ignore
+        tc_v = tcomp[0].fractional_part(tcomp)[::-1] + tcomp[0].integer_part(tcomp)  # type: ignore
+
+        prev: List[Symbol] = []
+
+        for a, b in list(zip(tl_v, tc_v))[::-1]:
+            if len(prev) == 0:
+                ex = And(a, Not(b))
+            else:
+                ex = Or(ex, And(*(prev + [a, Not(b)])))
+
+            prev.append(_eq(a, b))
+
+        if len(tl_v) > len(tc_v):
+            for x in tl_v[len(tc_v) :]:
+                ex = Or(ex, x)
+
+        if len(tl_v) < len(tc_v):
+            for x in tc_v[len(tl_v) :]:
+                ex = Or(ex, x)
+
+        return (bool, ex)
+
+    @staticmethod
+    def lt(tleft: TExp, tcomp: TExp) -> TExp:
+        return (
+            bool,
+            And(Not(QfixedImp.gt(tleft, tcomp)[1]), Not(QfixedImp.eq(tleft, tcomp)[1])),
+        )
+
+    @staticmethod
+    def lte(tleft: TExp, tcomp: TExp) -> TExp:
+        return (bool, Not(QfixedImp.gt(tleft, tcomp)[1]))
+
+    @staticmethod
+    def gte(tleft: TExp, tcomp: TExp) -> TExp:
+        return (bool, Not(QfixedImp.lt(tleft, tcomp)[1]))
 
 
 class Qfixed1_2(QfixedImp):

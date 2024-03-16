@@ -14,31 +14,44 @@
 
 import unittest
 
-from parameterized import parameterized_class
+from parameterized import parameterized, parameterized_class
 
 from qlasskit import qlassf
-from qlasskit.types.qfixed import Qfixed1_3, Qfixed1_4, Qfixed2_3
+from qlasskit.types.qfixed import Qfixed1_3, Qfixed2_3, Qfixed2_4
+from qlasskit.types.qtype import bin_to_bool_list
 
 from ..utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
 
 class TestQfixedEncoding(unittest.TestCase):
-    def test_fixed_to_bin(self):
-        self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(0.75)), "0110")
-        self.assertEqual(Qfixed1_3.to_bin(Qfixed1_4(0.1)), "00001")
-        self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(0.2)), "0001")
-        self.assertEqual(Qfixed1_3.to_bin(Qfixed1_3(1.0)), "1000")
+    @parameterized.expand(
+        [
+            (Qfixed1_3, "0110", 0.75),
+            (Qfixed1_3, "0100", 0.5),
+            (Qfixed1_3, "0010", 0.25),
+            (Qfixed1_3, "1000", 1.0),
+            (Qfixed2_3, "01000", 2.0),
+            (Qfixed2_3, "01100", 2.5),
+        ]
+    )
+    def test_fixed_from_bool_and_to_bin(self, qft, bin_v, val):
+        self.assertEqual(qft.from_bool(bin_to_bool_list(bin_v)), val)
+        self.assertEqual(qft.to_bin(qft(val)), bin_v)
 
-    def test_fixed_from_bool(self):
-        def fb(b):
-            return list(map(lambda c: True if c == "1" else False, b))
-
-        self.assertEqual(Qfixed1_3.from_bool(fb("0110")), 0.75)
-        self.assertEqual(Qfixed1_3.from_bool(fb("0100")), 0.5)
-        self.assertEqual(Qfixed1_3.from_bool(fb("0010")), 0.25)
-        self.assertEqual(Qfixed1_3.from_bool(fb("1000")), 1.0)
-        self.assertEqual(Qfixed2_3.from_bool(fb("01000")), 2.0)
-        self.assertEqual(Qfixed2_3.from_bool(fb("01100")), 2.5)
+    @parameterized.expand(
+        [
+            [Qfixed2_3, 3.75, 1.75, True],
+            [Qfixed2_3, 1.0, 2.0, False],
+            [Qfixed2_3, 0.0, 2.0, False],
+            [Qfixed2_4, 0.2, 0.3, False],
+            [Qfixed2_4, 0.1, 0.05, True],
+            [Qfixed2_4, 0.1, 0.2, False],
+            [Qfixed2_4, 0.6, 0.4, True],
+        ]
+    )
+    def test_fixed_gt(self, qft, a, b, r):
+        self.assertEqual(qft.gt(qft.const(a), qft.const(b))[1], r)
+        self.assertEqual(qft.lt(qft.const(a), qft.const(b))[1], not r)
 
 
 @parameterized_class(("compiler"), ENABLED_COMPILERS)
@@ -65,6 +78,26 @@ class TestQfixed(unittest.TestCase):
 
     def test_not_equal(self):
         f = "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> bool:\n\treturn a != b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_gt(self):
+        f = "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> bool:\n\treturn a > b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_lt(self):
+        f = "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> bool:\n\treturn a < b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_lte(self):
+        f = "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> bool:\n\treturn a <= b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_gte(self):
+        f = "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> bool:\n\treturn a >= b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
