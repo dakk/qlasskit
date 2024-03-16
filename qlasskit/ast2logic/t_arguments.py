@@ -22,7 +22,13 @@ from .typing import Arg, Args
 
 def translate_argument(ann, env, base="") -> Arg:  # noqa: C901
     def to_name(a):
-        return a.attr if isinstance(a, ast.Attribute) else a.id
+        if isinstance(a, ast.Attribute):
+            return a.attr
+        elif isinstance(a, ast.Subscript):  # for Qfixed and similar
+            t = "_".join(f"{e.value}" for e in a.slice.elts)
+            return f"{a.value.id}{t}"
+        else:
+            return a.id
 
     ttypes: List[TType] = []
 

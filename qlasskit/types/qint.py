@@ -18,7 +18,7 @@ from sympy import Symbol
 from sympy.logic import And, Not, Or, Xor, false, true
 
 from . import _eq, _full_adder, _neq
-from .qtype import Qtype, TExp
+from .qtype import Qtype, TExp, bin_to_bool_list, bool_list_to_bin
 
 
 class Qint(int, Qtype):
@@ -36,11 +36,10 @@ class Qint(int, Qtype):
 
     @classmethod
     def from_bool(cls, v: List[bool]):
-        return cls(int("".join(map(lambda x: "1" if x else "0", v[::-1])), 2))
+        return cls(int(bool_list_to_bin(v[::-1]), 2))
 
-    def to_bin(self) -> str:
-        s = bin(self.value)[2:][0 : self.BIT_SIZE]
-        return ("0" * (self.BIT_SIZE - len(s)) + s)[::-1]
+    def to_bool(self) -> List[bool]:
+        return bin_to_bool_list(bin(self.value), self.BIT_SIZE)[::-1]
 
     def to_amplitudes(self) -> List[float]:
         ampl = [0.0] * 2**self.BIT_SIZE
@@ -58,28 +57,8 @@ class Qint(int, Qtype):
     @classmethod
     def const(cls, v: int) -> TExp:
         """Return the list of bool representing an int"""
-        cval = list(map(lambda c: True if c == "1" else False, bin(v)[2:]))[::-1]
-        return cls.fill((cls, cval))
-
-    @classmethod
-    def fill(cls, v: TExp) -> TExp:
-        """Fill a Qint to reach its bit_size"""
-        if len(v[1]) < cls.BIT_SIZE:  # type: ignore
-            v = (
-                cls,
-                v[1] + (cls.BIT_SIZE - len(v[1])) * [False],  # type: ignore
-            )
-        return v
-
-    @classmethod
-    def crop(cls, v: TExp) -> TExp:
-        """Crop a Qint to reach its bit_size"""
-        if len(v[1]) > cls.BIT_SIZE:  # type: ignore
-            v = (
-                cls,
-                v[1][0 : cls.BIT_SIZE],  # type: ignore
-            )
-        return v
+        cval = list(map(lambda c: True if c == "1" else False, bin(v)[2:]))
+        return cls.fill((cls, cval[::-1]))
 
     # Comparators
 
@@ -289,3 +268,6 @@ class Qint12(Qint):
 
 class Qint16(Qint):
     BIT_SIZE = 16
+
+
+QINT_TYPES = [Qint2, Qint3, Qint4, Qint5, Qint6, Qint7, Qint8, Qint12, Qint16]

@@ -31,6 +31,24 @@ a, b, c, d = symbols("a,b,c,d")
 _ret = Symbol("_ret")
 
 
+class TestQintEncoding(unittest.TestCase):
+    def test_fixed_const(self):
+        self.assertEqual(Qint4.to_bin(Qint4(6)), "0110")
+        self.assertEqual(Qint4.to_bin(Qint4(1)), "1000")
+        self.assertEqual(Qint4.to_bin(Qint4(2)), "0100")
+        self.assertEqual(Qint4.to_bin(Qint4(0)), "0000")
+        self.assertEqual(Qint4.to_bin(Qint4(8)), "0001")
+
+    def test_fixed_from_bool(self):
+        def fb(b):
+            return list(map(lambda c: True if c == "1" else False, b))
+
+        self.assertEqual(Qint4.from_bool(fb("0110")), 6)
+        self.assertEqual(Qint4.from_bool(fb("0010")), 4)
+        self.assertEqual(Qint4.from_bool(fb("0100")), 2)
+        self.assertEqual(Qint4.from_bool(fb("0001")), 8)
+
+
 class TestQint(unittest.TestCase):
     def test_qint2_to_amplitudes(self):
         c = Qint2(int(1)).to_amplitudes()
