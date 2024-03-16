@@ -30,6 +30,7 @@ from .compiler import SupportedCompiler, to_quantum
 from .qcircuit import QCircuitWrapper
 from .types import *  # noqa: F403, F401
 from .types import Qtype, format_outcome, interpret_as_qtype, type_repr
+from .types.qfixed import *  # noqa: F403, F401
 
 MAX_TRUTH_TABLE_SIZE = 20
 

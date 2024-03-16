@@ -18,7 +18,7 @@ from sympy.logic import And, Or, false, true
 
 from . import _eq, _neq
 from .qint import Qint
-from .qtype import Qtype, TExp
+from .qtype import Qtype, TExp, bin_to_bool_list, bool_list_to_bin
 
 
 class Qchar(str, Qtype):
@@ -29,9 +29,8 @@ class Qchar(str, Qtype):
         assert len(value) == 1
         self.value = value[0]
 
-    def to_bin(self) -> str:
-        s = bin(ord(self.value))[2:][0 : self.BIT_SIZE]
-        return ("0" * (self.BIT_SIZE - len(s)) + s)[::-1]
+    def to_bool(self) -> List[bool]:
+        return bin_to_bool_list(bin(ord(self.value)), self.BIT_SIZE)[::-1]
 
     def to_amplitudes(self) -> List[float]:
         ampl = [0.0] * 2**self.BIT_SIZE
@@ -40,28 +39,16 @@ class Qchar(str, Qtype):
 
     @classmethod
     def from_bool(cls, v: List[bool]):
-        bin_str = "".join(map(lambda x: "1" if x else "0", v))
-        return cls(chr(int(bin_str[::-1], 2)))
+        return cls(chr(int(bool_list_to_bin(v)[::-1], 2)))
 
     @classmethod
     def comparable(cls, other_type=None) -> bool:
         return other_type == cls or issubclass(other_type, Qint)
 
     @classmethod
-    def fill(cls, v: TExp) -> TExp:
-        if len(v[1]) < cls.BIT_SIZE:  # type: ignore
-            v = (
-                cls,
-                v[1] + (cls.BIT_SIZE - len(v[1])) * [False],  # type: ignore
-            )
-        return v
-
-    @classmethod
     def const(cls, value: Any) -> TExp:
         assert len(value) == 1
-        cval = list(
-            map(lambda c: True if c == "1" else False, bin(ord(value))[2:][::-1])
-        )  # [::-1]
+        cval = bin_to_bool_list(bin(ord(value)))[::-1]
         return cls.fill((cls, cval))
 
     # Comparators
