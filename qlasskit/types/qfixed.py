@@ -116,8 +116,15 @@ class QfixedImp(float, Qtype):
         return v[1][v[0].BIT_SIZE_INTEGER :]  # type: ignore
 
     @staticmethod
-    def _as_little_endian_bool_list(v: TExp):
+    def _to_qint_repr(v: TExp):
         return v[0].fractional_part(v)[::-1] + v[0].integer_part(v)  # type: ignore
+
+    @staticmethod
+    def _from_qint_repr(v: TExp):
+        return (
+            v[1][v[0].BIT_SIZE_FRACTIONAL :]  # type: ignore
+            + v[1][: v[0].BIT_SIZE_FRACTIONAL][::-1]  # type: ignore
+        )
 
     @staticmethod
     def eq(tleft: TExp, tcomp: TExp) -> TExp:
@@ -137,8 +144,8 @@ class QfixedImp(float, Qtype):
 
     @staticmethod
     def gt(tleft: TExp, tcomp: TExp) -> TExp:
-        tl_v = QfixedImp._as_little_endian_bool_list(tleft)
-        tc_v = QfixedImp._as_little_endian_bool_list(tcomp)
+        tl_v = QfixedImp._to_qint_repr(tleft)
+        tc_v = QfixedImp._to_qint_repr(tcomp)
 
         prev: List[Symbol] = []
 
@@ -186,18 +193,12 @@ class QfixedImp(float, Qtype):
         elif len(tleft[1]) < len(tright[1]):
             tleft = tright[0].fill(tleft)  # type: ignore
 
-        tl_v = QfixedImp._as_little_endian_bool_list(tleft)
-        tr_v = QfixedImp._as_little_endian_bool_list(tright)
+        tl_v = QfixedImp._to_qint_repr(tleft)
+        tr_v = QfixedImp._to_qint_repr(tright)
 
-        return Qint.add((tleft[0], tl_v), (tright[0], tr_v))
+        res = Qint.add((tleft[0], tl_v), (tright[0], tr_v))
 
-        # carry = False
-        # sums = []
-        # for x in zip(tleft[1], tright[1]):
-        #     carry, sum = _full_adder(carry, x[0], x[1])
-        #     sums.append(sum)
-
-        # return (cls if cls.BIT_SIZE > tleft[0].BIT_SIZE else tleft[0], sums)  # type: ignore
+        return (tleft[0], QfixedImp._from_qint_repr((tleft[0], res[1])))
 
 
 class Qfixed1_2(QfixedImp):
