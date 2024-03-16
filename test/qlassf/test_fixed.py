@@ -16,7 +16,7 @@ import unittest
 
 from parameterized import parameterized, parameterized_class
 
-from qlasskit import qlassf
+from qlasskit import Qint2, qlassf
 from qlasskit.types.qfixed import Qfixed1_3, Qfixed2_3, Qfixed2_4
 from qlasskit.types.qtype import bin_to_bool_list
 
@@ -63,8 +63,18 @@ class TestQfixedEncoding(unittest.TestCase):
             [Qfixed2_3, 3.5, 0.5],
         ]
     )
-    def test_fixed_add(self, qft, a, b):
+    def test_fixed_add_sub(self, qft, a, b):
         self.assertEqual(qft.add(qft.const(a), qft.const(b))[1], qft.const(a + b)[1])
+        self.assertEqual(qft.sub(qft.const(a), qft.const(b))[1], qft.const(a - b)[1])
+
+    @parameterized.expand(
+        [
+            [Qfixed2_3, 0.5, Qint2, 2],
+            [Qfixed2_3, 0.5, Qint2, 0],
+        ]
+    )
+    def test_fixed_mul(self, qft, a, qit, b):
+        self.assertEqual(qft.mul(qft.const(a), qit.const(b))[1], qft.const(a * b)[1])
 
 
 @parameterized_class(("compiler"), ENABLED_COMPILERS)
@@ -119,13 +129,35 @@ class TestQfixed(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
-    def test_sum_const(self):
+    def test_add_const(self):
         f = "def test(a: Qfixed[2,4]) -> Qfixed[2, 4]:\n\treturn Qfixed2_4(0.5) + a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
-    def test_sum(self):
+    def test_add(self):
         f = "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> Qfixed[1,4]:\n\treturn a + b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_mul(self):
+        f = "def test(a: Qfixed[1,4]) -> Qfixed[1,4]:\n\treturn a * 3"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_sub(self):
+        f = (
+            "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> Qfixed[1,4]:\n"
+            "\treturn a - b if a > b else b - a"
+        )
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_sub_const(self):
+        # TODO: allow negative overflow
+        f = (
+            "def test(a: Qfixed[2,4]) -> Qfixed[2, 4]:\n"
+            "\treturn (a - Qfixed2_4(0.5)) if a > Qfixed2_4(0.5) else 0"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 

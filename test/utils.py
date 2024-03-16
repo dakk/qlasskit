@@ -174,10 +174,10 @@ def compute_result_of_originalf(cls, qf, truth_line):  # noqa: C901
                 qi = qf.returns.ttype.from_bool(qc[1])
             except:
                 qi = qc[0].from_bool(qc[1])
-            return qi.to_bin()   
-        elif type(res) is float:       
+            return qi.to_bin()
+        elif type(res) is float:
             qi = qf.returns.ttype(res)
-            return qi.to_bin()   
+            return qi.to_bin()
         else:
             return res.to_bin()
 
@@ -191,7 +191,7 @@ def compute_result_of_originalf(cls, qf, truth_line):  # noqa: C901
 
     res_original = qf.original_f(*args)
     res_original_str = res_to_str(res_original)
-    
+
     # truth_str = "".join(
     #     map(lambda x: "1" if x else "0", truth_line[-qf.output_size :])
     # )

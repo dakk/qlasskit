@@ -49,7 +49,11 @@ class QfixedImp(float, Qtype):
 
     def __init__(self, value: float):
         super().__init__()
+
         self.value = value
+        # v = str(value).split('.')
+        # self.value = int(v[0]) % self.BIT_SIZE_INTEGER + (float(f'0.{v[1]}')
+        # if len(v) == 2 else 0)
 
     @classmethod
     def from_bool(cls, v: List[bool]):
@@ -199,6 +203,40 @@ class QfixedImp(float, Qtype):
         res = Qint.add((tleft[0], tl_v), (tright[0], tr_v))
 
         return (tleft[0], QfixedImp._from_qint_repr((tleft[0], res[1])))
+
+    @classmethod
+    def sub(cls, tleft: TExp, tright: TExp) -> TExp:
+        """Subtract two Qfixed"""
+        an = cls.bitwise_not(cls.fill(tleft))  # type: ignore
+        su = cls.add(an, cls.fill(tright))  # type: ignore
+        return cls.bitwise_not(su)  # type: ignore
+
+    @classmethod
+    def mul(cls, tleft: TExp, tright: TExp) -> TExp:  # noqa: C901
+        a = len(list(filter(lambda b: b is bool, tleft[1])))
+        b = len(list(filter(lambda b: b is bool, tright[1])))
+
+        if a == 0 and issubclass(tleft[0], Qint):  # type: ignore
+            tconst = tleft
+            top = tright
+        elif b == 0 and issubclass(tright[0], Qint):  # type: ignore
+            top = tleft
+            tconst = tright
+        else:
+            raise Exception(
+                "Qfixed mul works only between a Qfixed and an integer constant"
+            )
+
+        v_const = int(bool_list_to_bin(tconst[1])[::-1], 2)
+
+        if v_const == 0:
+            return cls.const(0.0)
+
+        v = top
+        for i in range(v_const - 1):
+            v = cls.add(v, top)
+
+        return v
 
 
 class Qfixed1_2(QfixedImp):
