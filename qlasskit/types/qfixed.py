@@ -287,6 +287,36 @@ class Qfixed2_6(QfixedImp):
     BIT_SIZE_FRACTIONAL = 6
 
 
+class Qfixed3_3(QfixedImp):
+    BIT_SIZE = 6
+    BIT_SIZE_INTEGER = 3
+    BIT_SIZE_FRACTIONAL = 3
+
+
+class Qfixed3_4(QfixedImp):
+    BIT_SIZE = 7
+    BIT_SIZE_INTEGER = 3
+    BIT_SIZE_FRACTIONAL = 4
+
+
+class Qfixed3_6(QfixedImp):
+    BIT_SIZE = 9
+    BIT_SIZE_INTEGER = 3
+    BIT_SIZE_FRACTIONAL = 6
+
+
+class Qfixed4_4(QfixedImp):
+    BIT_SIZE = 8
+    BIT_SIZE_INTEGER = 4
+    BIT_SIZE_FRACTIONAL = 4
+
+
+class Qfixed4_6(QfixedImp):
+    BIT_SIZE = 10
+    BIT_SIZE_INTEGER = 4
+    BIT_SIZE_FRACTIONAL = 6
+
+
 QFIXED_TYPES = [
     Qfixed1_2,
     Qfixed1_3,
@@ -296,6 +326,11 @@ QFIXED_TYPES = [
     Qfixed2_3,
     Qfixed2_4,
     Qfixed2_6,
+    Qfixed3_3,
+    Qfixed3_4,
+    Qfixed3_6,
+    Qfixed4_4,
+    Qfixed4_6,
 ]
 
 
