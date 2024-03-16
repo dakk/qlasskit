@@ -105,3 +105,8 @@ class TestQfixed(unittest.TestCase):
     #     f = "def test(a: Qfixed[1,4]) -> Qfixed[1, 3]:\n\treturn 0.1 + a"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)
+
+    # def test_sum(self):
+    #     f = "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> Qfixed[1,4]:\n\treturn a + b"
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+    #     compute_and_compare_results(self, qf)

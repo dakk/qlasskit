@@ -98,16 +98,6 @@ class QfixedImp(float, Qtype):
         )
 
     @classmethod
-    def fill(cls, v: TExp) -> TExp:
-        if len(v[1]) >= cls.BIT_SIZE:  # type: ignore
-            return v
-
-        return (
-            cls,
-            v[1] + (cls.BIT_SIZE - len(v[1])) * [False],  # type: ignore
-        )
-
-    @classmethod
     def const(cls, v: float) -> TExp:
         """Return the list of bool representing a fixed"""
         v_bool = cls(v).to_bool()
@@ -124,6 +114,10 @@ class QfixedImp(float, Qtype):
     def fractional_part(v: TExp):
         """Return the fractional part of a TExp"""
         return v[1][v[0].BIT_SIZE_INTEGER :]  # type: ignore
+
+    @staticmethod
+    def _as_little_endian_bool_list(v: TExp):
+        return v[0].fractional_part(v)[::-1] + v[0].integer_part(v)  # type: ignore
 
     @staticmethod
     def eq(tleft: TExp, tcomp: TExp) -> TExp:
@@ -143,8 +137,8 @@ class QfixedImp(float, Qtype):
 
     @staticmethod
     def gt(tleft: TExp, tcomp: TExp) -> TExp:
-        tl_v = tleft[0].fractional_part(tleft)[::-1] + tleft[0].integer_part(tleft)  # type: ignore
-        tc_v = tcomp[0].fractional_part(tcomp)[::-1] + tcomp[0].integer_part(tcomp)  # type: ignore
+        tl_v = QfixedImp._as_little_endian_bool_list(tleft)
+        tc_v = QfixedImp._as_little_endian_bool_list(tcomp)
 
         prev: List[Symbol] = []
 
@@ -180,6 +174,30 @@ class QfixedImp(float, Qtype):
     @staticmethod
     def gte(tleft: TExp, tcomp: TExp) -> TExp:
         return (bool, Not(QfixedImp.lt(tleft, tcomp)[1]))
+
+    # Operations
+
+    @classmethod
+    def add(cls, tleft: TExp, tright: TExp) -> TExp:
+        """Add two Qfixed"""
+        if len(tleft[1]) > len(tright[1]):
+            tright = tleft[0].fill(tright)  # type: ignore
+
+        elif len(tleft[1]) < len(tright[1]):
+            tleft = tright[0].fill(tleft)  # type: ignore
+
+        tl_v = QfixedImp._as_little_endian_bool_list(tleft)
+        tr_v = QfixedImp._as_little_endian_bool_list(tright)
+
+        return Qint.add((tleft[0], tl_v), (tright[0], tr_v))
+
+        # carry = False
+        # sums = []
+        # for x in zip(tleft[1], tright[1]):
+        #     carry, sum = _full_adder(carry, x[0], x[1])
+        #     sums.append(sum)
+
+        # return (cls if cls.BIT_SIZE > tleft[0].BIT_SIZE else tleft[0], sums)  # type: ignore
 
 
 class Qfixed1_2(QfixedImp):

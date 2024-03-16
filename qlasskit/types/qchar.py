@@ -46,16 +46,6 @@ class Qchar(str, Qtype):
         return other_type == cls or issubclass(other_type, Qint)
 
     @classmethod
-    def fill(cls, v: TExp) -> TExp:
-        if len(v[1]) >= cls.BIT_SIZE:  # type: ignore
-            return v
-
-        return (
-            cls,
-            v[1] + (cls.BIT_SIZE - len(v[1])) * [False],  # type: ignore
-        )
-
-    @classmethod
     def const(cls, value: Any) -> TExp:
         assert len(value) == 1
         cval = bin_to_bool_list(bin(ord(value)))[::-1]

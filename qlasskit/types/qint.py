@@ -60,28 +60,6 @@ class Qint(int, Qtype):
         cval = list(map(lambda c: True if c == "1" else False, bin(v)[2:]))
         return cls.fill((cls, cval[::-1]))
 
-    @classmethod
-    def fill(cls, v: TExp) -> TExp:
-        """Fill a Qint to reach its bit_size"""
-        if len(v[1]) >= cls.BIT_SIZE:  # type: ignore
-            return v
-
-        return (
-            cls,
-            v[1] + (cls.BIT_SIZE - len(v[1])) * [False],  # type: ignore
-        )
-
-    @classmethod
-    def crop(cls, v: TExp) -> TExp:
-        """Crop a Qint to reach its bit_size"""
-        if len(v[1]) <= cls.BIT_SIZE:  # type: ignore
-            return v
-
-        return (
-            cls,
-            v[1][: cls.BIT_SIZE],
-        )  # type: ignore
-
     # Comparators
 
     @staticmethod
@@ -290,3 +268,6 @@ class Qint12(Qint):
 
 class Qint16(Qint):
     BIT_SIZE = 16
+
+
+QINT_TYPES = [Qint2, Qint3, Qint4, Qint5, Qint6, Qint7, Qint8, Qint12, Qint16]

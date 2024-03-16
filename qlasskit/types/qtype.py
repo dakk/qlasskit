@@ -104,15 +104,27 @@ class Qtype:
         """Return a list of bool representing the value"""
         raise Exception("abstract const")
 
-    @staticmethod
-    def fill(v: TExp) -> TExp:
+    @classmethod
+    def fill(cls, v: TExp) -> TExp:
         """Fill with leading false"""
-        raise Exception("abstract fill")
+        if len(v[1]) >= cls.BIT_SIZE:  # type: ignore
+            return v
 
-    @staticmethod
-    def crop(v: TExp) -> TExp:
+        return (
+            cls,
+            v[1] + (cls.BIT_SIZE - len(v[1])) * [False],  # type: ignore
+        )
+
+    @classmethod
+    def crop(cls, v: TExp) -> TExp:
         """Crop to right size"""
-        raise Exception("abstract crop")
+        if len(v[1]) <= cls.BIT_SIZE:  # type: ignore
+            return v
+
+        return (
+            cls,
+            v[1][: cls.BIT_SIZE],
+        )  # type: ignore
 
     # Comparators
 
