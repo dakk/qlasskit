@@ -71,9 +71,9 @@ class QfixedImp(float, Qtype):
         return cls(integer_value + fractional_value)
 
     def to_bool(self) -> List[bool]:
-        integer_part = bin_to_bool_list(bin(int(self.value)), self.BIT_SIZE_INTEGER)[
-            ::-1
-        ]
+        integer_part = bin_to_bool_list(
+            bin(int(self.value))[::-1], self.BIT_SIZE_INTEGER
+        )
 
         fractional_part = []
         c_val = self.value

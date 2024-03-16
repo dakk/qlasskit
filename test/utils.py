@@ -168,13 +168,16 @@ def compute_result_of_originalf(cls, qf, truth_line):  # noqa: C901
             return "1" if res else "0"
         elif type(res) is tuple or type(res) is list:
             return "".join([res_to_str(x) for x in res])
-        elif type(res) is int or type(res) is str or type(res) is float:
+        elif type(res) is int or type(res) is str:
             qc = const_to_qtype(res)
             try:
                 qi = qf.returns.ttype.from_bool(qc[1])
             except:
                 qi = qc[0].from_bool(qc[1])
-            return qi.to_bin()
+            return qi.to_bin()   
+        elif type(res) is float:       
+            qi = qf.returns.ttype(res)
+            return qi.to_bin()   
         else:
             return res.to_bin()
 
@@ -188,7 +191,11 @@ def compute_result_of_originalf(cls, qf, truth_line):  # noqa: C901
 
     res_original = qf.original_f(*args)
     res_original_str = res_to_str(res_original)
-    # print('\n\n', args, res_original, res_original_str, truth_line)
+    
+    # truth_str = "".join(
+    #     map(lambda x: "1" if x else "0", truth_line[-qf.output_size :])
+    # )
+    # print('\n\n', args, res_original, res_original_str, truth_str)
     # print (qf.expressions)
 
     cls.assertEqual(len(res_original_str), qf.output_size)

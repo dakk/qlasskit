@@ -32,6 +32,7 @@ class TestQfixedEncoding(unittest.TestCase):
             (Qfixed1_3, "1000", 1.0),
             (Qfixed2_3, "01000", 2.0),
             (Qfixed2_3, "01100", 2.5),
+            # (Qfixed2_3, "00000", 4.0),
         ]
     )
     def test_fixed_from_bool_and_to_bin(self, qft, bin_v, val):
@@ -58,6 +59,8 @@ class TestQfixedEncoding(unittest.TestCase):
             [Qfixed2_3, 0.5, 0.5],
             [Qfixed2_3, 0.75, 0.75],
             [Qfixed2_3, 1.0, 0.75],
+            [Qfixed2_3, 1.0, 0.5],
+            [Qfixed2_3, 3.5, 0.5],
         ]
     )
     def test_fixed_add(self, qft, a, b):
@@ -76,10 +79,10 @@ class TestQfixed(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
-    # def test_equal_const(self):
-    #     f = "def test(a: Qfixed[1,4]) -> bool:\n\treturn a == 0.1"
-    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-    #     compute_and_compare_results(self, qf)
+    def test_equal_const(self):
+        f = "def test(a: Qfixed[2,4]) -> bool:\n\treturn a == Qfixed2_4(0.5)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
 
     def test_equal(self):
         f = "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> bool:\n\treturn a == b"
@@ -93,6 +96,11 @@ class TestQfixed(unittest.TestCase):
 
     def test_gt(self):
         f = "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> bool:\n\treturn a > b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_gt_const(self):
+        f = "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> bool:\n\treturn a > Qfixed1_4(0.5)"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
@@ -111,6 +119,16 @@ class TestQfixed(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
+    def test_sum_const(self):
+        f = "def test(a: Qfixed[2,4]) -> Qfixed[2, 4]:\n\treturn Qfixed2_4(0.5) + a"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_sum(self):
+        f = "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> Qfixed[1,4]:\n\treturn a + b"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
     # def test_to_int(self):
     #     f = "def test(a: Qfixed[2,4]) -> Qint2:\n\treturn int(a)"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
@@ -118,15 +136,5 @@ class TestQfixed(unittest.TestCase):
 
     # def test_to_float(self):
     #     f = "def test(a: Qint2) -> Qfixed[2,4]:\n\treturn float(a)"
-    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-    #     compute_and_compare_results(self, qf)
-
-    # def test_sum_const(self):
-    #     f = "def test(a: Qfixed[1,4]) -> Qfixed[1, 3]:\n\treturn 0.1 + a"
-    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-    #     compute_and_compare_results(self, qf)
-
-    # def test_sum(self):
-    #     f = "def test(a: Qfixed[1,4], b: Qfixed[1,4]) -> Qfixed[1,4]:\n\treturn a + b"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)
