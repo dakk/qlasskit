@@ -16,9 +16,11 @@ import ast
 import unittest
 from typing import Tuple
 
+from parameterized import parameterized
+
 from qlasskit import Qint2, Qint4, ast2logic, exceptions
 from qlasskit.ast2ast import ast2ast
-from qlasskit.types.qfixed import Qfixed1_3
+from qlasskit.types import Qfixed1_3
 
 
 class TestAst2Logic_translate_argument(unittest.TestCase):
@@ -39,16 +41,16 @@ class TestAst2Logic_translate_argument(unittest.TestCase):
         self.assertEqual(c.ttype, bool)
         self.assertEqual(c.bitvec, ["a"])
 
-    def test_qint2(self):
-        f = "a: Qint2"
+    @parameterized.expand(["a: Qint[2]", "a : Qint2"])
+    def test_qint2(self, f):
         ann_ast = ast2ast(ast.parse(f).body[0].annotation)
         c = ast2logic.translate_argument(ann_ast, ast2logic.Env(), "a")
         self.assertEqual(c.name, "a")
         self.assertEqual(c.ttype, Qint2)
         self.assertEqual(c.bitvec, ["a.0", "a.1"])
 
-    def test_qint4(self):
-        f = "a: Qint4"
+    @parameterized.expand(["a: Qint[4]", "a : Qint4"])
+    def test_qint4(self, f):
         ann_ast = ast2ast(ast.parse(f).body[0].annotation)
         c = ast2logic.translate_argument(ann_ast, ast2logic.Env(), "a")
         self.assertEqual(c.name, "a")
@@ -80,7 +82,7 @@ class TestAst2Logic_translate_argument(unittest.TestCase):
         self.assertEqual(c.bitvec, ["a.0", "a.1.0", "a.1.1"])
 
     def test_tuple_of_int2(self):
-        f = "a: Tuple[Qint2, Qint2]"
+        f = "a: Tuple[Qint[2], Qint[2]]"
         ann_ast = ast2ast(ast.parse(f).body[0].annotation)
         c = ast2logic.translate_argument(ann_ast, ast2logic.Env(), "a")
         self.assertEqual(c.name, "a")
@@ -96,7 +98,7 @@ class TestAst2Logic_translate_argument(unittest.TestCase):
         )
 
     def test_list_of_int2(self):
-        f = "a: Qlist[Qint2, 2]"
+        f = "a: Qlist[Qint[2], 2]"
         ann_ast = ast2ast(ast.parse(f)).body[0].annotation
         c = ast2logic.translate_argument(ann_ast, ast2logic.Env(), "a")
         self.assertEqual(c.name, "a")

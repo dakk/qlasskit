@@ -46,7 +46,10 @@ class TestQlassfTuple(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_tuple_item_swap(self):
-        f = "def swapf(a: Tuple[Qint2, Qint2]) -> Tuple[Qint2, Qint2]:\n\treturn (a[1], a[0])"
+        f = (
+            "def swapf(a: Tuple[Qint[2], Qint[2]]) -> Tuple[Qint[2], Qint[2]]:\n"
+            "\treturn (a[1], a[0])"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
@@ -140,12 +143,12 @@ class TestQlassfTuple(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_multi_assign2(self):
-        f = "def test() -> Qint4:\n\tc, d = 1, 2\n\treturn c+d"
+        f = "def test() -> Qint[4]:\n\tc, d = 1, 2\n\treturn c+d"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_multi_assign3(self):
-        f = "def test() -> Qint4:\n\tc, d, e = 1, 2, 0xa\n\treturn c+d+e"
+        f = "def test() -> Qint[4]:\n\tc, d, e = 1, 2, 0xa\n\treturn c+d+e"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
@@ -165,24 +168,33 @@ class TestQlassfTuple(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_tuple_int_compare(self):
-        f = "def test(a: Tuple[Qint2, Qint2], b: Tuple[Qint2, Qint2]) -> bool:\n\treturn a == b"
+        f = (
+            "def test(a: Tuple[Qint[2], Qint[2]], b: Tuple[Qint[2], Qint[2]]) -> bool:\n"
+            "\treturn a == b"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_tuple_iterator_var(self):
         f = (
-            "def test(a: Tuple[Qint2, Qint2]) -> Qint2:\n\tc = 0\n\tfor x in a:\n"
+            "def test(a: Tuple[Qint[2], Qint[2]]) -> Qint[2]:\n\tc = 0\n\tfor x in a:\n"
             "\t\tc += x\n\treturn c"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_tuple_iterator_tuple(self):
-        f = "def test(a: Qint2) -> Qint2:\n\tc = 0\n\tfor x in (1,2,3):\n\t\tc += x + a\n\treturn c"
+        f = (
+            "def test(a: Qint[2]) -> Qint[2]:\n\tc = 0\n"
+            "\tfor x in (1,2,3):\n\t\tc += x + a\n\treturn c"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_tuple_iterator_vartuple(self):
-        f = "def test(a: Qint2) -> Qint2:\n\tc = (1,2,3)\n\tfor x in c:\n\t\ta += x\n\treturn a"
+        f = (
+            "def test(a: Qint[2]) -> Qint[2]:\n\tc = (1,2,3)\n"
+            "\tfor x in c:\n\t\ta += x\n\treturn a"
+        )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)

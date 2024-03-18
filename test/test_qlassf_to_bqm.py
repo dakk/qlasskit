@@ -46,7 +46,7 @@ class TestQlassfToBQM(unittest.TestCase):
             self.assertEqual(x.sample["a"], True)
 
     def test_to_bqm_2(self):
-        f = "def test(a: Qint2) -> bool:\n\treturn a != 2"
+        f = "def test(a: Qint[2]) -> bool:\n\treturn a != 2"
         qf = qlassf(f, to_compile=False)
         bqm = qf.to_bqm()
         ss = sample_bqm(bqm)
@@ -58,7 +58,7 @@ class TestQlassfToBQM(unittest.TestCase):
             self.assertEqual(x.sample["a"], 2)
 
     def test_to_bqm_3(self):
-        f = "def test(a: Qint2) -> Qint2:\n\treturn a + 1"
+        f = "def test(a: Qint[2]) -> Qint[2]:\n\treturn a + 1"
         qf = qlassf(f, to_compile=False)
         bqm = qf.to_bqm()
         ss = sample_bqm(bqm)
@@ -70,7 +70,7 @@ class TestQlassfToBQM(unittest.TestCase):
             self.assertEqual(x.sample["a"] + 1 % 16, 0)
 
     def test_to_bqm_4(self):
-        f = "def test(a: Qint2, b: Qint2) -> Qint4:\n\treturn Qint4(0) + a + b"
+        f = "def test(a: Qint[2], b: Qint[2]) -> Qint[4]:\n\treturn Qint4(0) + a + b"
         qf = qlassf(f, to_compile=False)
         qubo, offset = qf.to_bqm("qubo")
         ss = sample_qubo(qubo)
@@ -93,7 +93,7 @@ class TestQlassfToBQM(unittest.TestCase):
     def test_to_bqm_subset_sum_problem(self):
         lst = [0, 5, 2, 3]
         f = (
-            f"def subset_sum(ii: Tuple[Qint2, Qint2]) -> Qint3:\n\tl = {lst}\n\t"
+            f"def subset_sum(ii: Tuple[Qint[2], Qint[2]]) -> Qint[3]:\n\tl = {lst}\n\t"
             "return l[ii[0]] + l[ii[1]] - 7"
         )
         qf = qlassf(f, to_compile=False)
@@ -117,7 +117,7 @@ class TestQlassfToBQM(unittest.TestCase):
             self.assertEqual(sum(map(lambda i: lst[i], x.sample["ii"])), 7)
 
     def test_to_bqm_addends(self):
-        f = "def test(a: Qint4, b: Qint4) -> Qint4:\n\treturn a + b - 12"
+        f = "def test(a: Qint[4], b: Qint[4]) -> Qint[4]:\n\treturn a + b - 12"
         qf = qlassf(f, to_compile=False)
         bqm = qf.to_bqm()
 
@@ -130,7 +130,7 @@ class TestQlassfToBQM(unittest.TestCase):
             self.assertEqual(x.sample["a"] + x.sample["b"], 12)
 
     def test_to_bqm_factoring(self):
-        f = "def test(a: Qint3, b: Qint3) -> Qint4:\n\treturn Qint4(15) - (a * b)"
+        f = "def test(a: Qint[3], b: Qint[3]) -> Qint[4]:\n\treturn Qint4(15) - (a * b)"
         qf = qlassf(f, to_compile=False)
         bqm = qf.to_bqm()
 

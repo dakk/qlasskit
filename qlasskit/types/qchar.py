@@ -17,7 +17,7 @@ from typing import Any, List
 from sympy.logic import And, Or, false, true
 
 from . import _eq, _neq
-from .qint import Qint
+from .qint import QintImp
 from .qtype import Qtype, TExp, bin_to_bool_list, bool_list_to_bin
 
 
@@ -43,7 +43,7 @@ class Qchar(str, Qtype):
 
     @classmethod
     def comparable(cls, other_type=None) -> bool:
-        return other_type == cls or issubclass(other_type, Qint)
+        return other_type == cls or issubclass(other_type, QintImp)
 
     @classmethod
     def const(cls, value: Any) -> TExp:

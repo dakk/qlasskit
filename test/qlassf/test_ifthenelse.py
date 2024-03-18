@@ -75,7 +75,7 @@ class TestQlassfIfThenElse(unittest.TestCase):
 
     def test_if_for2(self):
         f = (
-            "def test(a: bool, b: bool) -> Qint2:\n"
+            "def test(a: bool, b: bool) -> Qint[2]:\n"
             + "\td = 0\n"
             + "\tfor i in range(3):\n"
             + "\t\tif a:\n"

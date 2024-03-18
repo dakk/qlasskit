@@ -1,4 +1,4 @@
-# Copyright 2023 Davide Gessa
+# Copyright 2023-2024 Davide Gessa
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class QintImp(int, Qtype):
     def comparable(cls, other_type=None) -> bool:
         """Return true if the type is comparable with itself or
         with [other_type]"""
-        if not other_type or issubclass(other_type, Qint):
+        if not other_type or issubclass(other_type, QintImp):
             return True
         return False
 
@@ -275,13 +275,24 @@ class Qint16(QintImp):
 
 QINT_TYPES = [Qint2, Qint3, Qint4, Qint5, Qint6, Qint7, Qint8, Qint12, Qint16]
 
+# class _GetQintType:
+#     @property
+#     def __name__(self):
+#         return 'Qint' # I'm not sure this is correct
+
+#     def __getitem__(self, index):
+#         return eval(f"Qint{index}")
+
 
 class QintMeta(type):
     def __getitem__(cls, params):
         if isinstance(params, tuple) and len(params) == 1:
             i = params
             if isinstance(i, int) and i >= 2:
-                return f"Qint{i}"  # TODO: transform to type
+                return f"Qint{i}"
+
+    # def __new__(cls, name, bases, dct):
+    #     return _GetQintType()
 
 
 class Qint(metaclass=QintMeta):

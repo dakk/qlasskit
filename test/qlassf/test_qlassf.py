@@ -71,7 +71,7 @@ class TestQlassfEncodeInputDecodeOutput(unittest.TestCase):
         self.assertEqual(qf.decode_output("0"), False)
 
     def test_encode_decode_qint(self):
-        f = "def test(a: Qint2) -> Qint2:\n\treturn a"
+        f = "def test(a: Qint[2]) -> Qint[2]:\n\treturn a"
         qf = qlassf(f, to_compile=False)
         self.assertEqual(qf.encode_input(Qint2(2)), "01"[::-1])
         self.assertEqual(qf.decode_output("01"[::-1]), Qint2(2))
@@ -80,7 +80,7 @@ class TestQlassfEncodeInputDecodeOutput(unittest.TestCase):
         self.assertEqual(qf.decode_output("00"), Qint2(0))
 
     def test_encode_decode_tuple(self):
-        f = "def test(a: Tuple[Qint2, bool]) -> Tuple[Qint2, bool]:\n\treturn a"
+        f = "def test(a: Tuple[Qint[2], bool]) -> Tuple[Qint[2], bool]:\n\treturn a"
         qf = qlassf(f, to_compile=False)
         self.assertEqual(qf.encode_input((Qint2(2), False)), "010")
         self.assertEqual(qf.decode_output("010"), (Qint2(2), False))
@@ -89,7 +89,7 @@ class TestQlassfEncodeInputDecodeOutput(unittest.TestCase):
         self.assertEqual(qf.decode_output("001"[::-1]), (Qint2(0), True))
 
     def test_encode_decode_tuple2(self):
-        f = "def test(a: Tuple[Qint2, Qint4]) -> Tuple[Qint2, Qint4]:\n\treturn a"
+        f = "def test(a: Tuple[Qint[2], Qint[4]]) -> Tuple[Qint[2], Qint[4]]:\n\treturn a"
         qf = qlassf(f, to_compile=False)
         self.assertEqual(qf.encode_input((Qint2(2), Qint4(3))), "011100"[::-1])
         self.assertEqual(qf.decode_output("011100"[::-1]), (Qint2(2), Qint4(3)))
@@ -151,7 +151,7 @@ class TestQlassfTruthTable(unittest.TestCase):
         )
 
     def test_big_truth(self):
-        f = "def test(a: Qint4) -> Qint4:\n\treturn a"
+        f = "def test(a: Qint[4]) -> Qint[4]:\n\treturn a"
         qf = qlassf(f, to_compile=False)
         tt = qf.truth_table()
         tth = qf.truth_table_header()
