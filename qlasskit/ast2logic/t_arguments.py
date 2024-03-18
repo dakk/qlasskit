@@ -25,7 +25,10 @@ def translate_argument(ann, env, base="") -> Arg:  # noqa: C901
         if isinstance(a, ast.Attribute):
             return a.attr
         elif isinstance(a, ast.Subscript):  # for Qfixed and similar
-            t = "_".join(f"{e.value}" for e in a.slice.elts)
+            if isinstance(a.slice, ast.Constant):
+                t = f"{a.slice.value}"
+            else:
+                t = "_".join(f"{e.value}" for e in a.slice.elts)
             return f"{a.value.id}{t}"
         else:
             return a.id

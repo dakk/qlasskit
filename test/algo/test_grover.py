@@ -23,7 +23,7 @@ from ..utils import qiskit_measure_and_count
 class TestAlgoGrover(unittest.TestCase):
     def test_grover(self):
         f = """
-def hash(k: Qint4) -> bool:
+def hash(k: Qint[4]) -> bool:
     h = True
     for i in range(4):
         h = h and k[i]
@@ -42,7 +42,7 @@ def hash(k: Qint4) -> bool:
 
     def test_grover_list_search(self):
         f = """
-def hash(k: Qint4) -> bool:
+def hash(k: Qint[4]) -> bool:
     h = False
     for i in [7]:
         if i == k:
@@ -62,7 +62,7 @@ def hash(k: Qint4) -> bool:
 
     def test_grover_without_element_to_search(self):
         f = """
-def hash(k: Qint4) -> bool:
+def hash(k: Qint[4]) -> bool:
     h = True
     for i in range(4):
         h = h and k[i]
@@ -80,7 +80,7 @@ def hash(k: Qint4) -> bool:
 
     def test_grover_too_many_args(self):
         f = """
-def hash(k: Qint4, q: Qint4) -> bool:
+def hash(k: Qint[4], q: Qint[4]) -> bool:
     h = True
     for i in range(4):
         h = h and (k[i] or q[i])
@@ -92,7 +92,7 @@ def hash(k: Qint4, q: Qint4) -> bool:
 
     def test_grover_subset_sum(self):
         f = """
-def subset_sum(ii: Tuple[Qint2, Qint2]) -> Qint2:
+def subset_sum(ii: Tuple[Qint[2], Qint[2]]) -> Qint[2]:
     l = [0, 1, 2, 0]
     return l[ii[0]] + l[ii[1]]
 """

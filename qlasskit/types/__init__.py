@@ -43,13 +43,35 @@ def _full_adder(c, a, b):  # Carry x Sum
     # return c, o
 
 
-from .qtype import Qtype, TExp, TType  # noqa: F401, E402
+from .qtype import (  # noqa: F401, E402
+    Qtype,
+    TExp,
+    TType,
+    bin_to_bool_list,
+    bool_list_to_bin,
+)
 from .qbool import Qbool  # noqa: F401, E402
 from .qlist import Qlist  # noqa: F401, E402
 
 from .qmatrix import Qmatrix  # noqa: F401, E402
 from .qchar import Qchar  # noqa: F401, E402
-from .qfixed import Qfixed, QFIXED_TYPES  # noqa: F401, E402
+from .qfixed import (  # noqa: F401, E402
+    Qfixed,
+    Qfixed1_2,
+    Qfixed1_3,
+    Qfixed1_4,
+    Qfixed1_6,
+    Qfixed2_2,
+    Qfixed2_3,
+    Qfixed2_4,
+    Qfixed2_6,
+    Qfixed3_3,
+    Qfixed3_4,
+    Qfixed3_6,
+    Qfixed4_4,
+    Qfixed4_6,
+    QFIXED_TYPES,
+)
 from .qint import (  # noqa: F401, E402
     Qint,
     Qint2,
@@ -61,29 +83,25 @@ from .qint import (  # noqa: F401, E402
     Qint8,
     Qint12,
     Qint16,
+    QINT_TYPES,
 )
 from .parameter import Parameter  # noqa: F401, E402
 
-BUILTIN_TYPES = [
-    Qint2,
-    Qint3,
-    Qint4,
-    Qint5,
-    Qint6,
-    Qint7,
-    Qint8,
-    Qint12,
-    Qint16,
-    Qchar,
-    Qlist,
-    Qmatrix,
-    Qfixed,
-] + QFIXED_TYPES
+BUILTIN_TYPES = (
+    [
+        Qchar,
+        Qlist,
+        Qmatrix,
+        Qfixed,
+    ]
+    + QINT_TYPES
+    + QFIXED_TYPES
+)
 
 
 def const_to_qtype(value: Any) -> TExp:
     if isinstance(value, int):
-        for det_type in [Qint2, Qint4, Qint6, Qint8, Qint12, Qint16]:  # Qint3, Qint5
+        for det_type in [Qint2, Qint4, Qint6, Qint8, Qint12, Qint16]:  # QINT_TYPES?
             if value < 2**det_type.BIT_SIZE:
                 return det_type.const(value)
 

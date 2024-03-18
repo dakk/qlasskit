@@ -16,9 +16,8 @@ import unittest
 
 from parameterized import parameterized, parameterized_class
 
-from qlasskit import Qint2, qlassf
-from qlasskit.types.qfixed import Qfixed1_3, Qfixed2_3, Qfixed2_4
-from qlasskit.types.qtype import bin_to_bool_list
+from qlasskit import qlassf
+from qlasskit.types import Qfixed1_3, Qfixed2_3, Qfixed2_4, Qint2, bin_to_bool_list
 
 from ..utils import COMPILATION_ENABLED, ENABLED_COMPILERS, compute_and_compare_results
 
@@ -162,11 +161,11 @@ class TestQfixed(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     # def test_to_int(self):
-    #     f = "def test(a: Qfixed[2,4]) -> Qint2:\n\treturn int(a)"
+    #     f = "def test(a: Qfixed[2,4]) -> Qint[2]:\n\treturn int(a)"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)
 
     # def test_to_float(self):
-    #     f = "def test(a: Qint2) -> Qfixed[2,4]:\n\treturn float(a)"
+    #     f = "def test(a: Qint[2]) -> Qfixed[2,4]:\n\treturn float(a)"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)

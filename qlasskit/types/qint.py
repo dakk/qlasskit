@@ -1,4 +1,4 @@
-# Copyright 2023 Davide Gessa
+# Copyright 2023-2024 Davide Gessa
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ from . import _eq, _full_adder, _neq
 from .qtype import Qtype, TExp, bin_to_bool_list, bool_list_to_bin
 
 
-class Qint(int, Qtype):
+class QintImp(int, Qtype):
     BIT_SIZE = 8
 
     def __init__(self, value):
@@ -50,7 +50,7 @@ class Qint(int, Qtype):
     def comparable(cls, other_type=None) -> bool:
         """Return true if the type is comparable with itself or
         with [other_type]"""
-        if not other_type or issubclass(other_type, Qint):
+        if not other_type or issubclass(other_type, QintImp):
             return True
         return False
 
@@ -122,17 +122,20 @@ class Qint(int, Qtype):
     @staticmethod
     def lt(tleft: TExp, tcomp: TExp) -> TExp:
         """Compare two Qint for lower than"""
-        return (bool, And(Not(Qint.gt(tleft, tcomp)[1]), Not(Qint.eq(tleft, tcomp)[1])))
+        return (
+            bool,
+            And(Not(QintImp.gt(tleft, tcomp)[1]), Not(QintImp.eq(tleft, tcomp)[1])),
+        )
 
     @staticmethod
     def lte(tleft: TExp, tcomp: TExp) -> TExp:
         """Compare two Qint for lower than - equal"""
-        return (bool, Not(Qint.gt(tleft, tcomp)[1]))
+        return (bool, Not(QintImp.gt(tleft, tcomp)[1]))
 
     @staticmethod
     def gte(tleft: TExp, tcomp: TExp) -> TExp:
         """Compare two Qint for greater than - equal"""
-        return (bool, Not(Qint.lt(tleft, tcomp)[1]))
+        return (bool, Not(QintImp.lt(tleft, tcomp)[1]))
 
     # Operations
 
@@ -234,40 +237,63 @@ class Qint(int, Qtype):
         return cls.bitwise_generic(Or, tleft, tright)
 
 
-class Qint2(Qint):
+class Qint2(QintImp):
     BIT_SIZE = 2
 
 
-class Qint3(Qint):
+class Qint3(QintImp):
     BIT_SIZE = 3
 
 
-class Qint4(Qint):
+class Qint4(QintImp):
     BIT_SIZE = 4
 
 
-class Qint5(Qint):
+class Qint5(QintImp):
     BIT_SIZE = 5
 
 
-class Qint6(Qint):
+class Qint6(QintImp):
     BIT_SIZE = 6
 
 
-class Qint7(Qint):
+class Qint7(QintImp):
     BIT_SIZE = 7
 
 
-class Qint8(Qint):
+class Qint8(QintImp):
     BIT_SIZE = 8
 
 
-class Qint12(Qint):
+class Qint12(QintImp):
     BIT_SIZE = 12
 
 
-class Qint16(Qint):
+class Qint16(QintImp):
     BIT_SIZE = 16
 
 
 QINT_TYPES = [Qint2, Qint3, Qint4, Qint5, Qint6, Qint7, Qint8, Qint12, Qint16]
+
+# class _GetQintType:
+#     @property
+#     def __name__(self):
+#         return 'Qint' # I'm not sure this is correct
+
+#     def __getitem__(self, index):
+#         return eval(f"Qint{index}")
+
+
+class QintMeta(type):
+    def __getitem__(cls, params):
+        if isinstance(params, tuple) and len(params) == 1:
+            i = params
+            if isinstance(i, int) and i >= 2:
+                return f"Qint{i}"
+
+    # def __new__(cls, name, bases, dct):
+    #     return _GetQintType()
+
+
+class Qint(metaclass=QintMeta):
+    pass

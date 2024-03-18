@@ -23,10 +23,10 @@ pip install qlasskit
 For a quickstart, read the _quickstart_ and _examples_ notebooks from the documentation: [https://dakk.github.io/qlasskit](https://dakk.github.io/qlasskit).
 
 ```python
-from qlasskit import qlassf, Qint4 
+from qlasskit import qlassf, Qint 
 
 @qlassf
-def h(k: Qint4) -> bool:
+def h(k: Qint[4]) -> bool:
     h = True
     for i in range(4):
         h = h and k[i]
@@ -65,11 +65,11 @@ You can also use other functions inside a qlassf:
 
 ```python
 @qlassf
-def equal_8(n: Qint4) -> bool:
+def equal_8(n: Qint[4]) -> bool:
   return equal_8 == 8
 
 @qlassfa(defs=[equal_8])
-def f(n: Qint4) -> bool:
+def f(n: Qint[4]) -> bool:
   n = n+1 if equal_8(n) else n
   return n
 ```
@@ -78,13 +78,13 @@ Qlasskit supports complex data types, like tuples and fixed size lists:
 
 ```python
 @qlassf
-def f(a: Tuple[Qint8, Qint8]) -> Tuple[bool, bool]:
+def f(a: Tuple[Qint[8], Qint[8]]) -> Tuple[bool, bool]:
   return a[0] == 42, a[1] == 0
 ```
 
 ```python
 @qlassf
-def search(alist: Qlist[Qint2, 4], to_search: Qint2):
+def search(alist: Qlist[Qint[2], 4], to_search: Qint[2]):
   for x in alist:
     if x == to_search:
       return True

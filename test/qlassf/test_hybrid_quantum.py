@@ -29,14 +29,14 @@ class TestQlassfHybridQuantum(unittest.TestCase):
     # THIS IS NOT ALLOWED, since hybrid quantum is applicable only with gates that
     # operates on 1 qubit a possible solution is to implement QFT directly as hybrid function.
     # def test_qft(self):
-    #     f = "def test(a: Qint2) -> Qint2:\n\treturn Q.QFT(a)"
+    #     f = "def test(a: Qint[2]) -> Qint[2]:\n\treturn Q.QFT(a)"
     #     qf = qlassf(f, to_compile=False, uncompute=False)
     #     print(qf.expressions)
     #     count = qiskit_measure_and_count(qf.circuit().export(), 128)
     #     [self.assertEqual(x in count, True) for x in ["00", "11", "01", "11"]]
 
     def test_h_multi(self):
-        f = "def test(a: Qint2) -> Qint2:\n\treturn Q.H(a)"
+        f = "def test(a: Qint[2]) -> Qint[2]:\n\treturn Q.H(a)"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, uncompute=False)
         count = qiskit_measure_and_count(qf.circuit().export(), 128)
         [self.assertEqual(x in count, True) for x in ["00", "11", "01", "11"]]
@@ -49,7 +49,7 @@ class TestQlassfHybridQuantum(unittest.TestCase):
         self.assertEqual(len(count.keys()), 2)
 
     def test_h_and_add(self):
-        f = "def test(a: Qint2) -> Qint2:\n\ta = Q.H(a)\n\treturn a + 1"
+        f = "def test(a: Qint[2]) -> Qint[2]:\n\ta = Q.H(a)\n\treturn a + 1"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, uncompute=False)
         count = qiskit_measure_and_count(qf.circuit().export(), 128)
         [self.assertEqual(x in count, True) for x in ["1110", "0011", "1001", "0100"]]

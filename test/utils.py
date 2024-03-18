@@ -1,4 +1,4 @@
-# Copyright 2023 Davide Gessa
+# Copyright 2023-2024 Davide Gessa
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,8 +23,9 @@ from qiskit import QuantumCircuit, transpile
 from qiskit_aer import Aer, AerSimulator
 from sympy.logic.boolalg import gateinputcount
 
-from qlasskit import Qint, Qtype, const_to_qtype
+from qlasskit import Qtype, const_to_qtype
 from qlasskit.qcircuit import CNotSim, GateNotSimulableException
+from qlasskit.types.qint import QintImp
 
 COMPILATION_ENABLED = True
 
@@ -81,7 +82,7 @@ def test_not(a: bool) -> bool:
     return not a
 
 
-class Qint14(Qint):
+class Qint14(QintImp):
     BIT_SIZE = 14
 
 

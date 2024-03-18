@@ -26,7 +26,7 @@ from ..utils import ENABLED_COMPILERS, qiskit_measure_and_count
 class TestAlgoSimon(unittest.TestCase):
     def test_simon(self):
         f = """
-def hash(k: Qint4) -> Qint4:
+def hash(k: Qint[4]) -> Qint[4]:
     return k >> 3
 """
         qf = qlassf(f, compiler=self.compiler)

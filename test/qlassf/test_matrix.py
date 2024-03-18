@@ -59,7 +59,7 @@ class TestQlassfMatrix(unittest.TestCase):
 
     def test_matrix_iterator_var(self):
         f = (
-            "def test(a: Qmatrix[Qint2, 2, 2]) -> Qint2:\n\tc = 0\n\tfor x in a:\n"
+            "def test(a: Qmatrix[Qint[2], 2, 2]) -> Qint[2]:\n\tc = 0\n\tfor x in a:\n"
             "\t\tfor y in x:\n\t\t\tc += y\n\treturn c"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
@@ -67,7 +67,7 @@ class TestQlassfMatrix(unittest.TestCase):
 
     def test_matrix_iterator_list(self):
         f = (
-            "def test(a: Qint2) -> Qint2:\n\tc = 0\n\tfor x in [[1,2],[3,4]]:\n"
+            "def test(a: Qint[2]) -> Qint[2]:\n\tc = 0\n\tfor x in [[1,2],[3,4]]:\n"
             "\t\tfor y in x:\n\t\t\tc += y + a\n\treturn c"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
@@ -75,7 +75,7 @@ class TestQlassfMatrix(unittest.TestCase):
 
     def test_matrix_iterator_varlist(self):
         f = (
-            "def test(a: Qint2) -> Qint2:\n\tc = [[1,2],[3,4]]\n\tfor x in c:\n"
+            "def test(a: Qint[2]) -> Qint[2]:\n\tc = [[1,2],[3,4]]\n\tfor x in c:\n"
             "\t\tfor y in x:\n\t\t\ta += y\n\treturn a"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
@@ -83,7 +83,7 @@ class TestQlassfMatrix(unittest.TestCase):
 
     def test_matrix_len(self):
         f = (
-            "def test(a: Qmatrix[Qint2, 2, 2]) -> Qint2:\n\tc = 0\n"
+            "def test(a: Qmatrix[Qint[2], 2, 2]) -> Qint[2]:\n\tc = 0\n"
             "\tfor x in range(len(a)):\n\t\tc += a[x][0]\n\treturn c"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
@@ -93,13 +93,14 @@ class TestQlassfMatrix(unittest.TestCase):
     # (value=Name(id='a', ctx=Load()), slice=Name(id='i', ctx=Load()), ctx=Load())
     # def test_matrix_access2(self):
     #     f = (
-    #         "def test(a: Qmatrix[Qint2, 2, 2]) -> Qint2:\n\ti = 1\n\tj = i + 1\n\treturn a[i][i]"
+    #         "def test(a: Qmatrix[Qint[2], 2, 2]) -> Qint[2]:\n\ti = 1\n"
+    #           "\tj = i + 1\n\treturn a[i][i]"
     #     )
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)
 
     # def test_matrix_access_with_var(self):
-    #     f = "def test(a: Qint2) -> Qint2:\n\tc = [[1,2],[3,4]]\n\tb = c[a][a]\n\treturn b"
+    #     f = "def test(a: Qint[2]) -> Qint[2]:\n\tc = [[1,2],[3,4]]\n\tb = c[a][a]\n\treturn b"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)
 
@@ -108,7 +109,7 @@ class TestQlassfMatrix(unittest.TestCase):
     #     if self.compiler == "internal":
     #         return
 
-    #     f = ("def test(ab: Tuple[Qint2, Qint2]) -> Qint2:\n\tc = [1,2,3,2]\n\tai,bi = ab\n"
+    #     f = ("def test(ab: Tuple[Qint[2], Qint[2]]) -> Qint[2]:\n\tc = [1,2,3,2]\n\tai,bi = ab\n"
     #       "\td = c[ai] + c[bi]\n\treturn d")
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)
@@ -118,7 +119,7 @@ class TestQlassfMatrix(unittest.TestCase):
     #     if self.compiler == "internal":
     #         return
 
-    #     f = ("def test(ab: Tuple[Qint2, Qint2]) -> Qint2:\n\tc = [1,2,3,2]\n"
+    #     f = ("def test(ab: Tuple[Qint[2], Qint[2]]) -> Qint[2]:\n\tc = [1,2,3,2]\n"
     #       "\td = c[ab[0]] + c[ab[1]]\n\treturn d")
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)

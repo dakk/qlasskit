@@ -29,14 +29,15 @@ Boolean type.
 Qint
 ^^^^
 
-Unsigned integers; this type has subtypes for different Qint sizes (Qint2, Qint4, Qint8, Qint12, Qint16). 
+Unsigned integers; `Qint[2]` has 2 bits, and there other sizes are supported.
 Single bit of the Qint are accessible by the subscript operator `[]`.
-
+All the supported sizes have a constructor `Qintn()` defined in `qlasskit.types`.
 
 Qfixed
 ^^^^^^
 
 Fixed point rational number; `Qfixed[2,3]` has 2 bits for the integer part and 3 bits for the fractional.
+All the supported sizes have a constructor `Qfixedn_m()` defined in `qlasskit.types`.
 
 Qchar
 ^^^^^
@@ -53,14 +54,14 @@ List
 ^^^^
 
 Qlist[T, size] denotes a fixed-size list in qlasskit. 
-For example, the list `[1,2,3]` is typed as `Qlist[Qint2,3]`.
+For example, the list `[1,2,3]` is typed as `Qlist[Qint[2],3]`.
 
 
 Matrix
 ^^^^
 
 Qmatrix[T, m, n] denotes a fixed-size list in qlasskit. 
-For example, the matrix `[[1,2],[3,4]]` is typed as `Qmatrix[Qint2,2,2]`.
+For example, the matrix `[[1,2],[3,4]]` is typed as `Qmatrix[Qint[2],2,2]`.
 
 
 
@@ -243,7 +244,7 @@ Function def
 
 .. code-block:: python
 
-   def f(t: Qlist[Qint4,2]) -> Qint4:
+   def f(t: Qlist[Qint[4],2]) -> Qint[4]:
       return t[0] + t[1]
 
 
