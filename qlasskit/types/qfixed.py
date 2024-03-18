@@ -18,13 +18,13 @@ from sympy import Symbol
 from sympy.logic import And, Not, Or, false, true
 
 from . import _eq, _neq
-from .qint import Qint
+from .qint import QintImp
 from .qtype import Qtype, TExp, bin_to_bool_list, bool_list_to_bin
 
 
 class QfixedImp(float, Qtype):
     """Implementation of the Qfixed type
-    A number i.f is encoded in a Qfixed_2_4 as iiffff.
+    A number i.f is encoded in a Qfixed2_4 as iiffff.
     The interger part is in little endian like Qint
     Fractional part is obtained as binary fractions, by multiplying for
     2 and getting the integer part at each step.
@@ -97,7 +97,7 @@ class QfixedImp(float, Qtype):
     def comparable(cls, other_type=None) -> bool:
         return (
             other_type == cls
-            or issubclass(other_type, Qint)
+            or issubclass(other_type, QintImp)
             or issubclass(other_type, QfixedImp)
         )
 
@@ -200,7 +200,7 @@ class QfixedImp(float, Qtype):
         tl_v = QfixedImp._to_qint_repr(tleft)
         tr_v = QfixedImp._to_qint_repr(tright)
 
-        res = Qint.add((tleft[0], tl_v), (tright[0], tr_v))
+        res = QintImp.add((tleft[0], tl_v), (tright[0], tr_v))
 
         return (tleft[0], QfixedImp._from_qint_repr((tleft[0], res[1])))
 
@@ -216,10 +216,10 @@ class QfixedImp(float, Qtype):
         a = len(list(filter(lambda b: b is bool, tleft[1])))
         b = len(list(filter(lambda b: b is bool, tright[1])))
 
-        if a == 0 and issubclass(tleft[0], Qint):  # type: ignore
+        if a == 0 and issubclass(tleft[0], QintImp):  # type: ignore
             tconst = tleft
             top = tright
-        elif b == 0 and issubclass(tright[0], Qint):  # type: ignore
+        elif b == 0 and issubclass(tright[0], QintImp):  # type: ignore
             top = tleft
             tconst = tright
         else:
@@ -333,13 +333,31 @@ QFIXED_TYPES = [
     Qfixed4_6,
 ]
 
+# class _GetQfixedTypeInner:
+#     def __init__(self, base):
+#         self.base = base
+
+#     def __getitem__(self, index):
+#         return eval(f"Qfixed{self.base}_{index}")
+
+# class _GetQfixedType:
+#     @property
+#     def __name__(self):
+#         return 'Qfixed' # I'm not sure this is correct
+
+#     def __getitem__(self, index):
+#         return _GetQfixedTypeInner(index)
+
 
 class QfixedMeta(type):
     def __getitem__(cls, params):
         if isinstance(params, tuple) and len(params) == 2:
             i, f = params
             if isinstance(i, int) and isinstance(f, int) and i >= 0 and f >= 0:
-                return f"Qfixed{i}_{f}"  # TODO: transform to type
+                return f"Qfixed{i}_{f}"
+
+    # def __new__(cls, name, bases, dct):
+    #     return _GetQfixedType()
 
 
 class Qfixed(metaclass=QfixedMeta):

@@ -37,7 +37,7 @@ class TestQlassfParameters(unittest.TestCase):
 
     def test_bind_qint2(self):
         uqf = qlassf(
-            "def test(c: Parameter[Qint2], a: bool) -> Qint2: return c+1 if a else c",
+            "def test(c: Parameter[Qint[2]], a: bool) -> Qint[2]: return c+1 if a else c",
             to_compile=COMPILATION_ENABLED,
         )
         qf = uqf.bind(c=1)
@@ -46,7 +46,7 @@ class TestQlassfParameters(unittest.TestCase):
     def test_bind_multiple_qint2(self):
         uqf = qlassf(
             (
-                "def test(c: Parameter[Qint2], d: Parameter[Qint2], a: bool) -> Qint2: "
+                "def test(c: Parameter[Qint[2]], d: Parameter[Qint[2]], a: bool) -> Qint[2]: "
                 "return c+d if a else c+1"
             ),
             to_compile=COMPILATION_ENABLED,
@@ -64,7 +64,10 @@ class TestQlassfParameters(unittest.TestCase):
 
     def test_bind_tuple(self):
         uqf = qlassf(
-            "def test(c: Parameter[Tuple[bool, Qint2]]) -> Qint2: return c[1] if c[0] else c[1]+1",
+            (
+                "def test(c: Parameter[Tuple[bool, Qint[2]]]) -> Qint[2]:"
+                "return c[1] if c[0] else c[1]+1"
+            ),
             to_compile=COMPILATION_ENABLED,
         )
         qf = uqf.bind(c=(True, 2))

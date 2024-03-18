@@ -112,14 +112,14 @@ class TestCircuitBooleanOptimizer(unittest.TestCase):
         # print(g_total, g_simp)
 
     def test_circuit_boolean_optimizer_duplicate_qubit_bug(self):
-        s = "def qf(a: Qint4) -> Qint4:\n\treturn a * a"
+        s = "def qf(a: Qint[4]) -> Qint[4]:\n\treturn a * a"
         qf = qlassf(s)
         qc = qf.circuit()
         nc = circuit_boolean_optimizer(qc)
         self.assertEqual(qc.num_gates, nc.num_gates)
         self.assertEqual(qc.num_qubits, nc.num_qubits)
 
-        s = "def qf(a: Qint4) -> Qint4:\n\treturn a + 2 + 1 + 3"
+        s = "def qf(a: Qint[4]) -> Qint[4]:\n\treturn a + 2 + 1 + 3"
         qf = qlassf(s)
         qc = qf.circuit()
         nc = circuit_boolean_optimizer(qc)

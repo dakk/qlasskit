@@ -28,17 +28,17 @@ _ret = Symbol("_ret")
 @parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestForLoop(unittest.TestCase):
     def test_for_1it(self):
-        f = "def test(a: Qint2) -> Qint2:\n\tfor x in range(1):\n\t\ta += 1\n\treturn a"
+        f = "def test(a: Qint[2]) -> Qint[2]:\n\tfor x in range(1):\n\t\ta += 1\n\treturn a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_for_4it(self):
-        f = "def test(a: Qint2) -> Qint2:\n\tfor x in range(4):\n\t\ta += 1\n\treturn a"
+        f = "def test(a: Qint[2]) -> Qint[2]:\n\tfor x in range(4):\n\t\ta += 1\n\treturn a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
     def test_for_3it(self):
-        f = "def test(a: Qint2) -> Qint2:\n\tfor i in range(3):\n\t\ta += i\n\treturn a"
+        f = "def test(a: Qint[2]) -> Qint[2]:\n\tfor i in range(3):\n\t\ta += i\n\treturn a"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
@@ -61,7 +61,7 @@ class TestForLoop(unittest.TestCase):
 
     def test_for_cond(self):
         f = (
-            "def test(a: Qint2, b: bool) -> Qint2:\n\tfor i in range(2):\n"
+            "def test(a: Qint[2], b: bool) -> Qint[2]:\n\tfor i in range(2):\n"
             "\t\ta += (i if b else 1)\n\treturn a"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
@@ -69,7 +69,7 @@ class TestForLoop(unittest.TestCase):
 
     def test_for_sum(self):
         f = (
-            "def hash(k: Qint4) -> bool:\n\tz = 1\n\tfor i in range(3):\n"
+            "def hash(k: Qint[4]) -> bool:\n\tz = 1\n\tfor i in range(3):\n"
             "\t\tz += i\n\treturn z == 3"
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)

@@ -35,7 +35,7 @@ class TestCompilerRegression(unittest.TestCase):
         self.assertEqual(qc.num_qubits, 3)
 
     def test_3(self):
-        f = """def hash_simp(m: Qlist[Qint4, 2]) -> Qint8:
+        f = """def hash_simp(m: Qlist[Qint[4], 2]) -> Qint8:
     hv = 0
     for i in m:
         hv = ((hv << 4) ^ (hv >> 1) ^ i) & 0xff
