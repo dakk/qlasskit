@@ -20,7 +20,7 @@ import threading
 from typing import get_args
 
 from qiskit import QuantumCircuit, transpile
-from qiskit_aer import Aer, AerSimulator
+from qiskit_aer import AerSimulator
 from sympy.logic.boolalg import gateinputcount
 
 from qlasskit import Qtype, const_to_qtype
@@ -44,9 +44,9 @@ try:
 
     qsk_simulator = Qrack.get_backend("qasm_simulator")
 except:
-    qsk_simulator = Aer.get_backend("aer_simulator")
+    qsk_simulator = AerSimulator()
 
-qsk_simulator = Aer.get_backend("aer_simulator")
+qsk_simulator = AerSimulator()
 
 statistics = {"tests": 0, "qubits": 0, "gates": 0}
 
