@@ -73,6 +73,20 @@ def _replace_types_annotations(ann, arg=None):
             slice=_ituple,
         )
 
+    # Replace QintX with Qint[X]
+    if isinstance(ann, ast.Name) and ann.id[:4] == "Qint":
+        ann = ast.Subscript(
+            value=ast.Name(id="Qint", ctx=ast.Load()),
+            slice=ast.Constant(value=int(ann.id[4:])),
+        )
+
+    # Replace QfixedX with Qfixed[X]
+    if isinstance(ann, ast.Name) and ann.id[:6] == "Qfixed":
+        ann = ast.Subscript(
+            value=ast.Name(id="Qfixed", ctx=ast.Load()),
+            slice=ast.Constant(value=int(ann.id[6:])),
+        )
+
     # Replace Qlist[T,n] with Tuple[(T,)*n]
     if isinstance(ann, ast.Subscript) and ann.value.id == "Qlist":
         _elts = ann.slice.elts
@@ -471,10 +485,10 @@ class ASTRewriter(ast.NodeTransformer):
         return iterif(args)
 
     def __call_sum(self, node):
-        if len(node.args) == 1:
-            args = self.__unroll_arg(node.args[0])
-        else:
+        if len(node.args) != 1:
             raise Exception(f"sum() takes at most 1 argument ({len(node.args)} given)")
+
+        args = self.__unroll_arg(node.args[0])
 
         def iterif(arg_l):
             if len(arg_l) == 1:
@@ -485,25 +499,22 @@ class ASTRewriter(ast.NodeTransformer):
         return iterif(args)
 
     def __call_anyall(self, node):
-        if len(node.args) == 1:
-            args = self.__unroll_arg(node.args[0])
-        else:
+        if len(node.args) != 1:
             raise Exception(f"any() takes exactly 1 argument ({len(node.args)} given)")
 
+        args = self.__unroll_arg(node.args[0])
         op = ast.Or() if node.func.id == "any" else ast.And()
         return ast.BoolOp(op=op, values=args)
 
     def __call_chr(self, node):
         if len(node.args) != 1:
             raise Exception(f"chr() takes exactly 1 argument ({len(node.args)} given)")
-        args = self.__unroll_arg(node.args[0])
-        return args[0]
+        return node.args[0]
 
     def __call_ord(self, node):
         if len(node.args) != 1:
             raise Exception(f"ord() takes exactly 1 argument ({len(node.args)} given)")
-        args = self.__unroll_arg(node.args[0])
-        return args[0]
+        return node.args[0]
 
     def visit_Call(self, node):
         node.args = [self.visit(ar) for ar in node.args]

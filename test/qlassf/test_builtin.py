@@ -144,3 +144,28 @@ class TestQlassfBuiltinFunctions(unittest.TestCase):
     #     f = "def test(a: Qlist[bool, 3]) -> Qint[4]:\n\treturn range(len(a))"
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)
+
+    def test_int_of_int(self):
+        f = "def test(a: Qint[2]) -> Qint[4]:\n\treturn int(a) * 2"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_int_of_int2(self):
+        f = "def test(a: Qint2) -> Qint[4]:\n\treturn int(a) * 2"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_int_of_fixed(self):
+        f = "def test(a: Qfixed[2,2]) -> Qint[4]:\n\treturn int(a) * 2"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_float_of_fixed(self):
+        f = "def test(a: Qfixed[2,2]) -> Qfixed[2,2]:\n\treturn float(a)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_float_of_int(self):
+        f = "def test(a: Qint[2]) -> Qfixed[2,2]:\n\treturn float(a)"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)

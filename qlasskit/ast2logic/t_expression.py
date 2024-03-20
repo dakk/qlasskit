@@ -18,7 +18,7 @@ from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, Xor, false, true
 
 from ..boolquant import QuantumBooleanGate
-from ..types import Qbool, Qtype, TExp, const_to_qtype
+from ..types import Qbool, Qfixed, Qint, Qtype, TExp, const_to_qtype
 from . import Env, exceptions
 
 
@@ -313,19 +313,55 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             else:
                 return args[0][0], q_gate(*args_v)
 
-        if not hasattr(expr.func, "id"):
+        elif not hasattr(expr.func, "id"):
             raise exceptions.ExpressionNotHandledException(expr)
 
         # Typecast
-        if (
-            env.know_type(expr.func.id)
-            and len(expr.args) == 1
-            and isinstance(expr.args[0], ast.Constant)
-        ):
+        elif env.know_type(expr.func.id):
+            if len(expr.args) != 1:
+                raise Exception(
+                    f"{expr.func.id}() takes exactly 1 argument ({len(expr.args)} given)"
+                )
+
+            if not isinstance(expr.args[0], ast.Constant):
+                raise Exception(f"{expr.func.id}() accepts only constant values")
+
             return env.gettype(expr.func.id).const(expr.args[0].value)
 
+        # int()
+        elif expr.func.id == "int":
+            if len(expr.args) != 1:
+                raise Exception(
+                    f"int() takes exactly 1 argument ({len(expr.args)} given)"
+                )
+
+            (ta, te) = translate_expression(expr.args[0], env)
+            if ta.__name__[:4] == "Qint":  # type: ignore
+                return (ta, te)
+            elif ta.__name__[:6] == "Qfixed":  # type: ignore
+                ip = ta.integer_part((ta, te))  # type: ignore
+                return (Qint.type_for_size(len(ip)), ip)
+            else:
+                raise Exception(f"int() accepts only Qfixed and Qint: {ta} given")
+
+        # float()
+        elif expr.func.id == "float":
+            if len(expr.args) != 1:
+                raise Exception(
+                    f"float() takes exactly 1 argument ({len(expr.args)} given)"
+                )
+
+            (ta, te) = translate_expression(expr.args[0], env)
+            if ta.__name__[:6] == "Qfixed":  # type: ignore
+                return (ta, te)
+            elif ta.__name__[:4] == "Qint":  # type: ignore
+                tf = Qfixed.type_for_size(len(te))
+                return tf.fill((tf, te))
+            else:
+                raise Exception(f"float() accepts only Qfixed and Qint: {ta} given")
+
         # Known function
-        if env.know_function(expr.func.id):
+        elif env.know_function(expr.func.id):
             def_f = env.getdef(expr.func.id)
             args = [translate_expression(e, env) for e in expr.args]
 

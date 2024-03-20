@@ -205,6 +205,8 @@ Bultin functions:
 - `any(Tuple)`, `any(Qlist)`: returns True if any of the elemnts are True
 - `ord(Qchar)`: returns the integer value of the given Qchar
 - `chr(Qint)`: returns the char given its ascii code
+- `int(Qfixed | Qint)`: returns the integer part of a Qfixed 
+- `float(Qint | Qfixed)`: returns a Qfixed representing the Qint
 
 
 Statements 

@@ -361,4 +361,8 @@ class QfixedMeta(type):
 
 
 class Qfixed(metaclass=QfixedMeta):
-    pass
+    @staticmethod
+    def type_for_size(s: int):
+        for det_type in QFIXED_TYPES:
+            if det_type.BIT_SIZE_INTEGER == s:
+                return det_type
