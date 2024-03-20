@@ -98,6 +98,13 @@ class InternalCompiler(Compiler):
         elif expr in self.expqmap:
             return self.expqmap[expr]
 
+        # Special mappings sectiona
+        # Add here special expressions mappings to QC
+
+        # (a & b) ^ (a ^ b) & c => MCX(a,b,new), MCX(b,c,new)
+
+        # End of speccial mappings section
+
         elif isinstance(expr, Xor):
             if dest is None:
                 d = qc.get_free_ancilla()
