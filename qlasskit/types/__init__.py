@@ -23,7 +23,7 @@ def _neq(a, b):
 
 
 def _eq(a, b):
-    return Not(_neq(a, b))
+    return Not(Xor(a, b))
 
 
 def _half_adder(a, b):  # Carry x Sum
@@ -32,15 +32,15 @@ def _half_adder(a, b):  # Carry x Sum
 
 def _full_adder(c, a, b):  # Carry x Sum
     return (a & b) ^ (a ^ b) & c, Xor(Xor(a, b), c)
-
-    # from ..boolquant import H, CX, MCX
+    # from ..boolquant import Q
     # from sympy import Symbol
-    # o = Symbol('new_qubit')
-    # o = MCX(a, b, o)
-    # b = CX(a, b)
-    # o = MCX(b, c, o)
-    # c = CX(b,c)
-    # return c, o
+    # c_o = Symbol('carry')
+    # c_o = Q.MCX(a, b, c_o)
+    # b = Q.CX(a, b)
+    # c_o = Q.MCX(b, c, c_o)
+    # c = Q.CX(b, c)
+    # b = Q.CX(a, b)
+    # return c_o, c
 
 
 from .qtype import (  # noqa: F401, E402
