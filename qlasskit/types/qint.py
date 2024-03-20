@@ -296,4 +296,8 @@ class QintMeta(type):
 
 
 class Qint(metaclass=QintMeta):
-    pass
+    @staticmethod
+    def type_for_size(s: int):
+        for det_type in QINT_TYPES:
+            if det_type.BIT_SIZE == s:
+                return det_type
