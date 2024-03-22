@@ -1,6 +1,6 @@
 # Qlasskit
 
-![Logo](docs/source/_images/logo/header.png)
+![Logo](docs/source/_images/logo/header.png){:width="450px"}
 
 [![Unitary Fund](https://img.shields.io/badge/supported_by-Unitary_Fund-ffff00.svg)](https://unitary.fund)
 ![CI Status](https://github.com/dakk/qlasskit/actions/workflows/ci.yaml/badge.svg)
