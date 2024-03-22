@@ -94,6 +94,10 @@
 - [x] QUBO, Ising and BQM exporter
 - [x] Datatype: Char
 - [x] Simplification of circuits using boolean expressions decompilation (example notebook)
+- [x] Fixed type and operations
+- [x] Transform Qint* to generic type
+- [x] int() and float()
+
 
 ## Future features
 
@@ -106,11 +110,9 @@
 - [ ] Exponential
 - [ ] Builtin function: map
 - [ ] Datatype: Dict
-- [ ] Datatype: Float
 - [ ] Datatype: Enum
 - [ ] While loop
 - [ ] Recursion
-- [ ] Float arithmetic
 - [ ] Class support
 - [ ] QFT multiplier
 
