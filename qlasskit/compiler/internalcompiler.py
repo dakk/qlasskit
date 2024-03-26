@@ -32,14 +32,8 @@ class InternalCompiler(Compiler):
         self.expqmap = ExpQMap()
 
         # 1. We first add a qubit for every input bit
-        for arg in args:
-            for arg_b in arg.bitvec:
-                # qi =
-                qc.add_qubit(arg_b)
-                # qc.ancilla_lst.add(qi)
-
-                # TODO: this is redundant, since we also have qc[]
-                # self.expqmap[Symbol(arg_b)] = qi
+        input_symbols = [arg_b for arg in args for arg_b in arg.bitvec]
+        [qc.add_qubit(arg) for arg in input_symbols]
 
         # 2. We store here qubit index for the true/false value if required (constant return)
         a_true = None
@@ -63,12 +57,13 @@ class InternalCompiler(Compiler):
 
             # 3.2 If a qubit is mapped to another qubit (iff sym.name is a _ret)
             elif isinstance(symp_exp, Symbol) and sym.name.startswith("_ret"):
-                # 3.2.1 Xor mapping to a new qubit
-                iret = qc.add_qubit(sym.name)
-                qc.cx(qc[symp_exp.name], iret)
-
-                # TODO: the following solution reduce qubits by 8%!
-                # iret = qc[symp_exp.name]
+                # 3.2.1 Xor mapping to a new qubit if the expr is an input
+                if symp_exp.name in input_symbols:
+                    iret = qc.add_qubit(sym.name)
+                    qc.cx(qc[symp_exp.name], iret)
+                # 3.2.2 Remap otherwise
+                else:
+                    iret = qc[symp_exp.name]
 
             # 3.3 Self-not (a = ~a)
             elif (
