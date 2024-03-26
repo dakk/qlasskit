@@ -19,7 +19,7 @@ from sympy.logic import And, Not, Or, Xor
 from sympy.logic.boolalg import BooleanFalse, BooleanTrue
 from tweedledum.classical import LogicNetwork
 from tweedledum.ir import Qubit, rotation_angle
-from tweedledum.passes import parity_decomp
+from tweedledum.passes import gate_cancellation, linear_resynth, parity_decomp
 from tweedledum.synthesis import xag_synth
 
 from .. import QCircuit
@@ -101,6 +101,9 @@ class TweedledumCompiler(Compiler):
 
         sy = xag_synth(_logic_network)
         sy = parity_decomp(sy)
+        sy = gate_cancellation(sy)
+        sy = linear_resynth(sy)
+
         # print(sy)
 
         qc = QCircuit(sy.num_qubits(), native=sy)
