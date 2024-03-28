@@ -15,7 +15,7 @@
 import sys
 from typing import Any, List, Literal, Tuple
 
-from sympy.logic.boolalg import Boolean, Not
+from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue, Not
 
 if sys.version_info < (3, 11):
     from typing_extensions import TypeAlias
@@ -125,6 +125,18 @@ class Qtype:
             cls,
             v[1][: cls.BIT_SIZE],
         )  # type: ignore
+
+    @staticmethod
+    def is_const(v: TExp) -> bool:
+        """Return True if v is a constant"""
+        for el in v[1]:
+            if (
+                not type(el) is bool
+                and not isinstance(el, BooleanFalse)
+                and not isinstance(el, BooleanTrue)
+            ):
+                return False
+        return True
 
     # Comparators
 

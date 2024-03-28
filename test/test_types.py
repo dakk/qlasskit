@@ -15,7 +15,10 @@
 import unittest
 from typing import Tuple
 
-from qlasskit import Qint2, Qint4, Qlist
+from sympy import Symbol
+from sympy.logic import And
+
+from qlasskit import Qint2, Qint4, Qlist, Qtype
 from qlasskit.types import format_outcome, interpret_as_qtype
 
 
@@ -65,3 +68,10 @@ class TestTypes_interpret_as_type(unittest.TestCase):
     def test_interpret_tuple_bool(self):
         _out = interpret_as_qtype([True, True, False], Tuple[bool, bool, bool], 3)
         self.assertEqual(_out, (False, True, True))
+
+
+class TestTypes_Qtype(unittest.TestCase):
+    def test_is_const(self):
+        self.assertEqual(Qtype.is_const((bool, [False])), True)
+        self.assertEqual(Qtype.is_const((bool, [Symbol("a")])), False)
+        self.assertEqual(Qtype.is_const((bool, [And(False, False)])), True)
