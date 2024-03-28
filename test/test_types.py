@@ -15,10 +15,11 @@
 import unittest
 from typing import Tuple
 
+from parameterized import parameterized
 from sympy import Symbol
 from sympy.logic import And
 
-from qlasskit import Qint2, Qint4, Qlist, Qtype
+from qlasskit import Qint, Qint2, Qint4, Qlist, Qtype
 from qlasskit.types import format_outcome, interpret_as_qtype
 
 
@@ -71,7 +72,29 @@ class TestTypes_interpret_as_type(unittest.TestCase):
 
 
 class TestTypes_Qtype(unittest.TestCase):
-    def test_is_const(self):
-        self.assertEqual(Qtype.is_const((bool, [False])), True)
-        self.assertEqual(Qtype.is_const((bool, [Symbol("a")])), False)
-        self.assertEqual(Qtype.is_const((bool, [And(False, False)])), True)
+    @parameterized.expand(
+        [
+            ((bool, [False]), True),
+            ((bool, [Symbol("a")]), False),
+            ((bool, [And(False, False)]), True),
+            ((Qint[2], [False, False]), True),
+            ((Qint[2], [False, Symbol("a")]), False),
+        ]
+    )
+    def test_is_const(self, tval, res):
+        self.assertEqual(Qtype.is_const(tval), res)
+
+    @parameterized.expand(
+        [((Qint2, [True]), [True, False]), ((Qint2, [False, True]), [False, True])]
+    )
+    def test_fill(self, tval, res):
+        self.assertEqual(tval[0].fill(tval)[1], res)
+
+    @parameterized.expand(
+        [
+            ((Qint2, [True, False, False]), [True, False]),
+            ((Qint2, [False, True]), [False, True]),
+        ]
+    )
+    def test_crop(self, tval, res):
+        self.assertEqual(tval[0].crop(tval)[1], res)
