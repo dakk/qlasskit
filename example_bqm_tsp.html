@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>&lt;no title&gt; &mdash; qlasskit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=68902938" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/dark_mode_js/default_light.js?v=c2e647ce"></script>
+        <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Working with big circuits" href="example_big_circuit.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            qlasskit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Qlasskit</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_it_works.html">How it works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported.html">Supported python subset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exporter.html">Exporting to other frameworks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bqm.html">Binary Quadratic Model, Qubo &amp; Ising</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decompiler_and_optimizer.html">Decompiler and Circuit Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="example_grover.html">Grover search</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_subset.html">Grover search: subset problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_hash.html">Grover search: hash function preimage attack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_sudoku.html">Grover search: sudoku solver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_simon.html">Simon function periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_deutsch_jozsa.html">Deutsch Jozsa algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_unitary_of_f.html">Unitary of qlasskit function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_big_circuit.html">Working with big circuits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">qlasskit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">&lt;no title&gt;</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/example_bqm_tsp.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Encode the TSP using qlasskit and parameters</span>
+
+<span class="kn">from</span> <span class="nn">qlasskit</span> <span class="kn">import</span> <span class="n">qlassf</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">Qlist</span><span class="p">,</span> <span class="n">Qmatrix</span><span class="p">,</span> <span class="n">Qint</span>
+
+
+<span class="nd">@qlassf</span>
+<span class="k">def</span> <span class="nf">tsp</span><span class="p">(</span>
+    <span class="n">dst_matrix</span><span class="p">:</span> <span class="n">Parameter</span><span class="p">[</span><span class="n">Qmatrix</span><span class="p">[</span><span class="n">Qint</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]],</span> <span class="n">order</span><span class="p">:</span> <span class="n">Qlist</span><span class="p">[</span><span class="n">Qint</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">3</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Qint</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span>
+    <span class="n">dst_sum</span> <span class="o">=</span> <span class="n">Qint4</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">oim</span> <span class="o">=</span> <span class="n">order</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">oi</span> <span class="o">=</span> <span class="n">order</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">dst_sum</span> <span class="o">+=</span> <span class="n">dst_matrix</span><span class="p">[</span><span class="n">oim</span><span class="p">][</span><span class="n">oi</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">dst_sum</span>
+
+
+<span class="n">tsp_f</span> <span class="o">=</span> <span class="n">tsp</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">dst_matrix</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="n">tsp_f</span><span class="o">.</span><span class="n">expressions</span>
+<span class="c1"># bqm = tsp_f.to_bqm()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">Exception</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">16</span>
+<span class="g g-Whitespace">     </span><span class="mi">12</span>         <span class="n">dst_sum</span> <span class="o">+=</span> <span class="n">dst_matrix</span><span class="p">[</span><span class="n">oim</span><span class="p">][</span><span class="n">oi</span><span class="p">]</span>
+<span class="g g-Whitespace">     </span><span class="mi">13</span>     <span class="k">return</span> <span class="n">dst_sum</span>
+<span class="ne">---&gt; </span><span class="mi">16</span> <span class="n">tsp_f</span> <span class="o">=</span> <span class="n">tsp</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">dst_matrix</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="g g-Whitespace">     </span><span class="mi">17</span> <span class="n">tsp_f</span><span class="o">.</span><span class="n">expressions</span>
+<span class="g g-Whitespace">     </span><span class="mi">18</span> <span class="c1"># bqm = tsp_f.to_bqm()</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/qlasskit-0.1.18-py3.10.egg/qlasskit/qlassfun.py:110,</span> in <span class="ni">UnboundQlassf.bind</span><span class="nt">(self, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">106</span>         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;original_f is not available in python notebooks!&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">108</span>     <span class="n">original_f</span> <span class="o">=</span> <span class="n">orig</span>
+<span class="ne">--&gt; </span><span class="mi">110</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_translate</span><span class="p">(</span><span class="n">fun_ast</span><span class="p">,</span> <span class="n">original_f</span><span class="p">)</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/qlasskit-0.1.18-py3.10.egg/qlasskit/qlassfun.py:294,</span> in <span class="ni">QlassF.from_function.&lt;locals&gt;._do_translate</span><span class="nt">(fun_ast, original_f)</span>
+<span class="g g-Whitespace">    </span><span class="mi">293</span> <span class="k">def</span> <span class="nf">_do_translate</span><span class="p">(</span><span class="n">fun_ast</span><span class="p">,</span> <span class="n">original_f</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">294</span>     <span class="n">fun</span> <span class="o">=</span> <span class="n">ast2ast</span><span class="p">(</span><span class="n">fun_ast</span><span class="o">.</span><span class="n">body</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="g g-Whitespace">    </span><span class="mi">295</span>     <span class="n">fun_name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">fun_ret</span><span class="p">,</span> <span class="n">exps</span> <span class="o">=</span> <span class="n">translate_ast</span><span class="p">(</span><span class="n">fun</span><span class="p">,</span> <span class="n">types</span><span class="p">,</span> <span class="n">defs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">297</span>     <span class="n">exps</span> <span class="o">=</span> <span class="n">bool_optimizer</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">exps</span><span class="p">)</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/qlasskit-0.1.18-py3.10.egg/qlasskit/ast2ast.py:546,</span> in <span class="ni">ast2ast</span><span class="nt">(a_tree)</span>
+<span class="g g-Whitespace">    </span><span class="mi">543</span> <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">544</span>     <span class="n">a_tree</span> <span class="o">=</span> <span class="n">IndexReplacer</span><span class="p">()</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">a_tree</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">546</span> <span class="n">a_tree</span> <span class="o">=</span> <span class="n">ASTRewriter</span><span class="p">()</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">a_tree</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">547</span> <span class="c1"># print(ast.dump(a_tree))</span>
+<span class="g g-Whitespace">    </span><span class="mi">548</span> <span class="k">return</span> <span class="n">a_tree</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/lib/python3.10/ast.py:418,</span> in <span class="ni">NodeVisitor.visit</span><span class="nt">(self, node)</span>
+<span class="g g-Whitespace">    </span><span class="mi">416</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;visit_&#39;</span> <span class="o">+</span> <span class="n">node</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+<span class="g g-Whitespace">    </span><span class="mi">417</span> <span class="n">visitor</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">generic_visit</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">418</span> <span class="k">return</span> <span class="n">visitor</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/qlasskit-0.1.18-py3.10.egg/qlasskit/ast2ast.py:282,</span> in <span class="ni">ASTRewriter.visit_FunctionDef</span><span class="nt">(self, node)</span>
+<span class="g g-Whitespace">    </span><span class="mi">279</span> <span class="n">node</span><span class="o">.</span><span class="n">returns</span> <span class="o">=</span> <span class="n">_replace_types_annotations</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">returns</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">280</span> <span class="bp">self</span><span class="o">.</span><span class="n">ret</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">returns</span>
+<span class="ne">--&gt; </span><span class="mi">282</span> <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">generic_visit</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/lib/python3.10/ast.py:494,</span> in <span class="ni">NodeTransformer.generic_visit</span><span class="nt">(self, node)</span>
+<span class="g g-Whitespace">    </span><span class="mi">492</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">old_value</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">493</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">AST</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">494</span>         <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">495</span>         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">496</span>             <span class="k">continue</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/lib/python3.10/ast.py:418,</span> in <span class="ni">NodeVisitor.visit</span><span class="nt">(self, node)</span>
+<span class="g g-Whitespace">    </span><span class="mi">416</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;visit_&#39;</span> <span class="o">+</span> <span class="n">node</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+<span class="g g-Whitespace">    </span><span class="mi">417</span> <span class="n">visitor</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">generic_visit</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">418</span> <span class="k">return</span> <span class="n">visitor</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/qlasskit-0.1.18-py3.10.egg/qlasskit/ast2ast.py:433,</span> in <span class="ni">ASTRewriter.visit_For</span><span class="nt">(self, node)</span>
+<span class="g g-Whitespace">    </span><span class="mi">427</span>     <span class="n">rolls</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">flatten</span><span class="p">([</span><span class="n">tar_assign</span><span class="p">]))</span>
+<span class="g g-Whitespace">    </span><span class="mi">429</span>     <span class="n">new_body</span> <span class="o">=</span> <span class="p">[</span>
+<span class="g g-Whitespace">    </span><span class="mi">430</span>         <span class="n">NameValReplacer</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">_val</span><span class="p">)</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="g g-Whitespace">    </span><span class="mi">431</span>         <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">body</span>
+<span class="g g-Whitespace">    </span><span class="mi">432</span>     <span class="p">]</span>
+<span class="ne">--&gt; </span><span class="mi">433</span>     <span class="n">rolls</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">flatten</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">b</span><span class="p">))</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">new_body</span><span class="p">]))</span>
+<span class="g g-Whitespace">    </span><span class="mi">435</span> <span class="k">return</span> <span class="n">rolls</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/qlasskit-0.1.18-py3.10.egg/qlasskit/ast2ast.py:433,</span> in <span class="ni">&lt;listcomp&gt;</span><span class="nt">(.0)</span>
+<span class="g g-Whitespace">    </span><span class="mi">427</span>     <span class="n">rolls</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">flatten</span><span class="p">([</span><span class="n">tar_assign</span><span class="p">]))</span>
+<span class="g g-Whitespace">    </span><span class="mi">429</span>     <span class="n">new_body</span> <span class="o">=</span> <span class="p">[</span>
+<span class="g g-Whitespace">    </span><span class="mi">430</span>         <span class="n">NameValReplacer</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">_val</span><span class="p">)</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="g g-Whitespace">    </span><span class="mi">431</span>         <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">body</span>
+<span class="g g-Whitespace">    </span><span class="mi">432</span>     <span class="p">]</span>
+<span class="ne">--&gt; </span><span class="mi">433</span>     <span class="n">rolls</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">flatten</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">b</span><span class="p">))</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">new_body</span><span class="p">]))</span>
+<span class="g g-Whitespace">    </span><span class="mi">435</span> <span class="k">return</span> <span class="n">rolls</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/lib/python3.10/ast.py:418,</span> in <span class="ni">NodeVisitor.visit</span><span class="nt">(self, node)</span>
+<span class="g g-Whitespace">    </span><span class="mi">416</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;visit_&#39;</span> <span class="o">+</span> <span class="n">node</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+<span class="g g-Whitespace">    </span><span class="mi">417</span> <span class="n">visitor</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">generic_visit</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">418</span> <span class="k">return</span> <span class="n">visitor</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/qlasskit-0.1.18-py3.10.egg/qlasskit/ast2ast.py:359,</span> in <span class="ni">ASTRewriter.visit_AugAssign</span><span class="nt">(self, node)</span>
+<span class="g g-Whitespace">    </span><span class="mi">352</span> <span class="c1"># Reassigning an already present variable (use a temp variable)</span>
+<span class="g g-Whitespace">    </span><span class="mi">353</span> <span class="c1"># if node.target.id in self.env:</span>
+<span class="g g-Whitespace">    </span><span class="mi">354</span> <span class="n">new_targ</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;__</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ctx</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">Load</span><span class="p">())</span>
+<span class="g g-Whitespace">    </span><span class="mi">356</span> <span class="k">return</span> <span class="p">[</span>
+<span class="g g-Whitespace">    </span><span class="mi">357</span>     <span class="n">ast</span><span class="o">.</span><span class="n">Assign</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">358</span>         <span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="n">new_targ</span><span class="p">],</span>
+<span class="ne">--&gt; </span><span class="mi">359</span>         <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">360</span>             <span class="n">ast</span><span class="o">.</span><span class="n">BinOp</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">361</span>         <span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">362</span>     <span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">363</span>     <span class="n">ast</span><span class="o">.</span><span class="n">Assign</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">364</span>         <span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="p">],</span>
+<span class="g g-Whitespace">    </span><span class="mi">365</span>         <span class="n">value</span><span class="o">=</span><span class="n">new_targ</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">366</span>     <span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">367</span> <span class="p">]</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/lib/python3.10/ast.py:418,</span> in <span class="ni">NodeVisitor.visit</span><span class="nt">(self, node)</span>
+<span class="g g-Whitespace">    </span><span class="mi">416</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;visit_&#39;</span> <span class="o">+</span> <span class="n">node</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+<span class="g g-Whitespace">    </span><span class="mi">417</span> <span class="n">visitor</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">generic_visit</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">418</span> <span class="k">return</span> <span class="n">visitor</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/qlasskit-0.1.18-py3.10.egg/qlasskit/ast2ast.py:143,</span> in <span class="ni">ASTRewriter.generic_visit</span><span class="nt">(self, node)</span>
+<span class="g g-Whitespace">    </span><span class="mi">142</span> <span class="k">def</span> <span class="nf">generic_visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">143</span>     <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">generic_visit</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/lib/python3.10/ast.py:503,</span> in <span class="ni">NodeTransformer.generic_visit</span><span class="nt">(self, node)</span>
+<span class="g g-Whitespace">    </span><span class="mi">501</span>     <span class="n">old_value</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">new_values</span>
+<span class="g g-Whitespace">    </span><span class="mi">502</span> <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old_value</span><span class="p">,</span> <span class="n">AST</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">503</span>     <span class="n">new_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">old_value</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">504</span>     <span class="k">if</span> <span class="n">new_node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">505</span>         <span class="nb">delattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/lib/python3.10/ast.py:418,</span> in <span class="ni">NodeVisitor.visit</span><span class="nt">(self, node)</span>
+<span class="g g-Whitespace">    </span><span class="mi">416</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;visit_&#39;</span> <span class="o">+</span> <span class="n">node</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+<span class="g g-Whitespace">    </span><span class="mi">417</span> <span class="n">visitor</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">generic_visit</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">418</span> <span class="k">return</span> <span class="n">visitor</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/qlasskit-0.1.18-py3.10.egg/qlasskit/ast2ast.py:165,</span> in <span class="ni">ASTRewriter.visit_Subscript</span><span class="nt">(self, node)</span>
+<span class="g g-Whitespace">    </span><span class="mi">162</span>     <span class="n">tup</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
+<span class="g g-Whitespace">    </span><span class="mi">164</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tup</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Tuple</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">165</span>     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">166</span>         <span class="s2">&quot;Not a tuple in ast2ast visit subscript with not constant _sval: &quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">167</span>         <span class="o">+</span> <span class="n">ast</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">tup</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">168</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">170</span> <span class="n">elts</span> <span class="o">=</span> <span class="n">tup</span><span class="o">.</span><span class="n">elts</span>
+<span class="g g-Whitespace">    </span><span class="mi">172</span> <span class="n">ifex</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">IfExp</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">173</span>     <span class="n">test</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">Compare</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">174</span>         <span class="n">left</span><span class="o">=</span><span class="n">_sval</span><span class="p">,</span> <span class="n">ops</span><span class="o">=</span><span class="p">[</span><span class="n">ast</span><span class="o">.</span><span class="n">Eq</span><span class="p">()],</span> <span class="n">comparators</span><span class="o">=</span><span class="p">[</span><span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)]</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">177</span>     <span class="n">orelse</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">178</span> <span class="p">)</span>
+
+<span class="nn">Exception: Not a tuple</span> in <span class="ni">ast2ast visit subscript with not constant _sval: Subscript(value=Name(id=&#39;dst_matrix&#39;, ctx=Load()), slice=Name(id=&#39;oim&#39;, ctx=Load()), ctx=Load</span><span class="nt">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="example_big_circuit.html" class="btn btn-neutral float-left" title="Working with big circuits" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2024, Davide Gessa (dakk).</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
