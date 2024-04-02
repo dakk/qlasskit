@@ -28,8 +28,8 @@ def translate_argument(ann, env, base="") -> Arg:  # noqa: C901
             if isinstance(a.slice, ast.Constant):
                 t = f"{a.slice.value}"
             else:
-                t = "_".join(f"{e.value}" for e in a.slice.elts)
-            return f"{a.value.id}{t}"
+                t = "_".join(f"{e.value}" for e in a.slice.elts)  # type: ignore
+            return f"{a.value.id}{t}"  # type: ignore
         else:
             return a.id
 

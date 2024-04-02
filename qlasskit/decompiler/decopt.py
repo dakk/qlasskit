@@ -72,7 +72,7 @@ def circuit_boolean_optimizer(
             n_exps.append((s, e_symp.xreplace(emap)))
 
         # Create new circuit section using the compiler
-        symbols = qc.qubit_map.keys()
+        symbols = list(qc.qubit_map.keys())
 
         if preserve:
             symbols = list(map(lambda x: f"q{x}", preserve))

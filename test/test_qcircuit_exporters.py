@@ -225,5 +225,5 @@ class TestQCircuitExportQutip(unittest.TestCase):
 
         self.assertEqual(probabilities, [1])
 
-        for i in zip(states[0].data.toarray(), self.result):
+        for i in zip(states[0].data.to_array(), self.result):
             self.assertAlmostEqual(float(i[0][0]), i[1])

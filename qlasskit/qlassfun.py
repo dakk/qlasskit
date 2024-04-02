@@ -82,9 +82,9 @@ class UnboundQlassf:
 
         fun_ast.body[0].args.args = list(
             filter(
-                lambda arg: not (
+                lambda arg: not (  # type: ignore
                     isinstance(arg.annotation, ast.Subscript)
-                    and arg.annotation.value.id == "Parameter"
+                    and arg.annotation.value.id == "Parameter"  # type: ignore
                 ),
                 fun_ast.body[0].args.args,
             )

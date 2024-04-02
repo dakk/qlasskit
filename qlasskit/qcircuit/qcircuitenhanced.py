@@ -57,24 +57,24 @@ class QCircuitEnhanced(QCircuit):
 
     def remove_identities(self):
         """Remove identities from the circuit"""
-        result = []
+        result: List[gates.AppliedGate] = []
         i = 0
-        len_g = len(self.gates)
+        len_g = len(self.gates)  # type: ignore
         while i < len_g:
-            if i < (len_g - 1) and self.gates[i] == self.gates[i + 1]:
+            if i < (len_g - 1) and self.gates[i] == self.gates[i + 1]:  # type: ignore
                 if isinstance(result[-1][0], gates.Barrier):
                     result.pop()
                 i += 2
             elif (
                 i < (len_g - 2)
-                and self.gates[i] == self.gates[i + 2]
-                and isinstance(self.gates[i + 1][0], gates.Barrier)
+                and self.gates[i] == self.gates[i + 2]  # type: ignore
+                and isinstance(self.gates[i + 1][0], gates.Barrier)  # type: ignore
             ):
                 if isinstance(result[-1][0], gates.Barrier):
                     result.pop()
                 i += 3
             else:
-                result.append(self.gates[i])
+                result.append(self.gates[i])  # type: ignore
                 i += 1
 
         self.gates = result
@@ -133,7 +133,7 @@ class QCircuitEnhanced(QCircuit):
         uncomputed = set()
         new_gates_comp = []
 
-        for g, ws, p in reversed(self.gates_computed):
+        for g, ws, p in reversed(self.gates_computed):  # type: ignore
             if ws[-1] in self.marked_ancillas:
                 uncomputed.add(ws[-1])
                 self.append(g, ws, p)
