@@ -18,7 +18,7 @@ from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, Xor, false, true
 
 from ..boolquant import QuantumBooleanGate
-from ..types import Qbool, Qfixed, Qint, Qtype, TExp, const_to_qtype
+from ..types import Qbool, Qfixed, Qint, Qtype, TExp, TypeErrorException, const_to_qtype
 from . import Env, exceptions
 
 
@@ -107,7 +107,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         v_exps = [x[1] for x in vt_exps]
         for x in vt_exps:
             if x[0] != bool:
-                raise exceptions.TypeErrorException(x[0], bool)
+                raise TypeErrorException(x[0], bool)
 
         return (bool, unfold(v_exps, And if isinstance(expr.op, ast.And) else Or))
 
@@ -117,7 +117,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
         if isinstance(expr.op, ast.Not):
             if texp != bool:
-                raise exceptions.TypeErrorException(texp, bool)
+                raise TypeErrorException(texp, bool)
             return (bool, Not(exp))
 
         elif isinstance(expr.op, ast.Invert) and hasattr(texp, "bitwise_not"):
@@ -132,13 +132,13 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         te_false = translate_expression(expr.orelse, env)
 
         if te_test[0] != bool:
-            raise exceptions.TypeErrorException(te_test[0], bool)
+            raise TypeErrorException(te_test[0], bool)
 
         if te_true[0] != te_false[0]:
             if not hasattr(te_true[0], "BIT_SIZE") or not hasattr(
                 te_false[0], "BIT_SIZE"
             ):
-                raise exceptions.TypeErrorException(te_false[0], te_true[0])
+                raise TypeErrorException(te_false[0], te_true[0])
 
             if te_true[0].BIT_SIZE > te_false[0].BIT_SIZE:  # type: ignore
                 te_false = te_true[0].fill(te_false)  # type: ignore
@@ -169,7 +169,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
                 t, e = const_to_qtype(x.value)  # type: ignore
                 types.append(t)
                 values.append(e)
-            return types, values
+            return (Tuple[tuple(types)], values)
 
         q_value = const_to_qtype(expr.value)
 
@@ -203,7 +203,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             arg_l = get_args(tleft[0])
             arg_r = get_args(tcomp[0])
             if arg_l != arg_r:
-                raise exceptions.TypeErrorException(tleft[0], tcomp[0])
+                raise TypeErrorException(tleft[0], tcomp[0])
 
             if isinstance(expr.ops[0], ast.Eq):
                 op = Qbool.eq
@@ -227,7 +227,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
         elif issubclass(tleft[0], Qtype) and issubclass(tcomp[0], Qtype):  # type: ignore
             if not tleft[0].comparable(tcomp[0]):  # type: ignore
-                raise exceptions.TypeErrorException(tcomp[0], tleft[0])
+                raise TypeErrorException(tcomp[0], tleft[0])
             op_type = tleft[0]  # type: ignore
 
         # Call the comparator
@@ -367,7 +367,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
 
             # Check if args match function args and replace
             if len(args) != len(def_f[1]):
-                raise exceptions.TypeErrorException(args, def_f[1])
+                raise TypeErrorException(args, def_f[1])
 
             subs = {}
             for a, fa in zip(args, def_f[1]):

@@ -70,7 +70,7 @@ def exprs_to_quantum(
 ):
     args = []
     for s in symbols:
-        args.append(Arg(s, "bool", [s]))
+        args.append(Arg(s, bool, [s]))
     return to_quantum(
         name="",
         args=args,

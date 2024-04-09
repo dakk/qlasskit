@@ -17,9 +17,11 @@ from typing import List, Tuple
 from sympy import Symbol
 from sympy.logic.boolalg import Boolean
 
+from ..types import TType
+
 
 class Arg:
-    def __init__(self, name: str, ttype: object, bitvec: List[str]):
+    def __init__(self, name: str, ttype: TType, bitvec: List[str]):
         self.name = name
         self.ttype = ttype
         self.bitvec = bitvec

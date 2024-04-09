@@ -20,11 +20,6 @@ class OperationNotSupportedException(Exception):
         super().__init__(f"Operation '{op}' not supported by type {tt}")
 
 
-class TypeErrorException(Exception):
-    def __init__(self, got, excepted):
-        super().__init__(f"Got '{got}' excepted '{excepted}'")
-
-
 class NoReturnTypeException(Exception):
     def __init__(self):
         super().__init__("Return type is mandatory")

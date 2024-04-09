@@ -20,6 +20,7 @@ from .ast2logic import flatten
 
 class IndexReplacer(ast.NodeTransformer):
     """Replace Index with its content (for python < 3.9)"""
+
     def generic_visit(self, node):
         return super().generic_visit(node)
 
@@ -50,6 +51,7 @@ class IsNamePresent(ast.NodeTransformer):
 
 class NameValReplacer(ast.NodeTransformer):
     """Replace all Name with name_id with the given val"""
+
     def __init__(self, name_id, val):
         self.name_id = name_id
         self.val = val

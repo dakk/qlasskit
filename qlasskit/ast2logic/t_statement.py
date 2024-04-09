@@ -17,7 +17,7 @@ from typing import List, Tuple
 from sympy import Symbol
 from sympy.logic.boolalg import Boolean
 
-from ..types import TType
+from ..types import TType, TypeErrorException
 from . import Binding, Env, decompose_to_symbols, exceptions, translate_expression
 
 
@@ -78,7 +78,7 @@ def translate_statement(  # noqa: C901
         ):
             texp, vexp = ret_type.crop((texp, vexp))  # type: ignore
         elif texp != ret_type:
-            raise exceptions.TypeErrorException(texp, ret_type)
+            raise TypeErrorException(texp, ret_type)
 
         res = decompose_to_symbols(vexp, "_ret")
         env.bind(Binding("_ret", texp, [x[0] for x in res]))

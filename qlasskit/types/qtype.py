@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import sys
-from typing import Any, List, Literal, Tuple
+from typing import Any, List, Literal, Tuple, TypeVar, Union
 
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue, Not
 
@@ -22,8 +22,16 @@ if sys.version_info < (3, 11):
 else:
     from typing import TypeAlias
 
-TType: TypeAlias = object
+TType: TypeAlias = Union[type[bool], type["Qtype"], object]
 TExp: TypeAlias = Tuple[TType, Boolean]
+
+T = TypeVar("T")
+TGExp = Tuple[T, Boolean]
+
+
+class TypeErrorException(Exception):
+    def __init__(self, got, excepted):
+        super().__init__(f"Got '{got}' excepted '{excepted}'")
 
 
 def bin_to_bool_list(b: str, bit_size=None) -> List[bool]:
@@ -107,24 +115,24 @@ class Qtype:
     @classmethod
     def fill(cls, v: TExp) -> TExp:
         """Fill with leading false"""
-        if len(v[1]) >= cls.BIT_SIZE:  # type: ignore
+        if len(v[1]) >= cls.BIT_SIZE:
             return v
 
         return (
             cls,
-            v[1] + (cls.BIT_SIZE - len(v[1])) * [False],  # type: ignore
+            v[1] + (cls.BIT_SIZE - len(v[1])) * [False],
         )
 
     @classmethod
     def crop(cls, v: TExp) -> TExp:
         """Crop to right size"""
-        if len(v[1]) <= cls.BIT_SIZE:  # type: ignore
+        if len(v[1]) <= cls.BIT_SIZE:
             return v
 
         return (
             cls,
             v[1][: cls.BIT_SIZE],
-        )  # type: ignore
+        )
 
     @staticmethod
     def is_const(v: TExp) -> bool:

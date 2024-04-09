@@ -49,6 +49,7 @@ from .qtype import (  # noqa: F401, E402
     TType,
     bin_to_bool_list,
     bool_list_to_bin,
+    TypeErrorException,
 )
 from .qbool import Qbool  # noqa: F401, E402
 from .qlist import Qlist  # noqa: F401, E402
