@@ -169,7 +169,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
                 t, e = const_to_qtype(x.value)  # type: ignore
                 types.append(t)
                 values.append(e)
-            return (Tuple[tuple(types)], values)
+            return (Tuple[tuple(types)], values) # type: ignore
 
         q_value = const_to_qtype(expr.value)
 
@@ -184,7 +184,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         elts = [x[1] for x in telts]
         tlts = [x[0] for x in telts]
 
-        return (Tuple[tuple(tlts)], elts)
+        return (Tuple[tuple(tlts)], elts) # type: ignore
 
     # Compare operator
     elif isinstance(expr, ast.Compare):
