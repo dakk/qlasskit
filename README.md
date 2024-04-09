@@ -105,10 +105,6 @@ qf = test.bind(a=True)
 ```
 
 
-## Roadmap
-
-Read [TODO](TODO.md) for details about the roadmap and TODOs.
-
 ## Contributing
 
 Read [CONTRIBUTING](CONTRIBUTING.md) for details.
