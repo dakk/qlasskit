@@ -140,7 +140,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             ):
                 raise TypeErrorException(te_false[0], te_true[0])
 
-            if te_true[0].BIT_SIZE > te_false[0].BIT_SIZE:  # type: ignore
+            if te_true[0].BIT_SIZE > te_false[0].BIT_SIZE:
                 te_false = te_true[0].fill(te_false)  # type: ignore
             elif te_true[0].BIT_SIZE < te_false[0].BIT_SIZE:  # type: ignore
                 te_true = te_false[0].fill(te_true)  # type: ignore
@@ -169,7 +169,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
                 t, e = const_to_qtype(x.value)  # type: ignore
                 types.append(t)
                 values.append(e)
-            return (Tuple[tuple(types)], values) # type: ignore
+            return (Tuple[tuple(types)], values)  # type: ignore
 
         q_value = const_to_qtype(expr.value)
 
@@ -184,7 +184,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         elts = [x[1] for x in telts]
         tlts = [x[0] for x in telts]
 
-        return (Tuple[tuple(tlts)], elts) # type: ignore
+        return (Tuple[tuple(tlts)], elts)  # type: ignore
 
     # Compare operator
     elif isinstance(expr, ast.Compare):
@@ -336,10 +336,10 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
                 )
 
             (ta, te) = translate_expression(expr.args[0], env)
-            if ta.__name__[:4] == "Qint":  # type: ignore
+            if ta.__name__[:4] == "Qint":
                 return (ta, te)
-            elif ta.__name__[:6] == "Qfixed":  # type: ignore
-                ip = ta.integer_part((ta, te))  # type: ignore
+            elif ta.__name__[:6] == "Qfixed" and isinstance(ta, Qfixed):
+                ip = ta.integer_part((ta, te))
                 return (Qint.type_for_size(len(ip)), ip)
             else:
                 raise Exception(f"int() accepts only Qfixed and Qint: {ta} given")
@@ -352,9 +352,9 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
                 )
 
             (ta, te) = translate_expression(expr.args[0], env)
-            if ta.__name__[:6] == "Qfixed":  # type: ignore
+            if ta.__name__[:6] == "Qfixed":
                 return (ta, te)
-            elif ta.__name__[:4] == "Qint":  # type: ignore
+            elif ta.__name__[:4] == "Qint":
                 tf = Qfixed.type_for_size(len(te))
                 return tf.fill((tf, te))
             else:

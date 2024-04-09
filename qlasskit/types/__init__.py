@@ -175,7 +175,7 @@ def interpret_as_qtype(
 
     def _interpret(out, qtype, out_len):
         if hasattr(qtype, "from_bool"):
-            return qtype.from_bool(out[0:out_len])  # type: ignore
+            return qtype.from_bool(out[0:out_len])
         elif qtype == bool:
             return out[0]
         else:  # Tuple
