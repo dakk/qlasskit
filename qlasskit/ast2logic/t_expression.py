@@ -338,8 +338,8 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             (ta, te) = translate_expression(expr.args[0], env)
             if ta.__name__[:4] == "Qint":
                 return (ta, te)
-            elif ta.__name__[:6] == "Qfixed" and isinstance(ta, Qfixed):
-                ip = ta.integer_part((ta, te))
+            elif ta.__name__[:6] == "Qfixed":
+                ip = ta.integer_part((ta, te))  # type: ignore
                 return (Qint.type_for_size(len(ip)), ip)
             else:
                 raise Exception(f"int() accepts only Qfixed and Qint: {ta} given")

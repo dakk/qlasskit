@@ -151,7 +151,7 @@ class QintImp(int, Qtype):
             tright = tleft[0].fill(tright)
 
         elif len(tleft[1]) < len(tright[1]):
-            tleft = tright[0].fill(tleft) # type: ignore
+            tleft = tright[0].fill(tleft)  # type: ignore
 
         carry = False
         sums = []
@@ -159,7 +159,7 @@ class QintImp(int, Qtype):
             carry, sum = _full_adder(carry, x[0], x[1])
             sums.append(sum)
 
-        return (cls if cls.BIT_SIZE > tleft[0].BIT_SIZE else tleft[0], sums) # type: ignore
+        return (cls if cls.BIT_SIZE > tleft[0].BIT_SIZE else tleft[0], sums)  # type: ignore
 
     @classmethod
     def mul(cls, tleft: TExp, tright: TExp) -> TExp:  # noqa: C901
@@ -234,7 +234,7 @@ class QintImp(int, Qtype):
             tright = tleft[0].fill(tright)
 
         elif len(tleft[1]) < len(tright[1]):
-            tleft = tright[0].fill(tleft) # type: ignore
+            tleft = tright[0].fill(tleft)  # type: ignore
 
         newl = [op(a, b) for (a, b) in zip(tleft[1], tright[1])]
         return (tright[0], newl)

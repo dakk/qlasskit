@@ -209,7 +209,7 @@ class QfixedImp(float, Qtype):
             tright = tleft[0].fill(tright)
 
         elif len(tleft[1]) < len(tright[1]):
-            tleft = tright[0].fill(tleft) # type: ignore
+            tleft = tright[0].fill(tleft)  # type: ignore
 
         tl_v = QfixedImp._to_qint_repr(tleft)
         tr_v = QfixedImp._to_qint_repr(tright)

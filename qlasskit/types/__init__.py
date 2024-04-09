@@ -58,6 +58,7 @@ from .qmatrix import Qmatrix  # noqa: F401, E402
 from .qchar import Qchar  # noqa: F401, E402
 from .qfixed import (  # noqa: F401, E402
     Qfixed,
+    QfixedImp,
     Qfixed1_2,
     Qfixed1_3,
     Qfixed1_4,
@@ -75,6 +76,7 @@ from .qfixed import (  # noqa: F401, E402
 )
 from .qint import (  # noqa: F401, E402
     Qint,
+    QintImp,
     Qint2,
     Qint3,
     Qint4,
