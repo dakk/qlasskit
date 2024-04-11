@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
+from typing import List, cast
 
 from sympy import Symbol
 from sympy.logic import And, Not, Or, Xor, false, true
@@ -147,19 +147,22 @@ class QintImp(int, Qtype):
         if not issubclass(tright[0], Qtype):
             raise TypeErrorException(tright[0], Qtype)
 
-        if len(tleft[1]) > len(tright[1]):
-            tright = tleft[0].fill(tright)
+        tright_e = cast(Qtype, tright)
+        tleft_e = cast(Qtype, tleft)
 
-        elif len(tleft[1]) < len(tright[1]):
-            tleft = tright[0].fill(tleft)  # type: ignore
+        if len(tleft_e[1]) > len(tright_e[1]):
+            tright_e = tleft_e[0].fill(tright_e)
+
+        elif len(tleft_e[1]) < len(tright_e[1]):
+            tleft_e = tright_e[0].fill(tleft_e)
 
         carry = False
         sums = []
-        for x in zip(tleft[1], tright[1]):
+        for x in zip(tleft_e[1], tright_e[1]):
             carry, sum = _full_adder(carry, x[0], x[1])
             sums.append(sum)
 
-        return (cls if cls.BIT_SIZE > tleft[0].BIT_SIZE else tleft[0], sums)  # type: ignore
+        return (cls if cls.BIT_SIZE > tleft_e[0].BIT_SIZE else tleft_e[0], sums)
 
     @classmethod
     def mul(cls, tleft: TExp, tright: TExp) -> TExp:  # noqa: C901
@@ -230,14 +233,17 @@ class QintImp(int, Qtype):
         if not issubclass(tright[0], Qtype):
             raise TypeErrorException(tright[0], Qtype)
 
-        if len(tleft[1]) > len(tright[1]):
-            tright = tleft[0].fill(tright)
+        tright_e = cast(Qtype, tright)
+        tleft_e = cast(Qtype, tleft)
 
-        elif len(tleft[1]) < len(tright[1]):
-            tleft = tright[0].fill(tleft)  # type: ignore
+        if len(tleft_e[1]) > len(tright_e[1]):
+            tright_e = tleft_e[0].fill(tright_e)
 
-        newl = [op(a, b) for (a, b) in zip(tleft[1], tright[1])]
-        return (tright[0], newl)
+        elif len(tleft_e[1]) < len(tright_e[1]):
+            tleft_e = tright_e[0].fill(tleft_e)
+
+        newl = [op(a, b) for (a, b) in zip(tleft_e[1], tright_e[1])]
+        return (tright_e[0], newl)
 
     @classmethod
     def bitwise_xor(cls, tleft: TExp, tright: TExp) -> TExp:

@@ -114,9 +114,9 @@ def const_to_qtype(value: Any) -> TExp:
         return Qchar.const(value)
 
     elif isinstance(value, float):
-        for det_type in QFIXED_TYPES:  # type: ignore
-            v = det_type.const(value)  # type: ignore
-            c_val = det_type.from_bool(v[1])
+        for fdet_type in QFIXED_TYPES:
+            v = fdet_type.const(value)
+            c_val = fdet_type.from_bool(v[1])
             if c_val > value - 0.05 and c_val < value + 0.05:
                 return v
 

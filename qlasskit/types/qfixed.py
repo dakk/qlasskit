@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
+from typing import List, cast
 
 from sympy import Symbol
 from sympy.logic import And, Not, Or, false, true
@@ -126,7 +126,7 @@ class QfixedImp(float, Qtype):
         return v[1][v[0].BIT_SIZE_INTEGER :]
 
     @staticmethod
-    def _to_qint_repr(v: TExp):
+    def _to_qint_repr(v: Qtype):
         if not issubclass(v[0], QfixedImp):
             raise TypeErrorException(v[0], QfixedImp)
 
@@ -157,8 +157,16 @@ class QfixedImp(float, Qtype):
 
     @staticmethod
     def gt(tleft: TExp, tcomp: TExp) -> TExp:
-        tl_v = QfixedImp._to_qint_repr(tleft)
-        tc_v = QfixedImp._to_qint_repr(tcomp)
+        if not issubclass(tleft[0], QfixedImp):
+            raise TypeErrorException(tleft[0], QfixedImp)
+        if not issubclass(tcomp[0], QfixedImp):
+            raise TypeErrorException(tcomp[0], QfixedImp)
+
+        tleft_e = cast(Qtype, tleft)
+        tcomp_e = cast(Qtype, tcomp)
+
+        tl_v = QfixedImp._to_qint_repr(tleft_e)
+        tc_v = QfixedImp._to_qint_repr(tcomp_e)
 
         prev: List[Symbol] = []
 
@@ -205,18 +213,21 @@ class QfixedImp(float, Qtype):
         if not issubclass(tleft[0], QfixedImp):
             raise TypeErrorException(tleft[0], QfixedImp)
 
-        if len(tleft[1]) > len(tright[1]):
-            tright = tleft[0].fill(tright)
+        tright_e = cast(Qtype, tright)
+        tleft_e = cast(Qtype, tleft)
 
-        elif len(tleft[1]) < len(tright[1]):
-            tleft = tright[0].fill(tleft)  # type: ignore
+        if len(tleft_e[1]) > len(tright_e[1]):
+            tright_e = tleft_e[0].fill(tright_e)
 
-        tl_v = QfixedImp._to_qint_repr(tleft)
-        tr_v = QfixedImp._to_qint_repr(tright)
+        elif len(tleft_e[1]) < len(tright_e[1]):
+            tleft_e = tright_e[0].fill(tleft_e)
 
-        res = QintImp.add((tleft[0], tl_v), (tright[0], tr_v))
+        tl_v = QfixedImp._to_qint_repr(tleft_e)
+        tr_v = QfixedImp._to_qint_repr(tright_e)
 
-        return (tleft[0], QfixedImp._from_qint_repr((tleft[0], res[1])))
+        res = QintImp.add((tleft_e[0], tl_v), (tright_e[0], tr_v))
+
+        return (tleft_e[0], QfixedImp._from_qint_repr((tleft_e[0], res[1])))
 
     @classmethod
     def sub(cls, tleft: TExp, tright: TExp) -> TExp:
