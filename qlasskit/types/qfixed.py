@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
+from typing import List, cast
 
 from sympy import Symbol
 from sympy.logic import And, Not, Or, false, true
 
-from . import _eq, _neq
+from . import TypeErrorException, _eq, _neq
 from .qint import QintImp
 from .qtype import Qtype, TExp, bin_to_bool_list, bool_list_to_bin
 
@@ -112,23 +112,32 @@ class QfixedImp(float, Qtype):
     @staticmethod
     def integer_part(v: TExp):
         """Return the integer part of a TExp"""
-        return v[1][: v[0].BIT_SIZE_INTEGER]  # type: ignore
+        if not issubclass(v[0], QfixedImp):
+            raise TypeErrorException(v[0], QfixedImp)
+
+        return v[1][: v[0].BIT_SIZE_INTEGER]
 
     @staticmethod
     def fractional_part(v: TExp):
         """Return the fractional part of a TExp"""
-        return v[1][v[0].BIT_SIZE_INTEGER :]  # type: ignore
+        if not issubclass(v[0], QfixedImp):
+            raise TypeErrorException(v[0], QfixedImp)
+
+        return v[1][v[0].BIT_SIZE_INTEGER :]
 
     @staticmethod
-    def _to_qint_repr(v: TExp):
-        return v[0].fractional_part(v)[::-1] + v[0].integer_part(v)  # type: ignore
+    def _to_qint_repr(v: Qtype):
+        if not issubclass(v[0], QfixedImp):
+            raise TypeErrorException(v[0], QfixedImp)
+
+        return v[0].fractional_part(v)[::-1] + v[0].integer_part(v)
 
     @staticmethod
     def _from_qint_repr(v: TExp):
-        return (
-            v[1][v[0].BIT_SIZE_FRACTIONAL :]  # type: ignore
-            + v[1][: v[0].BIT_SIZE_FRACTIONAL][::-1]  # type: ignore
-        )
+        if not issubclass(v[0], QfixedImp):
+            raise TypeErrorException(v[0], QfixedImp)
+
+        return v[1][v[0].BIT_SIZE_FRACTIONAL :] + v[1][: v[0].BIT_SIZE_FRACTIONAL][::-1]
 
     @staticmethod
     def eq(tleft: TExp, tcomp: TExp) -> TExp:
@@ -148,8 +157,16 @@ class QfixedImp(float, Qtype):
 
     @staticmethod
     def gt(tleft: TExp, tcomp: TExp) -> TExp:
-        tl_v = QfixedImp._to_qint_repr(tleft)
-        tc_v = QfixedImp._to_qint_repr(tcomp)
+        if not issubclass(tleft[0], QfixedImp):
+            raise TypeErrorException(tleft[0], QfixedImp)
+        if not issubclass(tcomp[0], QfixedImp):
+            raise TypeErrorException(tcomp[0], QfixedImp)
+
+        tleft_e = cast(Qtype, tleft)
+        tcomp_e = cast(Qtype, tcomp)
+
+        tl_v = QfixedImp._to_qint_repr(tleft_e)
+        tc_v = QfixedImp._to_qint_repr(tcomp_e)
 
         prev: List[Symbol] = []
 
@@ -191,35 +208,53 @@ class QfixedImp(float, Qtype):
     @classmethod
     def add(cls, tleft: TExp, tright: TExp) -> TExp:
         """Add two Qfixed"""
-        if len(tleft[1]) > len(tright[1]):
-            tright = tleft[0].fill(tright)  # type: ignore
+        if not issubclass(tright[0], QfixedImp):
+            raise TypeErrorException(tright[0], QfixedImp)
+        if not issubclass(tleft[0], QfixedImp):
+            raise TypeErrorException(tleft[0], QfixedImp)
 
-        elif len(tleft[1]) < len(tright[1]):
-            tleft = tright[0].fill(tleft)  # type: ignore
+        tright_e = cast(Qtype, tright)
+        tleft_e = cast(Qtype, tleft)
 
-        tl_v = QfixedImp._to_qint_repr(tleft)
-        tr_v = QfixedImp._to_qint_repr(tright)
+        if len(tleft_e[1]) > len(tright_e[1]):
+            tright_e = tleft_e[0].fill(tright_e)
 
-        res = QintImp.add((tleft[0], tl_v), (tright[0], tr_v))
+        elif len(tleft_e[1]) < len(tright_e[1]):
+            tleft_e = tright_e[0].fill(tleft_e)
 
-        return (tleft[0], QfixedImp._from_qint_repr((tleft[0], res[1])))
+        tl_v = QfixedImp._to_qint_repr(tleft_e)
+        tr_v = QfixedImp._to_qint_repr(tright_e)
+
+        res = QintImp.add((tleft_e[0], tl_v), (tright_e[0], tr_v))
+
+        return (tleft_e[0], QfixedImp._from_qint_repr((tleft_e[0], res[1])))
 
     @classmethod
     def sub(cls, tleft: TExp, tright: TExp) -> TExp:
         """Subtract two Qfixed"""
-        an = cls.bitwise_not(cls.fill(tleft))  # type: ignore
-        su = cls.add(an, cls.fill(tright))  # type: ignore
-        return cls.bitwise_not(su)  # type: ignore
+        if not issubclass(tleft[0], Qtype):
+            raise TypeErrorException(tleft[0], Qtype)
+        if not issubclass(tright[0], Qtype):
+            raise TypeErrorException(tright[0], Qtype)
+
+        an = cls.bitwise_not(cls.fill(tleft))
+        su = cls.add(an, cls.fill(tright))
+        return cls.bitwise_not(su)
 
     @classmethod
     def mul(cls, tleft: TExp, tright: TExp) -> TExp:  # noqa: C901
+        if not issubclass(tright[0], Qtype):
+            raise TypeErrorException(tright[0], Qtype)
+        if not issubclass(tleft[0], Qtype):
+            raise TypeErrorException(tleft[0], Qtype)
+
         a = len(list(filter(lambda b: b is bool, tleft[1])))
         b = len(list(filter(lambda b: b is bool, tright[1])))
 
-        if a == 0 and issubclass(tleft[0], QintImp):  # type: ignore
+        if a == 0 and issubclass(tleft[0], QintImp):
             tconst = tleft
             top = tright
-        elif b == 0 and issubclass(tright[0], QintImp):  # type: ignore
+        elif b == 0 and issubclass(tright[0], QintImp):
             top = tleft
             tconst = tright
         else:

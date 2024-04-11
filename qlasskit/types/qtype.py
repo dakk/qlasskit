@@ -22,7 +22,12 @@ if sys.version_info < (3, 11):
 else:
     from typing import TypeAlias
 
-TType: TypeAlias = Union[type[bool], type["Qtype"], object]
+if sys.version_info >= (3, 9):
+    from builtins import type as Type
+else:
+    from typing import Type
+
+TType: TypeAlias = Union[Type[bool], Type["Qtype"]]
 TExp: TypeAlias = Tuple[TType, Boolean]
 
 T = TypeVar("T")

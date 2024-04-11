@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
+from typing import List, cast
 
 from sympy import Symbol
 from sympy.logic import And, Not, Or, Xor, false, true
 
-from . import _eq, _full_adder, _neq
+from . import TypeErrorException, _eq, _full_adder, _neq
 from .qtype import Qtype, TExp, bin_to_bool_list, bool_list_to_bin
 
 
@@ -142,19 +142,27 @@ class QintImp(int, Qtype):
     @classmethod
     def add(cls, tleft: TExp, tright: TExp) -> TExp:
         """Add two Qint"""
-        if len(tleft[1]) > len(tright[1]):
-            tright = tleft[0].fill(tright)  # type: ignore
+        if not issubclass(tleft[0], Qtype):
+            raise TypeErrorException(tleft[0], Qtype)
+        if not issubclass(tright[0], Qtype):
+            raise TypeErrorException(tright[0], Qtype)
 
-        elif len(tleft[1]) < len(tright[1]):
-            tleft = tright[0].fill(tleft)  # type: ignore
+        tright_e = cast(Qtype, tright)
+        tleft_e = cast(Qtype, tleft)
+
+        if len(tleft_e[1]) > len(tright_e[1]):
+            tright_e = tleft_e[0].fill(tright_e)
+
+        elif len(tleft_e[1]) < len(tright_e[1]):
+            tleft_e = tright_e[0].fill(tleft_e)
 
         carry = False
         sums = []
-        for x in zip(tleft[1], tright[1]):
+        for x in zip(tleft_e[1], tright_e[1]):
             carry, sum = _full_adder(carry, x[0], x[1])
             sums.append(sum)
 
-        return (cls if cls.BIT_SIZE > tleft[0].BIT_SIZE else tleft[0], sums)  # type: ignore
+        return (cls if cls.BIT_SIZE > tleft_e[0].BIT_SIZE else tleft_e[0], sums)
 
     @classmethod
     def mul(cls, tleft: TExp, tright: TExp) -> TExp:  # noqa: C901
@@ -202,27 +210,40 @@ class QintImp(int, Qtype):
     @classmethod
     def sub(cls, tleft: TExp, tright: TExp) -> TExp:
         """Subtract two Qint"""
-        an = cls.bitwise_not(cls.fill(tleft))  # type: ignore
-        su = cls.add(an, cls.fill(tright))  # type: ignore
-        return cls.bitwise_not(su)  # type: ignore
+        an = cls.bitwise_not(cls.fill(tleft))
+        su = cls.add(an, cls.fill(tright))
+        return cls.bitwise_not(su)
 
     @classmethod
     def mod(cls, tleft: TExp, tright: TExp) -> TExp:  # noqa: C901
         # x mod y = x & (y - 1)
-        tval = tright[0].sub(tright, tright[0].const(1))  # type: ignore
-        return tleft[0].bitwise_and(tleft, tval)  # type: ignore
+        if not issubclass(tleft[0], Qtype):
+            raise TypeErrorException(tleft[0], Qtype)
+        if not issubclass(tright[0], Qtype):
+            raise TypeErrorException(tright[0], Qtype)
+
+        tval = tright[0].sub(tright, tright[0].const(1))
+        return tleft[0].bitwise_and(tleft, tval)
 
     @classmethod
     def bitwise_generic(cls, op, tleft: TExp, tright: TExp) -> TExp:
         """Bitwise generic"""
-        if len(tleft[1]) > len(tright[1]):
-            tright = tleft[0].fill(tright)  # type: ignore
+        if not issubclass(tleft[0], Qtype):
+            raise TypeErrorException(tleft[0], Qtype)
+        if not issubclass(tright[0], Qtype):
+            raise TypeErrorException(tright[0], Qtype)
 
-        elif len(tleft[1]) < len(tright[1]):
-            tleft = tright[0].fill(tleft)  # type: ignore
+        tright_e = cast(Qtype, tright)
+        tleft_e = cast(Qtype, tleft)
 
-        newl = [op(a, b) for (a, b) in zip(tleft[1], tright[1])]
-        return (tright[0], newl)
+        if len(tleft_e[1]) > len(tright_e[1]):
+            tright_e = tleft_e[0].fill(tright_e)
+
+        elif len(tleft_e[1]) < len(tright_e[1]):
+            tleft_e = tright_e[0].fill(tleft_e)
+
+        newl = [op(a, b) for (a, b) in zip(tleft_e[1], tright_e[1])]
+        return (tright_e[0], newl)
 
     @classmethod
     def bitwise_xor(cls, tleft: TExp, tright: TExp) -> TExp:

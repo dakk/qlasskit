@@ -55,7 +55,7 @@ def translate_argument(ann, env, base="") -> Arg:  # noqa: C901
                 al.extend(inner_arg.bitvec)
             ind += 1
         ttypes_t = tuple(ttypes)
-        return Arg(base, Tuple[ttypes_t], al)
+        return Arg(base, Tuple[ttypes_t], al)  # type: ignore
 
     elif isinstance(ann, ast.Tuple):
         al = []
@@ -73,7 +73,7 @@ def translate_argument(ann, env, base="") -> Arg:  # noqa: C901
                 al.extend(inner_arg.bitvec)
             ind += 1
         ttypes_t = tuple(ttypes)
-        return Arg(base, Tuple[ttypes_t], al)
+        return Arg(base, Tuple[ttypes_t], al)  # type: ignore
 
     # Bool
     elif to_name(ann) == "bool":
