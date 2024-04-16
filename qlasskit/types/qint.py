@@ -164,9 +164,52 @@ class QintImp(int, Qtype):
 
         return (cls if cls.BIT_SIZE > tleft_e[0].BIT_SIZE else tleft_e[0], sums)
 
+    @staticmethod
+    def mul_even_const(t_num: TExp, t_const: TExp) -> TExp:
+        """Multiply by an even const using shift and add
+        (x << 3) + (x << 1) # Here 10*x is computed as x*2^3 + x*2
+        """
+        const = t_const[0].from_bool(t_const[1])
+
+        # Multiply t_num by the nearest n | 2**n < t_const
+        n = 1
+        while 2**n <= const:
+            n += 1
+        if 2**n > const:
+            n -= 1
+
+        t_num_r = t_num[0].crop(t_num[0].shift_left(t_num, n))
+
+        # Shift t_const by t_const - 2**n
+        r = const - 2**n
+        if r > 0:
+            # Add the shift result to t_num
+            res = t_num_r[0].add(
+                t_num_r, t_num[0].crop(t_num[0].shift_left(t_num, int(r / 2)))
+            )
+        else:
+            res = t_num_r
+
+        return res
+
     @classmethod
     def mul(cls, tleft: TExp, tright: TExp) -> TExp:  # noqa: C901
-        # TODO: use RGQFT multiplier
+        # Fill constants so explicit typecast is not needed
+        if cls.is_const(tleft):
+            tleft = tright[0].fill(tleft)
+
+        if cls.is_const(tright):
+            tright = tleft[0].fill(tright)
+
+        # If one operand is an even constant, use mul_even_const
+        if cls.is_const(tleft) or cls.is_const(tright):
+            t_num = tleft if cls.is_const(tright) else tright
+            t_const = tleft if cls.is_const(tleft) else tright
+            const = t_const[0].from_bool(t_const[1])
+
+            if const % 2 == 0:
+                return cls.mul_even_const(t_num, t_const)
+
         n = len(tleft[1])
         m = len(tright[1])
 

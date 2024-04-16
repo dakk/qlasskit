@@ -293,13 +293,27 @@ class TestQlassfInt(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
-    def test_shift_left(self):
-        f = "def test(n: Qint[2]) -> Qint[4]: return n << 1"
+    @parameterized.expand(
+        [
+            (1,),
+            (2,),
+            (3,),
+        ]
+    )
+    def test_shift_left(self, v):
+        f = f"def test(n: Qint[4]) -> Qint[4]: return n << {v}"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
-    def test_shift_right(self):
-        f = "def test(n: Qint[2]) -> Qint[4]: return n >> 1"
+    @parameterized.expand(
+        [
+            (1,),
+            (2,),
+            (3,),
+        ]
+    )
+    def test_shift_right(self, v):
+        f = f"def test(n: Qint[2]) -> Qint[4]: return n >> {v}"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
@@ -479,3 +493,21 @@ class TestQlassfIntMul(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
         self.assertEqual(qf.expressions[0][1], True)
+
+
+@parameterized_class(
+    ("ttype_i", "ttype_o", "const", "compiler"),
+    inject_parameterized_compilers(
+        [
+            (4, 4, 2),
+            (4, 4, 3),
+            (4, 4, 4),
+            (4, 4, 6),
+        ]
+    ),
+)
+class TestQlassfIntMulByConst(unittest.TestCase):
+    def test_mul(self):
+        f = f"def test(a: Qint[{self.ttype_i}]) -> Qint[{self.ttype_o}]: return a * {self.const}"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)

@@ -223,7 +223,7 @@ def compute_and_compare_results(cls, qf, test_original_f=True, test_qcircuit=Tru
 
     # circ_qi = qf.circuit().export("circuit", "qiskit")
 
-    # update_statistics(qf.circuit().num_qubits, qf.circuit().num_gates)
+    update_statistics(qf.circuit().num_qubits, qf.circuit().num_gates)
 
     # print(qf.expressions)
     # print(circ_qi.draw("text"))
