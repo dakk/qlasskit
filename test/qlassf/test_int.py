@@ -499,10 +499,12 @@ class TestQlassfIntMul(unittest.TestCase):
     ("ttype_i", "ttype_o", "const", "compiler"),
     inject_parameterized_compilers(
         [
-            (4, 4, 2),
-            (4, 4, 3),
-            (4, 4, 4),
-            (4, 4, 6),
+            (4, 6, 2),
+            (4, 6, 4),
+            (4, 6, 6),
+            (6, 8, 6),
+            (6, 8, 8),
+            (6, 8, 10),
         ]
     ),
 )
