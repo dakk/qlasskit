@@ -72,9 +72,9 @@ def _replace_types_annotations(ann, arg=None):
         isinstance(ann, ast.Subscript)
         and isinstance(ann.value, ast.Name)
         and ann.value.id == "Tuple"
-        and hasattr(ann.slice, 'elts')
+        and hasattr(ann.slice, "elts")
     ):
-        _elts = ann.slice.elts 
+        _elts = ann.slice.elts
         _ituple = ast.Tuple(elts=[_replace_types_annotations(el) for el in _elts])
 
         ann = ast.Subscript(
@@ -101,7 +101,7 @@ def _replace_types_annotations(ann, arg=None):
         isinstance(ann, ast.Subscript)
         and isinstance(ann.value, ast.Name)
         and ann.value.id == "Qlist"
-        and hasattr(ann.slice, 'elts')
+        and hasattr(ann.slice, "elts")
     ):
         _elts = ann.slice.elts
         _ituple = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[1].value)
@@ -116,7 +116,7 @@ def _replace_types_annotations(ann, arg=None):
         isinstance(ann, ast.Subscript)
         and isinstance(ann.value, ast.Name)
         and ann.value.id == "Qmatrix"
-        and hasattr(ann.slice, 'elts')
+        and hasattr(ann.slice, "elts")
     ):
         _elts = ann.slice.elts
         _ituple_row = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[2].value)
@@ -425,13 +425,13 @@ class ASTRewriter(ast.NodeTransformer):
             isinstance(iter, ast.Subscript)
             and isinstance(iter.value, ast.Name)
             and iter.value.id in self.env
-            and hasattr(iter.slice, 'value')
+            and hasattr(iter.slice, "value")
         ):
             if isinstance(self.env[iter.value.id], ast.Tuple):
                 new_iter = self.env[iter.value.id].elts[iter.slice.value]
 
-            elif isinstance(self.env[iter.value.id], ast.Subscript):  
-                _elts = self.env[iter.value.id].slice.elts[iter.slice.value]  
+            elif isinstance(self.env[iter.value.id], ast.Subscript):
+                _elts = self.env[iter.value.id].slice.elts[iter.slice.value]
 
                 if isinstance(_elts, ast.Tuple):
                     _elts = _elts.elts
@@ -439,8 +439,8 @@ class ASTRewriter(ast.NodeTransformer):
                 new_iter = [
                     ast.Subscript(
                         value=ast.Subscript(
-                            value=ast.Name(id=iter.value.id, ctx=ast.Load()), 
-                            slice=ast.Constant(value=iter.slice.value),  
+                            value=ast.Name(id=iter.value.id, ctx=ast.Load()),
+                            slice=ast.Constant(value=iter.slice.value),
                             ctx=ast.Load(),
                         ),
                         slice=ast.Constant(value=e),
@@ -448,8 +448,8 @@ class ASTRewriter(ast.NodeTransformer):
                     for e in range(len(_elts))
                 ]
             else:
-                new_iter = iter 
-                
+                new_iter = iter
+
             iter = new_iter
 
         if isinstance(iter, ast.Constant) and isinstance(iter.value, ast.Tuple):

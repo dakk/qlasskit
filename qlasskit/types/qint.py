@@ -18,7 +18,7 @@ from sympy import Symbol
 from sympy.logic import And, Not, Or, Xor, false, true
 
 from . import TypeErrorException, _eq, _full_adder, _neq
-from .qtype import Qtype, TExp, bin_to_bool_list, bool_list_to_bin
+from .qtype import Qtype, TExp, TType, bin_to_bool_list, bool_list_to_bin
 
 
 class QintImp(int, Qtype):
@@ -164,11 +164,85 @@ class QintImp(int, Qtype):
 
         return (cls if cls.BIT_SIZE > tleft_e[0].BIT_SIZE else tleft_e[0], sums)
 
+    @staticmethod
+    def mul_even_const(t_num: TExp, const: int, result_type: Qtype) -> TExp:
+        """Multiply by an even const using shift and add
+        (x << 3) + (x << 1) # Here 10*x is computed as x*2^3 + x*2
+        """
+
+        # Multiply t_num by the nearest n | 2**n < t_const
+        n = 1
+        while 2**n <= const:
+            n += 1
+        if 2**n > const:
+            n -= 1
+
+        result_ttype = cast(TType, result_type)
+
+        t_num_r = result_type.shift_left((result_ttype, t_num[1]), n)
+
+        # Shift t_const by t_const - 2**n
+        r = const - 2**n
+        if r > 0:
+            # Add the shift result to t_num
+            res = result_type.add(
+                (result_ttype, t_num_r[1]),
+                result_type.shift_left((result_ttype, t_num[1]), int(r / 2)),
+            )
+        else:
+            res = (result_ttype, t_num_r[1])
+
+        return res
+
     @classmethod
-    def mul(cls, tleft: TExp, tright: TExp) -> TExp:  # noqa: C901
-        # TODO: use RGQFT multiplier
+    def mul(cls, tleft_: TExp, tright_: TExp) -> TExp:  # noqa: C901
+        if not issubclass(tleft_[0], Qtype):
+            raise TypeErrorException(tleft_[0], Qtype)
+        if not issubclass(tright_[0], Qtype):
+            raise TypeErrorException(tright_[0], Qtype)
+
+        def __mul_sizing(n, m):
+            if (n + m) <= 2:
+                return Qint2
+            elif (n + m) > 2 and (n + m) <= 4:
+                return Qint4
+            elif (n + m) > 4 and (n + m) <= 6:
+                return Qint6
+            elif (n + m) > 6 and (n + m) <= 8:
+                return Qint8
+            elif (n + m) > 8 and (n + m) <= 12:
+                return Qint12
+            elif (n + m) > 12 and (n + m) <= 16:
+                return Qint16
+            elif (n + m) > 16:
+                return Qint16
+            else:
+                raise Exception(f"Mul result size is too big ({n+m})")
+
+        # Fill constants so explicit typecast is not needed
+        if cls.is_const(tleft_):
+            tleft = tright_[0].fill(tleft_)
+        else:
+            tleft = tleft_
+
+        if cls.is_const(tright_):
+            tright = tleft_[0].fill(tright_)
+        else:
+            tright = tright_
+
         n = len(tleft[1])
         m = len(tright[1])
+
+        # If one operand is an even constant, use mul_even_const
+        if cls.is_const(tleft) or cls.is_const(tright):
+            t_num = tleft if cls.is_const(tright) else tright
+            t_const = tleft if cls.is_const(tleft) else tright
+            const = cast(int, cast(Qtype, t_const[0]).from_bool(t_const[1]))
+
+            if const % 2 == 0:
+                t = __mul_sizing(n, m)
+                res = cls.mul_even_const(t_num, const, t)
+                return t.crop(t.fill(res))
 
         if n != m:
             raise Exception(f"Mul works only on same size Qint: {n} != {m}")
@@ -190,22 +264,8 @@ class QintImp(int, Qtype):
             if i + m < n + m:
                 product[i + m] = carry
 
-        if (n + m) <= 2:
-            return Qint2, product
-        elif (n + m) > 2 and (n + m) <= 4:
-            return Qint4, product
-        elif (n + m) > 4 and (n + m) <= 6:
-            return Qint6, product
-        elif (n + m) > 6 and (n + m) <= 8:
-            return Qint8, product
-        elif (n + m) > 8 and (n + m) <= 12:
-            return Qint12, product
-        elif (n + m) > 12 and (n + m) <= 16:
-            return Qint16, product
-        elif (n + m) > 16:
-            return Qint16.crop((Qint16, product))
-
-        raise Exception(f"Mul result size is too big ({n+m})")
+        t = __mul_sizing(n, m)
+        return t.crop(t.fill((t, product)))
 
     @classmethod
     def sub(cls, tleft: TExp, tright: TExp) -> TExp:

@@ -187,12 +187,18 @@ class Qtype:
     @staticmethod
     def shift_right(v: TExp, i: int = 1) -> TExp:
         """Apply a shift right"""
-        return (v[0], v[1][i:])
+        if not issubclass(v[0], Qtype):
+            raise TypeErrorException(v[0], Qtype)
+
+        return v[0].fill((v[0], v[1][i:]))
 
     @staticmethod
     def shift_left(v: TExp, i: int = 1) -> TExp:
         """Apply a shift left"""
-        return (v[0], [False] * i + v[1])
+        if not issubclass(v[0], Qtype):
+            raise TypeErrorException(v[0], Qtype)
+
+        return v[0].crop((v[0], [False] * i + v[1]))
 
     @staticmethod
     def add(tleft: TExp, tright: TExp) -> TExp:
