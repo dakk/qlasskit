@@ -357,7 +357,6 @@ class QCircuit:
             Exception: If the specified framework is not supported.
 
         """
-
         if framework == "qiskit":
             from .exporter_qiskit import QiskitExporter
 
@@ -392,3 +391,80 @@ class QCircuit:
         else:
             qc = self.export("circuit", "qiskit")
             print(qc.draw("text"))
+
+    def zx_simplify(self):
+        try:
+            import math
+
+            import pyzx
+        except:
+            raise Exception("Install pyzx to perform `zx_simplify`: `pip install pyzx`")
+
+        zc = pyzx.Circuit(qubit_amount=self.num_qubits)
+
+        for g, w, p in self.gates:
+            if (
+                isinstance(g, gates.MCX)
+                or isinstance(g, gates.CX)
+                or (isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.X))
+            ):
+                if len(w) == 3:
+                    zc.add_gate("TOF", *w)
+                elif len(w) == 2:
+                    zc.add_gate("CNOT", *w)
+                else:
+                    raise Exception("MCX not handled")
+
+            elif isinstance(g, gates.X):
+                zc.add_gate("NOT", *w)
+
+            else:
+                raise Exception(f"Gate not handled for pyzx exporter: {g.__name__}")
+
+        g = zc.to_graph()
+        pyzx.simplify.full_reduce(g)
+        g.normalize()
+        zc2 = pyzx.extract_circuit(g.copy())
+
+        l_gates = []
+        for g in zc2.gates:
+            w = []
+            phase = None
+
+            if hasattr(g, "control"):
+                w.append(g.control)
+            if hasattr(g, "ctrl1"):
+                w.append(g.ctrl1)
+            if hasattr(g, "ctrl2"):
+                w.append(g.ctrl2)
+            if hasattr(g, "target"):
+                w.append(g.target)
+
+            if hasattr(g, "phase"):
+                phase = float(g.phase) * math.pi
+
+            elif hasattr(g, "phases"):
+                raise Exception("zx_simplify: multiple phases not handled", g.phases)
+
+            if hasattr(g, "adjoint") and g.adjoint:
+                raise Exception("zx_simplify: adjoint not handled")
+
+            if isinstance(g, pyzx.gates.NOT):
+                l_gates.append(gates.apply(gates.X(), w, phase))
+            elif isinstance(g, pyzx.gates.CZ):
+                l_gates.append(gates.apply(gates.CZ(), w, phase))
+            elif isinstance(g, pyzx.gates.T):
+                l_gates.append(gates.apply(gates.T(), w, phase))
+            elif isinstance(g, pyzx.gates.CNOT):
+                l_gates.append(gates.apply(gates.CX(), w, phase))
+            elif isinstance(g, pyzx.gates.HAD):
+                l_gates.append(gates.apply(gates.H(), w, phase))
+            elif isinstance(g, pyzx.gates.ZPhase):
+                l_gates.append(gates.apply(gates.RZ(), w, phase))
+            elif isinstance(g, pyzx.gates.Tofolli):
+                l_gates.append(gates.apply(gates.CCX(), w, phase))
+            else:
+                raise Exception("not handled", g)
+
+        self.gates = l_gates
+        self.gates_computed = []
