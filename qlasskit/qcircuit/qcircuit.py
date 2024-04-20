@@ -418,6 +418,9 @@ class QCircuit:
             elif isinstance(g, gates.X):
                 zc.add_gate("NOT", *w)
 
+            elif isinstance(g, gates.H):
+                zc.add_gate("H", *w)
+
             else:
                 raise Exception(f"Gate not handled for pyzx exporter: {g.__name__}")
 

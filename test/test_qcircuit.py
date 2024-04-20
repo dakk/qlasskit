@@ -151,3 +151,11 @@ class TestQCircuitQFT(unittest.TestCase):
 
         counts = qiskit_measure_and_count(qc.export("circuit", "qiskit"), shots=1024)
         self.assertEqual(counts, {"000": 1024})
+
+class TestQCircuitZXSimplify(unittest.TestCase):
+    def test_qft(self):
+        qc = QCircuit(3)
+        qc.qft([0, 1, 2])
+        
+        qc.zx_simplify()
+        print(qc.export().draw())
