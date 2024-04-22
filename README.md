@@ -18,6 +18,10 @@ Qlasskit implements circuit / gate exporters for Qiskit, Cirq, Qasm, Sympy and P
 Qlasskit also support exporting to Binary Quadratic Models (bqm, ising and qubo) ready to be used in
 quantum annealers, ising machines, simulators, etc.
 
+
+![Transformations](docs/source/_images/trasformations/qlasskit_transformations.png)
+
+
 ```bash
 pip install qlasskit
 ```
