@@ -277,6 +277,9 @@ class ASTRewriter(ast.NodeTransformer):
 
             if target_0id[0:2] == "__" and target_0id not in self.env:
                 orelse_inner = ast.Name(id=target_0id[2:])
+            elif target_0id[0 : len("_iftarg")] == "_iftarg":
+                if_l.append(b)
+                continue
             else:
                 orelse_inner = ast.Name(id=target_0id)
 

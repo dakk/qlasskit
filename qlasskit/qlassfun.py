@@ -291,7 +291,9 @@ class QlassF(QCircuitWrapper):
         original_f = eval(fun_ast.body[0].name) if isinstance(f, str) else f
 
         def _do_translate(fun_ast, original_f):
+            # print(ast.dump(fun_ast, indent=4))
             fun = ast2ast(fun_ast.body[0])
+            # print(ast.dump(fun, indent=4))
             fun_name, args, fun_ret, exps = translate_ast(fun, types, defs)
 
             exps = bool_optimizer.apply(exps)

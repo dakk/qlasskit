@@ -60,6 +60,19 @@ class TestQlassfIfThenElse(unittest.TestCase):
         qf = qlassf(f, compiler=self.compiler, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
 
+    def test_elif(self):
+        f = (
+            "def test(a: Qint2, b: bool) -> bool:\n"
+            + "\td = False\n"
+            + "\tif a == 0:\n"
+            + "\t\td = not b\n"
+            + "\telif a == 1:\n"
+            + "\t\td = b\n"
+            + "\treturn d"
+        )
+        qf = qlassf(f, compiler=self.compiler, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
     def test_if_for(self):
         f = (
             "def test(a: bool, b: bool) -> bool:\n"

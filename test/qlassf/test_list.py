@@ -118,7 +118,7 @@ class TestQlassfList(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
-    # TODO: handle this case
+    # TODO: handle this case (won't fix right now #42)
     # def test_list_of_tuple_of_tuple(self):
     #     f = (
     #         "def oracle(io_list: Parameter[List[Tuple[Tuple[bool, bool], bool]]],"

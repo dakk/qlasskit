@@ -26,7 +26,7 @@ def translate_statement(  # noqa: C901
 ) -> Tuple[List[Tuple[str, Boolean]], Env]:
     """Parse a statement"""
     # match stmt:
-    if isinstance(stmt, ast.If):
+    if isinstance(stmt, ast.If):  # This is handled by ast2ast
         # Translate test expression, body & orelse statements
         # test = translate_expression(stmt.test, env)
 
