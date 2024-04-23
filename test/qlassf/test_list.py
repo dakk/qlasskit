@@ -117,3 +117,32 @@ class TestQlassfList(unittest.TestCase):
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
+
+    # TODO: handle this case
+    # def test_list_of_tuple_of_tuple(self):
+    #     f = (
+    #         "def oracle(io_list: Parameter[List[Tuple[Tuple[bool, bool], bool]]],"
+    #         " f: bool) -> bool:\n"
+    #         "\tv = True\n"
+    #         "\tfor io in io_list:\n"
+    #         "\t\tv = v and (io[0][0] and io[0][1]) == io[1]\n"
+    #         "\treturn v"
+    #     )
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+    #     ttable = [(False, False), (True, False), (False, True), (True, True)]
+    #     tt = list(map(lambda e: (e, e[0] or e[1]), ttable))
+    #     qfb = qf.bind(io_list=tt)
+    #     print(qfb)
+
+    def test_list_of_tuple_of_tuple2(self):
+        f = (
+            "def oracle(io_list: Parameter[List[Tuple[bool, bool, bool]]], f: bool) -> bool:\n"
+            "\tv = True\n"
+            "\tfor io in io_list:\n"
+            "\t\tv = v and (io[0] or io[1]) == io[2]\n"
+            "\treturn v"
+        )
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        ttable = [(False, False), (True, False), (False, True), (True, True)]
+        tt = list(map(lambda e: (e[0], e[1], e[0] or e[1]), ttable))
+        qf.bind(io_list=tt)

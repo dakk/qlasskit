@@ -59,6 +59,14 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
                 return unroll_subscripts(sub.value, st)
             elif isinstance(sub.value, ast.Name):
                 return f"{sub.value.id}.{_sval.value}.{st}"
+            elif (
+                isinstance(sub.value, ast.Constant)
+                and hasattr(sub.value.value, "elts")
+                and isinstance(sub.slice, ast.Constant)
+            ):
+                return sub.value.value.elts[sub.slice.value]
+            else:
+                raise Exception(f"Subscript not handled: {ast.dump(sub)} {st}")
 
         _sval = expr.slice  # type: ignore
 
@@ -69,6 +77,9 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             sn = f"{expr.value.id}.{_sval.value}"
         else:
             sn = unroll_subscripts(expr, "")
+
+        if isinstance(sn, ast.Constant):
+            return (bool, sn.value)
 
         if sn.split(".")[0] not in env:
             raise exceptions.UnboundException(sn, env)
