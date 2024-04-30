@@ -22,7 +22,8 @@ from qlasskit.bqm import decode_samples
 # pyqubo doesn't work on python 3.12
 DISABLE_BQM_TESTS = False
 
-if os.getenv("GITHUB_ACTIONS") and sys.version_info.minor == 12:
+# os.getenv("GITHUB_ACTIONS") and 
+if sys.version_info.major == 3 and sys.version_info.minor == 12:
     try:
         import dimod
         import neal
