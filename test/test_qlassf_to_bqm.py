@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
+# import os
 import sys
 import unittest
 
@@ -46,10 +46,9 @@ def sample_qubo(qubo):
 
 
 class TestQlassfToBQM(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(cls):
         if DISABLE_BQM_TESTS:
-            cls.skipTest("Skipping this test")
+            self.skipTest("Skipping this test")
 
     def test_to_bqm_1(self):
         f = "def test(a: bool) -> bool:\n\treturn not a"
