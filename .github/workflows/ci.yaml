@@ -30,7 +30,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.11"] #, "3.12"]
+        python-version: ["3.11", "3.12"]
 
     steps:
     - name: Checkout
@@ -50,16 +50,16 @@ jobs:
   linters:
     runs-on: ubuntu-latest
     container:
-      image: cimg/python:3.8
+      image: cimg/python:3.11
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Set up Python 3.8
+    - name: Set up Python 3.11
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: 3.11
 
     - name: Install dependencies
       run: pip install tox
@@ -70,16 +70,16 @@ jobs:
   # coverage:
   #   runs-on: ubuntu-latest
   #   container:
-  #     image: cimg/python:3.8
+  #     image: cimg/python:3.11
 
   #   steps:
   #   - name: Checkout
   #     uses: actions/checkout@v2
 
-  #   - name: Set up Python 3.8
+  #   - name: Set up Python 3.11
   #     uses: actions/setup-python@v2
   #     with:
-  #       python-version: 3.8
+  #       python-version: 3.11
 
   #   - name: Install dependencies
   #     run: pip install tox
@@ -90,16 +90,16 @@ jobs:
   typecheck:
     runs-on: ubuntu-latest
     container:
-      image: cimg/python:3.8
+      image: cimg/python:3.11
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Set up Python 3.8
+    - name: Set up Python 3.11
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: 3.11
 
     - name: Install dependencies
       run: pip install tox
