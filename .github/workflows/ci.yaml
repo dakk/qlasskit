@@ -48,7 +48,7 @@ jobs:
       run: tox -c tox_no_tweedledum.ini -e unit-tests
 
 
-  unit-tests-notw:
+  unit-tests-notw-nopyqubo:
     runs-on: ubuntu-latest
 
     strategy:
