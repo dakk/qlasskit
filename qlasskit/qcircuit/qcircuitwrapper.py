@@ -33,7 +33,7 @@ class QCircuitWrapper:
     @property
     def num_qubits(self):
         return self._qcircuit.num_qubits
-    
+
     @property
     def num_gates(self):
         return self._qcircuit.num_gates
