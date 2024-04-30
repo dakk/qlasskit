@@ -22,7 +22,7 @@ from qlasskit.bqm import decode_samples
 # pyqubo doesn't work on python 3.12
 DISABLE_BQM_TESTS = False
 
-# os.getenv("GITHUB_ACTIONS") and 
+# os.getenv("GITHUB_ACTIONS") and
 if sys.version_info.major == 3 and sys.version_info.minor == 12:
     try:
         import dimod
@@ -46,7 +46,7 @@ def sample_qubo(qubo):
 
 
 class TestQlassfToBQM(unittest.TestCase):
-    def setUp(cls):
+    def setUp(self):
         if DISABLE_BQM_TESTS:
             self.skipTest("Skipping this test")
 
