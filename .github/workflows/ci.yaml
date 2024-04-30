@@ -65,7 +65,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
-      run: pip install tox
+      run: |
+        pip install setuptools
+        pip install tox
 
     - name: Run tests
       run: tox -c tox_no_tw_and_pyqubo.ini -e unit-tests
