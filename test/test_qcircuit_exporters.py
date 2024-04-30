@@ -25,7 +25,6 @@ from qlasskit.qcircuit import QCircuit
 
 from .utils import qiskit_measure_and_count
 
-
 def cx_circuit():
     qc = QCircuit()
     a, b = qc.add_qubit(), qc.add_qubit()
