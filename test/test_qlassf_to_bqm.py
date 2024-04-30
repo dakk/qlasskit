@@ -13,9 +13,21 @@
 # limitations under the License.
 
 import unittest
+import sys 
 
-import dimod
-import neal
+
+# pyqubo doesn't work on python 3.12
+DISABLE_BQM_TESTS = False 
+
+if os.getenv("GITHUB_ACTIONS") and sys.version_info.minor == 12:
+    try:
+        import dimod
+        import neal
+    except:
+        DISABLE_BQM_TESTS = True
+else:
+    import dimod
+    import neal
 
 from qlasskit import qlassf
 from qlasskit.bqm import decode_samples
@@ -33,6 +45,11 @@ def sample_qubo(qubo):
 
 
 class TestQlassfToBQM(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if DISABLE_BQM_TESTS:
+            cls.skipTest("Skipping this test")
+            
     def test_to_bqm_1(self):
         f = "def test(a: bool) -> bool:\n\treturn not a"
         qf = qlassf(f, to_compile=False)
