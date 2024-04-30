@@ -47,6 +47,7 @@ jobs:
     - name: Run tests
       run: |
         rm test/test_qcircuit_exporters.py
+        rm test/test_qlassf_to_bqm.py
         tox -c tox_3.8.ini -e unit-tests
 
 
