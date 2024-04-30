@@ -30,7 +30,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.11"]
 
     steps:
     - name: Checkout
@@ -46,6 +46,29 @@ jobs:
 
     - name: Run tests
       run: tox -c tox_no_tweedledum.ini -e unit-tests
+
+
+  unit-tests-notw:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: pip install tox
+
+    - name: Run tests
+      run: tox -c tox_no_tw_and_pyqubo.ini -e unit-tests
 
   linters:
     runs-on: ubuntu-latest
