@@ -183,12 +183,12 @@ class TestQCircuitExportCirq(unittest.TestCase):
 
 
 @parameterized_class(
-    ("qc", "result"),
+    ("qc", "result", "wires"),
     [
-        (cx_circuit(), [0, 0, 0, 1]),
-        (ccx_circuit(), [0, 0, 0, 0, 0, 0, 0, 1]),
-        (bell_circuit(), [0.5, 0, 0, 0.5]),
-        (qft_circuit(), [1, 0, 0, 0, 0, 0, 0, 0]),
+        (cx_circuit(), [0, 0, 0, 1], 2),
+        (ccx_circuit(), [0, 0, 0, 0, 0, 0, 0, 1], 3),
+        (bell_circuit(), [0.5, 0, 0, 0.5], 2),
+        (qft_circuit(), [1, 0, 0, 0, 0, 0, 0, 0], 3),
     ],
 )
 class TestQCircuitExportPennylane(unittest.TestCase):
@@ -196,7 +196,7 @@ class TestQCircuitExportPennylane(unittest.TestCase):
         tape = self.qc.export("circuit", "pennylane")
         tape = qml.tape.QuantumTape(tape.operations, [qml.probs()])
 
-        dev = qml.device("default.qubit", wires=3)
+        dev = qml.device("default.qubit", wires=self.wires)
         r = qml.execute([tape], dev, gradient_fn=None)
 
         self.assertEqual(len(r[0]), len(self.result))
