@@ -135,6 +135,6 @@ This software is licensed with [Apache License 2.0](LICENSE).
 
 Davide Gessa (dakk)
 - <https://twitter.com/dagide>
-- <https://mastodon.social/@dagide >
+- <https://mastodon.social/@dagide>
 - <https://dakk.github.io/>
 - <https://medium.com/@dakk>
