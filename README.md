@@ -7,6 +7,7 @@
 ![PyPI - Version](https://img.shields.io/pypi/v/qlasskit)
 ![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-blue)
 [![Discord](https://img.shields.io/badge/qlasskit-Discord-yellow?logo=discord&logoColor=f5f5f5)](https://discord.com/channels/764231928676089909/1210279373865754624)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/05acc06af76848028183a66448217d91)](https://app.codacy.com/gh/dakk/qlasskit/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Downloads](https://static.pepy.tech/badge/qlasskit)](https://pepy.tech/project/qlasskit)
 
 
@@ -133,7 +134,7 @@ This software is licensed with [Apache License 2.0](LICENSE).
 ## About the author
 
 Davide Gessa (dakk)
-- https://twitter.com/dagide
-- https://mastodon.social/@dagide 
-- https://dakk.github.io/
-- https://medium.com/@dakk
+- <https://twitter.com/dagide>
+- <https://mastodon.social/@dagide >
+- <https://dakk.github.io/>
+- <https://medium.com/@dakk>
