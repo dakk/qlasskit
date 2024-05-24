@@ -31,7 +31,7 @@ exclude_patterns = []
 autodoc_source_dir = [
     "../qlasskit",
 ]
-pygments_style = "lightbulb"
+pygments_style = "github-dark"
 default_dark_mode = False
 
 # -- Options for HTML output -------------------------------------------------
