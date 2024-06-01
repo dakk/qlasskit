@@ -579,6 +579,20 @@ class ASTRewriter(ast.NodeTransformer):
         else:
             return node
 
+    def visit_BinOp(self, node):
+        # ensure the right operand is an ast.constant and a positive integer
+        if isinstance(node.op, ast.Pow):
+            if (
+                isinstance(node.right, ast.Constant)
+                and isinstance(node.right.value, int)
+                and node.right.value > 0
+            ):
+                # generate a series of multiplications
+                result = node.left
+                for _ in range(node.right.value - 1):
+                    result = ast.BinOp(left=result, op=ast.Mult(), right=node.left)
+                return result
+        return super().generic_visit(node)
 
 def ast2ast(a_tree):
     # print(ast.dump(a_tree))
