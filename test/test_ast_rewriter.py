@@ -58,7 +58,3 @@ class TestASTRewriter(unittest.TestCase):
         expected_tree = ast.parse(expected_code)
 
         self.assertEqual(ast.dump(new_tree), ast.dump(expected_tree))
-
-
-if __name__ == "__main__":
-    unittest.main()
