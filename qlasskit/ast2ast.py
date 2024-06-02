@@ -580,18 +580,18 @@ class ASTRewriter(ast.NodeTransformer):
             return node
 
     def visit_BinOp(self, node):
-        # ensure the right operand is an ast.constant and a positive integer
+        # rewrite the ** operator to be a series of multiplications
         if isinstance(node.op, ast.Pow):
             if (
                 isinstance(node.right, ast.Constant)
                 and isinstance(node.right.value, int)
                 and node.right.value > 0
             ):
-                # generate a series of multiplications
                 result = node.left
                 for _ in range(node.right.value - 1):
                     result = ast.BinOp(left=result, op=ast.Mult(), right=node.left)
                 return result
+
             elif (
                 isinstance(node.right, ast.Constant)
                 and isinstance(node.right.value, int)
