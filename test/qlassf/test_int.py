@@ -513,3 +513,21 @@ class TestQlassfIntMulByConst(unittest.TestCase):
         f = f"def test(a: Qint[{self.ttype_i}]) -> Qint[{self.ttype_o}]: return a * {self.const}"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
+
+
+@parameterized_class(("compiler"), ENABLED_COMPILERS)
+class TestQlassfIntPow(unittest.TestCase):
+    def test_pow_const(self):
+        f = "def test(a: Qint[4]) -> Qint[8]: return a ** 2"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_pow_const2(self):
+        f = "def test(a: Qint[4]) -> Qint[16]: return a ** 3"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
+    def test_pow_zero(self):
+        f = "def test(a: Qint[4]) -> Qint[4]: return a ** 0"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
