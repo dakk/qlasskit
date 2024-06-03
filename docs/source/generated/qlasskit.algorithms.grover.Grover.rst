@@ -32,6 +32,7 @@
    
       ~Grover.input_qubits
       ~Grover.input_size
+      ~Grover.num_gates
       ~Grover.num_qubits
       ~Grover.output_qubits
       ~Grover.output_size

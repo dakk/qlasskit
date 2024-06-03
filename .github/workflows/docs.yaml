@@ -17,7 +17,7 @@ jobs:
           python-version: '3.10' 
       - name: Install dependencies
         run: |
-          pip install sphinx sphinx_rtd_theme sphinx_rtd_dark_mode myst_nb
+          pip install sphinx==7.2.6 sphinx_rtd_theme sphinx_rtd_dark_mode myst_nb
           pip install pennylane==0.33.1 pennylane-lightning==0.33.1
           pip install sympy qiskit[visualization] qiskit-aer matplotlib pylatexenc cirq pyqubo
           python setup.py install

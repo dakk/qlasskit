@@ -32,6 +32,7 @@
    
       ~QCircuitWrapper.input_qubits
       ~QCircuitWrapper.input_size
+      ~QCircuitWrapper.num_gates
       ~QCircuitWrapper.num_qubits
       ~QCircuitWrapper.output_qubits
       ~QCircuitWrapper.output_size
