@@ -233,6 +233,15 @@ class QintImp(int, Qtype):
         n = len(tleft[1])
         m = len(tright[1])
 
+        # Ensure same size operands by padding the smaller one
+        if n != m:
+            if n > m:
+                tright = tleft_[0].fill(tright)
+                m = n
+            else:
+                tleft = tright_[0].fill(tleft)
+                n = m
+
         # If one operand is an even constant, use mul_even_const
         if cls.is_const(tleft) or cls.is_const(tright):
             t_num = tleft if cls.is_const(tright) else tright
@@ -244,8 +253,8 @@ class QintImp(int, Qtype):
                 res = cls.mul_even_const(t_num, const, t)
                 return t.crop(t.fill(res))
 
-        if n != m:
-            raise Exception(f"Mul works only on same size Qint: {n} != {m}")
+        # if n != m:
+        #     raise Exception(f"Mul works only on same size Qint: {n} != {m}")
 
         product = [False] * (n + m)
 
