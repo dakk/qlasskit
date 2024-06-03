@@ -290,6 +290,8 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             return tright[0].bitwise_and(tleft, tright)  # type: ignore
         elif isinstance(expr.op, ast.BitOr) and hasattr(tleft[0], "bitwise_or"):
             return tleft[0].bitwise_or(tleft, tright)
+        elif isinstance(expr.op, ast.FloorDiv) and hasattr(tleft[0], "floor_div"):
+            return tleft[0].floor_div(tleft, tright)
         elif (
             isinstance(expr.op, ast.LShift)
             and hasattr(tleft[0], "shift_left")

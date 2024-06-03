@@ -316,6 +316,33 @@ class QintImp(int, Qtype):
     @classmethod
     def bitwise_or(cls, tleft: TExp, tright: TExp) -> TExp:
         return cls.bitwise_generic(Or, tleft, tright)
+    
+    @classmethod
+    def floor_div(cls, tleft: TExp, tright: TExp) -> TExp:
+        """Perform floor division on two Qint"""
+        if not issubclass(tleft[0], Qtype):
+            raise TypeErrorException(tleft[0], Qtype)
+        if not issubclass(tright[0], Qtype):
+            raise TypeErrorException(tright[0], Qtype)
+
+        tright_e = cast(Qtype, tright)
+        tleft_e = cast(Qtype, tleft)
+
+        if len(tleft_e[1]) != len(tright_e[1]):
+            raise ValueError("Operands must be of the same bit length")
+
+        n = len(tleft_e[1])
+        Q = 0
+        R = 0
+
+        for i in range(n):
+            R <<= 1
+            R |= tleft_e[1][i]
+            if R >= tright_e[1]:
+                R ^= tright_e[1]
+                Q |= (1 << (n - 1 - i))
+
+        return (cls, Q)
 
 
 class Qint2(QintImp):
