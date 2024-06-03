@@ -60,9 +60,9 @@ class TestASTRewriter(unittest.TestCase):
         new_tree = self.rewriter.visit(tree)
 
         self.assertTrue(len(new_tree.body), 1)
-        self.assertTrue(isinstance(new_tree.body[0]), ast.Assign)
-        self.assertTrue(isinstance(new_tree.body[0].value), ast.Constant)
-        self.assertEqual(isinstance(new_tree.body[0].value.value), 1)
+        self.assertTrue(isinstance(new_tree.body[0], ast.Assign))
+        self.assertTrue(isinstance(new_tree.body[0].value, ast.Constant))
+        self.assertEqual(new_tree.body[0].value.value, 1)
 
         if sys.version_info >= (3, 9):
             expected_code = "a = 1"
