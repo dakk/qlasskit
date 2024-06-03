@@ -186,6 +186,10 @@ Bin Op
 
 .. code-block:: python
 
+   a ** b
+
+.. code-block:: python
+
    a % 2
 
 .. note::
