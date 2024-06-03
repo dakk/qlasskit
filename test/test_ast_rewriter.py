@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import ast
+import sys
 import unittest
 
 from qlasskit.ast2ast import ASTRewriter
@@ -58,7 +59,12 @@ class TestASTRewriter(unittest.TestCase):
         tree = ast.parse(code)
         new_tree = self.rewriter.visit(tree)
 
-        expected_code = "a = 1"
-        expected_tree = ast.parse(expected_code)
+        self.assertTrue(len(new_tree.body), 1)
+        self.assertTrue(isinstance(new_tree.body[0]), ast.Assign)
+        self.assertTrue(isinstance(new_tree.body[0].value), ast.Constant)
+        self.assertEqual(isinstance(new_tree.body[0].value.value), 1)
 
-        self.assertEqual(ast.dump(new_tree), ast.dump(expected_tree))
+        if sys.version_info >= (3, 9):
+            expected_code = "a = 1"
+            expected_tree = ast.parse(expected_code)
+            self.assertEqual(ast.dump(new_tree), ast.dump(expected_tree))
