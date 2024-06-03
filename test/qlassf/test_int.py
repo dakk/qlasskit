@@ -60,11 +60,11 @@ class TestQint(unittest.TestCase):
         self.assertEqual(c, Qint2(1).export("binary"))
     
     def test_floor_div(self):
-        self.assertEqual(Qint2(10).floor_div(Qint2(3)), Qint2(3))
-        self.assertEqual(Qint2(20).floor_div(Qint2(4)), Qint2(5))
-        self.assertEqual(Qint2(5).floor_div(Qint2(2)), Qint2(2))
+        self.assertEqual(Qint2.floor_div(Qint2(10), Qint2(3)), Qint2(3))
+        self.assertEqual(Qint2.floor_div(Qint2(20), Qint2(4)), Qint2(5))
+        self.assertEqual(Qint2.floor_div(Qint2(5), Qint2(2)), Qint2(2))
         with self.assertRaises(ZeroDivisionError):
-            Qint2(10).floor_div(Qint2(0))
+            Qint2.floor_div(Qint2(10), Qint2(0))
 
 
 @parameterized_class(
