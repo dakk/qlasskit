@@ -227,3 +227,7 @@ class Qtype:
     @staticmethod
     def bitwise_or(tleft: TExp, tright: TExp) -> TExp:
         raise Exception("abstract bitwise_or")
+
+    @staticmethod
+    def floor_div(tleft: TExp, tright: TExp) -> TExp:
+        raise Exception("abstract floor_div")
