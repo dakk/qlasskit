@@ -17,7 +17,8 @@ jobs:
           python-version: '3.11' 
       - name: Install dependencies
         run: |
-          pip install sphinx==7.3.7 sphinx_rtd_theme==2.0.0 sphinx_rtd_dark_mode==1.3.0 myst_nb==1.1.0 referencing==0.31.1
+          pip install attrs>=23.1.0
+          pip install sphinx sphinx_rtd_theme sphinx_rtd_dark_mode myst_nb referencing
           pip install pennylane==0.33.1 pennylane-lightning==0.33.1
           pip install sympy qiskit[visualization] qiskit-aer matplotlib pylatexenc cirq pyqubo
           python setup.py install
