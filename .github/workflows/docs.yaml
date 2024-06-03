@@ -19,7 +19,7 @@ jobs:
         run: |
           pip install "jsonschema<4.18.0"
           pip install sphinx sphinx_rtd_theme sphinx_rtd_dark_mode myst_nb referencing
-          pip uninstall --no-input referencing 
+          pip uninstall  -y referencing 
           pip install pennylane==0.33.1 pennylane-lightning==0.33.1
           pip install sympy qiskit[visualization] qiskit-aer matplotlib pylatexenc cirq pyqubo
           python setup.py install
