@@ -316,7 +316,7 @@ class QintImp(int, Qtype):
     @classmethod
     def bitwise_or(cls, tleft: TExp, tright: TExp) -> TExp:
         return cls.bitwise_generic(Or, tleft, tright)
-    
+
     @classmethod
     def floor_div(cls, tleft: TExp, tright: TExp) -> TExp:
         """Perform floor division on two Qint"""

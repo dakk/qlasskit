@@ -58,7 +58,7 @@ class TestQint(unittest.TestCase):
         c = Qint2(1).to_bin()
         self.assertEqual(c, "10")
         self.assertEqual(c, Qint2(1).export("binary"))
-    
+
     def test_floor_div(self):
         self.assertEqual(Qint2.floor_div(Qint2(10), Qint2(3)), Qint2(3))
         self.assertEqual(Qint2.floor_div(Qint2(20), Qint2(4)), Qint2(5))
