@@ -18,7 +18,9 @@ import tempfile
 import unittest
 
 import sympy
-from sympy.logic.boolalg import is_anf, is_cnf, is_dnf, is_nnf
+from sympy.logic.boolalg import is_cnf, is_dnf, is_nnf
+
+# from sympy.logic.boolalg import to_anf
 from sympy.logic.utilities.dimacs import load
 
 import qlasskit
