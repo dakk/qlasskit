@@ -55,21 +55,27 @@ class TestPy2Bexp(unittest.TestCase):
         return result
 
     def test_help(self):
-        result = self.run_command(["py2bexp", "--help"])
+        result = self.run_command(["python", "-m", "qlasskit.tools.py2bexp", "--help"])
         print(result.stdout)
 
     def test_version(self):
-        result = self.run_command(["py2bexp", "--version"])
+        result = self.run_command(
+            ["python", "-m", "qlasskit.tools.py2bexp", "--version"]
+        )
         print(result.stdout)
 
     def test_output_to_stdout(self):
-        result = self.run_command(["py2bexp", "-i", self.temp_file.name])
+        result = self.run_command(
+            ["python", "-m", "qlasskit.tools.py2bexp", "-i", self.temp_file.name]
+        )
         print(result.stdout)
 
     def test_specific_entrypoint(self):
         result = self.run_command(
             [
-                "py2bexp",
+                "python",
+                "-m",
+                "qlasskit.tools.py2bexp",
                 "-i",
                 self.temp_file.name,
                 "-e",
@@ -85,7 +91,9 @@ class TestPy2Bexp(unittest.TestCase):
         try:
             self.run_command(
                 [
-                    "py2bexp",
+                    "python",
+                    "-m",
+                    "qlasskit.tools.py2bexp",
                     "-i",
                     self.temp_file.name,
                     "-o",
@@ -101,7 +109,9 @@ class TestPy2Bexp(unittest.TestCase):
     def test_dnf_form(self):
         result = self.run_command(
             [
-                "py2bexp",
+                "python",
+                "-m",
+                "qlasskit.tools.py2bexp",
                 "-i",
                 self.temp_file.name,
                 "-f",
@@ -113,7 +123,9 @@ class TestPy2Bexp(unittest.TestCase):
     def test_cnf_form(self):
         result = self.run_command(
             [
-                "py2bexp",
+                "python",
+                "-m",
+                "qlasskit.tools.py2bexp",
                 "-i",
                 self.temp_file.name,
                 "-f",
@@ -125,7 +137,9 @@ class TestPy2Bexp(unittest.TestCase):
     def test_dimacs_format(self):
         result = self.run_command(
             [
-                "py2bexp",
+                "python",
+                "-m",
+                "qlasskit.tools.py2bexp",
                 "-i",
                 self.temp_file.name,
                 "-f",
@@ -137,5 +151,7 @@ class TestPy2Bexp(unittest.TestCase):
         print(result.stdout)
 
     def test_stdin_input(self):
-        result = self.run_command(["py2bexp"], input=dummy_script)
+        result = self.run_command(
+            ["python", "-m", "qlasskit.tools.py2bexp"], input=dummy_script
+        )
         print(result.stdout)

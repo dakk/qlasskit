@@ -16,7 +16,9 @@
 
 import argparse
 import sys
+
 import sympy
+
 import qlasskit
 from qlasskit.qlassfun import QlassF
 from qlasskit.tools.utils import parse_str
@@ -131,3 +133,7 @@ def main():
         output_result(bool_expr, args.output, args.format)
     else:
         print("No qlassf function found", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main()
