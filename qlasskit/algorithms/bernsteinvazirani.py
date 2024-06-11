@@ -44,8 +44,8 @@ class BernsteinVazirani(QAlgorithm):
         self._qcircuit.barrier(label="s")
         for i in range(self.search_space_size):
             self._qcircuit.h(i)
-        self._qcircuit.x(self._f_circuit["_ret"])
         self._qcircuit.h(self._f_circuit["_ret"])
+        self._qcircuit.z(self._f_circuit["_ret"])
 
         # Prepare and add the f
         self._qcircuit.barrier(label="f")
