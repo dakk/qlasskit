@@ -61,4 +61,9 @@ setup(
         "Documentation": "https://dakk.github.io/qlasskit",
         "Source": "https://github.com/dakk/qlasskit",
     },
+    entry_points={
+        "console_scripts": [
+            "py2bexp=qlasskit.tools.py2bexp:main",
+        ]
+    },
 )
