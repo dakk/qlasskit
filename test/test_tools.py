@@ -18,7 +18,7 @@ import tempfile
 import unittest
 
 import sympy
-from sympy.logic.boolalg import is_cnf, is_dnf, is_nnf
+from sympy.logic.boolalg import And, Not, Or, is_cnf, is_dnf, is_nnf
 
 # from sympy.logic.boolalg import to_anf
 from sympy.logic.utilities.dimacs import load
@@ -219,9 +219,24 @@ class TestPy2Bexp(unittest.TestCase):
         )
         print(result.stdout)
         expr = load(result.stdout)
-        print(expr)
-        # expected = sympy.parse_expr("(x | y | ~z) & (z | ~y)")
-        # assert expr.equals(expected)
+        symbols = expr.free_symbols
+        x, y, z = symbols
+        expected1 = And(Or(x, y, Not(z)), Or(z, Not(y)))
+        expected2 = And(Or(y, z, Not(x)), Or(x, Not(z)))
+        expected3 = And(Or(z, x, Not(y)), Or(y, Not(x)))
+        expected4 = And(Or(x, z, Not(y)), Or(y, Not(z)))
+        expected5 = And(Or(y, x, Not(z)), Or(z, Not(x)))
+        expected6 = And(Or(z, y, Not(x)), Or(x, Not(y)))
+        # The result should be one of the 6 permutations of the expected expressions
+        # because the order of the symbols in the DIMACS format is not guaranteed
+        assert (
+            expr.equals(expected1)
+            or expr.equals(expected2)
+            or expr.equals(expected3)
+            or expr.equals(expected4)
+            or expr.equals(expected5)
+            or expr.equals(expected6)
+        )
         self.assertIn("p cnf 3 2", result.stdout)
 
     def test_stdin_input(self):
