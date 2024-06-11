@@ -18,6 +18,7 @@ import argparse
 import sys
 
 import sympy
+from sympy.logic.boolalg import to_anf, to_cnf, to_dnf, to_nnf
 
 import qlasskit
 from qlasskit.qlassfun import QlassF
@@ -39,18 +40,18 @@ def convert_to_bool_expression(qlassf: QlassF, form: str):
     combined_expr = sympy.And(*[expr[1] for expr in qlassf.expressions])
 
     if form == "anf":
-        return sympy.to_anf(combined_expr)
+        return to_anf(combined_expr)
     elif form == "cnf":
-        return sympy.to_cnf(combined_expr, simplify=True)
+        return to_cnf(combined_expr, simplify=True)
     elif form == "dnf":
-        return sympy.to_dnf(combined_expr, simplify=True)
+        return to_dnf(combined_expr, simplify=True)
     elif form == "nnf":
-        return sympy.to_nnf(combined_expr, simplify=True)
+        return to_nnf(combined_expr, simplify=True)
     return combined_expr  # Default case if no specific form is requested
 
 
 def convert_to_dimacs(expr):
-    clauses = sympy.to_cnf(expr, simplify=True).args
+    clauses = to_cnf(expr, simplify=True).args
     if len(clauses) == 1 and isinstance(clauses[0], sympy.Symbol):
         clauses = [clauses]
 
@@ -79,8 +80,13 @@ def convert_to_dimacs(expr):
     return dimacs_str
 
 
-def output_result(result, output_file, output_format):
+def output_result(result, output_file, output_format, form):
     if output_format == "dimacs":
+        if form != "cnf":
+            print(
+                "Warning: DIMACS format is only supported for CNF form. Converting to CNF."
+            )
+            result = to_cnf(result, simplify=True)
         result = convert_to_dimacs(result)
     if output_file == "-":
         print(result)
@@ -130,7 +136,7 @@ def main():
 
     if qlassf:
         bool_expr = convert_to_bool_expression(qlassf, args.form)
-        output_result(bool_expr, args.output, args.format)
+        output_result(bool_expr, args.output, args.format, args.form)
     else:
         print("No qlassf function found", file=sys.stderr)
 
