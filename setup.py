@@ -64,6 +64,7 @@ setup(
     entry_points={
         "console_scripts": [
             "py2bexp=qlasskit.tools.py2bexp:main",
+            "py2qasm=qlasskit.tools.py2qasm:main",
         ]
     },
 )
