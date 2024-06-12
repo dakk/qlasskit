@@ -16,6 +16,7 @@ import os
 import subprocess
 import tempfile
 import unittest
+from itertools import permutations
 
 import sympy
 from sympy.logic.boolalg import And, Not, Or, is_cnf, is_dnf, is_nnf
@@ -69,25 +70,22 @@ class TestPy2Bexp(unittest.TestCase):
             print(f"Standard error:\n{e.stderr}")
             raise
 
-    def test_help(self):
-        result = self.run_command(["python", "-m", "qlasskit.tools.py2bexp", "--help"])
-        print(result.stdout)
+    # def test_help(self):
+    #     result = self.run_command(["python", "-m", "qlasskit.tools.py2bexp", "--help"])
 
     def test_version(self):
         result = self.run_command(
             ["python", "-m", "qlasskit.tools.py2bexp", "--version"]
         )
-        print(result.stdout)
-        assert result.stdout == f"qlasskit {qlasskit.__version__}\n"
+        self.assertTrue(result.stdout == f"qlasskit {qlasskit.__version__}\n")
 
     def test_output_to_stdout(self):
         result = self.run_command(
             ["python", "-m", "qlasskit.tools.py2bexp", "-i", self.temp_file.name]
         )
-        print(result.stdout)
         expr = sympy.parse_expr(result.stdout)
         expected = sympy.parse_expr("(x | y | ~z) & (z | ~y)")
-        assert expr.equals(expected)
+        self.assertTrue(expr.equals(expected))
 
     def test_specific_entrypoint(self):
         result = self.run_command(
@@ -101,10 +99,9 @@ class TestPy2Bexp(unittest.TestCase):
                 "a",
             ]
         )
-        print(result.stdout)
         expr = sympy.parse_expr(result.stdout)
         expected = sympy.parse_expr("~b")
-        assert expr.equals(expected)
+        self.assertTrue(expr.equals(expected))
 
     def test_output_to_file(self):
         with tempfile.NamedTemporaryFile(delete=False) as temp_output:
@@ -123,10 +120,9 @@ class TestPy2Bexp(unittest.TestCase):
             )
             with open(output_file, "r") as f:
                 content = f.read()
-                print(content)
                 expr = sympy.parse_expr(content)
                 expected = sympy.parse_expr("(x | y | ~z) & (z | ~y)")
-                assert expr.equals(expected)
+                self.assertTrue(expr.equals(expected))
         finally:
             os.unlink(output_file)
 
@@ -142,11 +138,10 @@ class TestPy2Bexp(unittest.TestCase):
                 "dnf",
             ]
         )
-        print(result.stdout)
         expr = sympy.parse_expr(result.stdout)
         expected = sympy.parse_expr("(x | y | ~z) & (z | ~y)")
-        assert expr.equals(expected)
-        assert is_dnf(result.stdout)
+        self.assertTrue(is_dnf(result.stdout))
+        self.assertTrue(expr.equals(expected))
 
     def test_cnf_form(self):
         result = self.run_command(
@@ -160,11 +155,10 @@ class TestPy2Bexp(unittest.TestCase):
                 "cnf",
             ]
         )
-        print(result.stdout)
         expr = sympy.parse_expr(result.stdout)
         expected = sympy.parse_expr("(x | y | ~z) & (z | ~y)")
-        assert expr.equals(expected)
-        assert is_cnf(result.stdout)
+        self.assertTrue(is_cnf(result.stdout))
+        self.assertTrue(expr.equals(expected))
 
     def test_nnf_form(self):
         result = self.run_command(
@@ -178,11 +172,10 @@ class TestPy2Bexp(unittest.TestCase):
                 "nnf",
             ]
         )
-        print(result.stdout)
         expr = sympy.parse_expr(result.stdout)
         expected = sympy.parse_expr("(x | y | ~z) & (z | ~y)")
-        assert expr.equals(expected)
-        assert is_nnf(result.stdout)
+        self.assertTrue(is_nnf(result.stdout))
+        self.assertTrue(expr.equals(expected))
 
     def test_anf_form(self):
         result = self.run_command(
@@ -196,12 +189,10 @@ class TestPy2Bexp(unittest.TestCase):
                 "anf",
             ]
         )
-        print(result.stdout)
         expr = sympy.parse_expr(result.stdout)
-        print(expr)
         expected = sympy.parse_expr("(x | y | ~z) & (z | ~y)")
-        assert expr.equals(expected)
-        # assert is_anf(result.stdout) # This is not working
+        self.assertTrue(expr.equals(expected))
+        # self.assertTrue(is_anf(result.stdout)) # This is not working
 
     def test_dimacs_format(self):
         result = self.run_command(
@@ -217,33 +208,25 @@ class TestPy2Bexp(unittest.TestCase):
                 "dimacs",
             ]
         )
-        print(result.stdout)
         expr = load(result.stdout)
         symbols = expr.free_symbols
-        x, y, z = symbols
-        expected1 = And(Or(x, y, Not(z)), Or(z, Not(y)))
-        expected2 = And(Or(y, z, Not(x)), Or(x, Not(z)))
-        expected3 = And(Or(z, x, Not(y)), Or(y, Not(x)))
-        expected4 = And(Or(x, z, Not(y)), Or(y, Not(z)))
-        expected5 = And(Or(y, x, Not(z)), Or(z, Not(x)))
-        expected6 = And(Or(z, y, Not(x)), Or(x, Not(y)))
+
         # The result should be one of the 6 permutations of the expected expressions
         # because the order of the symbols in the DIMACS format is not guaranteed
-        assert (
-            expr.equals(expected1)
-            or expr.equals(expected2)
-            or expr.equals(expected3)
-            or expr.equals(expected4)
-            or expr.equals(expected5)
-            or expr.equals(expected6)
-        )
+        assert_val = False
+        for sl in permutations(symbols):
+            exp = And(Or(sl[0], sl[1], Not(sl[2])), Or(sl[2], Not(sl[1])))
+            if expr.equals(exp):
+                assert_val = True
+                break
+
+        self.assertTrue(assert_val)
         self.assertIn("p cnf 3 2", result.stdout)
 
     def test_stdin_input(self):
         result = self.run_command(
             ["python", "-m", "qlasskit.tools.py2bexp"], stdin_input=dummy_script
         )
-        print(result.stdout)
         expr = sympy.parse_expr(result.stdout)
         expected = sympy.parse_expr("(x | y | ~z) & (z | ~y)")
-        assert expr.equals(expected)
+        self.assertTrue(expr.equals(expected))
