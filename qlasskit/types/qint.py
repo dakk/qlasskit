@@ -219,10 +219,6 @@ class QintImp(int, Qtype):
             else:
                 raise Exception(f"Mul result size is too big ({n+m})")
 
-        def pad_operand(operand, size):
-            padded_value = operand[1] + [False] * (size - len(operand[1]))
-            return operand[0], padded_value
-
         # Fill constants so explicit typecast is not needed
         if cls.is_const(tleft_):
             tleft = tright_[0].fill(tleft_)
@@ -240,10 +236,10 @@ class QintImp(int, Qtype):
         # Ensure same size operands by padding the smaller one
         if n != m:
             if n > m:
-                tright = pad_operand(tright, n)
+                tright = tleft_[0].fill(tright)
                 m = n
             else:
-                tleft = pad_operand(tleft, m)
+                tleft = tright_[0].fill(tleft)
                 n = m
 
         # If one operand is an even constant, use mul_even_const

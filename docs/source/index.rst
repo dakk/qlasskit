@@ -55,12 +55,13 @@ quantum annealers, ising machines, simulators, etc.
    example_grover_subset.ipynb
    example_grover_hash.ipynb
    example_grover_sudoku.ipynb
-   example_grover_factorize.ipynb
+   example_grover_factors.ipynb
    example_simon.ipynb
    example_deutsch_jozsa.ipynb
    example_unitary_of_f.ipynb
    example_big_circuit.ipynb
-   example_bqm_tsp.ipynb
+
+.. example_bqm_tsp.ipynb
 
 
 Indices and tables

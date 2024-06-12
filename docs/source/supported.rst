@@ -58,7 +58,7 @@ For example, the list `[1,2,3]` is typed as `Qlist[Qint[2],3]`.
 
 
 Matrix
-^^^^
+^^^^^^
 
 Qmatrix[T, m, n] denotes a fixed-size list in qlasskit. 
 For example, the matrix `[[1,2],[3,4]]` is typed as `Qmatrix[Qint[2],2,2]`.
@@ -106,7 +106,7 @@ List (fixed size)
 
 
 2D Matrix (fixed size)
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
    
@@ -183,6 +183,10 @@ Bin Op
 .. code-block:: python
 
    a * b
+
+.. code-block:: python
+
+   a ** b
 
 .. code-block:: python
 

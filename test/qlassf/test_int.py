@@ -527,6 +527,11 @@ class TestQlassfIntPow(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)
         compute_and_compare_results(self, qf)
 
+    def test_pow_const3(self):
+        f = "def test(a: Qint[2]) -> Qint[16]: return a ** 4"
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED)
+        compute_and_compare_results(self, qf)
+
     def test_pow_zero(self):
         f = "def test(a: Qint[4]) -> Qint[4]: return a ** 0"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED)

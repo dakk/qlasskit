@@ -25,14 +25,18 @@
    
       Barrier
       CCX
+      CP
       CX
       H
+      I
       MCX
       MCtrl
       NopGate
+      P
       QControlledGate
       QGate
       S
+      Swap
       T
       Toffoli
       X

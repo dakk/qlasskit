@@ -25,6 +25,7 @@
       ~QlassF.f
       ~QlassF.from_function
       ~QlassF.gate
+      ~QlassF.to_bqm
       ~QlassF.to_logicfun
       ~QlassF.truth_table
       ~QlassF.truth_table_header
@@ -39,6 +40,7 @@
    
       ~QlassF.input_qubits
       ~QlassF.input_size
+      ~QlassF.num_gates
       ~QlassF.num_qubits
       ~QlassF.output_qubits
       ~QlassF.output_size
