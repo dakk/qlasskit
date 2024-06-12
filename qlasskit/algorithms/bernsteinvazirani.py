@@ -71,5 +71,5 @@ class BernsteinVazirani(QAlgorithm):
     ) -> Union[Tuple, Qtype, str]:
         format_outcome(istr, len(self.f.args[0]))
         #iq = interpret_as_qtype(istr, self.f.args[0].ttype, len(self.f.args[0]))
-        return interpret_as_qtype(istr, self.f.args[0].ttype, len(self.f.args[0]))
+        return istr[-len(self.f.args[0]):][::-1]
         #return "Constant" if iq == 0 else "Balanced"
