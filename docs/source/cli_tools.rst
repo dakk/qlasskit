@@ -13,6 +13,7 @@ Receives a python script (file or stdin) in input and outputs bool expressions. 
 contain at least one qlassf function.
 
 .. code-block::
+
     usage: py2bexp [-h] [-i INPUT_FILE] [-e ENTRYPOINT] [-o OUTPUT] [-f {anf,cnf,dnf,nnf}] [-t {sympy,dimacs}] [-v]
 
     Convert qlassf functions in a Python script to boolean expressions.
@@ -40,6 +41,7 @@ Receives a python script (file or stdin) in input and outputs qasm code. The pyt
 contain at least one qlassf function.
 
 .. code-block::
+
     usage: py2qasm [-h] [-i INPUT_FILE] [-e ENTRYPOINT] [-o OUTPUT] [-c {internal,tweedledum,recompiler}] [-q {2.0,3.0}]
                 [-v]
 
