@@ -24,16 +24,14 @@ import qlasskit
 from qlasskit.qlassfun import QlassF
 from qlasskit.tools.utils import parse_str
 
+from .tools import find_last_qlassf
+
 
 def read_input(input_file):
     if input_file == "-":
         return sys.stdin.read()
     with open(input_file, "r") as file:
         return file.read()
-
-
-def find_last_qlassf(qlassf_list):
-    return qlassf_list[-1][1] if qlassf_list else None
 
 
 def convert_to_bool_expression(qlassf: QlassF, form: str):
