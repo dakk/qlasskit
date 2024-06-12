@@ -46,6 +46,7 @@ quantum annealers, ising machines, simulators, etc.
    bqm.ipynb
    decompiler_and_optimizer.ipynb
    api
+   cli_tools
 
 .. toctree::
    :maxdepth: 2
