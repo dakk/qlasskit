@@ -86,12 +86,4 @@ class BernsteinVazirani(QAlgorithm):
         
         # Format the outcome
         format_outcome(istr, len(self.f.args[0]) - 1)
-        
-        # Return the decoded output and the associated count
-        return {istr[::-1]: max_count}
-
-# Make sure to adjust the format_outcome call by subtracting 1 from the length, as we've removed one bit.
-
-        #iq = interpret_as_qtype(istr, self.f.args[0].ttype, len(self.f.args[0]))
         return istr[-len(self.f.args[0]):][::-1]
-        #return "Constant" if iq == 0 else "Balanced"
