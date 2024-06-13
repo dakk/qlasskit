@@ -24,7 +24,6 @@ from ..utils import ENABLED_COMPILERS, qiskit_measure_and_count
 
 @parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestAlgoBernsteinVazirani(unittest.TestCase):
-    
 
     def test_1_bernstein_vazirani(self):
         f = """
@@ -38,7 +37,7 @@ def oracle(x: Qint[4]) -> bool:
         qc_algo = algo.circuit().export("circuit", "qiskit")
         counts = qiskit_measure_and_count(qc_algo, shots=1024)
         counts_readable = algo.decode_counts(counts)
-        self.assertEqual(counts_readable["0111"],1024)
+        self.assertEqual(counts_readable["0111"], 1024)
 
     def test_2_bernstein_vazirani(self):
         f = """
@@ -52,7 +51,7 @@ def oracle(x: Qint[4]) -> bool:
         qc_algo = algo.circuit().export("circuit", "qiskit")
         counts = qiskit_measure_and_count(qc_algo, shots=1024)
         counts_readable = algo.decode_counts(counts)
-        self.assertEqual(counts_readable["0011"],1024)
+        self.assertEqual(counts_readable["0011"], 1024)
 
     def test_3_bernstein_vazirani(self):
         f = """
@@ -66,4 +65,4 @@ def oracle(x: Qint[4]) -> bool:
         qc_algo = algo.circuit().export("circuit", "qiskit")
         counts = qiskit_measure_and_count(qc_algo, shots=1024)
         counts_readable = algo.decode_counts(counts)
-        self.assertEqual(counts_readable["1111"],1024)
+        self.assertEqual(counts_readable["1111"], 1024)

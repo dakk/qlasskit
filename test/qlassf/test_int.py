@@ -129,7 +129,7 @@ class TestQlassfIntParametrized_2_4_8(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_int_const_compare_eq(self):
-        f = f"def test(a: {self.ttype_str}) -> bool:\n\treturn a == {int(self.ttype_size/2-1)}"
+        f = f"def test(a: {self.ttype_str}) -> bool:\n\treturn a == {int(self.ttype_size / 2 - 1)}"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
         self.assertEqual(qf.expressions[0][0], _ret)

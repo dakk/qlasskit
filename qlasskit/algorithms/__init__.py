@@ -21,4 +21,4 @@ from .qalgorithm import (  # noqa: F401, E402
 from .grover import Grover  # noqa: F401, E402
 from .simon import Simon  # noqa: F401, E402
 from .deutschjozsa import DeutschJozsa  # noqa: F401, E402
-from .bernsteinvazirani import BernsteinVazirani
+from .bernsteinvazirani import BernsteinVazirani  # noqa: F401, E402

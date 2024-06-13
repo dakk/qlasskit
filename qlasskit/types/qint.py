@@ -217,7 +217,7 @@ class QintImp(int, Qtype):
             elif (n + m) > 16:
                 return Qint16
             else:
-                raise Exception(f"Mul result size is too big ({n+m})")
+                raise Exception(f"Mul result size is too big ({n + m})")
 
         # Fill constants so explicit typecast is not needed
         if cls.is_const(tleft_):
