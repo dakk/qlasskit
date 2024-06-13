@@ -68,7 +68,6 @@ class BernsteinVazirani(QAlgorithm):
     # @override
     def decode_output(
         self, istr: Union[str, int, List, dict]
-    ) -> Union[Tuple[str, int], Qtype, str]:       
-        # Format the outcome
+    ) -> Union[Tuple[str, int], Qtype, str]: 
         format_outcome(istr, len(self.f.args[0]) - 1)
         return istr[-len(self.f.args[0]):][::-1]

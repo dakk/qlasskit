@@ -36,7 +36,7 @@ def oracle(x: Qint[4]) -> bool:
         qc_algo = algo.circuit().export("circuit", "qiskit")
         counts = qiskit_measure_and_count(qc_algo, shots=1024)
         counts_readable = algo.decode_counts(counts)
-        self.assertEqual(counts_readable,0111)
+        self.assertEqual(counts_readable[0111],1024)
 
     def test_2_bernstein_vazirani(self):
         f = """
@@ -50,7 +50,7 @@ def oracle(x: Qint[4]) -> bool:
         qc_algo = algo.circuit().export("circuit", "qiskit")
         counts = qiskit_measure_and_count(qc_algo, shots=1024)
         counts_readable = algo.decode_counts(counts)
-        self.assertEqual(counts_readable,1111)
+        self.assertEqual(counts_readable[1111],1024)
 
     def test_3_bernstein_vazirani(self):
         f = """
@@ -64,7 +64,7 @@ def oracle(x: Qint[4]) -> bool:
         qc_algo = algo.circuit().export("circuit", "qiskit")
         counts = qiskit_measure_and_count(qc_algo, shots=1024)
         counts_readable = algo.decode_counts(counts)
-        self.assertEqual(counts_readable,0011)
+        self.assertEqual(counts_readable[0011],1024)
 
     def test_4_bernstein_vazirani(self):
         f = """
@@ -78,5 +78,5 @@ def oracle(x: Qint[4]) -> bool:
         qc_algo = algo.circuit().export("circuit", "qiskit")
         counts = qiskit_measure_and_count(qc_algo, shots=1024)
         counts_readable = algo.decode_counts(counts)
-        self.assertEqual(counts_readable,0001)
+        self.assertEqual(counts_readable[0001],1024)
 
