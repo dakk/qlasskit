@@ -19,7 +19,7 @@ from parameterized import parameterized_class
 from qlasskit import qlassf
 from qlasskit.algorithms import DeutschJozsa
 
-from utils import ENABLED_COMPILERS, qiskit_measure_and_count
+from ..utils import ENABLED_COMPILERS, qiskit_measure_and_count
 
 
 @parameterized_class(("compiler"), ENABLED_COMPILERS)
