@@ -67,9 +67,31 @@ class BernsteinVazirani(QAlgorithm):
 
     # @override
     def decode_output(
-        self, istr: Union[str, int, List]
-    ) -> Union[Tuple, Qtype, str]:
-        format_outcome(istr, len(self.f.args[0]))
+        self, istr: Union[str, int, List, dict]
+    ) -> Union[Tuple[str, int], Qtype, str]:
+        if isinstance(istr, dict):
+            # Create a new dictionary to hold the sums of counts for bitstrings with the first bit removed
+            summed_counts = {}
+            for bitstring, count in istr.items():
+                remaining_bitstring = bitstring[1:]
+                if remaining_bitstring in summed_counts:
+                    summed_counts[remaining_bitstring] += count
+                else:
+                    summed_counts[remaining_bitstring] = count
+            
+            # Find the bitstring with the maximum count
+            max_key = max(summed_counts, key=summed_counts.get)
+            max_count = summed_counts[max_key]
+            istr = max_key
+        
+        # Format the outcome
+        format_outcome(istr, len(self.f.args[0]) - 1)
+        
+        # Return the decoded output and the associated count
+        return {istr[::-1]: max_count}
+
+# Make sure to adjust the format_outcome call by subtracting 1 from the length, as we've removed one bit.
+
         #iq = interpret_as_qtype(istr, self.f.args[0].ttype, len(self.f.args[0]))
         return istr[-len(self.f.args[0]):][::-1]
         #return "Constant" if iq == 0 else "Balanced"
