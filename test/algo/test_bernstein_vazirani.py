@@ -14,56 +14,44 @@
 
 import unittest
 
-from parameterized import parameterized_class
+from parameterized import parameterized, parameterized_class
 
-from qlasskit import qlassf
-from qlasskit.algorithms import BernsteinVazirani
+from qlasskit import QlassF
+from qlasskit.algorithms import BernsteinVazirani, secret_oracle
 
 from ..utils import ENABLED_COMPILERS, qiskit_measure_and_count
 
 
 @parameterized_class(("compiler"), ENABLED_COMPILERS)
 class TestAlgoBernsteinVazirani(unittest.TestCase):
-    
+    def test_secret_oracle(self):
+        isize = 4
+        secret = 12
 
-    def test_1_bernstein_vazirani(self):
-        f = """
-def oracle(x: Qint[4]) -> bool:
-        s=Qint4(14)
-        return ((x[0]&s[0])^(x[1]&s[1])^(x[2]&s[2])^(x[3]&s[3]))
-"""
-        qf = qlassf(f, compiler=self.compiler)
-        algo = BernsteinVazirani(qf)
+        f = f"def oracle(x: Qint[{isize}]) -> bool:\n"
+        f += f"  s=Qint{isize}({secret})\n"
+        f += "  return ("
+        f += "^".join(f"(x[{i}]&s[{i}])" for i in range(isize))
+        f += ")"
 
-        qc_algo = algo.circuit().export("circuit", "qiskit")
-        counts = qiskit_measure_and_count(qc_algo, shots=1024)
-        counts_readable = algo.decode_counts(counts)
-        self.assertEqual(counts_readable["0111"],1024)
+        qf = QlassF.from_function(f)
+        qf2 = secret_oracle(isize, secret)
+        self.assertEqual(qf.export("qasm"), qf2.export("qasm"))
 
-    def test_2_bernstein_vazirani(self):
-        f = """
-def oracle(x: Qint[4]) -> bool:
-        s=Qint4(12)
-        return ((x[0]&s[0])^(x[1]&s[1])^(x[2]&s[2])^(x[3]&s[3]))
-"""
-        qf = qlassf(f, compiler=self.compiler)
-        algo = BernsteinVazirani(qf)
-
-        qc_algo = algo.circuit().export("circuit", "qiskit")
-        counts = qiskit_measure_and_count(qc_algo, shots=1024)
-        counts_readable = algo.decode_counts(counts)
-        self.assertEqual(counts_readable["0011"],1024)
-
-    def test_3_bernstein_vazirani(self):
-        f = """
-def oracle(x: Qint[4]) -> bool:
-        s=Qint4(15)
-        return ((x[0]&s[0])^(x[1]&s[1])^(x[2]&s[2])^(x[3]&s[3]))
-"""
-        qf = qlassf(f, compiler=self.compiler)
-        algo = BernsteinVazirani(qf)
+    @parameterized.expand(
+        [
+            (4, 14),
+            (4, 12),
+            (4, 15),
+            (8, 122),
+        ]
+    )
+    def test_bernstein_vazirani_secret(self, isize, secret):
+        algo = BernsteinVazirani(secret_oracle(isize, secret))
 
         qc_algo = algo.circuit().export("circuit", "qiskit")
         counts = qiskit_measure_and_count(qc_algo, shots=1024)
         counts_readable = algo.decode_counts(counts)
-        self.assertEqual(counts_readable["1111"],1024)
+
+        self.assertTrue(secret in counts_readable)
+        self.assertEqual(counts_readable[secret], 1024)

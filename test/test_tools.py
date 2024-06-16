@@ -20,13 +20,13 @@ from itertools import permutations
 
 import sympy
 from sympy.logic.boolalg import And, Not, Or, is_cnf, is_dnf, is_nnf
+
 # from sympy.logic.boolalg import to_anf
 from sympy.logic.utilities.dimacs import load
 
 import qlasskit
 from qlasskit.qcircuit import exporter_qasm
 from qlasskit.qlassfun import qlassf
-
 from qlasskit.tools import utils
 
 dummy_script = """
