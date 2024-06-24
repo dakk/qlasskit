@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qlasskit"
+dynamic = ["version"]
+description = "A python-to-quantum compiler"
+readme = "README.md"
+requires-python = ">= 3.8.2"
+license = {text = "Apache 2.0"}
+authors = [
+    {name = "Davide Gessa", email = "gessadavide@gmail.com"},
+]
+dependencies = [
+    "sympy==1.12",
+]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Development Status :: 5 - Production/Stable",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+tweedledum = ["tweedledum==1.1.1"]
+bqm = ["pyqubo==1.0.5"]
+
+[project.urls]
+"Homepage" = "https://github.com/dakk/qlasskit"
+"Bug Tracker" = "https://github.com/dakk/qlasskit/issues/"
+"Documentation" = "https://dakk.github.io/qlasskit"
+"Source" = "https://github.com/dakk/qlasskit"
+
+[project.scripts]
+py2bexp = "qlasskit.tools.py2bexp:main"
+py2qasm = "qlasskit.tools.py2qasm:main"
+
+[tool.setuptools.packages.find]
+include = [
+    "qlasskit",
+    "qlasskit.boolopt",
+    "qlasskit.types",
+    "qlasskit.ast2logic",
+    "qlasskit.qcircuit",
+    "qlasskit.compiler",
+    "qlasskit.algorithms",
+    "qlasskit.decompiler",
+    "qlasskit.tools",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "qlasskit.__version__"}
