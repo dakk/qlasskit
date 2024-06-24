@@ -71,6 +71,6 @@ make html
 
 
 ```bash
-python setup.py sdist bdist_wheel
+python -m build
 python -m twine upload dist/*
 ```
