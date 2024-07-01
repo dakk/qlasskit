@@ -16,7 +16,9 @@ import ast
 import sys
 import unittest
 
-from qlasskit.ast2ast import ASTRewriter
+from parameterized import parameterized
+
+from qlasskit.ast2ast import ASTRewriter, ConstantFolder
 
 
 class TestASTRewriter(unittest.TestCase):
@@ -24,34 +26,17 @@ class TestASTRewriter(unittest.TestCase):
     def setUp(self):
         self.rewriter = ASTRewriter()
 
-    def test_exponentiation_transformation(self):
-        code = "a = b ** 3"
+    @parameterized.expand(
+        [
+            ("a = b ** 3", "a = b * b * b"),
+            ("a = b + 3", "a = b + 3"),
+            ("a = b ** c", "a = b ** c"),
+        ]
+    )
+    def test_exponentiation_transformation(self, code, expected_code):
         tree = ast.parse(code)
         new_tree = self.rewriter.visit(tree)
-
-        expected_code = "a = b * b * b"
         expected_tree = ast.parse(expected_code)
-
-        self.assertEqual(ast.dump(new_tree), ast.dump(expected_tree))
-
-    def test_non_exponentiation(self):
-        code = "a = b + 3"
-        tree = ast.parse(code)
-        new_tree = self.rewriter.visit(tree)
-
-        expected_code = "a = b + 3"
-        expected_tree = ast.parse(expected_code)
-
-        self.assertEqual(ast.dump(new_tree), ast.dump(expected_tree))
-
-    def test_exponentiation_with_non_constant(self):
-        code = "a = b ** c"
-        tree = ast.parse(code)
-        new_tree = self.rewriter.visit(tree)
-
-        expected_code = "a = b ** c"
-        expected_tree = ast.parse(expected_code)
-
         self.assertEqual(ast.dump(new_tree), ast.dump(expected_tree))
 
     def test_exponentiation_with_zero(self):
@@ -68,3 +53,23 @@ class TestASTRewriter(unittest.TestCase):
             expected_code = "a = 1"
             expected_tree = ast.parse(expected_code)
             self.assertEqual(ast.dump(new_tree), ast.dump(expected_tree))
+
+
+class TestASTConstantFolder(unittest.TestCase):
+    def setUp(self):
+        self.rewriter = ConstantFolder()
+
+    @parameterized.expand(
+        [
+            ("a + (13 - 12 + 1)", "a + 2"),
+            # ( "a + 13 - 12 + 1", "a + 2" ),
+            # ( "a + len([12])", "a + 1" ),
+            ("if True: a \nelse: b", "a"),
+            ("a if False else b", "b"),
+        ]
+    )
+    def test_expected_code(self, code, expected_code):
+        tree = ast.parse(code)
+        new_tree = self.rewriter.visit(tree)
+        expected_tree = ast.parse(expected_code)
+        self.assertEqual(ast.dump(new_tree), ast.dump(expected_tree))

@@ -47,6 +47,7 @@ include = [
     "qlasskit.boolopt",
     "qlasskit.types",
     "qlasskit.ast2logic",
+    "qlasskit.ast2ast",
     "qlasskit.qcircuit",
     "qlasskit.compiler",
     "qlasskit.algorithms",
