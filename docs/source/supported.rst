@@ -200,17 +200,18 @@ Function call
 ^^^^^^^^^^^^^
 
 Bultin functions:
-- `print()`: debug function, ignore by conversion
-- `len(Tuple)`, `len(Qlist)``: returns the length of a tuple
-- `max(a, b, ...)`, `max(Tuple)`, `max(Qlist)`: returns the max of a tuple
-- `min(a, b, ...)`, `min(Tuple)`, `min(Qlist)`: returns the min of a tuple
-- `sum(Tuple)`, `sum(Qlist)`: returns the sum of the elemnts of a tuple / list
-- `all(Tuple)`, `all(Qlist)`: returns True if all of the elemnts are True
-- `any(Tuple)`, `any(Qlist)`: returns True if any of the elemnts are True
-- `ord(Qchar)`: returns the integer value of the given Qchar
-- `chr(Qint)`: returns the char given its ascii code
-- `int(Qfixed | Qint)`: returns the integer part of a Qfixed 
-- `float(Qint | Qfixed)`: returns a Qfixed representing the Qint
+
+* `print()`: debug function, ignore by conversion
+* `len(Tuple)`, `len(Qlist)``: returns the length of a tuple
+* `max(a, b, ...)`, `max(Tuple)`, `max(Qlist)`: returns the max of a tuple
+* `min(a, b, ...)`, `min(Tuple)`, `min(Qlist)`: returns the min of a tuple
+* `sum(Tuple)`, `sum(Qlist)`: returns the sum of the elemnts of a tuple / list
+* `all(Tuple)`, `all(Qlist)`: returns True if all of the elemnts are True
+* `any(Tuple)`, `any(Qlist)`: returns True if any of the elemnts are True
+* `ord(Qchar)`: returns the integer value of the given Qchar
+* `chr(Qint)`: returns the char given its ascii code
+* `int(Qfixed | Qint)`: returns the integer part of a Qfixed 
+* `float(Qint | Qfixed)`: returns a Qfixed representing the Qint
 
 
 Statements 
