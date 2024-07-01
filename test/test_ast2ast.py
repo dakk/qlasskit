@@ -63,7 +63,7 @@ class TestASTConstantFolder(unittest.TestCase):
         [
             ("a + (13 - 12 + 1)", "a + 2"),
             # ( "a + 13 - 12 + 1", "a + 2" ),
-            # ( "a + len([12])", "a + 1" ),
+            ( "a + len([12])", "a + 1" ),
             ("if True: a \nelse: b", "a"),
             ("a if False else b", "b"),
         ]
