@@ -13,19 +13,8 @@
 # limitations under the License.
 import ast
 import copy
-import sys
 
-from .ast2logic import flatten
-
-
-class IndexReplacer(ast.NodeTransformer):
-    """Replace Index with its content (for python < 3.9)"""
-
-    def generic_visit(self, node):
-        return super().generic_visit(node)
-
-    def visit_Index(self, node):
-        return self.visit(node.value)
+from ..ast2logic import flatten
 
 
 class IsNamePresent(ast.NodeTransformer):
@@ -580,6 +569,10 @@ class ASTRewriter(ast.NodeTransformer):
             return node
 
     def visit_BinOp(self, node):
+        # Check if we have two constants
+        # if isinstance(node.right, ast.Constant) and isinstance(node.left, ast.Constant):
+        #     # return a constant evaluting the inner
+
         # rewrite the ** operator to be a series of multiplications
         if isinstance(node.op, ast.Pow):
             if (
@@ -599,13 +592,3 @@ class ASTRewriter(ast.NodeTransformer):
             ):
                 return ast.Constant(value=1)
         return super().generic_visit(node)
-
-
-def ast2ast(a_tree):
-    # print(ast.dump(a_tree))
-    if sys.version_info < (3, 9):
-        a_tree = IndexReplacer().visit(a_tree)
-
-    a_tree = ASTRewriter().visit(a_tree)
-    # print(ast.dump(a_tree))
-    return a_tree
