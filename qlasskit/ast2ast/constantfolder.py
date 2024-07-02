@@ -91,9 +91,20 @@ class ConstantFolder(ast.NodeTransformer):
     def visit_Call(self, node):
         self.generic_visit(node)
         if isinstance(node.func, ast.Name) and node.func.id in self.builtin_funcs:
-            if all(isinstance(arg, ast.Constant) for arg in node.args):
+
+            def arg_tr(arg):
+                if isinstance(arg, ast.Tuple) or isinstance(arg, ast.List):
+                    elts = [self.visit(elt) for elt in arg.elts]
+                    if all(isinstance(elt, ast.Constant) for elt in elts):
+                        return ast.Constant(value=[elt.value for elt in elts])
+
+                return arg
+
+            args = list(map(arg_tr, node.args))
+
+            if all(isinstance(arg, ast.Constant) for arg in args):
                 func = self.builtin_funcs[node.func.id]
-                args = [arg.value for arg in node.args]
+                args = [arg.value for arg in args]
                 return ast.Constant(func(*args))  # type: ignore
         return node
 
@@ -121,15 +132,15 @@ class ConstantFolder(ast.NodeTransformer):
         if isinstance(node.test, ast.Constant):
             return node.body if node.test.value else node.orelse
         return node
-    
-    def visit_List(self, node):
-        elts = [self.visit(elt) for elt in node.elts]
-        if all(isinstance(elt, ast.Constant) for elt in elts):
-            return ast.Constant(value=[elt.value for elt in elts])
-        return ast.List(elts=elts, ctx=node.ctx)
 
-    def visit_Tuple(self, node):
-        elts = [self.visit(elt) for elt in node.elts]
-        if all(isinstance(elt, ast.Constant) for elt in elts):
-            return ast.Constant(value=tuple(elt.value for elt in elts))
-        return ast.Tuple(elts=elts, ctx=node.ctx)
+    # def visit_List(self, node):
+    #     elts = [self.visit(elt) for elt in node.elts]
+    #     if all(isinstance(elt, ast.Constant) for elt in elts):
+    #         return ast.Constant(value=[elt.value for elt in elts])
+    #     return ast.List(elts=elts, ctx=node.ctx)
+
+    # def visit_Tuple(self, node):
+    #     elts = [self.visit(elt) for elt in node.elts]
+    #     if all(isinstance(elt, ast.Constant) for elt in elts):
+    #         return ast.Constant(value=tuple(elt.value for elt in elts))
+    #     return ast.Tuple(elts=elts, ctx=node.ctx)
