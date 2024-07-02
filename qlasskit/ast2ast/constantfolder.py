@@ -51,7 +51,7 @@ class ConstantFolder(ast.NodeTransformer):
                 }.get(type(node.ops[0]))
                 if op:
                     result = op(node.left.value, node.comparators[0].value)
-                    return ast.Constant(value=result)
+                    return ast.Constant(result)
         return node
 
     def visit_UnaryOp(self, node):
