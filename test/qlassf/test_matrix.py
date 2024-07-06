@@ -94,7 +94,14 @@ class TestQlassfMatrix(unittest.TestCase):
     # def test_matrix_access2(self):
     #     f = (
     #         "def test(a: Qmatrix[Qint[2], 2, 2]) -> Qint[2]:\n\ti = 1\n"
-    #           "\tj = i + 1\n\treturn a[i][i]"
+    #           "\tj = i + 1\n\treturn a[i][j]"
+    #     )
+    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+    #     compute_and_compare_results(self, qf)
+    # def test_matrix_access3(self):
+    #     f = (
+    #         "def test(a: Qmatrix[Qint[2], 2, 2], i: Qint[2], j: Qint[2]) -> Qint[2]:\n"
+    #         "\treturn a[i][j]"
     #     )
     #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
     #     compute_and_compare_results(self, qf)

@@ -26,14 +26,14 @@ class AddKind(ast.NodeTransformer):
         n.kind = None
         return n
 
+
 def add_kind(n):
     if sys.version_info >= (3, 9):
         return n
-    
+
     return AddKind().visit(n)
 
 
-    
 class TestASTRewriter(unittest.TestCase):
 
     def setUp(self):

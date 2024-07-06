@@ -573,7 +573,7 @@ class ASTRewriter(ast.NodeTransformer):
         # if isinstance(node.right, ast.Constant) and isinstance(node.left, ast.Constant):
         #     # return a constant evaluting the inner
 
-        # rewrite the ** operator to be a series of multiplications
+        # Rewrite the ** operator to be a series of multiplications
         if isinstance(node.op, ast.Pow):
             if (
                 isinstance(node.right, ast.Constant)
@@ -591,4 +591,5 @@ class ASTRewriter(ast.NodeTransformer):
                 and node.right.value == 0
             ):
                 return ast.Constant(value=1)
+
         return super().generic_visit(node)
