@@ -207,3 +207,11 @@ class TestQlassfTuple(unittest.TestCase):
         )
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
+
+    def test_tuple_var_access(self):
+        f = (
+            "def test(a: Tuple[bool, bool, bool, bool], i: Qint[2]) -> bool:\n"
+            "\treturn a[i]"
+        )
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)

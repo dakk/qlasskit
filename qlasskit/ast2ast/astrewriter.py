@@ -161,6 +161,53 @@ class ASTRewriter(ast.NodeTransformer):
         if isinstance(_sval, ast.Name) and _sval.id in self.const:
             node.slice = self.const[_sval.id]
 
+        # Handle inner access L[i]
+        elif (
+            isinstance(node, ast.Subscript)
+            and isinstance(node.value, ast.Name)
+            and isinstance(node.slice, ast.Name)
+        ):
+            nname = node.value.id
+            iname = node.slice.id
+
+            def create_if_exp(i, max_i):
+                if i == max_i:
+                    return ast.Subscript(
+                            value=ast.Name(id=nname, ctx=ast.Load()),
+                            slice=ast.Constant(value=i),
+                            ctx=ast.Load(),
+                        )
+                else:
+                    next_i = i + 1
+                    return ast.IfExp(
+                        test=ast.Compare(
+                                    left=ast.Name(id=iname, ctx=ast.Load()),
+                                    ops=[ast.Eq()],
+                                    comparators=[ast.Constant(value=i)],
+                                
+                        ),
+                        body=ast.Subscript(
+                                value=ast.Name(id=nname, ctx=ast.Load()),
+                                slice=ast.Constant(value=i),
+                                ctx=ast.Load(),
+                            ),
+                        orelse=create_if_exp(next_i, max_i),
+                    )
+
+            # Infer i and j sizes from env['a']
+            a_type = self.env[nname]
+
+            # self.env[nname] is a constant
+            if isinstance(a_type, ast.Tuple):
+                max_i = len(a_type.elts) - 1
+            # self.env[nname] is a type annotation
+            else:
+                outer_tuple = a_type.slice
+                max_i = len(outer_tuple.elts) - 1
+
+            # Create the IfExp structure
+            return create_if_exp(0,  max_i)
+        
         # Handle inner access L[i][j]
         elif (
             isinstance(node, ast.Subscript)

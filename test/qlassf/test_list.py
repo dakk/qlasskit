@@ -95,10 +95,6 @@ class TestQlassfList(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_list_access_with_var_on_tuple(self):
-        # TODO: this fails on internal compiler
-        if self.compiler == "internal":
-            return
-
         f = (
             "def test(ab: Tuple[Qint[2], Qint[2]]) -> Qint[2]:\n\tc = [1,2,3,2]\n\tai,bi = ab\n"
             "\td = c[ai] + c[bi]\n\treturn d"
@@ -107,10 +103,6 @@ class TestQlassfList(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_list_access_with_var_on_tuple2(self):
-        # TODO: this fails on internal compiler
-        if self.compiler == "internal":
-            return
-
         f = (
             "def test(ab: Tuple[Qint[2], Qint[2]]) -> Qint[2]:\n\tc = [1,2,3,2]\n"
             "\td = c[ab[0]] + c[ab[1]]\n\treturn d"
@@ -146,3 +138,11 @@ class TestQlassfList(unittest.TestCase):
         ttable = [(False, False), (True, False), (False, True), (True, True)]
         tt = list(map(lambda e: (e[0], e[1], e[0] or e[1]), ttable))
         qf.bind(io_list=tt)
+
+    def test_list_var_access(self):
+        f = (
+            "def test(a: Qlist[bool, 4], i: Qint[2]) -> bool:\n"
+            "\treturn a[i]"
+        )
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
