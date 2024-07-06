@@ -40,7 +40,7 @@ class TypeErrorException(Exception):
 
 
 def bin_to_bool_list(b: str, bit_size=None) -> List[bool]:
-    if b[0:2] == "0b":
+    if b.startswith("0b"):
         b = b[2:]
 
     if bit_size is None:

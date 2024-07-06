@@ -37,7 +37,7 @@ class InternalCompiler(Compiler):
 
         # 2. Iterate over all expressions; iret contains qubit index for the current exp
         for sym, exp in exprs:
-            is_temp = sym.name[0:2] == "__"
+            is_temp = sym.name.startswith("__")
             symp_exp = self._symplify_exp(exp)
 
             # 2.1 Compile the expression

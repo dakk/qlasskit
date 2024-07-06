@@ -13,40 +13,30 @@
 # limitations under the License.
 import ast
 import copy
+from dataclasses import dataclass
+from typing import Any
 
 from ..ast2logic import flatten
 
 
-class IsNamePresent(ast.NodeTransformer):
+@dataclass
+class IsNamePresent(ast.NodeVisitor):
     """Check if a tree contains a specific name_id"""
 
-    def __init__(self, name_id):
-        self.name_id = name_id
-        self.present = False
-
-    @property
-    def is_present(self):
-        return self.present
-
-    def generic_visit(self, node):
-        return super().generic_visit(node)
+    name_id: str
+    present: bool = False
 
     def visit_Name(self, node):
         if node.id == self.name_id:
             self.present = True
 
-        return node
 
-
+@dataclass
 class NameValReplacer(ast.NodeTransformer):
     """Replace all Name with name_id with the given val"""
 
-    def __init__(self, name_id, val):
-        self.name_id = name_id
-        self.val = val
-
-    def generic_visit(self, node):
-        return super().generic_visit(node)
+    name_id: str
+    val: Any
 
     def visit_Name(self, node):
         if node.id == self.name_id:
@@ -136,7 +126,7 @@ class ASTRewriter(ast.NodeTransformer):
     def uniqd(self):
         """Return an unique identifier as str"""
         self._uniqd += 1
-        return f"{hex(self._uniqd)[2:]}"
+        return f"{self._uniqd:x}"
 
     def __unroll_arg(self, arg):
         """Argument unrolling for visit_call()"""
@@ -214,7 +204,7 @@ class ASTRewriter(ast.NodeTransformer):
 
     def visit_Name(self, node):
         # __ prefix is reserved for internal use
-        if node.id[0:2] == "__":
+        if node.id.startswith("__"):
             raise Exception("invalid name starting with __")
 
         return node
@@ -241,7 +231,7 @@ class ASTRewriter(ast.NodeTransformer):
 
             target_0id = b.targets[0].id
 
-            if target_0id[0:2] == "__" and target_0id not in self.env:
+            if target_0id.startswith("__") and target_0id not in self.env:
                 orelse_inner = ast.Name(id=target_0id[2:])
             else:
                 orelse_inner = ast.Name(id=target_0id)
@@ -264,7 +254,7 @@ class ASTRewriter(ast.NodeTransformer):
 
             target_0id = b.targets[0].id
 
-            if target_0id[0:2] == "__" and target_0id not in self.env:
+            if target_0id.startswith("__") and target_0id not in self.env:
                 orelse_inner = ast.Name(id=target_0id[2:])
             elif target_0id[0 : len("_iftarg")] == "_iftarg":
                 if_l.append(b)
@@ -355,7 +345,7 @@ class ASTRewriter(ast.NodeTransformer):
         ip.visit(node.value)
 
         # Reassigning an already present variable (use a temp variable)
-        if ip.is_present and was_known and not isinstance(node.value, ast.Constant):
+        if ip.present and was_known and not isinstance(node.value, ast.Constant):
             new_targ = ast.Name(id=f"__{target_0id}", ctx=ast.Load())
 
             return [
