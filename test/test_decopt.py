@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
-import random
 import itertools
+import random
+import unittest
 
 from qlasskit import QCircuit, boolopt, qlassf
 from qlasskit.decompiler import circuit_boolean_optimizer
@@ -95,14 +95,17 @@ class TestCircuitBooleanOptimizer(unittest.TestCase):
         qc_n_un = qiskit_unitary(qc_n.export())
         self.assertEqual(qc_un, qc_n_un)
 
-
     def test_circuit_boolean_optimizer_random_x_cx(self):
         g_simp = 0
-        
-        possib = [(gates.CX, x[0], x[1]) for x in itertools.permutations([0,1,2],r=2)]
-        possib += [(gates.X, x[0]) for x in itertools.permutations([0,1,2],r=1)]
 
-        for i in random.choices(list(itertools.combinations_with_replacement(possib, r=8)), k=32):
+        possib = [
+            (gates.CX, x[0], x[1]) for x in itertools.permutations([0, 1, 2], r=2)
+        ]
+        possib += [(gates.X, x[0]) for x in itertools.permutations([0, 1, 2], r=1)]
+
+        for i in random.choices(
+            list(itertools.combinations_with_replacement(possib, r=8)), k=32
+        ):
             qc = QCircuit(3)
             for g in i:
                 qc.append(g[0](), g[1:])

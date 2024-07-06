@@ -35,6 +35,8 @@ def ast2ast(a_tree):
     if sys.version_info < (3, 9):
         a_tree = IndexReplacer().visit(a_tree)
 
+    # Matrix translator
+
     # Fold constants
     a_tree = ConstantFolder().visit(a_tree)
 

@@ -154,12 +154,83 @@ class ASTRewriter(ast.NodeTransformer):
     def generic_visit(self, node):
         return super().generic_visit(node)
 
-    def visit_Subscript(self, node):
+    def visit_Subscript(self, node):  # noqa: C901
         _sval = node.slice
 
         # Replace L[a] with const a, to L[const]
         if isinstance(_sval, ast.Name) and _sval.id in self.const:
             node.slice = self.const[_sval.id]
+
+        # Handle inner access L[i][j]
+        elif (
+            isinstance(node, ast.Subscript)
+            and isinstance(node.value, ast.Subscript)
+            and isinstance(node.value.value, ast.Name)
+            and isinstance(node.value.slice, ast.Name)
+            and isinstance(node.slice, ast.Name)
+        ):
+            nname = node.value.value.id
+            iname = node.value.slice.id
+            jname = node.slice.id
+
+            def create_if_exp(i, j, max_i, max_j):
+                if i == max_i and j == max_j:
+                    return ast.Subscript(
+                        value=ast.Subscript(
+                            value=ast.Name(id=nname, ctx=ast.Load()),
+                            slice=ast.Constant(value=i),
+                            ctx=ast.Load(),
+                        ),
+                        slice=ast.Constant(value=j),
+                        ctx=ast.Load(),
+                    )
+                else:
+                    next_j = j + 1 if j < max_j else 0
+                    next_i = i if j < max_j else i + 1
+                    return ast.IfExp(
+                        test=ast.BoolOp(
+                            op=ast.And(),
+                            values=[
+                                ast.Compare(
+                                    left=ast.Name(id=iname, ctx=ast.Load()),
+                                    ops=[ast.Eq()],
+                                    comparators=[ast.Constant(value=i)],
+                                ),
+                                ast.Compare(
+                                    left=ast.Name(id=jname, ctx=ast.Load()),
+                                    ops=[ast.Eq()],
+                                    comparators=[ast.Constant(value=j)],
+                                ),
+                            ],
+                        ),
+                        body=ast.Subscript(
+                            value=ast.Subscript(
+                                value=ast.Name(id=nname, ctx=ast.Load()),
+                                slice=ast.Constant(value=i),
+                                ctx=ast.Load(),
+                            ),
+                            slice=ast.Constant(value=j),
+                            ctx=ast.Load(),
+                        ),
+                        orelse=create_if_exp(next_i, next_j, max_i, max_j),
+                    )
+
+            # Infer i and j sizes from env['a']
+            a_type = self.env[nname]
+
+            # self.env[nname] is a constant
+            if isinstance(a_type, ast.Tuple):
+                max_i = len(a_type.elts) - 1
+                max_j = len(a_type.elts[0].elts) - 1  # type: ignore
+            # self.env[nname] is a type annotation
+            else:
+                outer_tuple = a_type.slice
+                max_i = len(outer_tuple.elts) - 1
+                inner_tuple = outer_tuple.elts
+                max_j = len(inner_tuple) - 1
+
+            # Create the IfExp structure
+            return create_if_exp(0, 0, max_i, max_j)
 
         # Unroll L[a] with (L[0] if a == 0 else L[1] if a == 1 ...)
         elif (isinstance(_sval, ast.Name) and _sval.id not in self.const) or isinstance(

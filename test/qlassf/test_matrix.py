@@ -89,44 +89,42 @@ class TestQlassfMatrix(unittest.TestCase):
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
 
-    # TODO: this raises Not a tuple in ast2ast visit subscript with not constant _sval: Subscript
-    # (value=Name(id='a', ctx=Load()), slice=Name(id='i', ctx=Load()), ctx=Load())
-    # def test_matrix_access2(self):
-    #     f = (
-    #         "def test(a: Qmatrix[Qint[2], 2, 2]) -> Qint[2]:\n\ti = 1\n"
-    #           "\tj = i + 1\n\treturn a[i][j]"
-    #     )
-    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-    #     compute_and_compare_results(self, qf)
-    # def test_matrix_access3(self):
-    #     f = (
-    #         "def test(a: Qmatrix[Qint[2], 2, 2], i: Qint[2], j: Qint[2]) -> Qint[2]:\n"
-    #         "\treturn a[i][j]"
-    #     )
-    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-    #     compute_and_compare_results(self, qf)
+    def test_matrix_access2(self):
+        f = (
+            "def test(a: Qmatrix[Qint[2], 2, 2]) -> Qint[2]:\n\ti = 0\n"
+            "\tj = i + 1\n\treturn a[i][j]"
+        )
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
 
-    # def test_matrix_access_with_var(self):
-    #     f = "def test(a: Qint[2]) -> Qint[2]:\n\tc = [[1,2],[3,4]]\n\tb = c[a][a]\n\treturn b"
-    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-    #     compute_and_compare_results(self, qf)
+    def test_matrix_access3(self):
+        f = (
+            "def test(a: Qmatrix[Qint[2], 2, 2], i: Qint[2], j: Qint[2]) -> Qint[2]:\n"
+            "\treturn a[i][j]"
+        )
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
 
-    # def test_list_access_with_var_on_tuple(self):
-    #     # TODO: this fails on internal compiler
-    #     if self.compiler == "internal":
-    #         return
+    def test_matrix_access_with_var(self):
+        f = (
+            "def test(a: Qint[2]) -> Qint[4]:\n\tc = [[1,2,7,8],[3,4,8,8],[5,6,9,1],[1,2,7,8]]\n"
+            "\tb = c[a][a]\n\treturn b"
+        )
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
 
-    #     f = ("def test(ab: Tuple[Qint[2], Qint[2]]) -> Qint[2]:\n\tc = [1,2,3,2]\n\tai,bi = ab\n"
-    #       "\td = c[ai] + c[bi]\n\treturn d")
-    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-    #     compute_and_compare_results(self, qf)
+    def test_list_access_with_var_on_tuple(self):
+        f = (
+            "def test(ab: Tuple[Qint[2], Qint[2]]) -> Qint[2]:\n\tc = [1,2,3,2]\n\tai,bi = ab\n"
+            "\td = c[ai] + c[bi]\n\treturn d"
+        )
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
 
-    # def test_list_access_with_var_on_tuple2(self):
-    #     # TODO: this fails on internal compiler
-    #     if self.compiler == "internal":
-    #         return
-
-    #     f = ("def test(ab: Tuple[Qint[2], Qint[2]]) -> Qint[2]:\n\tc = [1,2,3,2]\n"
-    #       "\td = c[ab[0]] + c[ab[1]]\n\treturn d")
-    #     qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
-    #     compute_and_compare_results(self, qf)
+    def test_list_access_with_var_on_tuple2(self):
+        f = (
+            "def test(ab: Tuple[Qint[2], Qint[2]]) -> Qint[2]:\n\tc = [1,2,3,2]\n"
+            "\td = c[ab[0]] + c[ab[1]]\n\treturn d"
+        )
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
