@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import unittest
+import random
+import itertools
 
 from qlasskit import QCircuit, boolopt, qlassf
 from qlasskit.decompiler import circuit_boolean_optimizer
@@ -93,23 +95,27 @@ class TestCircuitBooleanOptimizer(unittest.TestCase):
         qc_n_un = qiskit_unitary(qc_n.export())
         self.assertEqual(qc_un, qc_n_un)
 
-    def test_circuit_boolean_optimizer_random_x_cx(self):
-        g_total = 0
-        g_simp = 0
 
-        for i in range(12):
-            qc = QCircuit.random(3, 8, [gates.X, gates.CX])
-            g_total += 8
+    def test_circuit_boolean_optimizer_random_x_cx(self):
+        g_simp = 0
+        
+        possib = [(gates.CX, x[0], x[1]) for x in itertools.permutations([0,1,2],r=2)]
+        possib += [(gates.X, x[0]) for x in itertools.permutations([0,1,2],r=1)]
+
+        for i in random.choices(list(itertools.combinations_with_replacement(possib, r=8)), k=32):
+            qc = QCircuit(3)
+            for g in i:
+                qc.append(g[0](), g[1:])
 
             qc_n = circuit_boolean_optimizer(qc)
-            g_simp += qc_n.num_gates
+            g_simp += qc.num_gates - qc_n.num_gates
 
             qc_un = qiskit_unitary(qc.export())
 
             qc_n_un = qiskit_unitary(qc_n.export())
             self.assertEqual(qc_un, qc_n_un)
 
-        # print(g_total, g_simp)
+        # print(g_simp)
 
     def test_circuit_boolean_optimizer_duplicate_qubit_bug(self):
         s = "def qf(a: Qint[4]) -> Qint[4]:\n\treturn a * a"
