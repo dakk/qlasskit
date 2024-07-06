@@ -170,28 +170,27 @@ class ASTRewriter(ast.NodeTransformer):
             nname = node.value.id
             iname = node.slice.id
 
-            def create_if_exp(i, max_i):
+            def create_if_exp_single(i, max_i):
                 if i == max_i:
                     return ast.Subscript(
-                            value=ast.Name(id=nname, ctx=ast.Load()),
-                            slice=ast.Constant(value=i),
-                            ctx=ast.Load(),
-                        )
+                        value=ast.Name(id=nname, ctx=ast.Load()),
+                        slice=ast.Constant(value=i),
+                        ctx=ast.Load(),
+                    )
                 else:
                     next_i = i + 1
                     return ast.IfExp(
                         test=ast.Compare(
-                                    left=ast.Name(id=iname, ctx=ast.Load()),
-                                    ops=[ast.Eq()],
-                                    comparators=[ast.Constant(value=i)],
-                                
+                            left=ast.Name(id=iname, ctx=ast.Load()),
+                            ops=[ast.Eq()],
+                            comparators=[ast.Constant(value=i)],
                         ),
                         body=ast.Subscript(
-                                value=ast.Name(id=nname, ctx=ast.Load()),
-                                slice=ast.Constant(value=i),
-                                ctx=ast.Load(),
-                            ),
-                        orelse=create_if_exp(next_i, max_i),
+                            value=ast.Name(id=nname, ctx=ast.Load()),
+                            slice=ast.Constant(value=i),
+                            ctx=ast.Load(),
+                        ),
+                        orelse=create_if_exp_single(next_i, max_i),
                     )
 
             # Infer i and j sizes from env['a']
@@ -206,8 +205,8 @@ class ASTRewriter(ast.NodeTransformer):
                 max_i = len(outer_tuple.elts) - 1
 
             # Create the IfExp structure
-            return create_if_exp(0,  max_i)
-        
+            return create_if_exp_single(0, max_i)
+
         # Handle inner access L[i][j]
         elif (
             isinstance(node, ast.Subscript)

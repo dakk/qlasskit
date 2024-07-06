@@ -140,9 +140,6 @@ class TestQlassfList(unittest.TestCase):
         qf.bind(io_list=tt)
 
     def test_list_var_access(self):
-        f = (
-            "def test(a: Qlist[bool, 4], i: Qint[2]) -> bool:\n"
-            "\treturn a[i]"
-        )
+        f = "def test(a: Qlist[bool, 4], i: Qint[2]) -> bool:\n" "\treturn a[i]"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
