@@ -17,6 +17,65 @@ from dataclasses import dataclass
 from typing import Any
 
 from ..ast2logic import flatten
+from .env import Environment
+
+
+def create_if_exp(nname, iname, max_i, jname=None, max_j=None):
+    """Given a List or List of List `nname`, an index `iname` and an optional index `jname`,
+    returns L[0] if i == 0 else L[1] if i == 1 ..."""
+
+    def access_ij(i, j):
+        fsub = ast.Subscript(
+            value=ast.Name(id=nname, ctx=ast.Load()),
+            slice=ast.Constant(value=i),
+            ctx=ast.Load(),
+        )
+
+        if jname is not None:
+            return ast.Subscript(
+                value=fsub,
+                slice=ast.Constant(value=j),
+                ctx=ast.Load(),
+            )
+        else:
+            return fsub
+
+    def _create_if_exp(i, j=None):
+        if i == max_i and (jname is None or j == max_j):
+            return access_ij(i, j)
+        else:
+            cmp_i = ast.Compare(
+                left=ast.Name(id=iname, ctx=ast.Load()),
+                ops=[ast.Eq()],
+                comparators=[ast.Constant(value=i)],
+            )
+            if jname is not None:
+                next_j = j + 1 if j < max_j else 0
+                next_i = i if j < max_j else i + 1
+
+                return ast.IfExp(
+                    test=ast.BoolOp(
+                        op=ast.And(),
+                        values=[
+                            cmp_i,
+                            ast.Compare(
+                                left=ast.Name(id=jname, ctx=ast.Load()),
+                                ops=[ast.Eq()],
+                                comparators=[ast.Constant(value=j)],
+                            ),
+                        ],
+                    ),
+                    body=access_ij(i, j),
+                    orelse=_create_if_exp(next_i, next_j),
+                )
+            else:
+                return ast.IfExp(
+                    test=cmp_i,
+                    body=access_ij(i, j),
+                    orelse=_create_if_exp(i + 1),
+                )
+
+    return _create_if_exp(0, None if jname is None else 0)
 
 
 @dataclass
@@ -116,9 +175,8 @@ def _replace_types_annotations(ann, arg=None):
 class ASTRewriter(ast.NodeTransformer):
     """Rewrites the ast to a simplified version"""
 
-    def __init__(self, env={}, ret=None):
-        self.env = {}
-        self.const = {}
+    def __init__(self, ret=None):
+        self.env = Environment()
         self.ret = None
         self._uniqd = 1
 
@@ -137,10 +195,10 @@ class ASTRewriter(ast.NodeTransformer):
             # If it's a name, is in env and is a Tuple, return elements
             if (
                 arg.id in self.env
-                and isinstance(self.env[arg.id], ast.Subscript)
-                and self.env[arg.id].value.id == "Tuple"
+                and isinstance(self.env.get_type(arg.id), ast.Subscript)
+                and self.env.get_type(arg.id).value.id == "Tuple"
             ):
-                _sval = self.env[arg.id].slice
+                _sval = self.env.get_type(arg.id).slice
 
                 return [
                     ast.Subscript(
@@ -156,50 +214,27 @@ class ASTRewriter(ast.NodeTransformer):
 
     def visit_Subscript(self, node):  # noqa: C901
         # Replace L[a] with const a, to L[const]
-        if isinstance(node.slice, ast.Name) and node.slice.id in self.const:
-            node.slice = self.const[node.slice.id]
+        if isinstance(node.slice, ast.Name) and self.env.has_constant(node.slice.id):
+            node.slice = self.env.get_constant(node.slice.id)
 
         # Handle inner access L[i]
         elif isinstance(node.value, ast.Name) and isinstance(node.slice, ast.Name):
             nname = node.value.id
             iname = node.slice.id
 
-            def create_if_exp_single(i, max_i):
-                if i == max_i:
-                    return ast.Subscript(
-                        value=ast.Name(id=nname, ctx=ast.Load()),
-                        slice=ast.Constant(value=i),
-                        ctx=ast.Load(),
-                    )
-                else:
-                    next_i = i + 1
-                    return ast.IfExp(
-                        test=ast.Compare(
-                            left=ast.Name(id=iname, ctx=ast.Load()),
-                            ops=[ast.Eq()],
-                            comparators=[ast.Constant(value=i)],
-                        ),
-                        body=ast.Subscript(
-                            value=ast.Name(id=nname, ctx=ast.Load()),
-                            slice=ast.Constant(value=i),
-                            ctx=ast.Load(),
-                        ),
-                        orelse=create_if_exp_single(next_i, max_i),
-                    )
-
             # Infer i and j sizes from env['a']
-            a_type = self.env[nname]
+            gtype = self.env.get_type(nname)
 
             # self.env[nname] is a constant
-            if isinstance(a_type, ast.Tuple):
-                max_i = len(a_type.elts) - 1
+            if isinstance(gtype, ast.Tuple):
+                max_i = len(gtype.elts) - 1
             # self.env[nname] is a type annotation
             else:
-                outer_tuple = a_type.slice
+                outer_tuple = gtype.slice
                 max_i = len(outer_tuple.elts) - 1
 
             # Create the IfExp structure
-            return create_if_exp_single(0, max_i)
+            return create_if_exp(nname, iname, max_i)
 
         # Handle inner access L[i][j]
         elif (
@@ -212,74 +247,33 @@ class ASTRewriter(ast.NodeTransformer):
             iname = node.value.slice.id
             jname = node.slice.id
 
-            def create_if_exp(i, j, max_i, max_j):
-                if i == max_i and j == max_j:
-                    return ast.Subscript(
-                        value=ast.Subscript(
-                            value=ast.Name(id=nname, ctx=ast.Load()),
-                            slice=ast.Constant(value=i),
-                            ctx=ast.Load(),
-                        ),
-                        slice=ast.Constant(value=j),
-                        ctx=ast.Load(),
-                    )
-                else:
-                    next_j = j + 1 if j < max_j else 0
-                    next_i = i if j < max_j else i + 1
-                    return ast.IfExp(
-                        test=ast.BoolOp(
-                            op=ast.And(),
-                            values=[
-                                ast.Compare(
-                                    left=ast.Name(id=iname, ctx=ast.Load()),
-                                    ops=[ast.Eq()],
-                                    comparators=[ast.Constant(value=i)],
-                                ),
-                                ast.Compare(
-                                    left=ast.Name(id=jname, ctx=ast.Load()),
-                                    ops=[ast.Eq()],
-                                    comparators=[ast.Constant(value=j)],
-                                ),
-                            ],
-                        ),
-                        body=ast.Subscript(
-                            value=ast.Subscript(
-                                value=ast.Name(id=nname, ctx=ast.Load()),
-                                slice=ast.Constant(value=i),
-                                ctx=ast.Load(),
-                            ),
-                            slice=ast.Constant(value=j),
-                            ctx=ast.Load(),
-                        ),
-                        orelse=create_if_exp(next_i, next_j, max_i, max_j),
-                    )
-
             # Infer i and j sizes from env['a']
-            a_type = self.env[nname]
+            gtype = self.env.get_type(nname)
 
             # self.env[nname] is a constant
-            if isinstance(a_type, ast.Tuple):
-                max_i = len(a_type.elts) - 1
-                max_j = len(a_type.elts[0].elts) - 1  # type: ignore
+            if isinstance(gtype, ast.Tuple):
+                max_i = len(gtype.elts) - 1
+                max_j = len(gtype.elts[0].elts) - 1  # type: ignore
             # self.env[nname] is a type annotation
             else:
-                outer_tuple = a_type.slice
+                outer_tuple = gtype.slice
                 max_i = len(outer_tuple.elts) - 1
                 inner_tuple = outer_tuple.elts
                 max_j = len(inner_tuple) - 1
 
             # Create the IfExp structure
-            return create_if_exp(0, 0, max_i, max_j)
+            return create_if_exp(nname, iname, max_i, jname, max_j)
 
-        # Unroll L[a] with (L[0] if a == 0 else L[1] if a == 1 ...) when self.env[L] is constant
+        # Unroll L[a] with (L[0] if a == 0 else L[1] if a == 1 ...) when L is constant
         elif (
-            isinstance(node.slice, ast.Name) and node.slice.id not in self.const
+            isinstance(node.slice, ast.Name)
+            and not self.env.has_constant(node.slice.id)
         ) or isinstance(node.slice, ast.Subscript):
             if isinstance(node.value, ast.Name):
                 if node.value.id == "Tuple":
                     return node
 
-                tup = self.env[node.value.id]
+                tup = self.env.get_constant(node.value.id)
             else:
                 tup = node.value
 
@@ -390,7 +384,7 @@ class ASTRewriter(ast.NodeTransformer):
     def visit_AnnAssign(self, node):
         node.annotation = _replace_types_annotations(node.annotation)
         node.value = self.visit(node.value) if node.value else node.value
-        self.env[node.target] = node.annotation
+        self.env.set_type(node.target.id, node.annotation)
         return node
 
     def visit_FunctionDef(self, node):
@@ -399,7 +393,7 @@ class ASTRewriter(ast.NodeTransformer):
         ]
 
         for x in node.args.args:
-            self.env[x.arg] = x.annotation
+            self.env.set_type(x.arg, x.annotation)
 
         node.returns = _replace_types_annotations(node.returns)
         self.ret = node.returns
@@ -443,13 +437,14 @@ class ASTRewriter(ast.NodeTransformer):
         target_0id = node.targets[0].id
         was_known = target_0id in self.env
 
-        if isinstance(node.value, ast.Name) and node.value.id in self.env:
-            self.env[target_0id] = self.env[node.value.id]
+        if isinstance(node.value, ast.Constant):
+            self.env.set_constant(target_0id, node.value)
+        elif isinstance(node.value, ast.Name) and node.value.id in self.env:
+            self.env.copy_type(node.value.id, target_0id)
         elif isinstance(node.value, ast.Tuple) or isinstance(node.value, ast.List):
-            # TODO: this is a constant, not an annotation
-            self.env[target_0id] = self.visit(node.value)
+            self.env.set_constant(target_0id, self.visit(node.value))
         else:
-            self.env[target_0id] = "Unknown"
+            self.env.set_type(target_0id, "Unknown")
 
         # If value is not self referencing, we can skip this (ie: a = b + 1)
         ip = IsNamePresent(target_0id)
@@ -497,12 +492,14 @@ class ASTRewriter(ast.NodeTransformer):
         iter = self.visit(node.iter)
 
         # Get the list to iterate (should be defined with a fixed size)
-        if isinstance(iter, ast.Name) and iter.id in self.env:
-            if isinstance(self.env[iter.id], ast.Tuple):
-                iter = self.env[iter.id].elts
+        if isinstance(iter, ast.Name) and self.env.has_type(iter.id):
+            iter_type = self.env.get_type(iter.id)
 
-            elif isinstance(self.env[iter.id], ast.Subscript):
-                _elts = self.env[iter.id].slice.elts
+            if isinstance(iter_type, ast.Tuple):
+                iter = iter_type.elts
+
+            elif isinstance(iter_type, ast.Subscript):
+                _elts = iter_type.slice.elts  # type: ignore
 
                 iter = [
                     ast.Subscript(
@@ -517,14 +514,15 @@ class ASTRewriter(ast.NodeTransformer):
         elif (
             isinstance(iter, ast.Subscript)
             and isinstance(iter.value, ast.Name)
-            and iter.value.id in self.env
+            and self.env.has_type(iter.value.id)
             and hasattr(iter.slice, "value")
         ):
-            if isinstance(self.env[iter.value.id], ast.Tuple):
-                new_iter = self.env[iter.value.id].elts[iter.slice.value]
+            iter_value_type = self.env.get_type(iter.value.id)
+            if isinstance(iter_value_type, ast.Tuple):
+                new_iter = iter_value_type.elts[iter.slice.value]
 
-            elif isinstance(self.env[iter.value.id], ast.Subscript):
-                _elts = self.env[iter.value.id].slice.elts[iter.slice.value]
+            elif isinstance(iter_value_type, ast.Subscript):
+                _elts = iter_value_type.slice.elts[iter.slice.value]  # type: ignore
 
                 if isinstance(_elts, ast.Tuple):
                     _elts = _elts.elts
@@ -556,7 +554,7 @@ class ASTRewriter(ast.NodeTransformer):
             else:
                 _val = ast.Constant(value=i)
 
-            self.const[node.target.id] = _val
+            self.env.set_constant(node.target.id, _val)
 
             tar_assign = self.visit(ast.Assign(targets=[node.target], value=_val))
             rolls.extend(flatten([tar_assign]))
@@ -670,10 +668,6 @@ class ASTRewriter(ast.NodeTransformer):
             return node
 
     def visit_BinOp(self, node):
-        # Check if we have two constants
-        # if isinstance(node.right, ast.Constant) and isinstance(node.left, ast.Constant):
-        #     # return a constant evaluting the inner
-
         # Rewrite the ** operator to be a series of multiplications
         if isinstance(node.op, ast.Pow):
             if (
