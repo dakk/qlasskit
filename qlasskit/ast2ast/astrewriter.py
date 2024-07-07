@@ -155,18 +155,12 @@ class ASTRewriter(ast.NodeTransformer):
         return super().generic_visit(node)
 
     def visit_Subscript(self, node):  # noqa: C901
-        _sval = node.slice
-
         # Replace L[a] with const a, to L[const]
-        if isinstance(_sval, ast.Name) and _sval.id in self.const:
-            node.slice = self.const[_sval.id]
+        if isinstance(node.slice, ast.Name) and node.slice.id in self.const:
+            node.slice = self.const[node.slice.id]
 
         # Handle inner access L[i]
-        elif (
-            isinstance(node, ast.Subscript)
-            and isinstance(node.value, ast.Name)
-            and isinstance(node.slice, ast.Name)
-        ):
+        elif isinstance(node.value, ast.Name) and isinstance(node.slice, ast.Name):
             nname = node.value.id
             iname = node.slice.id
 
@@ -209,8 +203,7 @@ class ASTRewriter(ast.NodeTransformer):
 
         # Handle inner access L[i][j]
         elif (
-            isinstance(node, ast.Subscript)
-            and isinstance(node.value, ast.Subscript)
+            isinstance(node.value, ast.Subscript)
             and isinstance(node.value.value, ast.Name)
             and isinstance(node.value.slice, ast.Name)
             and isinstance(node.slice, ast.Name)
@@ -278,10 +271,10 @@ class ASTRewriter(ast.NodeTransformer):
             # Create the IfExp structure
             return create_if_exp(0, 0, max_i, max_j)
 
-        # Unroll L[a] with (L[0] if a == 0 else L[1] if a == 1 ...)
-        elif (isinstance(_sval, ast.Name) and _sval.id not in self.const) or isinstance(
-            _sval, ast.Subscript
-        ):
+        # Unroll L[a] with (L[0] if a == 0 else L[1] if a == 1 ...) when self.env[L] is constant
+        elif (
+            isinstance(node.slice, ast.Name) and node.slice.id not in self.const
+        ) or isinstance(node.slice, ast.Subscript):
             if isinstance(node.value, ast.Name):
                 if node.value.id == "Tuple":
                     return node
@@ -292,7 +285,7 @@ class ASTRewriter(ast.NodeTransformer):
 
             if not isinstance(tup, ast.Tuple):
                 raise Exception(
-                    "Not a tuple in ast2ast visit subscript with not constant _sval: "
+                    "Not a tuple in ast2ast visit subscript with not constant node.slice: "
                     + ast.dump(tup)
                 )
 
@@ -300,7 +293,7 @@ class ASTRewriter(ast.NodeTransformer):
 
             ifex = ast.IfExp(
                 test=ast.Compare(
-                    left=_sval, ops=[ast.Eq()], comparators=[ast.Constant(value=0)]
+                    left=node.slice, ops=[ast.Eq()], comparators=[ast.Constant(value=0)]
                 ),
                 body=elts[0],
                 orelse=ast.Constant(value=0),
@@ -308,7 +301,7 @@ class ASTRewriter(ast.NodeTransformer):
             for i, x in enumerate(elts[1:]):
                 ifex = ast.IfExp(
                     test=ast.Compare(
-                        left=_sval,
+                        left=node.slice,
                         ops=[ast.Eq()],
                         comparators=[ast.Constant(value=i + 1)],
                     ),
@@ -453,6 +446,7 @@ class ASTRewriter(ast.NodeTransformer):
         if isinstance(node.value, ast.Name) and node.value.id in self.env:
             self.env[target_0id] = self.env[node.value.id]
         elif isinstance(node.value, ast.Tuple) or isinstance(node.value, ast.List):
+            # TODO: this is a constant, not an annotation
             self.env[target_0id] = self.visit(node.value)
         else:
             self.env[target_0id] = "Unknown"
