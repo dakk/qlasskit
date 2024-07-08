@@ -16,6 +16,8 @@ from ast import NodeTransformer
 
 from .astrewriter import ASTRewriter
 from .constantfolder import ConstantFolder
+from .replacemultitargetassign import ReplaceMultiTargetAssign
+from .replacetypeann import ReplaceTypeAnn
 
 
 class IndexReplacer(NodeTransformer):
@@ -35,10 +37,14 @@ def ast2ast(a_tree):
     if sys.version_info < (3, 9):
         a_tree = IndexReplacer().visit(a_tree)
 
-    # Matrix translator
-
     # Fold constants
     a_tree = ConstantFolder().visit(a_tree)
+
+    # Replace Type Annotations
+    a_tree = ReplaceTypeAnn().visit(a_tree)
+
+    # Replace multi-target assign
+    a_tree = ReplaceMultiTargetAssign().visit(a_tree)
 
     # Rewrite the ast
     a_tree = ASTRewriter().visit(a_tree)
