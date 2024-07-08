@@ -134,10 +134,8 @@ class ASTRewriter(ast.NodeTransformer):
             # Infer i and j sizes from env['a']
             gtype = self.env.get_type(nname)
 
-            # self.env[nname] is a constant
             if isinstance(gtype, ast.Tuple):
                 max_i = len(gtype.elts) - 1
-            # self.env[nname] is a type annotation
             else:
                 outer_tuple = gtype.slice
                 max_i = len(outer_tuple.elts) - 1
@@ -159,11 +157,9 @@ class ASTRewriter(ast.NodeTransformer):
             # Infer i and j sizes from env['a']
             gtype = self.env.get_type(nname)
 
-            # self.env[nname] is a constant
-            if isinstance(gtype, ast.Tuple):
+            if isinstance(gtype, ast.Tuple) and isinstance(gtype.elts[0], ast.Tuple):
                 max_i = len(gtype.elts) - 1
-                max_j = len(gtype.elts[0].elts) - 1  # type: ignore
-            # self.env[nname] is a type annotation
+                max_j = len(gtype.elts[0].elts) - 1
             else:
                 outer_tuple = gtype.slice
                 max_i = len(outer_tuple.elts) - 1
@@ -364,14 +360,18 @@ class ASTRewriter(ast.NodeTransformer):
             return arg.elts
         elif isinstance(arg, ast.Constant) and isinstance(arg.value, ast.Tuple):
             return arg.value.elts
-        elif isinstance(arg, ast.Subscript):
-            _sval = self.env.get_type(arg.value.id)  # type: ignore
-            if isinstance(_sval, ast.Subscript) and isinstance(_sval.slice, ast.Tuple):
+        elif isinstance(arg, ast.Subscript) and isinstance(arg.value, ast.Name):
+            _sval = self.env.get_type(arg.value.id)
+            if (
+                isinstance(_sval, ast.Subscript)
+                and isinstance(_sval.slice, ast.Tuple)
+                and isinstance(arg.slice, ast.Constant)
+            ):
                 return [
                     ast.Subscript(
                         value=ast.Subscript(
-                            value=ast.Name(id=arg.value.id, ctx=ast.Load()),  # type: ignore
-                            slice=ast.Constant(value=arg.slice.value, kind=None),  # type: ignore
+                            value=ast.Name(id=arg.value.id, ctx=ast.Load()),
+                            slice=ast.Constant(value=arg.slice.value, kind=None),
                         ),
                         slice=ast.Constant(value=i, kind=None),
                     )
