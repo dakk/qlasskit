@@ -51,14 +51,14 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
     # Subscript: a[0][1]
     elif isinstance(expr, ast.Subscript):
 
-        def unroll_subscripts(sub, st):
-            _sval = sub.slice  # type: ignore
+        def unroll_subscripts(sub: ast.Subscript, st):
+            _sval = sub.slice
 
             if isinstance(sub.value, ast.Subscript):
-                st = f"{_sval.value}{'.' if st else ''}{st}"
+                st = f"{_sval.value}{'.' if st else ''}{st}"  # type: ignore
                 return unroll_subscripts(sub.value, st)
             elif isinstance(sub.value, ast.Name):
-                return f"{sub.value.id}.{_sval.value}.{st}"
+                return f"{sub.value.id}.{_sval.value}.{st}"  # type: ignore
             elif (
                 isinstance(sub.value, ast.Constant)
                 and hasattr(sub.value.value, "elts")
@@ -409,8 +409,6 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
     # Lambda
     # Dict
     # Set
-    # Call
-    # List
 
     else:
         raise exceptions.ExpressionNotHandledException(expr)
