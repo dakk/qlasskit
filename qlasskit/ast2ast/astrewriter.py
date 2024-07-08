@@ -242,12 +242,12 @@ class ASTRewriter(ast.NodeTransformer):
             if len(b.targets) != 1 or not isinstance(b.targets[0], ast.Name):
                 raise Exception("if targets only allow one Name target: ", ast.dump(b))
 
-            target_0id = b.targets[0].id
+            target = b.targets[0].id
 
-            if target_0id.startswith("__") and target_0id not in self.env:
-                orelse_inner = ast.Name(id=target_0id[2:])
+            if target.startswith("__") and target not in self.env:
+                orelse_inner = ast.Name(id=target[2:])
             else:
-                orelse_inner = ast.Name(id=target_0id)
+                orelse_inner = ast.Name(id=target)
 
             if_l.append(
                 ast.Assign(
@@ -265,15 +265,15 @@ class ASTRewriter(ast.NodeTransformer):
             if len(b.targets) != 1 or not isinstance(b.targets[0], ast.Name):
                 raise Exception("if targets only allow one Name target: ", ast.dump(b))
 
-            target_0id = b.targets[0].id
+            target = b.targets[0].id
 
-            if target_0id.startswith("__") and target_0id not in self.env:
-                orelse_inner = ast.Name(id=target_0id[2:])
-            elif target_0id[0 : len("_iftarg")] == "_iftarg":
+            if target.startswith("__") and target not in self.env:
+                orelse_inner = ast.Name(id=target[2:])
+            elif target[0 : len("_iftarg")] == "_iftarg":
                 if_l.append(b)
                 continue
             else:
-                orelse_inner = ast.Name(id=target_0id)
+                orelse_inner = ast.Name(id=target)
 
             if_l.append(
                 ast.Assign(
@@ -304,25 +304,25 @@ class ASTRewriter(ast.NodeTransformer):
         return super().generic_visit(node)
 
     def visit_Assign(self, node):
-        target_0id = node.targets[0].id
-        was_known = target_0id in self.env
+        target = node.targets[0].id
+        was_known = target in self.env
 
         if isinstance(node.value, ast.Constant):
-            self.env.set_constant(target_0id, node.value)
+            self.env.set_constant(target, node.value)
         elif isinstance(node.value, ast.Name) and node.value.id in self.env:
-            self.env.copy_type(node.value.id, target_0id)
+            self.env.copy_type(node.value.id, target)
         elif isinstance(node.value, ast.Tuple) or isinstance(node.value, ast.List):
-            self.env.set_constant(target_0id, self.visit(node.value))
+            self.env.set_constant(target, self.visit(node.value))
         else:
-            self.env.set_type(target_0id, "Unknown")
+            self.env.set_type(target, "Unknown")
 
         # If value is not self referencing, we can skip this (ie: a = b + 1)
-        ip = IsNamePresent(target_0id)
+        ip = IsNamePresent(target)
         ip.visit(node.value)
 
         # Reassigning an already present variable (use a temp variable)
         if ip.present and was_known and not isinstance(node.value, ast.Constant):
-            new_targ = ast.Name(id=f"__{target_0id}", ctx=ast.Load())
+            new_targ = ast.Name(id=f"__{target}", ctx=ast.Load())
 
             return [
                 ast.Assign(
