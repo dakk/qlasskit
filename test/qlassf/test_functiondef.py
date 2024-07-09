@@ -63,10 +63,30 @@ class TestQlassfFunctionDef(unittest.TestCase):
         compute_and_compare_results(self, qf)
         compute_and_compare_results(self, qg, test_original_f=False)
 
-    def test_inner_function(self):
+    def test_inner_function1(self):
         f = """def test(a: bool) -> bool:
     def test2(b:bool) -> bool:
         return not b
+    return test2(a)"""
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+        
+    def test_inner_function2(self):
+        f = """def test(a: bool, z: bool) -> bool:
+    def test2(b:bool) -> bool:
+        return not b
+    def test3(b:bool, c:bool) -> bool:
+        return b and c
+    return test3(test2(a), z)"""
+        qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
+        compute_and_compare_results(self, qf)
+
+    def test_inner_function3(self):
+        f = """def test(a: bool) -> bool:
+    def test2(b:bool) -> bool:
+        def test3(b:bool) -> bool:
+            return not b
+        return not test3(b)
     return test2(a)"""
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
