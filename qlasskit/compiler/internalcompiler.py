@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from copy import deepcopy
+
 from sympy import Symbol
 from sympy.logic import And, Not, Xor
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
@@ -25,11 +27,21 @@ from . import Compiler, CompilerException, ExpQMap
 class InternalCompiler(Compiler):
     """InternalCompiler translating an expression list to quantum circuit"""
 
+    def is_symbol_referenced_in_remaining_exps(self, symbol):
+        """Return True if the symbol is referenced in remaining expressions"""
+        for sym, exp in self.remaining_exps:
+            if sym == symbol:
+                return True
+            if symbol in exp.free_symbols:
+                return True
+        return False
+
     def compile(  # noqa: C901
         self, name, args: Args, returns: Arg, exprs: BoolExpList, uncompute=True
     ) -> QCircuit:
         qc = QCircuitEnhanced(name=name)
         self.expqmap = ExpQMap()
+        # self.remaining_exps = deepcopy(exprs)
 
         # 1. We first add a qubit for every input bit
         self.input_symbols = [arg_b for arg in args for arg_b in arg.bitvec]
@@ -37,6 +49,8 @@ class InternalCompiler(Compiler):
 
         # 2. Iterate over all expressions; iret contains qubit index for the current exp
         for sym, exp in exprs:
+            # self.remaining_exps.pop(0)
+
             is_temp = sym.name.startswith("__")
             symp_exp = self._symplify_exp(exp)
 
