@@ -18,6 +18,7 @@ from typing import Any
 
 from ..ast2logic import flatten
 from .env import Environment
+from .constantfolder import ConstantFolder
 
 
 def create_if_exp(nname, iname, max_i, jname=None, max_j=None):
@@ -425,6 +426,8 @@ class ASTRewriter(ast.NodeTransformer):
         return rolls
 
     def __call_range(self, node):
+        node = ConstantFolder().visit(node)
+        
         if not all([isinstance(a, ast.Constant) for a in node.args]):
             raise Exception("Range call on not constant arguments is not handled")
 
