@@ -62,8 +62,7 @@ quantum annealers, ising machines, simulators, etc.
    example_bernstein_vazirani.ipynb
    example_unitary_of_f.ipynb
    example_big_circuit.ipynb
-
-.. example_bqm_tsp.ipynb
+   example_bqm_tsp.ipynb
 
 
 Indices and tables
