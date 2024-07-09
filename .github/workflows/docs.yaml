@@ -21,7 +21,7 @@ jobs:
           pip install sphinx sphinx_rtd_theme sphinx_rtd_dark_mode myst_nb referencing
           pip uninstall  -y referencing 
           pip install pennylane==0.33.1 pennylane-lightning==0.33.1
-          pip install sympy qiskit[visualization] qiskit-aer matplotlib pylatexenc cirq pyqubo
+          pip install sympy qiskit[visualization] qiskit-aer matplotlib pylatexenc cirq pyqubo networkx
           pip install .
       - name: Sphinx build
         run: |
