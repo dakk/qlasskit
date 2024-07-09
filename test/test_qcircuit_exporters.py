@@ -102,13 +102,13 @@ class TestQCircuitExportSympy(unittest.TestCase):
         sym_circ = self.qc.export("circuit", "sympy")
         statev = qapply(sym_circ)
         meas = measure_all(statev)
-        self.assertEqual(meas, self.result)
+        self.assertEqual(list(map(lambda x: (x[0], float(x[1])), meas)), self.result)
 
     def test_export_sympy_gate(self):
         sym_circ = self.qc.export("gate", "sympy")
         statev = qapply(sym_circ * Qubit("0" * self.qc.num_qubits))
         meas = measure_all(statev)
-        self.assertEqual(meas, self.result)
+        self.assertEqual(list(map(lambda x: (x[0], float(x[1])), meas)), self.result)
 
 
 @parameterized_class(
