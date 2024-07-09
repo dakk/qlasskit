@@ -22,6 +22,7 @@ from . import SympyTransformer
 from .exp_transformers import (
     remove_Implies,
     remove_ITE,
+    remove_obvious_expr,
     transform_or2and,
     transform_or2xor,
 )
@@ -91,6 +92,7 @@ defaultOptimizer = BoolOptimizerProfile(
         remove_Implies(),
         transform_or2xor(),
         transform_or2and(),
+        remove_obvious_expr(),
     ]
 )
 
@@ -104,6 +106,7 @@ defaultOptimizerDebug = BoolOptimizerProfile(
         remove_Implies(),
         transform_or2xor(),
         transform_or2and(),
+        remove_obvious_expr(),
         print_step("after"),
     ]
 )
@@ -115,5 +118,6 @@ fastOptimizer = BoolOptimizerProfile(
         remove_Implies(),
         transform_or2xor(),
         transform_or2and(),
+        remove_obvious_expr(),
     ]
 )

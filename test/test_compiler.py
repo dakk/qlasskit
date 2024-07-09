@@ -69,3 +69,16 @@ class TestCompiler(unittest.TestCase):
         self.assertEqual(qf.circuit().num_qubits, 4)
         self.assertEqual(qf.circuit().num_gates, 4)
         compute_and_compare_results(self, qf)
+
+    # def test_sum_and_sub(self):
+    #     f = (
+    #         "def test(a: Qint[2]) -> Qint[2]:\n"
+    #         "\treturn (a + 3) - 3"
+    #     )
+    #     qf = qlassf(f, to_compile=True, compiler=self.compiler, uncompute=True)
+    #     # print(qf.expressions)
+    #     # qf.circuit().draw()
+    #     compute_and_compare_results(self, qf)
+
+
+# class TestInternalCompiler(unittest.TestCase):

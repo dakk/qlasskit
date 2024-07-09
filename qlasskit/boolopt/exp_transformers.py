@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from sympy import Symbol
 from sympy.logic import And, Not, Or, Xor
+from sympy.logic.boolalg import BooleanFalse, BooleanTrue
 
 from . import SympyTransformer
 
@@ -61,3 +63,44 @@ class transform_or2xor(SympyTransformer):
 class transform_or2and(SympyTransformer):
     def visit_Or(self, expr):
         return Not(And(*[Not(self.visit(e)) for e in expr.args]))
+
+
+class remove_obvious_expr(SympyTransformer):
+    def visit_Not(self, expr):
+        if isinstance(expr.args[0], Not):
+            return expr.args[0].args[0]
+        return expr
+
+    def visit_And(self, expr):
+        if len(expr.args) == 2 and (
+            (
+                isinstance(expr.args[0], Symbol)
+                and isinstance(expr.args[1], Not)
+                and (expr.args[0] == expr.args[1].args[0])
+            )
+            or (
+                isinstance(expr.args[0], Not)
+                and isinstance(expr.args[1], Symbol)
+                and (expr.args[1] == expr.args[0].args[0])
+            )
+        ):
+            return BooleanFalse()
+
+        return expr
+
+    def visit_Or(self, expr):
+        if len(expr.args) == 2 and (
+            (
+                isinstance(expr.args[0], Symbol)
+                and isinstance(expr.args[1], Not)
+                and (expr.args[0] == expr.args[1].args[0])
+            )
+            or (
+                isinstance(expr.args[0], Not)
+                and isinstance(expr.args[1], Symbol)
+                and (expr.args[1] == expr.args[0].args[0])
+            )
+        ):
+            return BooleanTrue()
+
+        return expr

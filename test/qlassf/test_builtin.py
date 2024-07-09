@@ -51,8 +51,7 @@ class TestQlassfBuiltinFunctions(unittest.TestCase):
         self.assertEqual(qf.expressions[2][1], True)
         self.assertEqual(qf.expressions[3][1], False)
         compute_and_compare_results(self, qf)
-        
-        
+
     def test_range_of_len(self):
         f = (
             "def test(a: Tuple[bool, bool, bool, bool]) -> Qint[4]:\n\tx = 0\n"

@@ -70,7 +70,7 @@ class TestQlassfFunctionDef(unittest.TestCase):
     return test2(a)"""
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         compute_and_compare_results(self, qf)
-        
+
     def test_inner_function2(self):
         f = """def test(a: bool, z: bool) -> bool:
     def test2(b:bool) -> bool:

@@ -51,6 +51,6 @@ def ast2ast(a_tree):
 
     # Fold constants again
     a_tree = ConstantFolder().visit(a_tree)
-    
+
     # print(ast.dump(a_tree))
     return a_tree
