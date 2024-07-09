@@ -93,7 +93,7 @@ class TestQCircuitExportQASM(unittest.TestCase):
     [
         (cx_circuit(), [(Qubit("11"), 1)]),
         (ccx_circuit(), [(Qubit("111"), 1)]),
-        (bell_circuit(), [(Qubit("00"), 1 / 2), (Qubit("11"), 1 / 2)]),
+        (bell_circuit(), [(Qubit("00"), 0.5), (Qubit("11"), 0.5)]),
         # (qft_circuit(), [(Qubit("000"), 1)]),
     ],
 )
