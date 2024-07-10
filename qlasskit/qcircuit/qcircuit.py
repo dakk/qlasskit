@@ -15,7 +15,7 @@
 import copy
 import math
 import random
-from typing import Any, List, Literal, Tuple, Union
+from typing import Any, Dict, List, Literal, Tuple, Union
 
 from sympy import Symbol
 
@@ -53,6 +53,15 @@ class QCircuit:
             for i in w:
                 _used_qubits.add(i)
         return _used_qubits
+
+    @property
+    def gate_stats(self) -> Dict:
+        d = {}
+        for g, w, p in self.gates:
+            if g.name not in d:
+                d[g.name] = 0
+            d[g.name] += 1
+        return d
 
     @staticmethod
     def random(qubits_n: int, depth: int, gate_list=None) -> "QCircuit":

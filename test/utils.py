@@ -48,7 +48,7 @@ except:
 
 qsk_simulator = AerSimulator()
 
-statistics = {"tests": 0, "qubits": 0, "gates": 0}
+statistics = {"tests": 0, "qubits": 0, "gates": 0, "gate_stats": {}}
 
 try:
     old_statistics = json.loads(open(".t_statistics", "r").read())[-100:]
@@ -58,12 +58,18 @@ except:
 statistics_lock = threading.Lock()
 
 
-def update_statistics(q, g):
+def update_statistics(q, g, gate_stats):
     with statistics_lock:
         global statistics
         statistics["tests"] += 1
         statistics["qubits"] += q
         statistics["gates"] += g
+
+        for k, v in gate_stats.items():
+            if k not in statistics["gate_stats"]:
+                statistics["gate_stats"][k] = 0
+            statistics["gate_stats"][k] += v
+
         f = open(".t_statistics", "w")
         f.write(json.dumps(old_statistics + [statistics], indent=4))
         f.close()
@@ -223,7 +229,9 @@ def compute_and_compare_results(cls, qf, test_original_f=True, test_qcircuit=Tru
 
     # circ_qi = qf.circuit().export("circuit", "qiskit")
 
-    update_statistics(qf.circuit().num_qubits, qf.circuit().num_gates)
+    update_statistics(
+        qf.circuit().num_qubits, qf.circuit().num_gates, qf.circuit().gate_stats
+    )
 
     # print(qf.expressions)
     # print(circ_qi.draw("text"))

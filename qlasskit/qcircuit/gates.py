@@ -20,6 +20,10 @@ class QGate:
         self.__name__ = name
         self.n_qubits = n_qubits
 
+    @property
+    def name(self) -> str:
+        return self.__name__
+
     def __repr__(self):
         return f"{self.__name__}"
 
