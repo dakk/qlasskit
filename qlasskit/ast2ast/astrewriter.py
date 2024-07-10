@@ -183,6 +183,9 @@ class ASTRewriter(ast.NodeTransformer):
             else:
                 tup = node.value
 
+            if isinstance(tup, ast.Constant):
+                tup = tup.value
+
             if not isinstance(tup, ast.Tuple):
                 raise Exception(
                     "Not a tuple in ast2ast visit subscript with not constant node.slice: "
@@ -191,13 +194,8 @@ class ASTRewriter(ast.NodeTransformer):
 
             elts = tup.elts
 
-            ifex = ast.IfExp(
-                test=ast.Compare(
-                    left=node.slice, ops=[ast.Eq()], comparators=[ast.Constant(value=0)]
-                ),
-                body=elts[0],
-                orelse=ast.Constant(value=0),
-            )
+            ifex = elts[0]
+            
             for i, x in enumerate(elts[1:]):
                 ifex = ast.IfExp(
                     test=ast.Compare(

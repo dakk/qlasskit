@@ -24,6 +24,9 @@ class Environment:
         self.types[name] = type_annotation
 
     def set_constant(self, name, value):
+        if isinstance(value, ast.Constant):
+            return self.set_constant(name, value.value)
+
         self.constants[name] = value
 
         if name not in self.types:
