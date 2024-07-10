@@ -16,7 +16,7 @@ import unittest
 
 from parameterized import parameterized_class
 from sympy import Symbol, symbols
-from sympy.logic import ITE, And, Not, false, true
+from sympy.logic import ITE, And, Not, Or, false, true
 
 from qlasskit import exceptions, qlassf
 
@@ -90,7 +90,8 @@ class TestQlassfBoolean(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_or_not(self):
-        ex = Not(And(a, Not(b)))
+        # ex = Not(And(a, Not(b)))
+        ex = Or(b, Not(a))
         f = "def test(a: bool, b: bool) -> bool:\n\treturn not a or b"
         qf = qlassf(f, to_compile=COMPILATION_ENABLED, compiler=self.compiler)
         self.assertEqual(len(qf.expressions), 1)
@@ -138,7 +139,8 @@ class TestQlassfBoolean(unittest.TestCase):
         compute_and_compare_results(self, qf)
 
     def test_ifexp3(self):
-        exp = And(a, Not(And(b, c)))
+        # exp = And(a, Not(And(b, c)))
+        exp = And(a, Or(Not(b), Not(c)))
         f = (
             "def test(a: bool, b: bool, c: bool) -> bool:\n"
             "\treturn (c and not b) if a and ((not b) and c) else (a and not c)"

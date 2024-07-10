@@ -18,6 +18,8 @@ from sympy.logic.boolalg import BooleanFalse, BooleanTrue
 
 from . import SympyTransformer
 
+DISABLE_OR = False
+
 
 class remove_ITE(SympyTransformer):
     def visit_ITE(self, expr):
@@ -62,7 +64,9 @@ class transform_or2xor(SympyTransformer):
 
 class transform_or2and(SympyTransformer):
     def visit_Or(self, expr):
-        return Not(And(*[Not(self.visit(e)) for e in expr.args]))
+        if len(expr.args) > 2 or DISABLE_OR:
+            return Not(And(*[Not(self.visit(e)) for e in expr.args]))
+        return expr
 
 
 class remove_obvious_expr(SympyTransformer):

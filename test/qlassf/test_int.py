@@ -16,7 +16,7 @@ import unittest
 
 from parameterized import parameterized, parameterized_class
 from sympy import Symbol, symbols
-from sympy.logic import And, Not
+from sympy.logic import And, Not, Or
 
 from qlasskit import Qint2, Qint4, exceptions, qlassf
 from qlasskit.types import bin_to_bool_list
@@ -89,7 +89,8 @@ class TestQlassfIntParametrized_2_4_8(unittest.TestCase):
         self.assertEqual(qf.expressions[0][0], _ret)
         self.assertEqual(
             qf.expressions[0][1],
-            And(Symbol("a.0"), Not(And(Symbol("b"), Not(Symbol("a.1"))))),
+            And(Symbol("a.0"), Or(Symbol("a.1"), Not(Symbol("b")))),
+            # And(Symbol("a.0"), Not(And(Symbol("b"), Not(Symbol("a.1"))))),
         )
         compute_and_compare_results(self, qf)
 
