@@ -15,7 +15,7 @@
 # from copy import deepcopy
 
 from sympy import Symbol
-from sympy.logic import And, Not, Xor
+from sympy.logic import And, Not, Or, Xor
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
 
 from ..ast2logic.typing import Arg, Args, BoolExpList
@@ -113,9 +113,13 @@ class InternalCompiler(Compiler):
         elif isinstance(expr, Not):
             return self.compile_not(qc, expr, dest, sym)
 
-        # 7. If expr is an And
+        # 7a. If expr is an And
         elif isinstance(expr, And):
             return self.compile_and(qc, expr, dest)
+
+        # 7b. If expr is an Or
+        elif isinstance(expr, Or):
+            return self.compile_or(qc, expr, dest)
 
         # 8. If expr is a Hybrid Quantum-Boolean gate
         elif isinstance(expr, QuantumBooleanGate):
@@ -155,6 +159,34 @@ class InternalCompiler(Compiler):
 
         # 4. Perform the MCX between all args
         erets = list(set(erets))
+        qc.mcx(erets, dest)
+
+        # 5. Mark ancilla every argument and return
+        [qc.mark_ancilla(eret) for eret in erets]
+        self.expqmap[expr] = dest
+
+        return dest
+
+    def compile_or(self, qc, expr, dest=None) -> int:
+        # TODO: this won't work on len(expr.args) > 2
+
+        # 1. Compile every argument
+        erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))
+
+        # 2. Get a destination qubit
+        if dest is None:
+            dest = qc.get_free_ancilla()
+
+        # 3. If dest is one of the argument, remove from the list
+        if dest in erets:
+            erets.remove(dest)
+
+        # . Perform the CX between all args and dest
+        erets = list(set(erets))
+        for i in erets:
+            qc.cx(i, dest)
+
+        # 4. Perform the MCX between all args
         qc.mcx(erets, dest)
 
         # 5. Mark ancilla every argument and return
