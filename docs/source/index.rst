@@ -53,6 +53,7 @@ quantum annealers, ising machines, simulators, etc.
    :caption: Examples
 
    example_grover.ipynb
+   example_grover_sat.ipynb
    example_grover_subset.ipynb
    example_grover_hash.ipynb
    example_grover_sudoku.ipynb
