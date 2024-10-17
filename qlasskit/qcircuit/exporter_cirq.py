@@ -47,7 +47,7 @@ class CirqExporter(QCircuitExporter):
                             gg = cirq.ControlledGate(
                                 sub_gate=cirq.X, num_controls=len(w) - 1
                             )
-                            yield gg(list(map(lambda wx: qubits[w], w)))
+                            yield gg(*(qubits[i] for i in w))
 
                         elif isinstance(g, gates.MCtrl) and isinstance(g.gate, gates.Z):
                             gg = cirq.ControlledGate(
