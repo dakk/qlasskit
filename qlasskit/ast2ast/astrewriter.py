@@ -195,7 +195,7 @@ class ASTRewriter(ast.NodeTransformer):
             elts = tup.elts
 
             ifex = elts[0]
-            
+
             for i, x in enumerate(elts[1:]):
                 ifex = ast.IfExp(
                     test=ast.Compare(

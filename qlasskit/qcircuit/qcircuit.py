@@ -73,6 +73,7 @@ class QCircuit:
                 gates.X,
                 gates.Z,
                 gates.Y,
+                gates.CZ,
                 gates.CX,
                 gates.CCX,
                 gates.H,
@@ -286,6 +287,11 @@ class QCircuit:
         """CCX gate"""
         w1, w2, w3 = self[w1], self[w2], self[w3]
         self.append(gates.CCX(), [w1, w2, w3])
+
+    def cz(self, w1, w2):
+        """CZ gate"""
+        w1, w2 = self[w1], self[w2]
+        self.append(gates.CZ(), [w1, w2])
 
     def mctrl(self, g, wl: List[int], target, param=None):
         """Multi controlled gate"""

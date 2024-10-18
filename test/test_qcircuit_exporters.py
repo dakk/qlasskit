@@ -34,6 +34,14 @@ def cx_circuit():
     return qc
 
 
+def cz_circuit():
+    qc = QCircuit()
+    a, b = qc.add_qubit(), qc.add_qubit()
+    qc.x(a)
+    qc.cz(a, b)
+    return qc
+
+
 def ccx_circuit():
     qc = QCircuit()
     a, b, c = qc.add_qubit("a"), qc.add_qubit("b"), qc.add_qubit("c")
@@ -63,6 +71,7 @@ def qft_circuit():
     ("qc", "result"),
     [
         (cx_circuit(), "gate qc q0 q1 {\n\tx q0\n\tcx q0 q1\n}\n\n"),
+        (cz_circuit(), "gate qc q0 q1 {\n\tx q0\n\tcz q0 q1\n}\n\n"),
         (ccx_circuit(), "gate qc a b c {\n\tx a\n\tx b\n\tccx a b c\n}\n\n"),
         (bell_circuit(), "gate qc a b {\n\th a\n\tcx a b\n}\n\n"),
         (
@@ -115,6 +124,7 @@ class TestQCircuitExportSympy(unittest.TestCase):
     ("qc", "result"),
     [
         (cx_circuit(), {"11": 1}),
+        (cz_circuit(), {"01": 1}),
         (ccx_circuit(), {"111": 1}),
         (qft_circuit(), {"000": 1}),
     ],
@@ -134,6 +144,13 @@ class TestQCircuitExportQiskit(unittest.TestCase):
             {
                 "q(0)": np.array([[[1]]], dtype=np.int8),
                 "q(1)": np.array([[[1]]], dtype=np.int8),
+            },
+        ),
+        (
+            cz_circuit(),
+            {
+                "q(0)": np.array([[[1]]], dtype=np.int8),
+                "q(1)": np.array([[[0]]], dtype=np.int8),
             },
         ),
         (
@@ -186,6 +203,7 @@ class TestQCircuitExportCirq(unittest.TestCase):
     ("qc", "result", "wires"),
     [
         (cx_circuit(), [0, 0, 0, 1], 2),
+        (cz_circuit(), [0, 0, 1, 0], 2),
         (ccx_circuit(), [0, 0, 0, 0, 0, 0, 0, 1], 3),
         (bell_circuit(), [0.5, 0, 0, 0.5], 2),
         (qft_circuit(), [1, 0, 0, 0, 0, 0, 0, 0], 3),
@@ -209,6 +227,7 @@ class TestQCircuitExportPennylane(unittest.TestCase):
     ("qc", "result"),
     [
         (cx_circuit(), [0, 0, 0, 1]),
+        (cz_circuit(), [0, 0, 1, 0]),
         (ccx_circuit(), [0, 0, 0, 0, 0, 0, 0, 1]),
         (bell_circuit(), [0.70710678, 0, 0, 0.70710678]),
         (qft_circuit(), [1, 0, 0, 0, 0, 0, 0, 0]),
@@ -225,5 +244,5 @@ class TestQCircuitExportQutip(unittest.TestCase):
 
         self.assertEqual(probabilities, [1])
 
-        for i in zip(states[0].data.to_array(), self.result):
+        for i in zip(states[0].data.toarray(), self.result):
             self.assertAlmostEqual(float(i[0][0]), i[1])

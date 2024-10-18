@@ -105,6 +105,11 @@ class CX(QControlledGate):
         super().__init__(X(), 1)
 
 
+class CZ(QControlledGate):
+    def __init__(self):
+        super().__init__(Z(), 1)
+
+
 class CP(QControlledGate):
     def __init__(self):
         super().__init__(P(), 1)
