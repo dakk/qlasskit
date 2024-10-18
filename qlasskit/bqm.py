@@ -149,7 +149,8 @@ def decode_samples(qf, sampleset):
                 el.sample[bv] if bv in el.sample else random.randint(0, 1)
                 for bv in arg.bitvec
             ]
-            args[arg.name] = interpret_as_qtype(bitstr[::-1], arg.ttype, len(arg))
+            # TODO: fix this typing
+            args[arg.name] = interpret_as_qtype(bitstr[::-1], arg.ttype, len(arg))  # type: ignore
 
         # bitstr = [ el.sample[bv] for bv in qf.returns.bitvec ]
         # args['_ret'] = interpret_as_qtype(bitstr, qf.returns.ttype, len(qf.returns))
