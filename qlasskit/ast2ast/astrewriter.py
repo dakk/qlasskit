@@ -456,7 +456,7 @@ class ASTRewriter(ast.NodeTransformer):
                     ast.Compare(left=arg_l[0], ops=[op], comparators=[l_it])
                     for l_it in arg_l[1:]
                 ]
-                comp = ast.BoolOp(op=ast.And(), values=comps)
+                comp = ast.BoolOp(op=ast.And(), values=comps) # type: ignore
                 return ast.IfExp(test=comp, body=arg_l[0], orelse=iterif(arg_l[1:]))
 
         return iterif(args)
