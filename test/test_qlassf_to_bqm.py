@@ -23,7 +23,7 @@ from qlasskit.bqm import decode_samples
 DISABLE_BQM_TESTS = False
 
 # os.getenv("GITHUB_ACTIONS") and
-if sys.version_info.major == 3 and sys.version_info.minor == 12:
+if sys.version_info.major == 3 and sys.version_info.minor >= 12:
     try:
         import dimod
         import neal
