@@ -1,0 +1,124 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# BQM Polynomial solver"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[(x0, ~(x.3 ^ x.4 ^ (x.4 & x.5))),\n",
+       " (x1, x0 & y.4),\n",
+       " (x2, x.3 & x.4),\n",
+       " (x3, x.4 & x.5 & (x.3 ^ x.4)),\n",
+       " (x4, ~(x.0 ^ x.3 ^ x2 ^ x3)),\n",
+       " (x5, ~(x.4 ^ x.5)),\n",
+       " (x6, x5 & y.5 & (x0 ^ y.4)),\n",
+       " (x7, x1 ^ x4 ^ x6 ^ y.3),\n",
+       " (x8, ~x7),\n",
+       " (x9, x4 & y.3),\n",
+       " (x10, x.0 & x.3),\n",
+       " (x11, (x.0 ^ x.3) & (x2 ^ x3)),\n",
+       " (x12, ~(x.0 ^ x.1 ^ x10 ^ x11)),\n",
+       " (x13, (x1 ^ x6) & (x4 ^ y.3)),\n",
+       " (x14, ~(x12 ^ x13 ^ x9 ^ y.0)),\n",
+       " (_ret.0, x7),\n",
+       " (_ret.1, x14 ^ x8),\n",
+       " (_ret.2,\n",
+       "  (x14 & x8) ^ ~(y.1 ^ (x12 & y.0) ^ ((x12 ^ y.0) & (x13 ^ x9)) ^ ~(x.1 ^ x.2 ^ (x.0 & x.1) ^ ((x.0 ^ x.1) & (x10 ^ x11))))),\n",
+       " (_ret.3, ~(x0 ^ y.4 ^ (x5 & y.5))),\n",
+       " (_ret.4, ~(x5 ^ y.5)),\n",
+       " (_ret.5, x.5)]"
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "from qlasskit import qlassf, Qfixed\n",
+    "\n",
+    "\n",
+    "@qlassf\n",
+    "def poly(x: Qfixed[3, 3], y: Qfixed[3, 3]) -> Qfixed[3, 3]:\n",
+    "    return x * 3 - y * 2 + 1.0\n",
+    "\n",
+    "\n",
+    "poly.expressions"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Vars: 127 \n",
+      "Interactions: 1951\n"
+     ]
+    }
+   ],
+   "source": [
+    "bqm = poly.to_bqm()\n",
+    "print(\"Vars:\", bqm.num_variables, \"\\nInteractions:\", bqm.num_interactions)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{'x': 7.875, 'y': 7.375}\n"
+     ]
+    }
+   ],
+   "source": [
+    "import neal\n",
+    "from qlasskit.bqm import decode_samples\n",
+    "\n",
+    "sa = neal.SimulatedAnnealingSampler()\n",
+    "sampleset = sa.sample(bqm, num_reads=10)\n",
+    "decoded_samples = decode_samples(poly, sampleset)\n",
+    "best_sample = min(decoded_samples, key=lambda x: x.energy)\n",
+    "print(best_sample.sample)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "qlasskit_310-env",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
