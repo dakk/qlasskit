@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   unit-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
@@ -26,7 +26,7 @@ jobs:
       run: tox -e unit-tests #--override testenv.deps+=tweedledum --override testenv.extras=tweedledum
 
   unit-tests-3_8:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
@@ -52,7 +52,7 @@ jobs:
 
 
   unit-tests-notw:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
@@ -75,7 +75,7 @@ jobs:
 
 
   unit-tests-notw-nopyqubo:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
@@ -98,7 +98,7 @@ jobs:
       run: tox -c tox_no_tw_and_pyqubo.ini -e unit-tests
 
   linters:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
       image: cimg/python:3.11
 
@@ -118,7 +118,7 @@ jobs:
       run: tox -e linters
 
   # coverage:
-  #   runs-on: ubuntu-latest
+  #   runs-on: ubuntu-24.04
   #   container:
   #     image: cimg/python:3.11
 
@@ -138,7 +138,7 @@ jobs:
   #     run: tox -e coverage
 
   typecheck:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
       image: cimg/python:3.11
 
