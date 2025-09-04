@@ -215,7 +215,7 @@ class TestQCircuitExportPennylane(unittest.TestCase):
         tape = qml.tape.QuantumTape(tape.operations, [qml.probs()])
 
         dev = qml.device("default.qubit", wires=self.wires)
-        r = qml.execute([tape], dev, gradient_fn=None)
+        r = qml.execute([tape], dev)
 
         self.assertEqual(len(r[0]), len(self.result))
 
