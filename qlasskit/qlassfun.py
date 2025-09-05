@@ -107,7 +107,7 @@ class UnboundQlassf:
             f_ast2 = ast.fix_missing_locations(fun_ast)
             c = compile(f_ast2, "<string>", "exec")
 
-            ns = {}
+            ns: Dict = {}
             try:
                 exec(c, globals(), ns)  # explicit namespace works in >=3.13 and <3.13
                 original_f = ns.get(fun_ast.body[0].name)
