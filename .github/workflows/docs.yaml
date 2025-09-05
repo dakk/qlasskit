@@ -1,6 +1,12 @@
 name: docs
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+    branches: [master]
 
 permissions:
   contents: write

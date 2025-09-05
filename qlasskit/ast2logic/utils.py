@@ -20,6 +20,12 @@ from typing import List, Any, Iterable, Union
 #     return [item for row in m for item in row]
 
 
+def safe_str(x: object) -> str:
+    if isinstance(x, bytes):
+        return x.decode("utf-8", errors="replace")
+    return str(x)
+
+
 def flatten(m: List[Union[Any, List[Any]]]) -> List[Any]:
     return [
         item

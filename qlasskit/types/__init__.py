@@ -131,7 +131,8 @@ def type_repr(typ) -> str:
         args = [type_repr(a) for a in get_args(typ)]
         return f"{typ.__name__}[{','.join(args)}]"
 
-    elif len(get_args(typ)) > 0:  # This is for python = 3.8
+    # TODO: This is for python = 3.8 which is not supported anymore, remove
+    elif len(get_args(typ)) > 0:
         args = [type_repr(a) for a in get_args(typ)]
         if all([args[0] == a for a in args[1:]]):
             return f"Qlist[{args[0]}, {len(args)}]"

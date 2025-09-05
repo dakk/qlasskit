@@ -18,6 +18,7 @@ from ..types import *  # noqa: F401, F403
 from ..types import TType
 from . import Env, exceptions
 from .typing import Arg, Args
+from .utils import safe_str
 
 
 def translate_argument(ann, env, base="") -> Arg:  # noqa: C901
@@ -26,9 +27,9 @@ def translate_argument(ann, env, base="") -> Arg:  # noqa: C901
             return a.attr
         elif isinstance(a, ast.Subscript):  # for Qfixed and similar
             if isinstance(a.slice, ast.Constant):
-                t = f"{a.slice.value}"
+                t = safe_str(a.slice.value)
             else:
-                t = "_".join(f"{e.value}" for e in a.slice.elts)  # type: ignore
+                t = "_".join(safe_str(e.value) for e in a.slice.elts)  # type: ignore
             return f"{a.value.id}{t}"  # type: ignore
         else:
             return a.id

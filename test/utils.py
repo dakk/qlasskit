@@ -60,7 +60,7 @@ statistics_lock = threading.Lock()
 
 def update_statistics(q, g, gate_stats):
     with statistics_lock:
-        global statistics
+        global statistics  # noqa: F824
         statistics["tests"] += 1
         statistics["qubits"] += q
         statistics["gates"] += g

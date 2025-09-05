@@ -96,7 +96,7 @@ class ConstantFolder(ast.NodeTransformer):
                 if isinstance(arg, ast.Tuple) or isinstance(arg, ast.List):
                     elts = [self.visit(elt) for elt in arg.elts]
                     if all(isinstance(elt, ast.Constant) for elt in elts):
-                        return ast.Constant([elt.value for elt in elts])
+                        return ast.Constant([elt.value for elt in elts])  # type: ignore
 
                 return arg
 
@@ -113,7 +113,7 @@ class ConstantFolder(ast.NodeTransformer):
         if isinstance(node.value, ast.List) and isinstance(node.slice, ast.Constant):
             if all(isinstance(elt, ast.Constant) for elt in node.value.elts):
                 try:
-                    return node.value.elts[node.slice.value]
+                    return node.value.elts[node.slice.value]  # type: ignore
                 except IndexError:
                     pass
         return node

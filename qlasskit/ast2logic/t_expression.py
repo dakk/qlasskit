@@ -20,6 +20,7 @@ from sympy.logic import ITE, And, Not, Or, Xor, false, true
 from ..boolquant import QuantumBooleanGate
 from ..types import Qbool, Qfixed, Qint, Qtype, TExp, TypeErrorException, const_to_qtype
 from . import Env, exceptions
+from .utils import safe_str
 
 
 def decompose_to_symbols(vlist, base, res=[]) -> List[Symbol]:
@@ -64,7 +65,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
                 and hasattr(sub.value.value, "elts")
                 and isinstance(sub.slice, ast.Constant)
             ):
-                return sub.value.value.elts[sub.slice.value]
+                return sub.value.value.elts[sub.slice.value]  # type: ignore
             else:
                 raise Exception(f"Subscript not handled: {ast.dump(sub)} {st}")
 
@@ -74,7 +75,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             raise exceptions.ExpressionNotHandledException(expr)
 
         if isinstance(expr.value, ast.Name):
-            sn = f"{expr.value.id}.{_sval.value}"
+            sn = f"{expr.value.id}.{safe_str(_sval.value)}"
         else:
             sn = unroll_subscripts(expr, "")
 
@@ -295,13 +296,13 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             and hasattr(tleft[0], "shift_left")
             and isinstance(expr.right, ast.Constant)
         ):
-            return tleft[0].shift_left(tleft, expr.right.value)
+            return tleft[0].shift_left(tleft, expr.right.value)  # type: ignore
         elif (
             isinstance(expr.op, ast.RShift)
             and hasattr(tleft[0], "shift_right")
             and isinstance(expr.right, ast.Constant)
         ):
-            return tleft[0].shift_right(tleft, expr.right.value)
+            return tleft[0].shift_right(tleft, expr.right.value)  # type: ignore
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 

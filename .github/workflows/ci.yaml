@@ -1,6 +1,12 @@
 name: CI
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+    branches: [master]
 
 jobs:
   unit-tests:
@@ -24,32 +30,6 @@ jobs:
 
     - name: Run tests
       run: tox -e unit-tests #--override testenv.deps+=tweedledum --override testenv.extras=tweedledum
-
-  unit-tests-3_8:
-    runs-on: ubuntu-24.04
-
-    strategy:
-      matrix:
-        python-version: ["3.8"]
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install dependencies
-      run: pip install tox
-
-    - name: Run tests
-      run: |
-        rm test/test_qcircuit_exporters.py
-        rm test/test_qlassf_to_bqm.py
-        tox -c tox_3.8.ini -e unit-tests
-
 
   unit-tests-notw:
     runs-on: ubuntu-24.04
@@ -99,17 +79,15 @@ jobs:
 
   linters:
     runs-on: ubuntu-24.04
-    container:
-      image: cimg/python:3.11
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Python 3.11
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.11
+        python-version: "3.11"
 
     - name: Install dependencies
       run: pip install tox
@@ -139,17 +117,14 @@ jobs:
 
   typecheck:
     runs-on: ubuntu-24.04
-    container:
-      image: cimg/python:3.11
-
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Python 3.11
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.11
+        python-version: "3.11"
 
     - name: Install dependencies
       run: pip install tox
