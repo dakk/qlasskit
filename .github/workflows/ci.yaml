@@ -31,32 +31,6 @@ jobs:
     - name: Run tests
       run: tox -e unit-tests #--override testenv.deps+=tweedledum --override testenv.extras=tweedledum
 
-  unit-tests-3_8:
-    runs-on: ubuntu-24.04
-
-    strategy:
-      matrix:
-        python-version: ["3.8"]
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install dependencies
-      run: pip install tox
-
-    - name: Run tests
-      run: |
-        rm test/test_qcircuit_exporters.py
-        rm test/test_qlassf_to_bqm.py
-        tox -c tox_3.8.ini -e unit-tests
-
-
   unit-tests-notw:
     runs-on: ubuntu-24.04
 
