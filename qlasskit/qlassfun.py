@@ -40,6 +40,20 @@ def in_ipynb():
 
     return "ipykernel" in sys.modules
 
+def is_parameter_annotation(node):
+    """Return True if an annotation looks like 'Parameter[...]'."""
+    if node is None:
+        return False
+    if isinstance(node, ast.Subscript):
+        if isinstance(node.value, ast.Name) and node.value.id == "Parameter":
+            return True
+        if isinstance(node.value, ast.Attribute) and node.value.attr == "Parameter":
+            return True
+    elif isinstance(node, ast.Name) and node.id == "Parameter":
+        return True
+    elif isinstance(node, ast.Attribute) and node.attr == "Parameter":
+        return True
+    return False
 
 class UnboundQlassf:
     """Class representing a qlassf function with unbound parameters"""
@@ -65,7 +79,7 @@ class UnboundQlassf:
         for k, w in kwargs.items():
 
             def to_val(w):
-                if hasattr(w, "__iter__"):
+                if hasattr(w, "__iter__") and not isinstance(w, (str, bytes)):
                     return ast.Tuple(ctx=ast.Load(), elts=list(map(to_val, w)))
                 else:
                     return ast.Constant(value=w)
@@ -80,25 +94,25 @@ class UnboundQlassf:
                 )
             )
 
-        fun_ast.body[0].args.args = list(
-            filter(
-                lambda arg: not (  # type: ignore
-                    isinstance(arg.annotation, ast.Subscript)
-                    and arg.annotation.value.id == "Parameter"  # type: ignore
-                ),
-                fun_ast.body[0].args.args,
-            )
-        )
+        # remove args annotated with Parameter[…]
+        fun_ast.body[0].args.args = [
+            arg for arg in fun_ast.body[0].args.args
+            if not is_parameter_annotation(arg.annotation)
+        ]
 
+        # prepend our injected assignments
         fun_ast.body[0].body = new_body + fun_ast.body[0].body
 
         if not in_ipynb():
             f_ast2 = ast.fix_missing_locations(fun_ast)
             c = compile(f_ast2, "<string>", "exec")
+
+            ns = {}
             try:
-                exec(c)
-                original_f = eval(fun_ast.body[0].name)
-            except:
+                exec(c, globals(), ns)  # explicit namespace works in >=3.13 and <3.13
+                original_f = ns.get(fun_ast.body[0].name)
+            except Exception:
+                # fallback: partial on original function
                 original_f = partial(self.original_f, **kwargs)
         else:
 
@@ -287,7 +301,7 @@ class QlassF(QCircuitWrapper):
         assert isinstance(fun_ast.body[0], ast.FunctionDef)
 
         if isinstance(f, str):
-            exec(f)
+            exec(f, globals())
         original_f = eval(fun_ast.body[0].name) if isinstance(f, str) else f
 
         def _do_translate(fun_ast, original_f):
