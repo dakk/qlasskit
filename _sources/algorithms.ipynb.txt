@@ -1,0 +1,247 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Algorithms"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\n",
+    "Qlasskit implements high level representation of quantum algorithms that relies on black boxes functions and oracles.\n",
+    "\n",
+    "- Grover search\n",
+    "- Simon periodicity\n",
+    "- Deutsch Jozsa\n",
+    "- Bernstein Vazirani"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Abstraction tools\n",
+    "\n",
+    "All algorithms share the same base class `QAlgorithm` which inherits from `QCircuitWrapper`. The `QCircuitWrapper` is also father of `qlassf` functions, and offers useful methods to handle high level types.\n",
+    "\n",
+    "One of those tools is `decode_counts`, that translates the result dictionary from a quantum sampling in its binary form, to the high level representation of data types used in the qlasskit function; `decode_output` instead, translate a single bitstring."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "4"
+      ]
+     },
+     "execution_count": 1,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "from typing import Tuple\n",
+    "from qlasskit import qlassf, Qint, Qint4\n",
+    "\n",
+    "\n",
+    "@qlassf\n",
+    "def test_tools(a: Qint[4]) -> Qint[4]:\n",
+    "    return a + 1\n",
+    "\n",
+    "\n",
+    "test_tools.decode_output(\"0100\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Another method called `encode_input` is able to do the reverse job, transforming high level types to binary form."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "'0100'"
+      ]
+     },
+     "execution_count": 2,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "test_tools.encode_input(Qint4(4))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Grover search\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from qlasskit.algorithms import Grover\n",
+    "\n",
+    "\n",
+    "@qlassf\n",
+    "def g_orac(a: Tuple[bool, bool]) -> bool:\n",
+    "    return a[0] and not a[1]\n",
+    "\n",
+    "\n",
+    "q_algo = Grover(g_orac, True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\n",
+    "Further examples can be found on the following notebooks:\n",
+    "\n",
+    "- [example_grover.ipynb]()\n",
+    "- [example_grover_subset.ipynb]()\n",
+    "- [example_grover_hash.ipynb]()\n",
+    "- [example_grover_sudoku.ipynb]()\n",
+    "- [example_grover_factors.ipynb]()\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Simon periodicity"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from qlasskit.algorithms import Simon\n",
+    "\n",
+    "\n",
+    "@qlassf\n",
+    "def f(a: Qint[4]) -> Qint[4]:\n",
+    "    return (a >> 3) + 1\n",
+    "\n",
+    "\n",
+    "q_algo = Simon(f)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\n",
+    "Further examples can be found on the following notebooks:\n",
+    "\n",
+    "- [example_simon.ipynb]()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Deutsch Jozsa"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from qlasskit.algorithms import DeutschJozsa\n",
+    "\n",
+    "\n",
+    "@qlassf\n",
+    "def f(b: Qint[4]) -> bool:\n",
+    "    return b < 16\n",
+    "\n",
+    "\n",
+    "q_algo = DeutschJozsa(f)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\n",
+    "Further examples can be found on the following notebooks:\n",
+    "\n",
+    "- [example_deutsch_jozsa.ipynb]()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Bernstein Vazirani"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from qlasskit.algorithms import BernsteinVazirani, secret_oracle\n",
+    "\n",
+    "oracle = secret_oracle(4, 14)\n",
+    "\n",
+    "q_algo = BernsteinVazirani(oracle)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Further examples can be found on the following notebooks:\n",
+    "\n",
+    "- [example_bernstein_vazirani.ipynb]()"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "qlasskit_310-env",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
