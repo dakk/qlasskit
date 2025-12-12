@@ -10,7 +10,7 @@ sys.path.append(os.path.abspath(os.path.join("..", "..")))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 project = "qlasskit"
-copyright = "2023-2024, Davide Gessa (dakk)"
+copyright = "2023-2025, Davide Gessa (dakk)"
 author = "Davide Gessa (dakk)"
 
 # -- General configuration ---------------------------------------------------
