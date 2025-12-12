@@ -57,6 +57,7 @@ class QintImp(int, Qtype):
     @classmethod
     def const(cls, v: int) -> TExp:
         """Return the list of bool representing an int"""
+        v = v % (2**cls.BIT_SIZE)  # Normalize to [0, 2**BIT_SIZE)
         cval = list(map(lambda c: True if c == "1" else False, bin(v)[2:]))
         return cls.fill((cls, cval[::-1]))
 
@@ -217,7 +218,7 @@ class QintImp(int, Qtype):
             elif (n + m) > 16:
                 return Qint16
             else:
-                raise Exception(f"Mul result size is too big ({n+m})")
+                raise Exception(f"Mul result size is too big ({n + m})")
 
         # Fill constants so explicit typecast is not needed
         if cls.is_const(tleft_):
