@@ -1,0 +1,69 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/nbclient/client.py", line 1319, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+bqm = tsp_f.to_bqm()
+print("Vars:", bqm.num_variables, "\nInteractions:", bqm.num_interactions)
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mTypeError[39m                                 Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[4][39m[32m, line 1[39m
+[32m----> [39m[32m1[39m bqm = [43mtsp_f[49m[43m.[49m[43mto_bqm[49m[43m([49m[43m)[49m
+[32m      2[39m [38;5;28mprint[39m([33m"[39m[33mVars:[39m[33m"[39m, bqm.num_variables, [33m"[39m[38;5;130;01m\n[39;00m[33mInteractions:[39m[33m"[39m, bqm.num_interactions)
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/qlasskit/qlassfun.py:273[39m, in [36mQlassF.to_bqm[39m[34m(self, fmt)[39m
+[32m    272[39m [38;5;28;01mdef[39;00m[38;5;250m [39m[34mto_bqm[39m([38;5;28mself[39m, fmt: BQMFormat = [33m"[39m[33mbqm[39m[33m"[39m):
+[32m--> [39m[32m273[39m     [38;5;28;01mreturn[39;00m [43mto_bqm[49m[43m([49m
+[32m    274[39m [43m        [49m[43margs[49m[43m=[49m[38;5;28;43mself[39;49m[43m.[49m[43margs[49m[43m,[49m[43m [49m[43mreturns[49m[43m=[49m[38;5;28;43mself[39;49m[43m.[49m[43mreturns[49m[43m,[49m[43m [49m[43mexprs[49m[43m=[49m[38;5;28;43mself[39;49m[43m.[49m[43mexpressions[49m[43m,[49m[43m [49m[43mfmt[49m[43m=[49m[43mfmt[49m
+[32m    275[39m [43m    [49m[43m)[49m
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/qlasskit/bqm.py:90[39m, in [36mto_bqm[39m[34m(args, returns, exprs, fmt)[39m
+[32m     86[39m     new_e = AndConst(
+[32m     87[39m         a_vars[exp.name], a_vars[exp.name], a_vars[sym.name], sym.name
+[32m     88[39m     )
+[32m     89[39m [38;5;28;01melif[39;00m sym.name[[32m0[39m:[32m4[39m] == [33m"[39m[33m_ret[39m[33m"[39m:
+[32m---> [39m[32m90[39m     new_e = [43mSympyToBQM[49m[43m([49m[43ma_vars[49m[43m)[49m[43m.[49m[43mvisit[49m[43m([49m[43mexp[49m[43m)[49m
+[32m     91[39m [38;5;28;01melif[39;00m [38;5;28misinstance[39m(exp, Not):
+[32m     92[39m     args = [stbqm.visit(a) [38;5;28;01mfor[39;00m a [38;5;129;01min[39;00m exp.args]
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/qlasskit/bqm.py:53[39m, in [36mSympyToBQM.visit[39m[34m(self, e)[39m
+[32m     51[39m         [38;5;28;01mreturn[39;00m pyqubo.And(*args)
+[32m     52[39m [38;5;28;01melif[39;00m [38;5;28misinstance[39m(e, Xor):
+[32m---> [39m[32m53[39m     args = [43m[[49m[38;5;28;43mself[39;49m[43m.[49m[43mvisit[49m[43m([49m[43ma[49m[43m)[49m[43m [49m[38;5;28;43;01mfor[39;49;00m[43m [49m[43ma[49m[43m [49m[38;5;129;43;01min[39;49;00m[43m [49m[43me[49m[43m.[49m[43margs[49m[43m][49m
+[32m     55[39m     [38;5;28;01mif[39;00m [38;5;28mlen[39m(args) > [32m2[39m:
+[32m     56[39m         [38;5;28;01mreturn[39;00m pyqubo.Xor(args[[32m0[39m], [38;5;28mself[39m.visit(Xor(*e.args[[32m1[39m:])))
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/qlasskit/bqm.py:53[39m, in [36m<listcomp>[39m[34m(.0)[39m
+[32m     51[39m         [38;5;28;01mreturn[39;00m pyqubo.And(*args)
+[32m     52[39m [38;5;28;01melif[39;00m [38;5;28misinstance[39m(e, Xor):
+[32m---> [39m[32m53[39m     args = [[38;5;28;43mself[39;49m[43m.[49m[43mvisit[49m[43m([49m[43ma[49m[43m)[49m [38;5;28;01mfor[39;00m a [38;5;129;01min[39;00m e.args]
+[32m     55[39m     [38;5;28;01mif[39;00m [38;5;28mlen[39m(args) > [32m2[39m:
+[32m     56[39m         [38;5;28;01mreturn[39;00m pyqubo.Xor(args[[32m0[39m], [38;5;28mself[39m.visit(Xor(*e.args[[32m1[39m:])))
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/qlasskit/bqm.py:61[39m, in [36mSympyToBQM.visit[39m[34m(self, e)[39m
+[32m     59[39m [38;5;28;01melif[39;00m [38;5;28misinstance[39m(e, Or):
+[32m     60[39m     args = [[38;5;28mself[39m.visit(a) [38;5;28;01mfor[39;00m a [38;5;129;01min[39;00m e.args]
+[32m---> [39m[32m61[39m     [38;5;28;01mreturn[39;00m [43mpyqubo[49m[43m.[49m[43mOr[49m[43m([49m[43m*[49m[43margs[49m[43m)[49m
+[32m     62[39m [38;5;28;01melse[39;00m:
+[32m     63[39m     [38;5;28;01mraise[39;00m [38;5;167;01mException[39;00m([33mf[39m[33m"[39m[38;5;132;01m{[39;00me[38;5;132;01m}[39;00m[33m: unable to translate to BQM[39m[33m"[39m)
+
+[31mTypeError[39m: Or.__init__() takes 3 positional arguments but 4 were given
+

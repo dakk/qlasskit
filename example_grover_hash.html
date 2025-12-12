@@ -1,0 +1,230 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grover search: hash function preimage attack &mdash; qlasskit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=c309799c" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/dark_mode_js/default_light.js?v=c2e647ce"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Grover search: sudoku solver" href="example_grover_sudoku.html" />
+    <link rel="prev" title="Grover search: subset problem" href="example_grover_subset.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            qlasskit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Qlasskit</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_it_works.html">How it works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported.html">Supported python subset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exporter.html">Exporting to other frameworks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bqm.html">Binary Quadratic Model, Qubo &amp; Ising</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decompiler_and_optimizer.html">Decompiler and Circuit Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_tools.html">CLI Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="example_grover.html">Grover search</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_sat.html">Grover search: SAT problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_subset.html">Grover search: subset problem</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Grover search: hash function preimage attack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_sudoku.html">Grover search: sudoku solver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_factors.html">Grover: factorize number</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_simon.html">Simon function periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_deutsch_jozsa.html">Deutsch Jozsa algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_bernstein_vazirani.html">Bernstein Vazirani algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_unitary_of_f.html">Unitary of qlasskit function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_big_circuit.html">Working with big circuits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_bqm_tsp.html">Solving TSP as Binary Quadratic Model</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">qlasskit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Grover search: hash function preimage attack</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/example_grover_hash.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="grover-search-hash-function-preimage-attack">
+<h1>Grover search: hash function preimage attack<a class="headerlink" href="#grover-search-hash-function-preimage-attack" title="Link to this heading"></a></h1>
+<p>In the ever-evolving landscape of cybersecurity, the advent of quantum computing presents both an extraordinary opportunity and an unprecedented challenge. In this notebook we exploit a Grover Search to perform a preimage attack on a toy hash function.</p>
+<p>A preimage attack on a cryptographic hash function <code class="docutils literal notranslate"><span class="pre">h(m)</span></code> tries to find a message <code class="docutils literal notranslate"><span class="pre">m</span></code> that has a specific hash value. Using qlasskit it is easy to write an hash function like the following <code class="docutils literal notranslate"><span class="pre">hash_simp</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qlasskit</span><span class="w"> </span><span class="kn">import</span> <span class="n">qlassf</span><span class="p">,</span> <span class="n">Qint</span><span class="p">,</span> <span class="n">Qint8</span><span class="p">,</span> <span class="n">Qlist</span>
+
+
+<span class="nd">@qlassf</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hash_simp</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="n">Qlist</span><span class="p">[</span><span class="n">Qint</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="mi">2</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Qint</span><span class="p">[</span><span class="mi">8</span><span class="p">]:</span>
+    <span class="n">hv</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+        <span class="n">hv</span> <span class="o">=</span> <span class="p">((</span><span class="n">hv</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">hv</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
+
+    <span class="k">return</span> <span class="n">hv</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Thanks to the fact that qlasskit function are standard python functions, we can call the <code class="docutils literal notranslate"><span class="pre">original_f</span></code> to perform some kind of analysis on the hash function. Since the input space is tiny (it is a toy hash function), we can detect if the hash function is uniform (if it maps equally to the output space).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">hash_simp</span><span class="o">.</span><span class="n">original_f</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hash function output space:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Hash function output space: 256
+</pre></div>
+</div>
+</div>
+</div>
+<p>We got that <code class="docutils literal notranslate"><span class="pre">hash_simp</span></code> is following an uniform distribution.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hash_simp</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;qiskit&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/32c48a1e7e9bd438cc4e3d0ea6c5e8505fa7c676532d7c9eeacc0b35c21acb5f.png" src="_images/32c48a1e7e9bd438cc4e3d0ea6c5e8505fa7c676532d7c9eeacc0b35c21acb5f.png" />
+</div>
+</div>
+<p>Now we use our quantum function as an oracle for a Grover search, in order to find which input maps to the value <code class="docutils literal notranslate"><span class="pre">0xca</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qlasskit.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">Grover</span>
+
+<span class="n">q_algo</span> <span class="o">=</span> <span class="n">Grover</span><span class="p">(</span><span class="n">hash_simp</span><span class="p">,</span> <span class="n">Qint8</span><span class="p">(</span><span class="mh">0xCA</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then we use our prefered framework and simulator for sampling the result; this is an example using <code class="docutils literal notranslate"><span class="pre">qiskit</span></code> with <code class="docutils literal notranslate"><span class="pre">aer_simulator</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qiskit</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuantumCircuit</span><span class="p">,</span> <span class="n">transpile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qiskit.visualization</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_histogram</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qiskit_aer</span><span class="w"> </span><span class="kn">import</span> <span class="n">AerSimulator</span>
+
+<span class="n">qc</span> <span class="o">=</span> <span class="n">q_algo</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;qiskit&quot;</span><span class="p">)</span>
+<span class="n">qc</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>
+<span class="n">simulator</span> <span class="o">=</span> <span class="n">AerSimulator</span><span class="p">()</span>
+<span class="n">circ</span> <span class="o">=</span> <span class="n">transpile</span><span class="p">(</span><span class="n">qc</span><span class="p">,</span> <span class="n">simulator</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">simulator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circ</span><span class="p">)</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+<span class="n">counts</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get_counts</span><span class="p">(</span><span class="n">circ</span><span class="p">)</span>
+
+<span class="n">counts_readable</span> <span class="o">=</span> <span class="n">q_algo</span><span class="o">.</span><span class="n">decode_counts</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">discard_lower</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">plot_histogram</span><span class="p">(</span><span class="n">counts_readable</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/ef5708e41a99760bac37001d2affeaf1f2486aa9958012b11ec2b49c731ffe39.png" src="_images/ef5708e41a99760bac37001d2affeaf1f2486aa9958012b11ec2b49c731ffe39.png" />
+</div>
+</div>
+<p>Using <code class="docutils literal notranslate"><span class="pre">QlassF.original_f</span></code> we can double check the result without invoking a quantum simulator; calling it with the tuple <code class="docutils literal notranslate"><span class="pre">(12,12)</span></code> must result in the hash value <code class="docutils literal notranslate"><span class="pre">0xca</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">hash_simp</span><span class="o">.</span><span class="n">original_f</span><span class="p">((</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0xca
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="example_grover_subset.html" class="btn btn-neutral float-left" title="Grover search: subset problem" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="example_grover_sudoku.html" class="btn btn-neutral float-right" title="Grover search: sudoku solver" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Davide Gessa (dakk).</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

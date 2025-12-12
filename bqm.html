@@ -1,0 +1,348 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Binary Quadratic Model, Qubo &amp; Ising &mdash; qlasskit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=c309799c" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/dark_mode_js/default_light.js?v=c2e647ce"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Decompiler and Circuit Optimizer" href="decompiler_and_optimizer.html" />
+    <link rel="prev" title="Exporting to other frameworks" href="exporter.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            qlasskit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Qlasskit</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_it_works.html">How it works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported.html">Supported python subset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exporter.html">Exporting to other frameworks</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Binary Quadratic Model, Qubo &amp; Ising</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#running-on-simulated-sampler-annealer">Running on simulated sampler annealer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-on-dwave-annealer">Running on DWave annealer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="decompiler_and_optimizer.html">Decompiler and Circuit Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_tools.html">CLI Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="example_grover.html">Grover search</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_sat.html">Grover search: SAT problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_subset.html">Grover search: subset problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_hash.html">Grover search: hash function preimage attack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_sudoku.html">Grover search: sudoku solver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_factors.html">Grover: factorize number</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_simon.html">Simon function periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_deutsch_jozsa.html">Deutsch Jozsa algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_bernstein_vazirani.html">Bernstein Vazirani algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_unitary_of_f.html">Unitary of qlasskit function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_big_circuit.html">Working with big circuits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_bqm_tsp.html">Solving TSP as Binary Quadratic Model</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">qlasskit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Binary Quadratic Model, Qubo &amp; Ising</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/bqm.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="binary-quadratic-model-qubo-ising">
+<h1>Binary Quadratic Model, Qubo &amp; Ising<a class="headerlink" href="#binary-quadratic-model-qubo-ising" title="Link to this heading"></a></h1>
+<p>Any qlassf function can be transformed to a binary quadratic model using the <code class="docutils literal notranslate"><span class="pre">to_bqm</span></code> function. In this example we create a generic function that factorize <code class="docutils literal notranslate"><span class="pre">num</span></code>, and we bind <code class="docutils literal notranslate"><span class="pre">num</span></code> with 15.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qlasskit</span><span class="w"> </span><span class="kn">import</span> <span class="n">qlassf</span><span class="p">,</span> <span class="n">Qint</span><span class="p">,</span> <span class="n">Parameter</span>
+
+
+<span class="nd">@qlassf</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_factor_generic</span><span class="p">(</span><span class="n">num</span><span class="p">:</span> <span class="n">Parameter</span><span class="p">[</span><span class="n">Qint</span><span class="p">[</span><span class="mi">4</span><span class="p">]],</span> <span class="n">a</span><span class="p">:</span> <span class="n">Qint</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">b</span><span class="p">:</span> <span class="n">Qint</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Qint</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="n">num</span> <span class="o">-</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span>
+
+
+<span class="n">test_factor</span> <span class="o">=</span> <span class="n">test_factor_generic</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">bqm</span> <span class="o">=</span> <span class="n">test_factor</span><span class="o">.</span><span class="n">to_bqm</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Vars:&quot;</span><span class="p">,</span> <span class="n">bqm</span><span class="o">.</span><span class="n">num_variables</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Interactions:&quot;</span><span class="p">,</span> <span class="n">bqm</span><span class="o">.</span><span class="n">num_interactions</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Vars: 14 
+Interactions: 41
+</pre></div>
+</div>
+</div>
+</div>
+<p>A qlassf function can also be exported as a QUBO model using <code class="docutils literal notranslate"><span class="pre">to_bqm('qubo')</span></code> or as an Ising model using <code class="docutils literal notranslate"><span class="pre">to_bqm('ising')</span></code>.</p>
+<section id="running-on-simulated-sampler-annealer">
+<h2>Running on simulated sampler annealer<a class="headerlink" href="#running-on-simulated-sampler-annealer" title="Link to this heading"></a></h2>
+<p>Now we can run a simulated sampler annealer to minimize this function; qlasskit offer a <code class="docutils literal notranslate"><span class="pre">decode_samples</span></code> helper function that translates sample result to the high level types of qlasskit.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">neal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qlasskit.bqm</span><span class="w"> </span><span class="kn">import</span> <span class="n">decode_samples</span>
+
+<span class="n">sa</span> <span class="o">=</span> <span class="n">neal</span><span class="o">.</span><span class="n">SimulatedAnnealingSampler</span><span class="p">()</span>
+<span class="n">sampleset</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">bqm</span><span class="p">,</span> <span class="n">num_reads</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">decoded_samples</span> <span class="o">=</span> <span class="n">decode_samples</span><span class="p">(</span><span class="n">test_factor</span><span class="p">,</span> <span class="n">sampleset</span><span class="p">)</span>
+<span class="n">best_sample</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">decoded_samples</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">best_sample</span><span class="o">.</span><span class="n">sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;a&#39;: 3, &#39;b&#39;: 5}
+</pre></div>
+</div>
+</div>
+</div>
+<p>The result is 5 and 3 as expected (since 5 times 3 is equal to 15).</p>
+</section>
+<section id="running-on-dwave-annealer">
+<h2>Running on DWave annealer<a class="headerlink" href="#running-on-dwave-annealer" title="Link to this heading"></a></h2>
+<p>If we have a valid DWave account, we can run our problem on a real quantum annealer as follow:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dwave.system</span><span class="w"> </span><span class="kn">import</span> <span class="n">DWaveSampler</span><span class="p">,</span> <span class="n">EmbeddingComposite</span>
+
+<span class="n">sampler</span> <span class="o">=</span> <span class="n">EmbeddingComposite</span><span class="p">(</span><span class="n">DWaveSampler</span><span class="p">())</span>
+<span class="n">sampleset</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">bqm</span><span class="p">,</span> <span class="n">num_reads</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">decoded_samples</span> <span class="o">=</span> <span class="n">decode_samples</span><span class="p">(</span><span class="n">test_factor</span><span class="p">,</span> <span class="n">sampleset</span><span class="p">)</span>
+<span class="n">best_sample</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">decoded_samples</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">best_sample</span><span class="o">.</span><span class="n">sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">SolverFailureError</span><span class="g g-Whitespace">                        </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">sampler</span> <span class="o">=</span> <span class="n">EmbeddingComposite</span><span class="p">(</span><span class="n">DWaveSampler</span><span class="p">())</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">sampleset</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">bqm</span><span class="p">,</span> <span class="n">num_reads</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">5</span> <span class="n">decoded_samples</span> <span class="o">=</span> <span class="n">decode_samples</span><span class="p">(</span><span class="n">test_factor</span><span class="p">,</span> <span class="n">sampleset</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="n">best_sample</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">decoded_samples</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="nb">print</span><span class="p">(</span><span class="n">best_sample</span><span class="o">.</span><span class="n">sample</span><span class="p">)</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/qlasskit-0.1.18-py3.10.egg/qlasskit/bqm.py:142,</span> in <span class="ni">decode_samples</span><span class="nt">(qf, sampleset)</span>
+<span class="g g-Whitespace">    </span><span class="mi">140</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;Get dimod sampleset and return an high level decoded solution&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">141</span> <span class="n">model</span> <span class="o">=</span> <span class="n">qf</span><span class="o">.</span><span class="n">to_bqm</span><span class="p">(</span><span class="s2">&quot;pq_model&quot;</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">142</span> <span class="n">decoded</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">decode_sampleset</span><span class="p">(</span><span class="n">sampleset</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">144</span> <span class="n">new_dec</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="g g-Whitespace">    </span><span class="mi">145</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">decoded</span><span class="p">:</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dimod/sampleset.py:1121,</span> in <span class="ni">SampleSet.record</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1105</span> <span class="nd">@property</span>
+<span class="g g-Whitespace">   </span><span class="mi">1106</span> <span class="k">def</span><span class="w"> </span><span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="g g-Whitespace">   </span><span class="mi">1107</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;:obj:`numpy.recarray` containing the samples, energies, number of occurences, and other sample data.</span>
+<span class="g g-Whitespace">   </span><span class="mi">1108</span><span class="sd"> </span>
+<span class="g g-Whitespace">   </span><span class="mi">1109</span><span class="sd">     Examples:</span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1119</span><span class="sd"> </span>
+<span class="g g-Whitespace">   </span><span class="mi">1120</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">-&gt; </span><span class="mi">1121</span>     <span class="bp">self</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">1122</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dimod/sampleset.py:1485,</span> in <span class="ni">SampleSet.resolve</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1483</span> <span class="c1"># if it doesn&#39;t have the attribute then it is already resolved</span>
+<span class="g g-Whitespace">   </span><span class="mi">1484</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_future&#39;</span><span class="p">):</span>
+<span class="ne">-&gt; </span><span class="mi">1485</span>     <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_hook</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_future</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1486</span>     <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">record</span><span class="p">,</span> <span class="n">samples</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="n">samples</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">samples</span><span class="o">.</span><span class="n">vartype</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1487</span>     <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_future</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/system/composites/embedding.py:284,</span> in <span class="ni">EmbeddingComposite.sample.&lt;locals&gt;.async_unembed</span><span class="nt">(response)</span>
+<span class="g g-Whitespace">    </span><span class="mi">279</span> <span class="k">def</span><span class="w"> </span><span class="nf">async_unembed</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">280</span>     <span class="c1"># unembed the sampleset aysnchronously.</span>
+<span class="g g-Whitespace">    </span><span class="mi">282</span>     <span class="n">warninghandler</span><span class="o">.</span><span class="n">chain_break</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">embedding</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">284</span>     <span class="n">sampleset</span> <span class="o">=</span> <span class="n">unembed_sampleset</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">embedding</span><span class="p">,</span> <span class="n">source_bqm</span><span class="o">=</span><span class="n">bqm</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">285</span>                                   <span class="n">chain_break_method</span><span class="o">=</span><span class="n">chain_break_method</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">286</span>                                   <span class="n">chain_break_fraction</span><span class="o">=</span><span class="n">chain_break_fraction</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">287</span>                                   <span class="n">return_embedding</span><span class="o">=</span><span class="n">return_embedding</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">289</span>     <span class="k">if</span> <span class="n">return_embedding</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">290</span>         <span class="n">sampleset</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;embedding_context&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">291</span>             <span class="n">embedding_parameters</span><span class="o">=</span><span class="n">embedding_parameters</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">292</span>             <span class="n">chain_strength</span><span class="o">=</span><span class="n">embedding</span><span class="o">.</span><span class="n">chain_strength</span><span class="p">)</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/embedding/transforms.py:606,</span> in <span class="ni">unembed_sampleset</span><span class="nt">(target_sampleset, embedding, source_bqm, chain_break_method, chain_break_fraction, return_embedding)</span>
+<span class="g g-Whitespace">    </span><span class="mi">603</span> <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">604</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;given bqm does not match the embedding&quot;</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">606</span> <span class="n">record</span> <span class="o">=</span> <span class="n">target_sampleset</span><span class="o">.</span><span class="n">record</span>
+<span class="g g-Whitespace">    </span><span class="mi">608</span> <span class="n">unembedded</span><span class="p">,</span> <span class="n">idxs</span> <span class="o">=</span> <span class="n">chain_break_method</span><span class="p">(</span><span class="n">target_sampleset</span><span class="p">,</span> <span class="n">chains</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">610</span> <span class="n">reserved</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;sample&#39;</span><span class="p">,</span> <span class="s1">&#39;energy&#39;</span><span class="p">}</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dimod/sampleset.py:1121,</span> in <span class="ni">SampleSet.record</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1105</span> <span class="nd">@property</span>
+<span class="g g-Whitespace">   </span><span class="mi">1106</span> <span class="k">def</span><span class="w"> </span><span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="g g-Whitespace">   </span><span class="mi">1107</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;:obj:`numpy.recarray` containing the samples, energies, number of occurences, and other sample data.</span>
+<span class="g g-Whitespace">   </span><span class="mi">1108</span><span class="sd"> </span>
+<span class="g g-Whitespace">   </span><span class="mi">1109</span><span class="sd">     Examples:</span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1119</span><span class="sd"> </span>
+<span class="g g-Whitespace">   </span><span class="mi">1120</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">-&gt; </span><span class="mi">1121</span>     <span class="bp">self</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">1122</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dimod/sampleset.py:1485,</span> in <span class="ni">SampleSet.resolve</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1483</span> <span class="c1"># if it doesn&#39;t have the attribute then it is already resolved</span>
+<span class="g g-Whitespace">   </span><span class="mi">1484</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_future&#39;</span><span class="p">):</span>
+<span class="ne">-&gt; </span><span class="mi">1485</span>     <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_hook</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_future</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1486</span>     <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">record</span><span class="p">,</span> <span class="n">samples</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="n">samples</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">samples</span><span class="o">.</span><span class="n">vartype</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1487</span>     <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_future</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/system/samplers/dwave_sampler.py:452,</span> in <span class="ni">DWaveSampler.sample.&lt;locals&gt;._hook</span><span class="nt">(computation)</span>
+<span class="g g-Whitespace">    </span><span class="mi">450</span> <span class="k">except</span> <span class="p">(</span><span class="n">SolverError</span><span class="p">,</span> <span class="n">InvalidAPIResponseError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">451</span>     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">failover</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">452</span>         <span class="k">raise</span> <span class="n">exc</span>
+<span class="g g-Whitespace">    </span><span class="mi">453</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">SolverAuthenticationError</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">454</span>         <span class="k">raise</span> <span class="n">exc</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/system/samplers/dwave_sampler.py:439,</span> in <span class="ni">DWaveSampler.sample.&lt;locals&gt;._hook</span><span class="nt">(computation)</span>
+<span class="g g-Whitespace">    </span><span class="mi">436</span>     <span class="k">return</span> <span class="n">sampleset</span>
+<span class="g g-Whitespace">    </span><span class="mi">438</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">439</span>     <span class="k">return</span> <span class="n">resolve</span><span class="p">(</span><span class="n">computation</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">441</span> <span class="k">except</span> <span class="p">(</span><span class="n">ProblemUploadError</span><span class="p">,</span> <span class="n">RequestTimeout</span><span class="p">,</span> <span class="n">PollingTimeout</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">442</span>     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">failover</span><span class="p">:</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/system/samplers/dwave_sampler.py:429,</span> in <span class="ni">DWaveSampler.sample.&lt;locals&gt;._hook.&lt;locals&gt;.resolve</span><span class="nt">(computation)</span>
+<span class="g g-Whitespace">    </span><span class="mi">427</span> <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="n">computation</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">428</span>     <span class="n">sampleset</span> <span class="o">=</span> <span class="n">computation</span><span class="o">.</span><span class="n">sampleset</span>
+<span class="ne">--&gt; </span><span class="mi">429</span>     <span class="n">sampleset</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">431</span>     <span class="k">if</span> <span class="n">warninghandler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">432</span>         <span class="n">warninghandler</span><span class="o">.</span><span class="n">too_few_samples</span><span class="p">(</span><span class="n">sampleset</span><span class="p">)</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dimod/sampleset.py:1485,</span> in <span class="ni">SampleSet.resolve</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1483</span> <span class="c1"># if it doesn&#39;t have the attribute then it is already resolved</span>
+<span class="g g-Whitespace">   </span><span class="mi">1484</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_future&#39;</span><span class="p">):</span>
+<span class="ne">-&gt; </span><span class="mi">1485</span>     <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_hook</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_future</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1486</span>     <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">record</span><span class="p">,</span> <span class="n">samples</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="n">samples</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">samples</span><span class="o">.</span><span class="n">vartype</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1487</span>     <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_future</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/cloud/computation.py:823,</span> in <span class="ni">Future.sampleset.&lt;locals&gt;.&lt;lambda&gt;</span><span class="nt">(f)</span>
+<span class="g g-Whitespace">    </span><span class="mi">818</span> <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">819</span>     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t construct SampleSet without dimod. &quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">820</span>                        <span class="s2">&quot;Re-install the library with &#39;bqm&#39; support.&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">822</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sampleset</span> <span class="o">=</span> <span class="n">sampleset</span> <span class="o">=</span> <span class="n">dimod</span><span class="o">.</span><span class="n">SampleSet</span><span class="o">.</span><span class="n">from_future</span><span class="p">(</span>
+<span class="ne">--&gt; </span><span class="mi">823</span>     <span class="bp">self</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">wait_sampleset</span><span class="p">())</span>
+<span class="g g-Whitespace">    </span><span class="mi">825</span> <span class="c1"># propagate id to sampleset as well</span>
+<span class="g g-Whitespace">    </span><span class="mi">826</span> <span class="c1"># note: this requires dimod&gt;=0.8.21 (before that version SampleSet</span>
+<span class="g g-Whitespace">    </span><span class="mi">827</span> <span class="c1"># had slots set which prevented dynamic addition of attributes).</span>
+<span class="g g-Whitespace">    </span><span class="mi">828</span> <span class="n">sampleset</span><span class="o">.</span><span class="n">wait_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wait_id</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/cloud/computation.py:755,</span> in <span class="ni">Future.wait_sampleset</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">    </span><span class="mi">752</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;Blocking sampleset getter.&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">754</span> <span class="c1"># blocking result get</span>
+<span class="ne">--&gt; </span><span class="mi">755</span> <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_result</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">757</span> <span class="c1"># common problem info: id/label</span>
+<span class="g g-Whitespace">    </span><span class="mi">758</span> <span class="n">problem_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">problem_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/cloud/computation.py:893,</span> in <span class="ni">Future._load_result</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">    </span><span class="mi">891</span> <span class="c1"># Check for other error conditions</span>
+<span class="g g-Whitespace">    </span><span class="mi">892</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exception</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">893</span>     <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exception</span>
+<span class="g g-Whitespace">    </span><span class="mi">895</span> <span class="c1"># If someone else took care of this while we were waiting</span>
+<span class="g g-Whitespace">    </span><span class="mi">896</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="nn">File ~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/cloud/client/base.py:1309,</span> in <span class="ni">Client._handle_problem_status</span><span class="nt">(self, message, future)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1307</span> <span class="k">if</span> <span class="s1">&#39;error_code&#39;</span> <span class="ow">in</span> <span class="n">message</span> <span class="ow">and</span> <span class="s1">&#39;error_msg&#39;</span> <span class="ow">in</span> <span class="n">message</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1308</span>     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Error response received: </span><span class="si">%r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1309</span>     <span class="k">raise</span> <span class="n">SolverFailureError</span><span class="p">(</span><span class="n">message</span><span class="p">[</span><span class="s1">&#39;error_msg&#39;</span><span class="p">])</span>
+<span class="g g-Whitespace">   </span><span class="mi">1311</span> <span class="k">if</span> <span class="s1">&#39;status&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">message</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1312</span>     <span class="k">raise</span> <span class="n">InvalidAPIResponseError</span><span class="p">(</span><span class="s2">&quot;&#39;status&#39; missing in problem description response&quot;</span><span class="p">)</span>
+
+<span class="ne">SolverFailureError</span>: Problem not accepted because user has insufficient remaining solver access time in project DEV.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="exporter.html" class="btn btn-neutral float-left" title="Exporting to other frameworks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="decompiler_and_optimizer.html" class="btn btn-neutral float-right" title="Decompiler and Circuit Optimizer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Davide Gessa (dakk).</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,397 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supported python subset &mdash; qlasskit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=c309799c" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/dark_mode_js/default_light.js?v=c2e647ce"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Parameters" href="parameters.html" />
+    <link rel="prev" title="How it works" href="how_it_works.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            qlasskit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Qlasskit</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_it_works.html">How it works</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Supported python subset</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#types">Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bool">bool</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qint">Qint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qfixed">Qfixed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qchar">Qchar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tuple">Tuple</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#list">List</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#matrix">Matrix</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#expressions">Expressions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#constants">Constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Tuple</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#list-fixed-size">List (fixed size)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#d-matrix-fixed-size">2D Matrix (fixed size)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#subscript">Subscript</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#boolean-operators">Boolean operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#if-expressions">If expressions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#comparators">Comparators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#unary-op">Unary Op</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bin-op">Bin Op</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#function-call">Function call</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#statements">Statements</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#assign">Assign</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#return">Return</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#for-loop">For loop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#function-def">Function def</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#if-then-else">If then else</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#quantum-hybrid">Quantum Hybrid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exporter.html">Exporting to other frameworks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bqm.html">Binary Quadratic Model, Qubo &amp; Ising</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decompiler_and_optimizer.html">Decompiler and Circuit Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_tools.html">CLI Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="example_grover.html">Grover search</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_sat.html">Grover search: SAT problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_subset.html">Grover search: subset problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_hash.html">Grover search: hash function preimage attack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_sudoku.html">Grover search: sudoku solver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_factors.html">Grover: factorize number</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_simon.html">Simon function periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_deutsch_jozsa.html">Deutsch Jozsa algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_bernstein_vazirani.html">Bernstein Vazirani algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_unitary_of_f.html">Unitary of qlasskit function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_big_circuit.html">Working with big circuits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_bqm_tsp.html">Solving TSP as Binary Quadratic Model</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">qlasskit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Supported python subset</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/supported.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="supported-python-subset">
+<h1>Supported python subset<a class="headerlink" href="#supported-python-subset" title="Link to this heading"></a></h1>
+<p>Qlasskit supports a subset of python. This subset will be expanded, but it is
+limited by the linearity of quantum circuits and by the number of qubits.</p>
+<p>The structure of a qlasskit function has the following pattern:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@qlasskit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="p">[</span><span class="o">...</span><span class="n">param</span><span class="p">:</span> <span class="nb">type</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+   <span class="n">statement</span>
+   <span class="o">...</span>
+   <span class="n">statement</span>
+</pre></div>
+</div>
+<section id="types">
+<h2>Types<a class="headerlink" href="#types" title="Link to this heading"></a></h2>
+<p>All types has a static size.</p>
+<section id="bool">
+<h3>bool<a class="headerlink" href="#bool" title="Link to this heading"></a></h3>
+<p>Boolean type.</p>
+</section>
+<section id="qint">
+<h3>Qint<a class="headerlink" href="#qint" title="Link to this heading"></a></h3>
+<p>Unsigned integers; <cite>Qint[2]</cite> has 2 bits, and there other sizes are supported.
+Single bit of the Qint are accessible by the subscript operator <cite>[]</cite>.
+All the supported sizes have a constructor <cite>Qintn()</cite> defined in <cite>qlasskit.types</cite>.</p>
+</section>
+<section id="qfixed">
+<h3>Qfixed<a class="headerlink" href="#qfixed" title="Link to this heading"></a></h3>
+<p>Fixed point rational number; <cite>Qfixed[2,3]</cite> has 2 bits for the integer part and 3 bits for the fractional.
+All the supported sizes have a constructor <cite>Qfixedn_m()</cite> defined in <cite>qlasskit.types</cite>.</p>
+</section>
+<section id="qchar">
+<h3>Qchar<a class="headerlink" href="#qchar" title="Link to this heading"></a></h3>
+<p>A character.</p>
+</section>
+<section id="tuple">
+<h3>Tuple<a class="headerlink" href="#tuple" title="Link to this heading"></a></h3>
+<p>Container type holding different types.</p>
+</section>
+<section id="list">
+<h3>List<a class="headerlink" href="#list" title="Link to this heading"></a></h3>
+<p>Qlist[T, size] denotes a fixed-size list in qlasskit.
+For example, the list <cite>[1,2,3]</cite> is typed as <cite>Qlist[Qint[2],3]</cite>.</p>
+</section>
+<section id="matrix">
+<h3>Matrix<a class="headerlink" href="#matrix" title="Link to this heading"></a></h3>
+<p>Qmatrix[T, m, n] denotes a fixed-size list in qlasskit.
+For example, the matrix <cite>[[1,2],[3,4]]</cite> is typed as <cite>Qmatrix[Qint[2],2,2]</cite>.</p>
+</section>
+</section>
+<section id="expressions">
+<h2>Expressions<a class="headerlink" href="#expressions" title="Link to this heading"></a></h2>
+<section id="constants">
+<h3>Constants<a class="headerlink" href="#constants" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kc">True</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="mi">42</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="mf">3.14</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;a&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h3>Tuple<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="list-fixed-size">
+<h3>List (fixed size)<a class="headerlink" href="#list-fixed-size" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="d-matrix-fixed-size">
+<h3>2D Matrix (fixed size)<a class="headerlink" href="#d-matrix-fixed-size" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">],</span> <span class="p">[</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">]]</span>
+</pre></div>
+</div>
+</section>
+<section id="subscript">
+<h3>Subscript<a class="headerlink" href="#subscript" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="boolean-operators">
+<h3>Boolean operators<a class="headerlink" href="#boolean-operators" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ow">not</span> <span class="n">a</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="ow">and</span> <span class="n">b</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="ow">or</span> <span class="n">b</span>
+</pre></div>
+</div>
+</section>
+<section id="if-expressions">
+<h3>If expressions<a class="headerlink" href="#if-expressions" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="k">if</span> <span class="n">b</span> <span class="k">else</span> <span class="n">c</span>
+</pre></div>
+</div>
+</section>
+<section id="comparators">
+<h3>Comparators<a class="headerlink" href="#comparators" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span> <span class="ow">or</span> <span class="n">b</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="ow">and</span> <span class="n">c</span> <span class="o">==</span> <span class="n">d</span> <span class="ow">or</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">a</span>
+</pre></div>
+</div>
+</section>
+<section id="unary-op">
+<h3>Unary Op<a class="headerlink" href="#unary-op" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">~</span><span class="n">a</span>
+</pre></div>
+</div>
+</section>
+<section id="bin-op">
+<h3>Bin Op<a class="headerlink" href="#bin-op" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">**</span> <span class="n">b</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">%</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Modulo operator only works with 2^n values.</p>
+</div>
+</section>
+<section id="function-call">
+<h3>Function call<a class="headerlink" href="#function-call" title="Link to this heading"></a></h3>
+<p>Bultin functions:</p>
+<ul class="simple">
+<li><p><cite>print()</cite>: debug function, ignore by conversion</p></li>
+<li><p><cite>len(Tuple)</cite>, <cite>len(Qlist)`</cite>: returns the length of a tuple</p></li>
+<li><p><cite>max(a, b, …)</cite>, <cite>max(Tuple)</cite>, <cite>max(Qlist)</cite>: returns the max of a tuple</p></li>
+<li><p><cite>min(a, b, …)</cite>, <cite>min(Tuple)</cite>, <cite>min(Qlist)</cite>: returns the min of a tuple</p></li>
+<li><p><cite>sum(Tuple)</cite>, <cite>sum(Qlist)</cite>: returns the sum of the elemnts of a tuple / list</p></li>
+<li><p><cite>all(Tuple)</cite>, <cite>all(Qlist)</cite>: returns True if all of the elemnts are True</p></li>
+<li><p><cite>any(Tuple)</cite>, <cite>any(Qlist)</cite>: returns True if any of the elemnts are True</p></li>
+<li><p><cite>ord(Qchar)</cite>: returns the integer value of the given Qchar</p></li>
+<li><p><cite>chr(Qint)</cite>: returns the char given its ascii code</p></li>
+<li><p><cite>int(Qfixed | Qint)</cite>: returns the integer part of a Qfixed</p></li>
+<li><p><cite>float(Qint | Qfixed)</cite>: returns a Qfixed representing the Qint</p></li>
+</ul>
+</section>
+</section>
+<section id="statements">
+<h2>Statements<a class="headerlink" href="#statements" title="Link to this heading"></a></h2>
+<section id="assign">
+<h3>Assign<a class="headerlink" href="#assign" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">a</span>
+</pre></div>
+</div>
+</section>
+<section id="return">
+<h3>Return<a class="headerlink" href="#return" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">b</span><span class="o">+</span><span class="mi">1</span>
+</pre></div>
+</div>
+</section>
+<section id="for-loop">
+<h3>For loop<a class="headerlink" href="#for-loop" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+   <span class="n">a</span> <span class="o">+=</span> <span class="n">i</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please note that in qlasskit, for loops are unrolled during compilation. Therefore,
+it is essential that the number of iterations for each for loop is known at the
+time of compilation.</p>
+</div>
+</section>
+<section id="function-def">
+<h3>Function def<a class="headerlink" href="#function-def" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">Qlist</span><span class="p">[</span><span class="n">Qint</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="mi">2</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Qint</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span>
+   <span class="k">return</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="if-then-else">
+<h3>If then else<a class="headerlink" href="#if-then-else" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">if</span> <span class="n">cond</span><span class="p">:</span>
+   <span class="n">c</span> <span class="o">+=</span> <span class="mi">12</span>
+<span class="k">else</span><span class="p">:</span>
+   <span class="n">c</span> <span class="o">+=</span> <span class="mi">13</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>At present, the if-then-else statement in qlasskit is designed to support branch bodies
+that exclusively contain assignment statements.</p>
+</div>
+</section>
+</section>
+<section id="quantum-hybrid">
+<h2>Quantum Hybrid<a class="headerlink" href="#quantum-hybrid" title="Link to this heading"></a></h2>
+<p>In a qlassf function, you have the option to utilize quantum gates through the Q module. It’s
+important to keep in mind that incorporating quantum gates within a qlasskit function leads
+to a Python function that exhibits distinct behaviors compared to its quantum counterpart.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">bell</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+   <span class="k">return</span> <span class="n">Q</span><span class="o">.</span><span class="n">CX</span><span class="p">(</span><span class="n">Q</span><span class="o">.</span><span class="n">H</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="how_it_works.html" class="btn btn-neutral float-left" title="How it works" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="parameters.html" class="btn btn-neutral float-right" title="Parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Davide Gessa (dakk).</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

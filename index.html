@@ -1,0 +1,257 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qlasskit &mdash; qlasskit  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=c309799c" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/dark_mode_js/default_light.js?v=c2e647ce"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Quickstart" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            qlasskit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Qlasskit</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_it_works.html">How it works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported.html">Supported python subset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exporter.html">Exporting to other frameworks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bqm.html">Binary Quadratic Model, Qubo &amp; Ising</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decompiler_and_optimizer.html">Decompiler and Circuit Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_tools.html">CLI Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="example_grover.html">Grover search</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_sat.html">Grover search: SAT problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_subset.html">Grover search: subset problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_hash.html">Grover search: hash function preimage attack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_sudoku.html">Grover search: sudoku solver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_factors.html">Grover: factorize number</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_simon.html">Simon function periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_deutsch_jozsa.html">Deutsch Jozsa algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_bernstein_vazirani.html">Bernstein Vazirani algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_unitary_of_f.html">Unitary of qlasskit function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_big_circuit.html">Working with big circuits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_bqm_tsp.html">Solving TSP as Binary Quadratic Model</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">qlasskit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Qlasskit</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qlasskit">
+<h1>Qlasskit<a class="headerlink" href="#qlasskit" title="Link to this heading"></a></h1>
+<a class="reference external image-reference" href="https://github.com/dakk/qlasskit"><img alt="GitHub Repository" src="https://img.shields.io/badge/GitHub-Repository-blue?logo=github" />
+</a>
+<a class="reference external image-reference" href="https://unitary.fund"><img alt="Unitary Fund" src="https://img.shields.io/badge/supported_by-Unitary_Fund-ffff00.svg" />
+</a>
+<a class="reference external image-reference" href="https://github.com/dakk/qlasskit/actions/workflows/ci.yaml"><img alt="CI Status" src="https://github.com/dakk/qlasskit/actions/workflows/ci.yaml/badge.svg" />
+</a>
+<a class="reference external image-reference" href="https://pypi.org/project/qlasskit/"><img alt="PyPI - Version" src="https://img.shields.io/pypi/v/qlasskit" />
+</a>
+<a class="reference external image-reference" href="https://opensource.org/licenses/Apache-2.0"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache_2.0-blue" />
+</a>
+<a class="reference external image-reference" href="https://discord.com/channels/764231928676089909/1210279373865754624"><img alt="Discord" src="https://img.shields.io/badge/qlasskit-Discord-yellow?logo=discord&amp;logoColor=f5f5f5" />
+</a>
+<a class="reference external image-reference" href="https://app.codacy.com/gh/dakk/qlasskit/dashboard?utm_source=gh&amp;utm_medium=referral&amp;utm_content=&amp;utm_campaign=Badge_grade"><img alt="Codacy Badge" src="https://app.codacy.com/project/badge/Grade/05acc06af76848028183a66448217d91" />
+</a>
+<a class="reference external image-reference" href="https://pepy.tech/project/qlasskit"><img alt="Downloads" src="https://static.pepy.tech/badge/qlasskit" />
+</a>
+<p>Qlasskit is a Python library that allows quantum developers to write classical algorithms in pure
+Python and translate them into unitary operators (gates) for use in quantum circuits supporting a wide
+range of quantum frameworks.</p>
+<p>Qlasskit also support exporting to Binary Quadratic Models (bqm, ising and qubo) ready to be used in
+quantum annealers, ising machines, simulators, etc.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Qlasskit</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_it_works.html">How it works</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="how_it_works.html#ast-translator">AST Translator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_it_works.html#compiler">Compiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_it_works.html#result">Result</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="supported.html">Supported python subset</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="supported.html#types">Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="supported.html#expressions">Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="supported.html#statements">Statements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="supported.html#quantum-hybrid">Quantum Hybrid</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="algorithms.html">Algorithms</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#abstraction-tools">Abstraction tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#grover-search">Grover search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#simon-periodicity">Simon periodicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#deutsch-jozsa">Deutsch Jozsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html#bernstein-vazirani">Bernstein Vazirani</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="exporter.html">Exporting to other frameworks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="exporter.html#qiskit">Qiskit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exporter.html#qasm">QASM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exporter.html#cirq">Cirq</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exporter.html#pennylane">Pennylane</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exporter.html#sympy">Sympy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exporter.html#qutip">Qutip</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bqm.html">Binary Quadratic Model, Qubo &amp; Ising</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bqm.html#running-on-simulated-sampler-annealer">Running on simulated sampler annealer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bqm.html#running-on-dwave-annealer">Running on DWave annealer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="decompiler_and_optimizer.html">Decompiler and Circuit Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/qlasskit.qlassfun.qlassf.html">qlasskit.qlassfun.qlassf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/qlasskit.qlassfun.qlassfa.html">qlasskit.qlassfun.qlassfa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/qlasskit.qlassfun.QlassF.html">qlasskit.qlassfun.QlassF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/qlasskit.algorithms.qalgorithm.html">qlasskit.algorithms.qalgorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/qlasskit.algorithms.grover.Grover.html">qlasskit.algorithms.grover.Grover</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/qlasskit.algorithms.simon.Simon.html">qlasskit.algorithms.simon.Simon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/qlasskit.algorithms.deutschjozsa.DeutschJozsa.html">qlasskit.algorithms.deutschjozsa.DeutschJozsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/qlasskit.qcircuit.qcircuit.QCircuit.html">qlasskit.qcircuit.qcircuit.QCircuit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/qlasskit.qcircuit.qcircuitwrapper.QCircuitWrapper.html">qlasskit.qcircuit.qcircuitwrapper.QCircuitWrapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/qlasskit.qcircuit.gates.html">qlasskit.qcircuit.gates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/qlasskit.bqm.decode_samples.html">qlasskit.bqm.decode_samples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/qlasskit.decompiler.Decompiler.html">qlasskit.decompiler.Decompiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/qlasskit.types.html">qlasskit.types</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli_tools.html">CLI Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli_tools.html#py2bexp">py2bexp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli_tools.html#py2qasm">py2qasm</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="example_grover.html">Grover search</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_sat.html">Grover search: SAT problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_subset.html">Grover search: subset problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_hash.html">Grover search: hash function preimage attack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_sudoku.html">Grover search: sudoku solver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_grover_factors.html">Grover: factorize number</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_simon.html">Simon function periodicity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_deutsch_jozsa.html">Deutsch Jozsa algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_bernstein_vazirani.html">Bernstein Vazirani algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_unitary_of_f.html">Unitary of qlasskit function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_big_circuit.html">Working with big circuits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_bqm_tsp.html">Solving TSP as Binary Quadratic Model</a></li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+<section id="cite">
+<h1>Cite<a class="headerlink" href="#cite" title="Link to this heading"></a></h1>
+<div class="highlight-latex notranslate"><div class="highlight"><pre><span></span>@software<span class="nb">{</span>qlasskit2023,
+  author = <span class="nb">{</span>Davide Gessa<span class="nb">}</span>,
+  title = <span class="nb">{</span>qlasskit: a python-to-quantum circuit compiler<span class="nb">}</span>,
+  url = <span class="nb">{</span>https://github.com/dakk/qlasskit<span class="nb">}</span>,
+  year = <span class="nb">{</span>2023<span class="nb">}</span>,
+<span class="nb">}</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quickstart.html" class="btn btn-neutral float-right" title="Quickstart" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Davide Gessa (dakk).</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
