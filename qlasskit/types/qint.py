@@ -286,50 +286,52 @@ class QintImp(int, Qtype):
 
     @classmethod
     def mod(cls, tleft: TExp, tright: TExp) -> TExp:  # noqa: C901
-        # x mod y = x & (y - 1)
+        """Modulo operation using floor division, returns remainder"""
         if not issubclass(tleft[0], Qtype):
             raise TypeErrorException(tleft[0], Qtype)
         if not issubclass(tright[0], Qtype):
             raise TypeErrorException(tright[0], Qtype)
 
-        tval = tright[0].sub(tright, tright[0].const(1))
-        return tleft[0].bitwise_and(tleft, tval)
+        _, r = cls.divide_generic(tleft, tright)
+        return r
 
     @staticmethod
-    def _floor_div_const_optimize(
+    def _divide_generic_const_optimize(
         cls, tleft: TExp, tright_value: int
-    ) -> Optional[TExp]:
-        """Optimize division by constant divisors"""
+    ) -> Optional[tuple[TExp, TExp]]:
+        """Optimize division by constant divisors, returns (quotient, remainder)"""
         if tright_value == 1:
-            return tleft
+            return (tleft, cls.const(0))
         if tright_value > 0 and (tright_value & (tright_value - 1)) == 0:
             power = 0
             temp = tright_value
             while temp > 1:
                 temp >>= 1
                 power += 1
-            return cls.shift_right(tleft, power)
-        if tright_value > 1 and tright_value % 2 == 0:
-            return cls.floor_div(
-                cls.shift_right(tleft, 1), cls.const(tright_value // 2)
-            )
+            q = cls.shift_right(tleft, power)
+            # r = x & (tright_value - 1)
+            mask = cls.const(tright_value - 1)
+            r = cls.bitwise_and(tleft, mask)
+            return (q, r)
         return None
 
     @staticmethod
-    def _floor_div_handle_const_divisor(
+    def _divide_generic_handle_const_divisor(
         cls, tleft: TExp, tright: TExp
-    ) -> Optional[TExp]:
-        """Handle constant divisor optimizations"""
+    ) -> Optional[tuple[TExp, TExp]]:
+        """Handle constant divisor optimizations, returns (quotient, remainder)"""
         if not cls.is_const(tright):
             return None
         tright_qtype = cast(Qtype, tright[0]).from_bool(tright[1])
         tright_value = cast(QintImp, tright_qtype)
         if tright_value == 0:
             raise ZeroDivisionError("division by zero")
-        return cls._floor_div_const_optimize(cls, tleft, tright_value)
+        return cls._divide_generic_const_optimize(cls, tleft, tright_value)
 
     @staticmethod
-    def _floor_div_normalize_sizes(cls, tleft: TExp, tright: TExp) -> tuple[TExp, TExp]:
+    def _divide_generic_normalize_sizes(
+        cls, tleft: TExp, tright: TExp
+    ) -> tuple[TExp, TExp]:
         """Normalize operand sizes"""
         if len(tleft[1]) > len(tright[1]):
             tright = cast(Qtype, tleft[0]).fill(tright)
@@ -338,8 +340,10 @@ class QintImp(int, Qtype):
         return tleft, tright
 
     @staticmethod
-    def _floor_div_long_division(cls, tleft: TExp, tright: TExp, n: int) -> TExp:
-        """Perform long division algorithm"""
+    def _floor_div_long_division(
+        cls, tleft: TExp, tright: TExp, n: int
+    ) -> tuple[TExp, TExp]:
+        """Perform long division algorithm, returns (quotient, remainder)"""
         tleft_type = cast(Qtype, tleft[0])
         Q = tleft_type.fill(cls.const(0))
         R = tleft_type.fill(cls.const(0))
@@ -361,34 +365,40 @@ class QintImp(int, Qtype):
             Q_bits[i] = Or(Q_bits[i], r_gte_d[1])
             Q = (Q[0], Q_bits)
 
-        return Q
+        return (Q, R)
 
     @classmethod
-    def floor_div(cls, tleft: TExp, tright: TExp) -> TExp:
-        """Floor divide two Qint"""
+    def divide_generic(cls, tleft: TExp, tright: TExp) -> tuple[TExp, TExp]:
+        """Divide two Qint, returns (quotient, remainder)"""
         if not issubclass(tleft[0], Qtype) or not issubclass(tright[0], Qtype):
             raise TypeErrorException(
                 tleft[0] if not issubclass(tleft[0], Qtype) else tright[0], Qtype
             )
 
-        opt_result = cls._floor_div_handle_const_divisor(cls, tleft, tright)
+        opt_result = cls._divide_generic_handle_const_divisor(cls, tleft, tright)
         if opt_result is not None:
             return opt_result
 
         if cls.is_const(tleft):
             tleft_value = cast(Qtype, tleft[0]).from_bool(tleft[1])
             if tleft_value == 0:
-                return cls.const(0)
+                return (cls.const(0), cls.const(0))
 
-        tleft, tright = cls._floor_div_normalize_sizes(cls, tleft, tright)
+        tleft, tright = cls._divide_generic_normalize_sizes(cls, tleft, tright)
 
         if cls.is_const(tleft) and cls.is_const(tright):
             tleft_val = cast(QintImp, cast(Qtype, tleft[0]).from_bool(tleft[1]))
             tright_val = cast(QintImp, cast(Qtype, tright[0]).from_bool(tright[1]))
             if tleft_val < tright_val:
-                return cls.const(0)
+                return (cls.const(0), tleft)
 
         return cls._floor_div_long_division(cls, tleft, tright, len(tleft[1]))
+
+    @classmethod
+    def floor_div(cls, tleft: TExp, tright: TExp) -> TExp:
+        """Floor divide two Qint, returns quotient"""
+        q, _ = cls.divide_generic(tleft, tright)
+        return q
 
     @classmethod
     def bitwise_generic(cls, op, tleft: TExp, tright: TExp) -> TExp:
