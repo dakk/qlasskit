@@ -1,0 +1,107 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/nbclient/client.py", line 1323, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+bqm = tsp_f.to_bqm()
+print("Vars:", bqm.num_variables, "\nInteractions:", bqm.num_interactions)
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mAttributeError[39m                            Traceback (most recent call last)
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/qlasskit/bqm.py:68[39m, in [36mto_bqm[39m[34m(args, returns, exprs, fmt)[39m
+[32m     67[39m [38;5;28;01mtry[39;00m:
+[32m---> [39m[32m68[39m     [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mpyqubo[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m AndConst, Binary, NotConst, OrConst, XorConst
+[32m     69[39m [38;5;28;01mexcept[39;00m:
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/pyqubo/__init__.py:6[39m
+[32m      5[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mpyqubo[39;00m[34;01m.[39;00m[34;01mutils[39;00m[34;01m.[39;00m[34;01masserts[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m *
+[32m----> [39m[32m6[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mpyqubo[39;00m[34;01m.[39;00m[34;01mutils[39;00m[34;01m.[39;00m[34;01msolver[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m *
+[32m      7[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01m.[39;00m[34;01marray[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m *
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/pyqubo/utils/solver.py:15[39m
+[32m      1[39m [38;5;66;03m# Copyright 2018 Recruit Communications Co., Ltd.[39;00m
+[32m      2[39m [38;5;66;03m#[39;00m
+[32m      3[39m [38;5;66;03m# Licensed under the Apache License, Version 2.0 (the "License");[39;00m
+[32m   (...)[39m[32m     12[39m [38;5;66;03m# See the License for the specific language governing permissions and[39;00m
+[32m     13[39m [38;5;66;03m# limitations under the License.[39;00m
+[32m---> [39m[32m15[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mneal[39;00m
+[32m     16[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mnumpy[39;00m[38;5;250m [39m[38;5;28;01mas[39;00m[38;5;250m [39m[34;01mnp[39;00m
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/neal/__init__.py:15[39m
+[32m      1[39m [38;5;66;03m# Copyright 2018 D-Wave Systems Inc.[39;00m
+[32m      2[39m [38;5;66;03m#[39;00m
+[32m      3[39m [38;5;66;03m#    Licensed under the Apache License, Version 2.0 (the "License");[39;00m
+[32m   (...)[39m[32m     12[39m [38;5;66;03m#    See the License for the specific language governing permissions and[39;00m
+[32m     13[39m [38;5;66;03m#    limitations under the License.[39;00m
+[32m---> [39m[32m15[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mneal[39;00m[34;01m.[39;00m[34;01msampler[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m *
+[32m     16[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mneal[39;00m[34;01m.[39;00m[34;01msampler[39;00m
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/neal/sampler.py:15[39m
+[32m      1[39m [38;5;66;03m# Copyright 2018 D-Wave Systems Inc.[39;00m
+[32m      2[39m [38;5;66;03m#[39;00m
+[32m      3[39m [38;5;66;03m#    Licensed under the Apache License, Version 2.0 (the "License");[39;00m
+[32m   (...)[39m[32m     12[39m [38;5;66;03m#    See the License for the specific language governing permissions and[39;00m
+[32m     13[39m [38;5;66;03m#    limitations under the License.[39;00m
+[32m---> [39m[32m15[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mdwave[39;00m[34;01m.[39;00m[34;01msamplers[39;00m[34;01m.[39;00m[34;01msa[39;00m[34;01m.[39;00m[34;01msampler[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m Neal, SimulatedAnnealingSampler, default_beta_range
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/dwave/samplers/__init__.py:19[39m
+[32m     17[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mdwave[39;00m[34;01m.[39;00m[34;01msamplers[39;00m[34;01m.[39;00m[34;01mgreedy[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m *
+[32m---> [39m[32m19[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mdwave[39;00m[34;01m.[39;00m[34;01msamplers[39;00m[34;01m.[39;00m[34;01mrandom[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m *
+[32m     21[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mdwave[39;00m[34;01m.[39;00m[34;01msamplers[39;00m[34;01m.[39;00m[34;01msa[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m *
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/dwave/samplers/random/__init__.py:15[39m
+[32m      1[39m [38;5;66;03m# Copyright 2022 D-Wave Systems Inc.[39;00m
+[32m      2[39m [38;5;66;03m#[39;00m
+[32m      3[39m [38;5;66;03m#    Licensed under the Apache License, Version 2.0 (the "License");[39;00m
+[32m   (...)[39m[32m     12[39m [38;5;66;03m#    See the License for the specific language governing permissions and[39;00m
+[32m     13[39m [38;5;66;03m#    limitations under the License.[39;00m
+[32m---> [39m[32m15[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mdwave[39;00m[34;01m.[39;00m[34;01msamplers[39;00m[34;01m.[39;00m[34;01mrandom[39;00m[34;01m.[39;00m[34;01msampler[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m *
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/dwave/samplers/random/sampler.py:22[39m
+[32m     20[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mnumpy[39;00m[38;5;250m [39m[38;5;28;01mas[39;00m[38;5;250m [39m[34;01mnp[39;00m
+[32m---> [39m[32m22[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mdwave[39;00m[34;01m.[39;00m[34;01msamplers[39;00m[34;01m.[39;00m[34;01mrandom[39;00m[34;01m.[39;00m[34;01mcyrandom[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m sample
+[32m     25[39m __all__ = [[33m'[39m[33mRandomSampler[39m[33m'[39m]
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/dwave/samplers/random/cyrandom.pyx:1[39m, in [36minit dwave.samplers.random.cyrandom[39m[34m()[39m
+
+[31mAttributeError[39m: module 'numpy.random.bit_generator' has no attribute 'SeedlessSequence'
+
+During handling of the above exception, another exception occurred:
+
+[31mException[39m                                 Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[4][39m[32m, line 1[39m
+[32m----> [39m[32m1[39m bqm = [43mtsp_f[49m[43m.[49m[43mto_bqm[49m[43m([49m[43m)[49m
+[32m      2[39m [38;5;28mprint[39m([33m"[39m[33mVars:[39m[33m"[39m, bqm.num_variables, [33m"[39m[38;5;130;01m\n[39;00m[33mInteractions:[39m[33m"[39m, bqm.num_interactions)
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/qlasskit/qlassfun.py:273[39m, in [36mQlassF.to_bqm[39m[34m(self, fmt)[39m
+[32m    272[39m [38;5;28;01mdef[39;00m[38;5;250m [39m[34mto_bqm[39m([38;5;28mself[39m, fmt: BQMFormat = [33m"[39m[33mbqm[39m[33m"[39m):
+[32m--> [39m[32m273[39m     [38;5;28;01mreturn[39;00m [43mto_bqm[49m[43m([49m
+[32m    274[39m [43m        [49m[43margs[49m[43m=[49m[38;5;28;43mself[39;49m[43m.[49m[43margs[49m[43m,[49m[43m [49m[43mreturns[49m[43m=[49m[38;5;28;43mself[39;49m[43m.[49m[43mreturns[49m[43m,[49m[43m [49m[43mexprs[49m[43m=[49m[38;5;28;43mself[39;49m[43m.[49m[43mexpressions[49m[43m,[49m[43m [49m[43mfmt[49m[43m=[49m[43mfmt[49m
+[32m    275[39m [43m    [49m[43m)[49m
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/qlasskit/bqm.py:70[39m, in [36mto_bqm[39m[34m(args, returns, exprs, fmt)[39m
+[32m     68[39m     [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mpyqubo[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m AndConst, Binary, NotConst, OrConst, XorConst
+[32m     69[39m [38;5;28;01mexcept[39;00m:
+[32m---> [39m[32m70[39m     [38;5;28;01mraise[39;00m [38;5;167;01mException[39;00m([33m"[39m[33mLibrary pyqubo not found: run `pip install pyqubo`[39m[33m"[39m)
+[32m     72[39m a_vars = {}
+[32m     73[39m [38;5;28;01mfor[39;00m arg [38;5;129;01min[39;00m args:
+
+[31mException[39m: Library pyqubo not found: run `pip install pyqubo`
+
