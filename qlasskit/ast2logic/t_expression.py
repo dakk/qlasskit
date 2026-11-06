@@ -422,6 +422,10 @@ class ExpressionTranslator(ast.NodeTransformer):
         elif self.env.know_type(expr.func.id):
             return self.__visit_Call_typecast(expr)
 
+        # Print
+        elif expr.func.id == "print":
+            return [], self.env
+
         # int()
         elif expr.func.id == "int":
             return self.__visit_Call_int(expr)

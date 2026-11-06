@@ -523,30 +523,5 @@ class ASTRewriter(ast.NodeTransformer):
         if not hasattr(node.func, "id"):
             return node
 
-        if node.func.id == "print":
-            return None
-
         handler = self.__call_dispatch.get(node.func.id)
         return handler(node) if handler is not None else node
-
-    # def visit_BinOp(self, node: ast.BinOp):
-    #     # Rewrite the ** operator to be a series of multiplications
-    #     if isinstance(node.op, ast.Pow):
-    #         if (
-    #             isinstance(node.right, ast.Constant)
-    #             and isinstance(node.right.value, int)
-    #             and node.right.value > 0
-    #         ):
-    #             result = node.left
-    #             for _ in range(node.right.value - 1):
-    #                 result = ast.BinOp(left=result, op=ast.Mult(), right=node.left)
-    #             return result
-
-    #         elif (
-    #             isinstance(node.right, ast.Constant)
-    #             and isinstance(node.right.value, int)
-    #             and node.right.value == 0
-    #         ):
-    #             return ast.Constant(value=1)
-
-    #     return super().generic_visit(node)
