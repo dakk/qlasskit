@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import sys
-from typing import Any, List, Literal, Tuple, TypeVar, Union
+from typing import Any, List, Literal, Optional, Tuple, TypeVar, Union
 
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue, Not
 
@@ -36,7 +36,7 @@ class TypeErrorException(Exception):
         super().__init__(f"Got '{got}' excepted '{excepted}'")
 
 
-def bin_to_bool_list(b: str, bit_size=None) -> List[bool]:
+def bin_to_bool_list(b: str, bit_size: Optional[int] = None) -> List[bool]:
     if b.startswith("0b"):
         b = b[2:]
 
@@ -79,7 +79,9 @@ class Qtype:
         """Return amplitudes to initialize the current value on a quantum circuit"""
         raise Exception("abstract to_amplitudes")
 
-    def export(self, mode: Literal["amplitudes", "binary"] = "binary"):
+    def export(
+        self, mode: Literal["amplitudes", "binary"] = "binary"
+    ) -> Union[str, List[float]]:
         if mode == "amplitudes":
             return self.to_amplitudes()
         elif mode == "binary":

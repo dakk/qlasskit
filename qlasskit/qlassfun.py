@@ -16,7 +16,16 @@ import ast
 import copy
 import inspect
 from functools import partial, reduce
-from typing import Any, Callable, Dict, List, Tuple, Union, get_args  # noqa: F401
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Union,
+    get_args,
+)  # noqa: F401
 
 from sympy import Symbol
 
@@ -35,13 +44,13 @@ from .types.qfixed import *  # noqa: F403, F401
 MAX_TRUTH_TABLE_SIZE = 20
 
 
-def in_ipynb():
+def in_ipynb() -> bool:
     import sys
 
     return "ipykernel" in sys.modules
 
 
-def is_parameter_annotation(node):
+def is_parameter_annotation(node: ast.AST) -> bool:
     """Return True if an annotation looks like 'Parameter[...]'."""
     if node is None:
         return False
@@ -150,7 +159,7 @@ class QlassF(QCircuitWrapper):
         self.returns = returns
         self.expressions = exps
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         ret_str = type_repr(self.returns.ttype)
         arg_str = ", ".join(
             map(lambda arg: f"{arg.name}:{type_repr(arg.ttype)}", self.args)
@@ -160,7 +169,7 @@ class QlassF(QCircuitWrapper):
 
     # @ovveride
     @property
-    def output_size(self):
+    def output_size(self) -> int:
         """Return the size of the return type (in bits)"""
         return len(self.returns)
 
@@ -214,7 +223,7 @@ class QlassF(QCircuitWrapper):
         )
         return header
 
-    def truth_table(self, max=None) -> List[List[bool]]:
+    def truth_table(self, max: Optional[int] = None) -> List[List[bool]]:
         """Returns the truth table for the function using the sympy boolean for computing
 
         Args:
@@ -251,7 +260,9 @@ class QlassF(QCircuitWrapper):
 
         return truth
 
-    def compile(self, compiler: SupportedCompiler = "internal", uncompute: bool = True):
+    def compile(
+        self, compiler: SupportedCompiler = "internal", uncompute: bool = True
+    ) -> None:
         self._qcircuit = to_quantum(
             name=self.name,
             args=self.args,

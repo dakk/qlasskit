@@ -21,76 +21,81 @@ from ..types import TType, TypeErrorException
 from . import Binding, Env, decompose_to_symbols, exceptions, translate_expression
 
 
+def __translate_assign(
+    stmt: ast.Assign, env: Env
+) -> Tuple[List[Tuple[str, Boolean]], Env]:
+    if len(stmt.targets) > 1:
+        raise exceptions.StatementNotHandledException(
+            stmt, f"too many targets {len(stmt.targets)}"
+        )
+
+    if not isinstance(stmt.targets[0], ast.Name):
+        raise exceptions.StatementNotHandledException(
+            stmt, "only name target supported"
+        )
+
+    target = stmt.targets[0].id
+
+    tval, val = translate_expression(stmt.value, env)  # TODO: typecheck
+    res = decompose_to_symbols(val, f"{target}")
+
+    env.bind(Binding(target, tval, [x[0] for x in res]), rebind=target in env)
+    res = list(map(lambda x: (Symbol(x[0]), x[1]), res))
+    return res, env
+
+
+def __translate_return(
+    stmt: ast.Return, env: Env, ret_type
+) -> Tuple[List[Tuple[str, Boolean]], Env]:
+    texp, vexp = translate_expression(stmt.value, env)  # TODO: typecheck
+
+    if (
+        hasattr(texp, "BIT_SIZE")
+        and hasattr(ret_type, "BIT_SIZE")
+        and texp.BIT_SIZE < ret_type.BIT_SIZE
+    ):
+        texp, vexp = ret_type.fill((texp, vexp))  # type: ignore
+    elif (
+        hasattr(texp, "BIT_SIZE")
+        and hasattr(ret_type, "BIT_SIZE")
+        and texp.BIT_SIZE > ret_type.BIT_SIZE
+    ):
+        texp, vexp = ret_type.crop((texp, vexp))  # type: ignore
+    elif texp != ret_type:
+        raise TypeErrorException(texp, ret_type)
+
+    res = decompose_to_symbols(vexp, "_ret")
+    env.bind(Binding("_ret", texp, [x[0] for x in res]))
+    res = list(map(lambda x: (Symbol(x[0]), x[1]), res))
+    return res, env
+
+
+def __translate_functiondef(
+    stmt: ast.FunctionDef, env: Env
+) -> Tuple[List[Tuple[str, Boolean]], Env]:
+    from .t_ast import translate_ast
+
+    lofun = translate_ast(stmt)
+    env.bind_function(lofun)
+    return [], env
+
+
 def translate_statement(  # noqa: C901
     stmt, env: Env, ret_type: TType
 ) -> Tuple[List[Tuple[str, Boolean]], Env]:
     """Parse a statement"""
     # match stmt:
     if isinstance(stmt, ast.If):  # This is handled by ast2ast
-        # Translate test expression, body & orelse statements
-        # test = translate_expression(stmt.test, env)
-
-        # body = []
-        # for st_inner in stmt.body:
-        #     exps, env = translate_statement(st_inner, env)
-        #     body.extend(exps)
-
-        # orelse = []
-        # for st_inner in stmt.orelse:
-        #     exps, env = translate_statement(st_inner, env)
-        #     orelse.extend(exps)
-
         raise exceptions.StatementNotHandledException(stmt)
 
     elif isinstance(stmt, ast.Assign):
-        if len(stmt.targets) > 1:
-            raise exceptions.StatementNotHandledException(
-                stmt, f"too many targets {len(stmt.targets)}"
-            )
-
-        if not isinstance(stmt.targets[0], ast.Name):
-            raise exceptions.StatementNotHandledException(
-                stmt, "only name target supported"
-            )
-
-        target = stmt.targets[0].id
-
-        tval, val = translate_expression(stmt.value, env)  # TODO: typecheck
-        res = decompose_to_symbols(val, f"{target}")
-
-        env.bind(Binding(target, tval, [x[0] for x in res]), rebind=target in env)
-        res = list(map(lambda x: (Symbol(x[0]), x[1]), res))
-        return res, env
+        return __translate_assign(stmt, env)
 
     elif isinstance(stmt, ast.Return):
-        texp, vexp = translate_expression(stmt.value, env)  # TODO: typecheck
-
-        if (
-            hasattr(texp, "BIT_SIZE")
-            and hasattr(ret_type, "BIT_SIZE")
-            and texp.BIT_SIZE < ret_type.BIT_SIZE
-        ):
-            texp, vexp = ret_type.fill((texp, vexp))  # type: ignore
-        elif (
-            hasattr(texp, "BIT_SIZE")
-            and hasattr(ret_type, "BIT_SIZE")
-            and texp.BIT_SIZE > ret_type.BIT_SIZE
-        ):
-            texp, vexp = ret_type.crop((texp, vexp))  # type: ignore
-        elif texp != ret_type:
-            raise TypeErrorException(texp, ret_type)
-
-        res = decompose_to_symbols(vexp, "_ret")
-        env.bind(Binding("_ret", texp, [x[0] for x in res]))
-        res = list(map(lambda x: (Symbol(x[0]), x[1]), res))
-        return res, env
+        return __translate_return(stmt, env, ret_type)
 
     elif isinstance(stmt, ast.FunctionDef):
-        from .t_ast import translate_ast
-
-        lofun = translate_ast(stmt)
-        env.bind_function(lofun)
-        return [], env
+        return __translate_functiondef(stmt, env)
 
     elif isinstance(stmt, ast.Expr):
         if hasattr(stmt, "value"):

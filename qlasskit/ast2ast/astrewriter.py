@@ -14,7 +14,7 @@
 import ast
 import copy
 from dataclasses import dataclass
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 from ..ast2logic import flatten
 from .constantfolder import ConstantFolder
@@ -131,7 +131,9 @@ class NameValReplacer(ast.NodeTransformer):
 class ASTRewriter(ast.NodeTransformer):
     """Rewrites the ast to a simplified version"""
 
-    def __init__(self, env=None, ret=None):
+    env: Environment
+
+    def __init__(self, env: Optional[Environment] = None, ret=None):
         self.env = Environment() if env is None else env
         self.ret = None
         self._uniqd = 1
@@ -340,7 +342,7 @@ class ASTRewriter(ast.NodeTransformer):
         elif isinstance(node.value, ast.Tuple) or isinstance(node.value, ast.List):
             self.env.set_constant(target, self.visit(node.value))
         else:
-            self.env.set_type(target, "Unknown")
+            self.env.set_type(target, "Unknown")  # type: ignore
 
         # If value is not self referencing, we can skip this (ie: a = b + 1)
         ip = IsNamePresent(target)
