@@ -374,28 +374,6 @@ class ASTRewriter(ast.NodeTransformer):
         node.value = self.visit(node.value)
         return node
 
-    # def visit_AugAssign(self, node: ast.AugAssign):
-    #     """Translate AugAssign to Assign + BinOp (+=, -=, etc)"""
-    #     # Reassigning an already present variable (use a temp variable)
-    #     # if node.target.id in self.env:
-    #     if not hasattr(node.target, "id"):
-    #         raise ValueError(node.target, "has no id")
-
-    #     new_targ = ast.Name(id=f"__{node.target.id}", ctx=ast.Load())
-
-    #     return [
-    #         ast.Assign(
-    #             targets=[new_targ],
-    #             value=self.visit(
-    #                 ast.BinOp(left=node.target, op=node.op, right=node.value)
-    #             ),
-    #         ),
-    #         ast.Assign(
-    #             targets=[node.target],
-    #             value=new_targ,
-    #         ),
-    #     ]
-
     def __unroll_arg(
         self, arg: Union[ast.Constant, ast.Subscript, ast.Tuple, ast.Name]
     ):
@@ -553,24 +531,24 @@ class ASTRewriter(ast.NodeTransformer):
         handler = self.__call_dispatch.get(node.func.id)
         return handler(node) if handler is not None else node
 
-    def visit_BinOp(self, node: ast.BinOp):
-        # Rewrite the ** operator to be a series of multiplications
-        if isinstance(node.op, ast.Pow):
-            if (
-                isinstance(node.right, ast.Constant)
-                and isinstance(node.right.value, int)
-                and node.right.value > 0
-            ):
-                result = node.left
-                for _ in range(node.right.value - 1):
-                    result = ast.BinOp(left=result, op=ast.Mult(), right=node.left)
-                return result
+    # def visit_BinOp(self, node: ast.BinOp):
+    #     # Rewrite the ** operator to be a series of multiplications
+    #     if isinstance(node.op, ast.Pow):
+    #         if (
+    #             isinstance(node.right, ast.Constant)
+    #             and isinstance(node.right.value, int)
+    #             and node.right.value > 0
+    #         ):
+    #             result = node.left
+    #             for _ in range(node.right.value - 1):
+    #                 result = ast.BinOp(left=result, op=ast.Mult(), right=node.left)
+    #             return result
 
-            elif (
-                isinstance(node.right, ast.Constant)
-                and isinstance(node.right.value, int)
-                and node.right.value == 0
-            ):
-                return ast.Constant(value=1)
+    #         elif (
+    #             isinstance(node.right, ast.Constant)
+    #             and isinstance(node.right.value, int)
+    #             and node.right.value == 0
+    #         ):
+    #             return ast.Constant(value=1)
 
-        return super().generic_visit(node)
+    #     return super().generic_visit(node)
