@@ -16,66 +16,65 @@ import ast
 import copy
 
 
+class TypeAnnotationsReplacer(ast.NodeTransformer):
+    def visit_Subscript(self, ann):
+        if not isinstance(ann.value, ast.Name) or not hasattr(ann.slice, "elts"):
+            return ann
+
+        if ann.value.id == "Tuple":
+            _elts = ann.slice.elts
+            _ituple = ast.Tuple(elts=[self.visit(el) for el in _elts])
+
+            return ast.Subscript(
+                value=ast.Name(id="Tuple", ctx=ast.Load()),
+                slice=_ituple,
+            )
+
+        # Replace Qlist[T,n] with Tuple[(T,)*n]
+        elif ann.value.id == "Qlist":
+            _elts = ann.slice.elts
+            _ituple = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[1].value)
+
+            return ast.Subscript(
+                value=ast.Name(id="Tuple", ctx=ast.Load()),
+                slice=_ituple,
+            )
+
+        # Replace Qmatrix[T,n,m] with Tuple[(Tuple[(T,)*m],)*n]
+        elif ann.value.id == "Qmatrix":
+            _elts = ann.slice.elts
+            _ituple_row = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[2].value)
+            _ituple = ast.Tuple(elts=[copy.deepcopy(_ituple_row)] * _elts[1].value)
+
+            return ast.Subscript(
+                value=ast.Name(id="Tuple", ctx=ast.Load()),
+                slice=_ituple,
+            )
+
+        return ann
+
+    def visit_Name(self, ann):
+        # Replace QintX with Qint[X]
+        if ann.id[:4] == "Qint":
+            ann = ast.Subscript(
+                value=ast.Name(id="Qint", ctx=ast.Load()),
+                slice=ast.Constant(value=int(ann.id[4:])),
+            )
+
+        # Replace QfixedX with Qfixed[X]
+        elif ann.id[:6] == "Qfixed":
+            ann = ast.Subscript(
+                value=ast.Name(id="Qfixed", ctx=ast.Load()),
+                slice=ast.Constant(value=int(ann.id[6:])),
+            )
+
+        return ann
+
+
 def _replace_types_annotations(ann, arg=None):
     """Replaces type annotations, translating high level types"""
-    if (
-        isinstance(ann, ast.Subscript)
-        and isinstance(ann.value, ast.Name)
-        and ann.value.id == "Tuple"
-        and hasattr(ann.slice, "elts")
-    ):
-        _elts = ann.slice.elts
-        _ituple = ast.Tuple(elts=[_replace_types_annotations(el) for el in _elts])
-
-        ann = ast.Subscript(
-            value=ast.Name(id="Tuple", ctx=ast.Load()),
-            slice=_ituple,
-        )
-
-    # Replace QintX with Qint[X]
-    if isinstance(ann, ast.Name) and ann.id[:4] == "Qint":
-        ann = ast.Subscript(
-            value=ast.Name(id="Qint", ctx=ast.Load()),
-            slice=ast.Constant(value=int(ann.id[4:])),
-        )
-
-    # Replace QfixedX with Qfixed[X]
-    if isinstance(ann, ast.Name) and ann.id[:6] == "Qfixed":
-        ann = ast.Subscript(
-            value=ast.Name(id="Qfixed", ctx=ast.Load()),
-            slice=ast.Constant(value=int(ann.id[6:])),
-        )
-
-    # Replace Qlist[T,n] with Tuple[(T,)*n]
-    if (
-        isinstance(ann, ast.Subscript)
-        and isinstance(ann.value, ast.Name)
-        and ann.value.id == "Qlist"
-        and hasattr(ann.slice, "elts")
-    ):
-        _elts = ann.slice.elts
-        _ituple = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[1].value)
-
-        ann = ast.Subscript(
-            value=ast.Name(id="Tuple", ctx=ast.Load()),
-            slice=_ituple,
-        )
-
-    # Replace Qmatrix[T,n,m] with Tuple[(Tuple[(T,)*m],)*n]
-    if (
-        isinstance(ann, ast.Subscript)
-        and isinstance(ann.value, ast.Name)
-        and ann.value.id == "Qmatrix"
-        and hasattr(ann.slice, "elts")
-    ):
-        _elts = ann.slice.elts
-        _ituple_row = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[2].value)
-        _ituple = ast.Tuple(elts=[copy.deepcopy(_ituple_row)] * _elts[1].value)
-
-        ann = ast.Subscript(
-            value=ast.Name(id="Tuple", ctx=ast.Load()),
-            slice=_ituple,
-        )
+    if ann is not None:
+        ann = TypeAnnotationsReplacer().visit(ann)
 
     if arg is not None:
         arg.annotation = ann
