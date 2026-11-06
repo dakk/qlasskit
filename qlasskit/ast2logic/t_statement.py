@@ -44,6 +44,32 @@ def __translate_assign(
     return res, env
 
 
+def __translate_augassign(stmt: ast.AugAssign, env: Env):
+    """Translate AugAssign (a += x) as a = a + x"""
+    if not isinstance(stmt.target, ast.Name):
+        raise exceptions.StatementNotHandledException(
+            stmt, "only name target supported"
+        )
+
+    target = stmt.target.id
+    value = ast.BinOp(left=stmt.target, op=stmt.op, right=stmt.value)
+
+    # Use a temp var if the target is already defined in env
+    if target in env:
+        tmp = f"__{target}"
+        tval, val = translate_expression(value, env)
+        res = decompose_to_symbols(val, tmp)
+        env.bind(Binding(tmp, tval, [x[0] for x in res]), rebind=tmp in env)
+        exps: List[Tuple[str, Boolean]] = [(Symbol(n), e) for n, e in res]
+        exps2, env = __translate_assign(
+            ast.Assign(targets=[stmt.target], value=ast.Name(id=tmp, ctx=ast.Load())),
+            env,
+        )
+        return exps + exps2, env
+
+    return __translate_assign(ast.Assign(targets=[stmt.target], value=value), env)
+
+
 def __translate_return(
     stmt: ast.Return, env: Env, ret_type
 ) -> Tuple[List[Tuple[str, Boolean]], Env]:
@@ -87,6 +113,9 @@ def translate_statement(  # noqa: C901
     # match stmt:
     if isinstance(stmt, ast.If):  # This is handled by ast2ast
         raise exceptions.StatementNotHandledException(stmt)
+
+    elif isinstance(stmt, ast.AugAssign):
+        return __translate_augassign(stmt, env)
 
     elif isinstance(stmt, ast.Assign):
         return __translate_assign(stmt, env)
