@@ -111,7 +111,7 @@ jobs:
       run: pip install tox
 
     - name: Run vermin
-      run: tox -e vermin
+      run: tox -c tox_no_tw_and_pyqubo.ini -e vermin
 
   # coverage:
   #   runs-on: ubuntu-24.04
