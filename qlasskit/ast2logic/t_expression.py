@@ -280,6 +280,24 @@ class ExpressionTranslator(ast.NodeTransformer):
             return tleft[0].add(tleft, tright)
         elif isinstance(expr.op, ast.Sub) and hasattr(tleft[0], "sub"):
             return tleft[0].sub(tleft, tright)
+        elif isinstance(expr.op, ast.Pow) and hasattr(tleft[0], "mul"):
+            # Transform pow to multiplications
+            if not isinstance(expr.right, ast.Constant) and not isinstance(
+                expr.right.value, int
+            ):
+                raise exceptions.ExpressionNotHandledException(expr.right)
+
+            if expr.right.value > 0:
+                result = tleft
+                for _ in range(expr.right.value - 1):
+                    result = result[0].mul(result, tleft)
+
+                return result
+            elif expr.right.value == 0:
+                return const_to_qtype(1)
+            else:
+                raise exceptions.ExpressionNotHandledException(expr.right)
+
         elif isinstance(expr.op, ast.Mult) and hasattr(tleft[0], "mul"):
             return tleft[0].mul(tleft, tright)
         elif isinstance(expr.op, ast.Mod):
