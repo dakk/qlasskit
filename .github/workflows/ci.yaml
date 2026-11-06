@@ -51,7 +51,7 @@ jobs:
       run: pip install tox
 
     - name: Run tests
-      run: tox -c tox_no_tweedledum.ini -e unit-tests
+      run: tox -e unit-tests
 
 
   unit-tests-notw-nopyqubo:
@@ -75,7 +75,7 @@ jobs:
         pip install tox
 
     - name: Run tests
-      run: tox -c tox_no_tw_and_pyqubo.ini -e unit-tests
+      run: tox -e unit-tests
 
   linters:
     runs-on: ubuntu-24.04
@@ -111,7 +111,7 @@ jobs:
       run: pip install tox
 
     - name: Run vermin
-      run: tox -c tox_no_tw_and_pyqubo.ini -e vermin
+      run: tox -e vermin
 
   # coverage:
   #   runs-on: ubuntu-24.04
