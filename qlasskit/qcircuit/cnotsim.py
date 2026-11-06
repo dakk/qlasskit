@@ -14,12 +14,12 @@
 
 from typing import List, Union
 
-from .gates import CCX, CX, MCX, MCtrl, X
+from .gates import CCX, CX, MCX, MCtrl, QGate, X
 from .qcircuit import QCircuit
 
 
 class GateNotSimulableException(Exception):
-    def __init__(self, g):
+    def __init__(self, g: QGate):
         super(GateNotSimulableException, self).__init__(
             f"Gate not simulable by CNotSim: {g}"
         )

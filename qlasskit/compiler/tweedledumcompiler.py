@@ -29,7 +29,7 @@ from . import Compiler
 
 
 def sympy_to_logic_network(  # noqa: C901
-    name, args: Args, returns: Arg, exprs: BoolExpList
+    name: str, args: Args, returns: Arg, exprs: BoolExpList
 ) -> LogicNetwork:
     _symbol_table: Dict[str, int] = dict()
     _logic_network = LogicNetwork()
@@ -91,7 +91,12 @@ class TweedledumCompiler(Compiler):
     """Compile using tweedledum synthesis library"""
 
     def compile(  # noqa: C901
-        self, name, args: Args, returns: Arg, exprs: BoolExpList, uncompute: bool = True
+        self,
+        name: str,
+        args: Args,
+        returns: Arg,
+        exprs: BoolExpList,
+        uncompute: bool = True,
     ) -> QCircuit:
         if not uncompute:
             raise Exception("Disabled uncompute not supported on tweedledum")

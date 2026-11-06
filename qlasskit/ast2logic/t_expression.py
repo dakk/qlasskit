@@ -46,12 +46,12 @@ class ExpressionTranslator(ast.NodeTransformer):
         self.env = env
 
     # Name reference
-    def visit_Name(self, expr):
+    def visit_Name(self, expr: ast.Name):
         binding = self.env[expr.id]
         return (binding.ttype, binding.to_exp())
 
     # Subscript: a[0][1]
-    def visit_Subscript(self, expr):  # noqa: C901
+    def visit_Subscript(self, expr: ast.Subscript):  # noqa: C901
         def unroll_subscripts(sub: ast.Subscript, st):
             _sval = sub.slice
 
@@ -108,7 +108,7 @@ class ExpressionTranslator(ast.NodeTransformer):
             return (inner_type, Symbol(sn))
 
     # Boolop: and, or
-    def visit_BoolOp(self, expr):
+    def visit_BoolOp(self, expr: ast.BoolOp):
         def unfold(v_exps, op):
             return (
                 op(v_exps[0], unfold(v_exps[1::], op)) if len(v_exps) > 1 else v_exps[0]
@@ -123,7 +123,7 @@ class ExpressionTranslator(ast.NodeTransformer):
         return (bool, unfold(v_exps, And if isinstance(expr.op, ast.And) else Or))
 
     # Unary: not
-    def visit_UnaryOp(self, expr):
+    def visit_UnaryOp(self, expr: ast.UnaryOp):
         texp, exp = self.visit(expr.operand)
 
         if isinstance(expr.op, ast.Not):
@@ -137,7 +137,7 @@ class ExpressionTranslator(ast.NodeTransformer):
             raise exceptions.ExpressionNotHandledException(expr)
 
     # If expression
-    def visit_IfExp(self, expr):
+    def visit_IfExp(self, expr: ast.IfExp):
         te_test = self.visit(expr.test)
         te_true = self.visit(expr.body)
         te_false = self.visit(expr.orelse)
@@ -168,7 +168,7 @@ class ExpressionTranslator(ast.NodeTransformer):
             )
 
     # Constant
-    def visit_Constant(self, expr):
+    def visit_Constant(self, expr: ast.Constant):
         if expr.value is True:
             return (bool, true)
         elif expr.value is False:
@@ -190,7 +190,7 @@ class ExpressionTranslator(ast.NodeTransformer):
             raise exceptions.ExpressionNotHandledException(expr)
 
     # Tuple
-    def visit_Tuple(self, expr):
+    def visit_Tuple(self, expr: ast.Tuple):
         telts = [self.visit(elt) for elt in expr.elts]
         elts = [x[1] for x in telts]
         tlts = [x[0] for x in telts]
@@ -198,7 +198,7 @@ class ExpressionTranslator(ast.NodeTransformer):
         return (Tuple[tuple(tlts)], elts)  # type: ignore
 
     # Compare operator
-    def visit_Compare(self, expr):  # noqa: C901
+    def visit_Compare(self, expr: ast.Compare):  # noqa: C901
         if len(expr.ops) != 1 or len(expr.comparators) != 1:
             raise exceptions.ExpressionNotHandledException(expr)
 
@@ -262,7 +262,7 @@ class ExpressionTranslator(ast.NodeTransformer):
         raise exceptions.ExpressionNotHandledException(expr)
 
     # Binop
-    def visit_BinOp(self, expr):  # noqa: C901
+    def visit_BinOp(self, expr: ast.BinOp):  # noqa: C901
         # Sub | Mult | MatMult | Div | Mod | Pow | FloorDiv
         # print(ast.dump(expr))
         tleft = self.visit(expr.left)
@@ -379,7 +379,7 @@ class ExpressionTranslator(ast.NodeTransformer):
         return (def_f[2].ttype, _ret)
 
     # Call
-    def visit_Call(self, expr):
+    def visit_Call(self, expr: ast.Call):
         # Quantum hybrid
         if (
             isinstance(expr.func, ast.Attribute)

@@ -11,13 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import ast
+
 from .astrewriter import ASTRewriter
 from .constantfolder import ConstantFolder
 from .replacemultitargetassign import ReplaceMultiTargetAssign
 from .replacetypeann import ReplaceTypeAnn
 
 
-def ast2ast(a_tree):
+def ast2ast(a_tree: ast.AST) -> ast.AST:
     # print(ast.dump(a_tree))
 
     # Fold constants

@@ -25,7 +25,7 @@ from qlasskit.tools.utils import parse_str
 from .tools import find_last_qlassf
 
 
-def read_input(input_file):
+def read_input(input_file: str):
     if input_file == "-":
         return sys.stdin.read()
     with open(input_file, "r") as file:
@@ -39,7 +39,7 @@ def convert_to_quasm(qlassf: QlassF, compiler="internal", version=3):
     return exporter.export(qcirc, mode="circuit")
 
 
-def output_result(result, output_file):
+def output_result(result, output_file: str):
     if output_file == "-":
         print(result)
     else:

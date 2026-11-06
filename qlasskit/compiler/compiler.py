@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from sympy.logic.boolalg import Boolean
+
 from .. import QCircuit
 from ..ast2logic.typing import Arg, Args, BoolExpList
 
@@ -21,10 +23,7 @@ class CompilerException(Exception):
 
 
 class Compiler:
-    def __init__(self):
-        pass
-
-    def _symplify_exp(self, exp):
+    def _symplify_exp(self, exp: Boolean):
         # exp = to_anf(exp, deep=False)
         return exp
 

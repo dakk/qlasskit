@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict
+from typing import Callable, Dict, List, Union
 
 from sympy import Symbol, cse
 from sympy.logic.boolalg import And, Boolean, Not, Or, Xor, simplify_logic
@@ -28,7 +28,7 @@ from .exp_transformers import (
 )
 
 
-def custom_simplify_logic(expr):
+def custom_simplify_logic(expr: Boolean) -> Boolean:
     if isinstance(expr, Xor):
         return expr
     elif isinstance(expr, (And, Or, Not)):
@@ -72,7 +72,9 @@ def print_step(name: str):
 
 
 class BoolOptimizerProfile:
-    def __init__(self, steps):
+    steps: List[Union[Callable[[BoolExpList], BoolExpList], SympyTransformer]]
+
+    def __init__(self, steps: List):
         self.steps = steps
 
     def apply(self, exps):

@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List, Optional
 
 from sympy import Symbol
-from sympy.logic.boolalg import And, Not, Or, Xor, simplify_logic
+from sympy.logic.boolalg import And, Boolean, Not, Or, Xor, simplify_logic
 
 from .. import QCircuit
 
@@ -24,7 +25,7 @@ from . import Decompiler
 
 
 # This differs from the bool_optimizer version
-def custom_simplify_logic2(expr):
+def custom_simplify_logic2(expr: Boolean) -> Boolean:
     if isinstance(expr, Xor):
         se = simplify_logic(expr)
         if isinstance(se, Xor) or isinstance(se, Not) or isinstance(se, Symbol):
@@ -40,7 +41,9 @@ def custom_simplify_logic2(expr):
 
 
 def circuit_boolean_optimizer(
-    qc: QCircuit, compiler: SupportedCompiler = "internal", preserve=None
+    qc: QCircuit,
+    compiler: SupportedCompiler = "internal",
+    preserve: Optional[List[int]] = None,
 ) -> QCircuit:
     """Decompile the quantum circuit, simplify boolean sections, and recreate an
     optimized quantum circuit. If preserve is set, the given list of qubits are preserved,
@@ -52,7 +55,7 @@ def circuit_boolean_optimizer(
     # Set not-preserved qubits to False
     emap = {}
     for i in range(qc.num_qubits) if preserve else []:
-        if i in preserve:
+        if i in preserve:  # type: ignore
             continue
         emap[Symbol(f"q{i}")] = False
 

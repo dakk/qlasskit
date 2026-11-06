@@ -14,10 +14,11 @@
 
 import ast
 import copy
+from typing import Union
 
 
 class TypeAnnotationsReplacer(ast.NodeTransformer):
-    def visit_Subscript(self, ann):
+    def visit_Subscript(self, ann: ast.Subscript):
         if not isinstance(ann.value, ast.Name) or not hasattr(ann.slice, "elts"):
             return ann
 
@@ -53,22 +54,27 @@ class TypeAnnotationsReplacer(ast.NodeTransformer):
 
         return ann
 
-    def visit_Name(self, ann):
+    def visit_Name(self, ann: ast.Name):
+        res_ann: Union[ast.Name, ast.Subscript]
+
         # Replace QintX with Qint[X]
         if ann.id[:4] == "Qint":
-            ann = ast.Subscript(
+            res_ann = ast.Subscript(
                 value=ast.Name(id="Qint", ctx=ast.Load()),
                 slice=ast.Constant(value=int(ann.id[4:])),
             )
 
         # Replace QfixedX with Qfixed[X]
         elif ann.id[:6] == "Qfixed":
-            ann = ast.Subscript(
+            res_ann = ast.Subscript(
                 value=ast.Name(id="Qfixed", ctx=ast.Load()),
                 slice=ast.Constant(value=int(ann.id[6:])),
             )
 
-        return ann
+        else:
+            res_ann = ann
+
+        return res_ann
 
 
 def _replace_types_annotations(ann, arg=None):
@@ -84,11 +90,11 @@ def _replace_types_annotations(ann, arg=None):
 
 
 class ReplaceTypeAnn(ast.NodeTransformer):
-    def visit_AnnAssign(self, node):
+    def visit_AnnAssign(self, node: ast.AnnAssign):
         node.annotation = _replace_types_annotations(node.annotation)
         return node
 
-    def visit_FunctionDef(self, node):
+    def visit_FunctionDef(self, node: ast.FunctionDef):
         node.args.args = [
             _replace_types_annotations(x.annotation, arg=x) for x in node.args.args
         ]

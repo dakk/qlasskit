@@ -18,5 +18,5 @@ from .qcircuit import QCircuit
 
 
 class QCircuitExporter:
-    def export(self, qcirc: "QCircuit", mode: Literal["circuit", "gate"]):
+    def export(self, qcirc: QCircuit, mode: Literal["circuit", "gate"]):
         raise Exception("abstrcact")

@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from sympy import And, Not, Symbol, Xor
 
 from ..ast2logic.typing import BoolExpList
 from ..qcircuit import QCircuit, gates
+from ..qcircuit.gates import AppliedGate
 
 
 class DecompilerException(Exception):
@@ -25,10 +26,14 @@ class DecompilerException(Exception):
 
 
 class DecompiledSection:
-    def __init__(self, gates, exps, sec_index):
+    gates: List[AppliedGate]
+    expressions: BoolExpList
+    index: Tuple[int, int]
+
+    def __init__(self, gates: List, exps: BoolExpList, sec_index: Tuple[int, int]):
         self.gates = gates
-        self.expressions: BoolExpList = exps
-        self.index: Tuple[int, int] = sec_index
+        self.expressions = exps
+        self.index = sec_index
 
     def __repr__(self):
         s = f"DecompiledResult[{self.index}](\n\t"
@@ -39,8 +44,10 @@ class DecompiledSection:
 
 
 class DecompilerResults:
-    def __init__(self, sections=[]):
-        self.sections: List[DecompiledSection] = []
+    sections: List[DecompiledSection]
+
+    def __init__(self, sections: Optional[List[DecompiledSection]] = None):
+        self.sections = sections if sections is not None else []
 
     def __repr__(self):
         s = "DecompiledResults["
@@ -55,16 +62,16 @@ class DecompilerResults:
         s += "\n]"
         return s
 
-    def __getitem__(self, i: int):
+    def __getitem__(self, i: int) -> DecompiledSection:
         return self.sections[i]
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.sections)
 
     def __iter__(self):
         return self.sections.__iter__()
 
-    def append(self, section: DecompiledSection):
+    def append(self, section: DecompiledSection) -> None:
         self.sections.append(section)
 
 
@@ -79,9 +86,6 @@ ZB_GATES = [
 
 
 class Decompiler:
-    def __init__(self):
-        pass
-
     def __exps_of_section(self, qc: QCircuit, section):
         exps = {}
 
@@ -139,7 +143,7 @@ class Decompiler:
 
                 exps = self.__exps_of_section(qc, current_section)
                 res = DecompiledSection(
-                    current_section, exps, (current_section_start_index, end)
+                    current_section, exps, (current_section_start_index, end)  # type: ignore
                 )
                 results.append(res)
                 current_section = []

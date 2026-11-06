@@ -32,15 +32,19 @@ TypeBinding = Tuple[str, Qtype]
 
 
 class Env:
+    bindings: List[Binding]
+    types: List[TypeBinding]
+    defs: List[LogicFun]
+
     def __init__(self) -> None:
-        self.bindings: List[Binding] = []
-        self.types: List[TypeBinding] = []
-        self.defs: List[LogicFun] = []
+        self.bindings = []
+        self.types = []
+        self.defs = []
 
         for t in BUILTIN_TYPES:
             self.bind_type((t.__name__, t))  # type: ignore
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str((self.bindings, self.types, self.defs))
 
     def bind_type(self, bb: TypeBinding):
@@ -60,7 +64,7 @@ class Env:
     def know_function(self, fun_name: str) -> bool:
         return len(list(filter(lambda x: x[0] == fun_name, self.defs))) == 1
 
-    def bind_function(self, deff: LogicFun):
+    def bind_function(self, deff: LogicFun) -> None:
         if self.know_type(deff[0]):
             return
 
@@ -101,7 +105,7 @@ class Env:
         except:
             raise exceptions.UnboundException(fun_name, self)
 
-    def bind(self, bb: Binding, rebind=False):
+    def bind(self, bb: Binding, rebind=False) -> None:
         if not rebind and bb.name in self:
             raise Exception("duplicate bind")
 
@@ -110,10 +114,10 @@ class Env:
 
         self.bindings.append(bb)
 
-    def __contains__(self, key):
+    def __contains__(self, key: str) -> bool:
         return len(list(filter(lambda x: x.name == key, self.bindings))) == 1
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Binding:
         try:
             return list(filter(lambda x: x.name == key, self.bindings))[0]
         except:

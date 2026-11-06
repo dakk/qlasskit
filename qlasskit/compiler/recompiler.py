@@ -25,7 +25,12 @@ class ReCompiler(Compiler):
     """ReCompiler translating decompiled expressions to quantum circuit"""
 
     def compile(  # noqa: C901
-        self, name, args: Args, returns: Arg, exprs: BoolExpList, uncompute=True
+        self,
+        name: str,
+        args: Args,
+        returns: Arg,
+        exprs: BoolExpList,
+        uncompute: bool = True,
     ) -> QCircuit:
         qc = QCircuitEnhanced(name=name)
         self.qubit_contains = {}

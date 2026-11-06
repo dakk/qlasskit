@@ -31,7 +31,7 @@ class ConstantFolder(ast.NodeTransformer):
             # "range": range, # This is handled differently
         }
 
-    def visit_Compare(self, node):
+    def visit_Compare(self, node: ast.Compare):
         self.generic_visit(node)
         if len(node.ops) == 1 and len(node.comparators) == 1:
             if isinstance(node.left, ast.Constant) and isinstance(
@@ -54,7 +54,7 @@ class ConstantFolder(ast.NodeTransformer):
                     return ast.Constant(result)
         return node
 
-    def visit_UnaryOp(self, node):
+    def visit_UnaryOp(self, node: ast.UnaryOp):
         self.generic_visit(node)
         if isinstance(node.operand, ast.Constant):
             op = {
@@ -67,7 +67,7 @@ class ConstantFolder(ast.NodeTransformer):
                 return ast.Constant(op(node.operand.value))  # type: ignore
         return node
 
-    def visit_BinOp(self, node):
+    def visit_BinOp(self, node: ast.BinOp):
         self.generic_visit(node)
         if isinstance(node.left, ast.Constant) and isinstance(node.right, ast.Constant):
             op = {
@@ -88,7 +88,7 @@ class ConstantFolder(ast.NodeTransformer):
                 return ast.Constant(op(node.left.value, node.right.value))
         return node
 
-    def visit_Call(self, node):
+    def visit_Call(self, node: ast.Call):
         self.generic_visit(node)
         if isinstance(node.func, ast.Name) and node.func.id in self.builtin_funcs:
 
@@ -108,7 +108,7 @@ class ConstantFolder(ast.NodeTransformer):
                 return ast.Constant(func(*args))  # type: ignore
         return node
 
-    def visit_Subscript(self, node):
+    def visit_Subscript(self, node: ast.Subscript):
         self.generic_visit(node)
         if isinstance(node.value, ast.List) and isinstance(node.slice, ast.Constant):
             if all(isinstance(elt, ast.Constant) for elt in node.value.elts):
@@ -118,7 +118,7 @@ class ConstantFolder(ast.NodeTransformer):
                     pass
         return node
 
-    def visit_If(self, node):
+    def visit_If(self, node: ast.If):
         self.generic_visit(node)
         if isinstance(node.test, ast.Constant):
             if node.test.value:
@@ -127,7 +127,7 @@ class ConstantFolder(ast.NodeTransformer):
                 return node.orelse
         return node
 
-    def visit_IfExp(self, node):
+    def visit_IfExp(self, node: ast.IfExp):
         self.generic_visit(node)
         if isinstance(node.test, ast.Constant):
             return node.body if node.test.value else node.orelse

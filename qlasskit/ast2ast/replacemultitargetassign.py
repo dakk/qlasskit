@@ -16,8 +16,7 @@ import ast
 
 
 class ReplaceMultiTargetAssign(ast.NodeTransformer):
-
-    def visit_Assign(self, node):
+    def visit_Assign(self, node: ast.Assign):
         if len(node.targets) != 1 or not hasattr(node.targets[0], "elts"):
             return node
 

@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional
 from .qcircuit import QCircuit, SupportedFramework
 
 
-def reindex(idx: int, qb_l: List[int]):
+def reindex(idx: int, qb_l: List[int]) -> List[int]:
     """Reindex a list of qubit `qb_l` to another location `idx`"""
     return list(map(lambda i: i + idx, qb_l))
 
@@ -27,15 +27,12 @@ class QCircuitWrapper:
 
     _qcircuit: QCircuit
 
-    def __init__(self):
-        pass
-
     @property
-    def num_qubits(self):
+    def num_qubits(self) -> int:
         return self._qcircuit.num_qubits
 
     @property
-    def num_gates(self):
+    def num_gates(self) -> int:
         return self._qcircuit.num_gates
 
     @property
@@ -86,7 +83,7 @@ class QCircuitWrapper:
 
         return int_counts
 
-    def circuit(self):
+    def circuit(self) -> QCircuit:
         return self._qcircuit
 
     def gate(self, framework: SupportedFramework = "qiskit"):

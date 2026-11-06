@@ -14,7 +14,7 @@
 
 from sympy import Symbol
 from sympy.logic import And, Not, Or, Xor
-from sympy.logic.boolalg import BooleanFalse, BooleanTrue
+from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
 
 from . import SympyTransformer
 
@@ -22,7 +22,7 @@ DISABLE_OR = False
 
 
 class remove_ITE(SympyTransformer):
-    def visit_ITE(self, expr):
+    def visit_ITE(self, expr: Boolean) -> Boolean:
         c = self.visit(expr.args[0])
         return self.visit(
             Or(
@@ -33,13 +33,13 @@ class remove_ITE(SympyTransformer):
 
 
 class remove_Implies(SympyTransformer):
-    def visit_Implies(self, expr):
+    def visit_Implies(self, expr: Boolean) -> Boolean:
         return self.visit(Or(Not(self.visit(expr.args[0])), self.visit(expr.args[1])))
 
 
 class transform_or2xor(SympyTransformer):
     # Or(And(a,b), And(!a,!b)) = !Xor(a,b)
-    def visit_Or(self, expr):
+    def visit_Or(self, expr: Boolean) -> Boolean:
         if (
             len(expr.args) == 2
             and isinstance(expr.args[0], And)
@@ -63,19 +63,19 @@ class transform_or2xor(SympyTransformer):
 
 
 class transform_or2and(SympyTransformer):
-    def visit_Or(self, expr):
+    def visit_Or(self, expr: Boolean) -> Boolean:
         if len(expr.args) > 2 or DISABLE_OR:
             return Not(And(*[Not(self.visit(e)) for e in expr.args]))
         return expr
 
 
 class remove_obvious_expr(SympyTransformer):
-    def visit_Not(self, expr):
+    def visit_Not(self, expr: Boolean) -> Boolean:
         if isinstance(expr.args[0], Not):
             return expr.args[0].args[0]
         return expr
 
-    def visit_And(self, expr):
+    def visit_And(self, expr: Boolean) -> Boolean:
         if len(expr.args) == 2 and (
             (
                 isinstance(expr.args[0], Symbol)
@@ -92,7 +92,7 @@ class remove_obvious_expr(SympyTransformer):
 
         return expr
 
-    def visit_Or(self, expr):
+    def visit_Or(self, expr: Boolean) -> Boolean:
         if len(expr.args) == 2 and (
             (
                 isinstance(expr.args[0], Symbol)

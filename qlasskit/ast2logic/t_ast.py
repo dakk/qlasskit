@@ -32,12 +32,16 @@ def translate_ast(fun, types: List = [], defs: List[LogicFun] = []) -> LogicFun:
 
     # env contains names visible from the current scope
     env = Env()
-    [env.bind_type((t.__name__, t)) for t in types]
+    for t in types:
+        env.bind_type((t.__name__, t))
 
     args: Args = translate_arguments(fun.args.args, env)
 
-    [env.bind(arg) for arg in args]
-    [env.bind_function(f) for f in defs]
+    for arg in args:
+        env.bind(arg)
+
+    for f in defs:
+        env.bind_function(f)
 
     if not fun.returns:
         raise exceptions.NoReturnTypeException()

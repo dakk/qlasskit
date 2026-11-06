@@ -11,11 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 
 from typing import Any, List, Tuple
 
 
 class QGate:
+    __name__: str
+    n_qubits: int
+
     def __init__(self, name: str, n_qubits: int = 1):
         self.__name__ = name
         self.n_qubits = n_qubits
@@ -24,22 +28,22 @@ class QGate:
     def name(self) -> str:
         return self.__name__
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__name__}"
 
     @classmethod
-    def invert(cls):
+    def invert(cls) -> type[QGate]:
         return cls
 
-    def is_nop(self):
+    def is_nop(self) -> bool:
         return False
 
 
 class NopGate(QGate):
-    def __init__(self, name="nop"):
+    def __init__(self, name: str = "nop"):
         super().__init__(name, 0)
 
-    def is_nop(self):
+    def is_nop(self) -> bool:
         return True
 
 
@@ -49,6 +53,9 @@ class Barrier(NopGate):
 
 
 class QControlledGate(QGate):
+    n_controls: int
+    gate: QGate
+
     def __init__(self, gate: QGate, n_controls: int):
         super().__init__(("C" * n_controls) + gate.__name__, n_controls + gate.n_qubits)
         self.n_controls = n_controls
@@ -124,16 +131,19 @@ Toffoli = CCX
 
 
 class MCX(QControlledGate):
-    def __init__(self, n_controls):
+    def __init__(self, n_controls: int):
         super().__init__(X(), n_controls)
 
 
 class MCtrl(QControlledGate):
-    def __init__(self, gate, n_controls):
+    def __init__(self, gate: QGate, n_controls: int):
         super().__init__(gate, n_controls)
 
 
-def apply(gate: QGate, qubits: List[int], param=None):
+AppliedGate = Tuple[QGate, List[int], Any]
+
+
+def apply(gate: QGate, qubits: List[int], param=None) -> AppliedGate:
     if len(qubits) != gate.n_qubits:
         raise Exception(f"expected {gate.n_qubits} qubits ({len(qubits)} given)")
     return (
@@ -141,6 +151,3 @@ def apply(gate: QGate, qubits: List[int], param=None):
         qubits,
         param,
     )
-
-
-AppliedGate = Tuple[QGate, List[int], Any]

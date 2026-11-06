@@ -109,7 +109,7 @@ class IsNamePresent(ast.NodeVisitor):
     name_id: str
     present: bool = False
 
-    def visit_Name(self, node):
+    def visit_Name(self, node: ast.Name):
         if node.id == self.name_id:
             self.present = True
 
@@ -121,7 +121,7 @@ class NameValReplacer(ast.NodeTransformer):
     name_id: str
     val: Any
 
-    def visit_Name(self, node):
+    def visit_Name(self, node: ast.Name):
         if node.id == self.name_id:
             return self.val
 
@@ -155,7 +155,7 @@ class ASTRewriter(ast.NodeTransformer):
         self._uniqd += 1
         return f"{self._uniqd:x}"
 
-    def visit_Subscript(self, node):  # noqa: C901
+    def visit_Subscript(self, node: ast.Subscript):  # noqa: C901
         # Replace L[a] with const a, to L[const]
         if isinstance(node.slice, ast.Name) and self.env.has_constant(node.slice.id):
             node.slice = self.env.get_constant(node.slice.id)
@@ -243,14 +243,14 @@ class ASTRewriter(ast.NodeTransformer):
 
         return node
 
-    def visit_Name(self, node):
+    def visit_Name(self, node: ast.Name):
         # __ prefix is reserved for internal use
         if node.id.startswith("__"):
             raise Exception("invalid name starting with __")
 
         return node
 
-    def visit_If(self, node):
+    def visit_If(self, node: ast.If):
         """Replace if(c,t,e) with if(c,t1), if(c,t2), ..., if(!c, e1), ..."""
         body = flatten([self.visit(n) for n in node.body])
         orelse = flatten([self.visit(n) for n in node.orelse])
@@ -314,13 +314,16 @@ class ASTRewriter(ast.NodeTransformer):
 
         return if_l
 
-    def visit_List(self, node):
+    def visit_List(self, node: ast.List):
         """Converts List to Tuple"""
         return ast.Tuple(elts=[self.visit(el) for el in node.elts])
 
-    def visit_AnnAssign(self, node):
+    def visit_AnnAssign(self, node: ast.AnnAssign):
         node.value = self.visit(node.value) if node.value else node.value
-        self.env.set_type(node.target.id, node.annotation)
+
+        if hasattr(node.target, "id"):
+            self.env.set_type(node.target.id, node.annotation)
+
         return node
 
     def visit_FunctionDef(self, node):
@@ -331,7 +334,10 @@ class ASTRewriter(ast.NodeTransformer):
 
         return super().generic_visit(node)
 
-    def visit_Assign(self, node):
+    def visit_Assign(self, node: ast.Assign):
+        if not hasattr(node.targets[0], "id"):
+            raise ValueError(node.targets[0], "has no id")
+
         target = node.targets[0].id
         was_known = target in self.env
 
@@ -366,10 +372,13 @@ class ASTRewriter(ast.NodeTransformer):
         node.value = self.visit(node.value)
         return node
 
-    def visit_AugAssign(self, node):
+    def visit_AugAssign(self, node: ast.AugAssign):
         """Translate AugAssign to Assign + BinOp (+=, -=, etc)"""
         # Reassigning an already present variable (use a temp variable)
         # if node.target.id in self.env:
+        if not hasattr(node.target, "id"):
+            raise ValueError(node.target, "has no id")
+
         new_targ = ast.Name(id=f"__{node.target.id}", ctx=ast.Load())
 
         return [
@@ -385,7 +394,9 @@ class ASTRewriter(ast.NodeTransformer):
             ),
         ]
 
-    def __unroll_arg(self, arg):
+    def __unroll_arg(
+        self, arg: Union[ast.Constant, ast.Subscript, ast.Tuple, ast.Name]
+    ):
         """Transform a node to a list (when is a Tuple or a subscribable type)"""
         if isinstance(arg, ast.Tuple):
             # If it's a tuple, return elts
@@ -432,8 +443,11 @@ class ASTRewriter(ast.NodeTransformer):
                 return self.env.get_constant(arg.id).elts
         return [arg]
 
-    def visit_For(self, node):
+    def visit_For(self, node: ast.For):
         """Unroll for loops to single iterations"""
+        if not hasattr(node.target, "id"):
+            raise ValueError(node.target, "has no id")
+
         iter = self.__unroll_arg(self.visit(node.iter))
         rolls = []
         iter = flatten(iter)
@@ -526,7 +540,7 @@ class ASTRewriter(ast.NodeTransformer):
             raise Exception(f"ord() takes exactly 1 argument ({len(node.args)} given)")
         return node.args[0]
 
-    def visit_Call(self, node):
+    def visit_Call(self, node: ast.Call):
         node.args = [self.visit(ar) for ar in node.args]
         if not hasattr(node.func, "id"):
             return node
@@ -537,7 +551,7 @@ class ASTRewriter(ast.NodeTransformer):
         handler = self.__call_dispatch.get(node.func.id)
         return handler(node) if handler is not None else node
 
-    def visit_BinOp(self, node):
+    def visit_BinOp(self, node: ast.BinOp):
         # Rewrite the ** operator to be a series of multiplications
         if isinstance(node.op, ast.Pow):
             if (

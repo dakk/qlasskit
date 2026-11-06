@@ -26,7 +26,7 @@ class Arg:
         self.ttype = ttype
         self.bitvec = bitvec
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.name} - {self.ttype} - [{', '.join(self.bitvec)}]"
 
     def __len__(self) -> int:

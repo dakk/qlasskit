@@ -20,13 +20,15 @@ from sympy.logic.boolalg import Boolean
 class ExpQMap:
     """Mapping between boolexp and qubit and vice-versa"""
 
-    def __init__(self):
-        self.exp_map: Dict[Boolean, int] = {}
+    exp_map: Dict[Boolean, int]
 
-    def __contains__(self, exp) -> bool:
+    def __init__(self):
+        self.exp_map = {}
+
+    def __contains__(self, exp: Boolean) -> bool:
         return exp in self.exp_map
 
-    def __getitem__(self, exp) -> int:
+    def __getitem__(self, exp: Boolean) -> int:
         return self.exp_map[exp]
 
     def __setitem__(self, exp: Boolean, qubit: int):

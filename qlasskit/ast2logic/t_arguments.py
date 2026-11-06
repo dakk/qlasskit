@@ -90,7 +90,7 @@ def translate_argument(ann, env, base="") -> Arg:  # noqa: C901
         raise exceptions.UnknownTypeException(ann)
 
 
-def translate_arguments(args, env: Env) -> Args:
+def translate_arguments(args: List, env: Env) -> Args:
     """Parse an argument list"""
     args_unrolled = map(
         lambda arg: translate_argument(arg.annotation, env=env, base=arg.arg), args

@@ -12,29 +12,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
 import copy
 import math
 import random
-from typing import Any, Dict, List, Literal, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Set, Tuple, Union
 
 from sympy import Symbol
 
 from . import SupportedFramework, gates
-from .gates import QGate
+from .gates import AppliedGate, QGate
 
 
 class QCircuit:
-    def __init__(self, num_qubits=0, name="qc", native=None):
+    name: str
+    num_qubits: int
+    gates: List[AppliedGate]
+    gates_computed: List[AppliedGate]
+    qubit_map: Dict[str, int]
+
+    def __init__(self, num_qubits: int = 0, name: str = "qc", native=None):
         """Initialize a quantum circuit.
 
         Args:
             num_qubits (int, optional): The number of qubits in the circuit. Defaults to 0.
 
         """
-        self.name: str = name
-        self.num_qubits: int = num_qubits
-        self.gates: List[gates.AppliedGate] = []
-        self.gates_computed: List[gates.AppliedGate] = []
+        self.name = name
+        self.num_qubits = num_qubits
+        self.gates = []
+        self.gates_computed = []
         self.qubit_map = {}
 
         for x in range(num_qubits):
@@ -43,11 +51,11 @@ class QCircuit:
         self.__native = native
 
     @property
-    def num_gates(self):
+    def num_gates(self) -> int:
         return len(list(filter(lambda x: not x[0].is_nop(), self.gates)))
 
     @property
-    def used_qubits(self):
+    def used_qubits(self) -> Set[int]:
         _used_qubits = set()
         for g, w, p in self.gates:
             for i in w:
@@ -55,7 +63,7 @@ class QCircuit:
         return _used_qubits
 
     @property
-    def gate_stats(self) -> Dict:
+    def gate_stats(self) -> Dict[str, int]:
         d = {}
         for g, w, p in self.gates:
             if g.name not in d:
@@ -64,7 +72,9 @@ class QCircuit:
         return d
 
     @staticmethod
-    def random(qubits_n: int, depth: int, gate_list=None) -> "QCircuit":
+    def random(
+        qubits_n: int, depth: int, gate_list: Optional[List[type[QGate]]] = None
+    ) -> QCircuit:
         qc = QCircuit(qubits_n)
 
         if gate_list is None:
@@ -84,27 +94,27 @@ class QCircuit:
             ]
 
         for x in range(depth):
-            g = random.choice(gate_list)()
+            g = random.choice(gate_list)()  # type: ignore
             w = random.sample(range(qubits_n), k=g.n_qubits)
 
             qc.append(g, w)
 
         return qc
 
-    def get_key_by_index(self, i: int):
+    def get_key_by_index(self, i: int) -> str:
         """Return the qubit name given its index"""
         for key in reversed(self.qubit_map.keys()):
             if self.qubit_map[key] == i:
                 return key
         raise Exception(f"Qubit with index {i} not found")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a string representation of the QCircuit"""
         return (
             f"QCircuit<{self.name}>({self.num_gates} gates, {self.num_qubits} qubits)"
         )
 
-    def __contains__(self, key: Union[str, Symbol, int]):
+    def __contains__(self, key: Union[str, Symbol, int]) -> bool:
         """Return True if the circuit contain a qubit with a given name/symbol"""
         if isinstance(key, str):
             return key in self.qubit_map
@@ -112,14 +122,14 @@ class QCircuit:
             return key.name in self.qubit_map
         return False
 
-    def __delitem__(self, key: Union[str, Symbol, int]):
+    def __delitem__(self, key: Union[str, Symbol, int]) -> None:
         """Remove a mapping key=>qubit"""
         if isinstance(key, str):
             del self.qubit_map[key]
         elif isinstance(key, Symbol):
             del self.qubit_map[key.name]
 
-    def __setitem__(self, key: Union[str, Symbol, int], qubit: int):
+    def __setitem__(self, key: Union[str, Symbol, int], qubit: int) -> None:
         """Set a mapping key=>qubit"""
         if isinstance(key, str):
             self.qubit_map[key] = qubit
@@ -135,13 +145,13 @@ class QCircuit:
         else:
             return key
 
-    def __add__(self, qc: "QCircuit") -> "QCircuit":
+    def __add__(self, qc: QCircuit) -> QCircuit:
         """Create a new QCircuit that merges two"""
         nqc = copy.deepcopy(self)
         nqc += qc
         return nqc
 
-    def copy(self, vanilla=False) -> "QCircuit":
+    def copy(self, vanilla=False) -> QCircuit:
         """Create a copy of the quantum circuit; if vanilla is True, reset all mapping info"""
         self.__native = None
         if vanilla:
@@ -152,7 +162,7 @@ class QCircuit:
 
         return copy.deepcopy(self)
 
-    def repeat(self, n: int) -> "QCircuit":
+    def repeat(self, n: int) -> QCircuit:
         """Return a copy of the QCircuit repeated n times"""
         o = self.copy()
         n_qc = self.copy()
@@ -160,7 +170,7 @@ class QCircuit:
             n_qc += o.copy()
         return n_qc
 
-    def __iadd__(self, other: Union[gates.AppliedGate, "QCircuit"]):  # type: ignore
+    def __iadd__(self, other: Union[gates.AppliedGate, QCircuit]):  # type: ignore
         """AugAssign between a qcircuit and a AppliedGate|QCircuit"""
         if isinstance(other, Tuple):  # type: ignore
             self.append(other[0], other[1], other[2])  # type: ignore
@@ -168,7 +178,7 @@ class QCircuit:
             self.append_circuit(other, list(range(other.num_qubits)))
         return self
 
-    def append_circuit(self, other: "QCircuit", qubits: List[int] = []):
+    def append_circuit(self, other: QCircuit, qubits: List[int] = []):
         """Add a qcircuit, remapping to qubits"""
         if other.num_qubits > self.num_qubits:
             raise Exception(
@@ -198,7 +208,7 @@ class QCircuit:
         self.gates_computed.extend(ogates_computed)
         return self
 
-    def add_qubit(self, name=None) -> int:
+    def add_qubit(self, name: Optional[Union[Symbol, str]] = None) -> int:
         """Add a qubit to the circuit.
 
         Args:
@@ -400,7 +410,7 @@ class QCircuit:
         else:
             raise Exception(f"Framework {framework} not supported")
 
-    def draw(self):
+    def draw(self) -> None:
         """Draw the circuit"""
         if self.__native:
             print(self.__native)

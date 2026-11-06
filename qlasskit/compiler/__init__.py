@@ -17,7 +17,7 @@ from typing import Literal, List, get_args
 
 from .expqmap import ExpQMap  # noqa: F401
 from .compiler import Compiler, CompilerException  # noqa: F401
-from ..ast2logic.typing import Arg
+from ..ast2logic.typing import Arg, Args, BoolExpList
 
 try:
     import tweedledum  # noqa: F401
@@ -41,10 +41,10 @@ if not TWEEDLEDUM_ENABLED:
 
 
 def to_quantum(
-    name,
-    args,
-    returns,
-    exprs,
+    name: str,
+    args: Args,
+    returns: Arg,
+    exprs: BoolExpList,
     compiler: SupportedCompiler = "internal",
     uncompute: bool = True,
 ):
@@ -74,7 +74,7 @@ def exprs_to_quantum(
     return to_quantum(
         name="",
         args=args,
-        returns=None,
+        returns=None,  # type: ignore
         exprs=exprs,
         compiler=compiler,
         uncompute=False,

@@ -30,7 +30,12 @@ class InternalCompiler(Compiler):
     """InternalCompiler translating an expression list to quantum circuit"""
 
     def compile(  # noqa: C901
-        self, name, args: Args, returns: Arg, exprs: BoolExpList, uncompute=True
+        self,
+        name: str,
+        args: Args,
+        returns: Optional[Arg],
+        exprs: BoolExpList,
+        uncompute: bool = True,
     ) -> QCircuit:
         qc = QCircuitEnhanced(name=name)
         self.expqmap = ExpQMap()
@@ -55,7 +60,7 @@ class InternalCompiler(Compiler):
             qc.map_qubit(sym, iret, promote=not is_temp)
 
             # 2.3 Remove all the temp qubits
-            self.expqmap.remove(qc.uncompute())
+            self.expqmap.remove(list(qc.uncompute()))
 
         # 3. Remove identities gates (ie: X - X)
         qc.remove_identities()

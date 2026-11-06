@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import copy
-from typing import List, Union
+from typing import List, Optional, Set, Union
 
 from sympy import Symbol
 
@@ -22,14 +22,20 @@ from .qcircuit import QCircuit
 
 
 class QCircuitEnhanced(QCircuit):
-    def __init__(self, num_qubits=0, name="qc", native=None):
+    ancilla_lst: Set[int]
+    free_ancilla_lst: Set[int]
+    marked_ancillas: Set[int]
+
+    def __init__(self, num_qubits: int = 0, name: str = "qc", native=None):
         super().__init__(num_qubits, name, native)
 
         self.ancilla_lst = set()
         self.free_ancilla_lst = set()
         self.marked_ancillas = set()
 
-    def map_qubit(self, name: Union[str, Symbol], index: int, promote=False):
+    def map_qubit(
+        self, name: Union[str, Symbol], index: int, promote: bool = False
+    ) -> None:
         """Map a name to a qubit
 
         Args:
@@ -55,7 +61,7 @@ class QCircuitEnhanced(QCircuit):
 
         self[name] = index
 
-    def remove_identities(self):
+    def remove_identities(self) -> None:
         """Remove identities from the circuit"""
         result: List[gates.AppliedGate] = []
         i = 0
@@ -79,7 +85,7 @@ class QCircuitEnhanced(QCircuit):
 
         self.gates = result
 
-    def add_ancilla(self, name=None, is_free=True) -> int:
+    def add_ancilla(self, name: Optional[str] = None, is_free: bool = True) -> int:
         """Add an ancilla qubit"""
         i = self.add_qubit(name if name else f"anc_{len(self.ancilla_lst)}")
         self.ancilla_lst.add(i)
@@ -96,12 +102,12 @@ class QCircuitEnhanced(QCircuit):
 
         return anc
 
-    def mark_ancilla(self, w):
+    def mark_ancilla(self, w: int):
         """Mark an ancilla for uncomputing"""
         if w in self.ancilla_lst:
             self.marked_ancillas.add(w)
 
-    def uncompute_all(self, keep: List[Union[Symbol, int]] = []):
+    def uncompute_all(self, keep: List[Union[Symbol, int]] = []) -> Set[int]:
         """Uncompute the whole circuit expect for the keep (symbols or qubit)"""
         # TODO: replace with + invert(keep)
         scopy = copy.deepcopy(self.gates)
@@ -123,12 +129,12 @@ class QCircuitEnhanced(QCircuit):
 
         return uncomputed
 
-    def uncompute(self, to_mark=[]):
+    def uncompute(self, to_mark: List[int] = []) -> Set[int]:
         """Uncompute all the marked ancillas plus the to_mark list"""
         [self.mark_ancilla(x) for x in to_mark]
 
         if len(self.marked_ancillas) == 0:
-            return []
+            return set()
 
         uncomputed = set()
         new_gates_comp = []

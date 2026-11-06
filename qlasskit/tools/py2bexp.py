@@ -16,9 +16,10 @@
 
 import argparse
 import sys
+from typing import Literal
 
 import sympy
-from sympy.logic.boolalg import to_anf, to_cnf, to_dnf, to_nnf
+from sympy.logic.boolalg import Boolean, to_anf, to_cnf, to_dnf, to_nnf
 
 import qlasskit
 from qlasskit.qlassfun import QlassF
@@ -27,14 +28,14 @@ from qlasskit.tools.utils import parse_str
 from .tools import find_last_qlassf
 
 
-def read_input(input_file):
+def read_input(input_file: str):
     if input_file == "-":
         return sys.stdin.read()
     with open(input_file, "r") as file:
         return file.read()
 
 
-def convert_to_bool_expression(qlassf: QlassF, form: str):
+def convert_to_bool_expression(qlassf: QlassF, form: str) -> Boolean:
     combined_expr = sympy.And(*[expr[1] for expr in qlassf.expressions])
 
     if form == "anf":
@@ -48,7 +49,7 @@ def convert_to_bool_expression(qlassf: QlassF, form: str):
     return combined_expr  # Default case if no specific form is requested
 
 
-def convert_to_dimacs(expr):
+def convert_to_dimacs(expr: Boolean) -> Boolean:
     clauses = to_cnf(expr, simplify=True).args
     if len(clauses) == 1 and isinstance(clauses[0], sympy.Symbol):
         clauses = [clauses]
@@ -78,7 +79,12 @@ def convert_to_dimacs(expr):
     return dimacs_str
 
 
-def output_result(result, output_file, output_format, form):
+def output_result(
+    result: Boolean,
+    output_file: str,
+    output_format: Literal["dimacs"],
+    form: Literal["cnf"],
+):
     if output_format == "dimacs":
         if form != "cnf":
             print(
