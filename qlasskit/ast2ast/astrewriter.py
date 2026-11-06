@@ -14,69 +14,92 @@
 import ast
 import copy
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Union
 
 from ..ast2logic import flatten
 from .constantfolder import ConstantFolder
 from .env import Environment
 
 
-def create_if_exp(nname, iname, max_i, jname=None, max_j=None):
-    """Given a List or List of List `nname`, an index `iname` and an optional index `jname`,
-    returns L[0] if i == 0 else L[1] if i == 1 ..."""
+def iterator_accessor(
+    n_name: str, i_name: str, i_max: int
+) -> Union[ast.Subscript, ast.IfExp]:
+    """Given a List `n_name`, an index `i_name` returns L[0] if i == 0 else L[1] if i == 1 ..."""
+    res: Union[ast.Subscript, ast.IfExp] = ast.Subscript(
+        value=ast.Name(id=n_name, ctx=ast.Load()),
+        slice=ast.Constant(value=0),
+        ctx=ast.Load(),
+    )
+    for i in range(1, i_max + 1):
+        cmp_i = ast.Compare(
+            left=ast.Name(id=i_name, ctx=ast.Load()),
+            ops=[ast.Eq()],
+            comparators=[ast.Constant(value=i)],
+        )
+        res = ast.IfExp(
+            test=cmp_i,
+            body=ast.Subscript(
+                value=ast.Name(id=n_name, ctx=ast.Load()),
+                slice=ast.Constant(value=i),
+                ctx=ast.Load(),
+            ),
+            orelse=res,
+        )
 
-    def access_ij(i, j):
-        fsub = ast.Subscript(
-            value=ast.Name(id=nname, ctx=ast.Load()),
-            slice=ast.Constant(value=i),
+    return res
+
+
+def iterator_accessor2(
+    n_name: str,
+    i_name: str,
+    i_max: int,
+    j_name: str,
+    j_max: int,
+) -> Union[ast.Subscript, ast.IfExp]:
+    """Given a List of List `n_name`, an index `i_name` and an optional index `j_name`,
+    returns L[0][0] if i == 0 and j == 0 else L[0][1] if i == 0 and j == 1 ..."""
+
+    def access_ij(i: int, j: int) -> ast.Subscript:
+        "Return [i][j] subscript of name"
+        return ast.Subscript(
+            value=ast.Subscript(
+                value=ast.Name(id=n_name, ctx=ast.Load()),
+                slice=ast.Constant(value=i),
+                ctx=ast.Load(),
+            ),
+            slice=ast.Constant(value=j),
             ctx=ast.Load(),
         )
 
-        if jname is not None:
-            return ast.Subscript(
-                value=fsub,
-                slice=ast.Constant(value=j),
-                ctx=ast.Load(),
-            )
-        else:
-            return fsub
+    res: Union[ast.Subscript, ast.IfExp] = access_ij(0, 0)
 
-    def _create_if_exp(i, j=None):
-        if i == max_i and (jname is None or j == max_j):
-            return access_ij(i, j)
-        else:
+    for i in range(i_max + 1):
+        for j in range(j_max + 1):
+            if i == 0 and j == 0:
+                continue
+
             cmp_i = ast.Compare(
-                left=ast.Name(id=iname, ctx=ast.Load()),
+                left=ast.Name(id=i_name, ctx=ast.Load()),
                 ops=[ast.Eq()],
                 comparators=[ast.Constant(value=i)],
             )
-            if jname is not None:
-                next_j = j + 1 if j < max_j else 0
-                next_i = i if j < max_j else i + 1
 
-                return ast.IfExp(
-                    test=ast.BoolOp(
-                        op=ast.And(),
-                        values=[
-                            cmp_i,
-                            ast.Compare(
-                                left=ast.Name(id=jname, ctx=ast.Load()),
-                                ops=[ast.Eq()],
-                                comparators=[ast.Constant(value=j)],
-                            ),
-                        ],
-                    ),
-                    body=access_ij(i, j),
-                    orelse=_create_if_exp(next_i, next_j),
-                )
-            else:
-                return ast.IfExp(
-                    test=cmp_i,
-                    body=access_ij(i, j),
-                    orelse=_create_if_exp(i + 1),
-                )
+            cmp_j = ast.Compare(
+                left=ast.Name(id=j_name, ctx=ast.Load()),
+                ops=[ast.Eq()],
+                comparators=[ast.Constant(value=j)],
+            )
 
-    return _create_if_exp(0, None if jname is None else 0)
+            res = ast.IfExp(
+                test=ast.BoolOp(
+                    op=ast.And(),
+                    values=[cmp_i, cmp_j],
+                ),
+                body=access_ij(i, j),
+                orelse=res,
+            )
+
+    return res
 
 
 @dataclass
@@ -112,6 +135,17 @@ class ASTRewriter(ast.NodeTransformer):
         self.env = Environment() if env is None else env
         self.ret = None
         self._uniqd = 1
+        self.__call_dispatch = {
+            "range": self.__call_range,
+            "len": self.__call_len,
+            "sum": self.__call_sum,
+            "ord": self.__call_ord,
+            "chr": self.__call_chr,
+            "any": self.__call_anyall,
+            "all": self.__call_anyall,
+            "min": self.__call_minmax,
+            "max": self.__call_minmax,
+        }
 
     @property
     def uniqd(self):
@@ -139,7 +173,7 @@ class ASTRewriter(ast.NodeTransformer):
                 max_i = len(outer_tuple.elts) - 1
 
             # Create the IfExp structure
-            return create_if_exp(nname, iname, max_i)
+            return iterator_accessor(nname, iname, max_i)
 
         # Handle inner access L[i][j]
         elif (
@@ -165,7 +199,7 @@ class ASTRewriter(ast.NodeTransformer):
                 max_j = len(inner_tuple) - 1
 
             # Create the IfExp structure
-            return create_if_exp(nname, iname, max_i, jname, max_j)
+            return iterator_accessor2(nname, iname, max_i, jname, max_j)
 
         # Unroll L[a] with (L[0] if a == 0 else L[1] if a == 1 ...) when L is constant
         elif (
@@ -498,29 +532,8 @@ class ASTRewriter(ast.NodeTransformer):
         if node.func.id == "print":
             return None
 
-        elif node.func.id == "range":
-            return self.__call_range(node)
-
-        elif node.func.id == "len":
-            return self.__call_len(node)
-
-        elif node.func.id == "sum":
-            return self.__call_sum(node)
-
-        elif node.func.id == "ord":
-            return self.__call_ord(node)
-
-        elif node.func.id == "chr":
-            return self.__call_chr(node)
-
-        elif node.func.id in ["any", "all"]:
-            return self.__call_anyall(node)
-
-        elif node.func.id in ["min", "max"]:
-            return self.__call_minmax(node)
-
-        else:
-            return node
+        handler = self.__call_dispatch.get(node.func.id)
+        return handler(node) if handler is not None else node
 
     def visit_BinOp(self, node):
         # Rewrite the ** operator to be a series of multiplications

@@ -5,6 +5,10 @@
 If you have found an issue with qlasskit, first do a search in the [Qlasskit issue tracker](https://github.com/dakk/qlasskit/issues) to ensure that there are no existing issues with
 similar content. If you can't find another related issue, open a new one: please try to be as detailed as possible.
 
+## AI assisted Contributions
+
+AI assisted contributions are allowed but we only accept humans as authors of contributions, so you are responsible for the code you submit; the use of AI tools should be disclosed in PR description and you must fully understand the code you submit.
+
 
 ## Submit a pull request
 

@@ -41,17 +41,17 @@ def decompose_to_symbols(vlist, base, res: List = []) -> List[Symbol]:
         return [new_symb]
 
 
-def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
-    """Translate an expression"""
+class ExpressionTranslator(ast.NodeTransformer):
+    def __init__(self, env: Env):
+        self.env = env
 
     # Name reference
-    if isinstance(expr, ast.Name):
-        binding = env[expr.id]
+    def visit_Name(self, expr):
+        binding = self.env[expr.id]
         return (binding.ttype, binding.to_exp())
 
     # Subscript: a[0][1]
-    elif isinstance(expr, ast.Subscript):
-
+    def visit_Subscript(self, expr):  # noqa: C901
         def unroll_subscripts(sub: ast.Subscript, st):
             _sval = sub.slice
 
@@ -82,11 +82,11 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         if isinstance(sn, ast.Constant):
             return (bool, sn.value)
 
-        if sn.split(".")[0] not in env:
-            raise exceptions.UnboundException(sn, env)
+        if sn.split(".")[0] not in self.env:
+            raise exceptions.UnboundException(sn, self.env)
 
         # Get the inner type
-        inner_type = env[sn.split(".")[0]].ttype
+        inner_type = self.env[sn.split(".")[0]].ttype
         for i in sn.split(".")[1:]:
             if hasattr(inner_type, "BIT_SIZE"):
                 if int(i) < inner_type.BIT_SIZE:
@@ -108,14 +108,13 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             return (inner_type, Symbol(sn))
 
     # Boolop: and, or
-    elif isinstance(expr, ast.BoolOp):
-
+    def visit_BoolOp(self, expr):
         def unfold(v_exps, op):
             return (
                 op(v_exps[0], unfold(v_exps[1::], op)) if len(v_exps) > 1 else v_exps[0]
             )
 
-        vt_exps = [translate_expression(e_in, env) for e_in in expr.values]
+        vt_exps = [self.visit(e_in) for e_in in expr.values]
         v_exps = [x[1] for x in vt_exps]
         for x in vt_exps:
             if x[0] != bool:
@@ -124,8 +123,8 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         return (bool, unfold(v_exps, And if isinstance(expr.op, ast.And) else Or))
 
     # Unary: not
-    elif isinstance(expr, ast.UnaryOp):
-        texp, exp = translate_expression(expr.operand, env)
+    def visit_UnaryOp(self, expr):
+        texp, exp = self.visit(expr.operand)
 
         if isinstance(expr.op, ast.Not):
             if texp != bool:
@@ -138,10 +137,10 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             raise exceptions.ExpressionNotHandledException(expr)
 
     # If expression
-    elif isinstance(expr, ast.IfExp):
-        te_test = translate_expression(expr.test, env)
-        te_true = translate_expression(expr.body, env)
-        te_false = translate_expression(expr.orelse, env)
+    def visit_IfExp(self, expr):
+        te_test = self.visit(expr.test)
+        te_true = self.visit(expr.body)
+        te_false = self.visit(expr.orelse)
 
         if te_test[0] != bool:
             raise TypeErrorException(te_test[0], bool)
@@ -169,7 +168,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             )
 
     # Constant
-    elif isinstance(expr, ast.Constant):
+    def visit_Constant(self, expr):
         if expr.value is True:
             return (bool, true)
         elif expr.value is False:
@@ -191,20 +190,20 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             raise exceptions.ExpressionNotHandledException(expr)
 
     # Tuple
-    elif isinstance(expr, ast.Tuple):
-        telts = [translate_expression(elt, env) for elt in expr.elts]
+    def visit_Tuple(self, expr):
+        telts = [self.visit(elt) for elt in expr.elts]
         elts = [x[1] for x in telts]
         tlts = [x[0] for x in telts]
 
         return (Tuple[tuple(tlts)], elts)  # type: ignore
 
     # Compare operator
-    elif isinstance(expr, ast.Compare):
+    def visit_Compare(self, expr):  # noqa: C901
         if len(expr.ops) != 1 or len(expr.comparators) != 1:
             raise exceptions.ExpressionNotHandledException(expr)
 
-        tleft = translate_expression(expr.left, env)
-        tcomp = translate_expression(expr.comparators[0], env)
+        tleft = self.visit(expr.left)
+        tcomp = self.visit(expr.comparators[0])
 
         # Check comparability
         if tleft[0] == bool and tcomp[0] == bool:
@@ -263,11 +262,11 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         raise exceptions.ExpressionNotHandledException(expr)
 
     # Binop
-    elif isinstance(expr, ast.BinOp):
+    def visit_BinOp(self, expr):  # noqa: C901
         # Sub | Mult | MatMult | Div | Mod | Pow | FloorDiv
         # print(ast.dump(expr))
-        tleft = translate_expression(expr.left, env)
-        tright = translate_expression(expr.right, env)
+        tleft = self.visit(expr.left)
+        tright = self.visit(expr.right)
 
         if tleft[0] == bool and tright[0] == bool:
             if isinstance(expr.op, ast.BitXor):
@@ -308,8 +307,79 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
+    def __visit_Call_typecast(self, expr):
+        if len(expr.args) != 1:
+            raise Exception(
+                f"{expr.func.id}() takes exactly 1 argument ({len(expr.args)} given)"
+            )
+
+        if not isinstance(expr.args[0], ast.Constant):
+            raise Exception(f"{expr.func.id}() accepts only constant values")
+
+        return self.env.gettype(expr.func.id).const(expr.args[0].value)
+
+    def __visit_Call_int(self, expr):
+        if len(expr.args) != 1:
+            raise Exception(f"int() takes exactly 1 argument ({len(expr.args)} given)")
+
+        ta, te = self.visit(expr.args[0])
+        if ta.__name__[:4] == "Qint":
+            return (ta, te)
+        elif ta.__name__[:6] == "Qfixed":
+            ip = ta.integer_part((ta, te))  # type: ignore
+            return (Qint.type_for_size(len(ip)), ip)
+        else:
+            raise Exception(f"int() accepts only Qfixed and Qint: {ta} given")
+
+    def __visit_Call_float(self, expr):
+        if len(expr.args) != 1:
+            raise Exception(
+                f"float() takes exactly 1 argument ({len(expr.args)} given)"
+            )
+
+        ta, te = self.visit(expr.args[0])
+        if ta.__name__[:6] == "Qfixed":
+            return (ta, te)
+        elif ta.__name__[:4] == "Qint":
+            tf = Qfixed.type_for_size(len(te))
+            return cast(TExp, tf.fill((tf, te)))
+        else:
+            raise Exception(f"float() accepts only Qfixed and Qint: {ta} given")
+
+    def __visit_Call_known_function(self, expr):
+        def_f = self.env.getdef(expr.func.id)
+        args = [self.visit(e) for e in expr.args]
+
+        # Check if args match function args and replace
+        if len(args) != len(def_f[1]):
+            raise TypeErrorException(args, def_f[1])
+
+        subs = {}
+        for a, fa in zip(args, def_f[1]):
+            if isinstance(a[1], List):
+                for i in range(len(a[1])):  # type: ignore
+                    index = ".".join(a[1][i].name.split(".")[1:])  # type: ignore
+                    if index == "":
+                        index = f"{i}"
+
+                    subs[f"{fa.name}.{index}"] = a[1][i]  # type: ignore
+
+            else:
+                subs[fa.name] = a[1]
+
+        n_exps = []
+        for s, e in def_f[3]:
+            n_exps.append((s, e.subs(subs, simultaneus=True)))
+
+        _ret = list(map(lambda se: se[1], n_exps))
+
+        if len(_ret) == 1:
+            return (bool, _ret[0])
+
+        return (def_f[2].ttype, _ret)
+
     # Call
-    elif isinstance(expr, ast.Call):
+    def visit_Call(self, expr):
         # Quantum hybrid
         if (
             isinstance(expr.func, ast.Attribute)
@@ -317,7 +387,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             and expr.func.value.id == "Q"
         ):
             gate = expr.func.attr
-            args = [translate_expression(e, env) for e in expr.args]
+            args = [self.visit(e) for e in expr.args]
             args_v = [b for (a, b) in args]
 
             q_gate = QuantumBooleanGate.build(gate)
@@ -331,87 +401,31 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
             raise exceptions.ExpressionNotHandledException(expr)
 
         # Typecast
-        elif env.know_type(expr.func.id):
-            if len(expr.args) != 1:
-                raise Exception(
-                    f"{expr.func.id}() takes exactly 1 argument ({len(expr.args)} given)"
-                )
-
-            if not isinstance(expr.args[0], ast.Constant):
-                raise Exception(f"{expr.func.id}() accepts only constant values")
-
-            return env.gettype(expr.func.id).const(expr.args[0].value)
+        elif self.env.know_type(expr.func.id):
+            return self.__visit_Call_typecast(expr)
 
         # int()
         elif expr.func.id == "int":
-            if len(expr.args) != 1:
-                raise Exception(
-                    f"int() takes exactly 1 argument ({len(expr.args)} given)"
-                )
-
-            ta, te = translate_expression(expr.args[0], env)
-            if ta.__name__[:4] == "Qint":
-                return (ta, te)
-            elif ta.__name__[:6] == "Qfixed":
-                ip = ta.integer_part((ta, te))  # type: ignore
-                return (Qint.type_for_size(len(ip)), ip)
-            else:
-                raise Exception(f"int() accepts only Qfixed and Qint: {ta} given")
+            return self.__visit_Call_int(expr)
 
         # float()
         elif expr.func.id == "float":
-            if len(expr.args) != 1:
-                raise Exception(
-                    f"float() takes exactly 1 argument ({len(expr.args)} given)"
-                )
-
-            ta, te = translate_expression(expr.args[0], env)
-            if ta.__name__[:6] == "Qfixed":
-                return (ta, te)
-            elif ta.__name__[:4] == "Qint":
-                tf = Qfixed.type_for_size(len(te))
-                return cast(TExp, tf.fill((tf, te)))
-            else:
-                raise Exception(f"float() accepts only Qfixed and Qint: {ta} given")
+            return self.__visit_Call_float(expr)
 
         # Known function
-        elif env.know_function(expr.func.id):
-            def_f = env.getdef(expr.func.id)
-            args = [translate_expression(e, env) for e in expr.args]
+        elif self.env.know_function(expr.func.id):
+            return self.__visit_Call_known_function(expr)
 
-            # Check if args match function args and replace
-            if len(args) != len(def_f[1]):
-                raise TypeErrorException(args, def_f[1])
-
-            subs = {}
-            for a, fa in zip(args, def_f[1]):
-                if isinstance(a[1], List):
-                    for i in range(len(a[1])):  # type: ignore
-                        index = ".".join(a[1][i].name.split(".")[1:])  # type: ignore
-                        if index == "":
-                            index = f"{i}"
-
-                        subs[f"{fa.name}.{index}"] = a[1][i]  # type: ignore
-
-                else:
-                    subs[fa.name] = a[1]
-
-            n_exps = []
-            for s, e in def_f[3]:
-                n_exps.append((s, e.subs(subs, simultaneus=True)))
-
-            _ret = list(map(lambda se: se[1], n_exps))
-
-            if len(_ret) == 1:
-                return (bool, _ret[0])
-
-            return (def_f[2].ttype, _ret)
-
-        raise exceptions.UnknownSymbolException(expr.func.id, env)
+        raise exceptions.UnknownSymbolException(expr.func.id, self.env)
 
     # Lambda
     # Dict
     # Set
 
-    else:
+    def generic_visit(self, expr):
         raise exceptions.ExpressionNotHandledException(expr)
+
+
+def translate_expression(expr, env: Env) -> TExp:
+    """Translate an expression"""
+    return ExpressionTranslator(env).visit(expr)  # type: ignore
