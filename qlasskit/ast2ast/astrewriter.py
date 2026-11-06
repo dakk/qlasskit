@@ -372,27 +372,27 @@ class ASTRewriter(ast.NodeTransformer):
         node.value = self.visit(node.value)
         return node
 
-    def visit_AugAssign(self, node: ast.AugAssign):
-        """Translate AugAssign to Assign + BinOp (+=, -=, etc)"""
-        # Reassigning an already present variable (use a temp variable)
-        # if node.target.id in self.env:
-        if not hasattr(node.target, "id"):
-            raise ValueError(node.target, "has no id")
+    # def visit_AugAssign(self, node: ast.AugAssign):
+    #     """Translate AugAssign to Assign + BinOp (+=, -=, etc)"""
+    #     # Reassigning an already present variable (use a temp variable)
+    #     # if node.target.id in self.env:
+    #     if not hasattr(node.target, "id"):
+    #         raise ValueError(node.target, "has no id")
 
-        new_targ = ast.Name(id=f"__{node.target.id}", ctx=ast.Load())
+    #     new_targ = ast.Name(id=f"__{node.target.id}", ctx=ast.Load())
 
-        return [
-            ast.Assign(
-                targets=[new_targ],
-                value=self.visit(
-                    ast.BinOp(left=node.target, op=node.op, right=node.value)
-                ),
-            ),
-            ast.Assign(
-                targets=[node.target],
-                value=new_targ,
-            ),
-        ]
+    #     return [
+    #         ast.Assign(
+    #             targets=[new_targ],
+    #             value=self.visit(
+    #                 ast.BinOp(left=node.target, op=node.op, right=node.value)
+    #             ),
+    #         ),
+    #         ast.Assign(
+    #             targets=[node.target],
+    #             value=new_targ,
+    #         ),
+    #     ]
 
     def __unroll_arg(
         self, arg: Union[ast.Constant, ast.Subscript, ast.Tuple, ast.Name]
