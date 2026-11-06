@@ -32,15 +32,6 @@ def _half_adder(a, b):  # Carry x Sum
 
 def _full_adder(c, a, b):  # Carry x Sum
     return (a & b) ^ (a ^ b) & c, Xor(Xor(a, b), c)
-    # from ..boolquant import Q
-    # from sympy import Symbol
-    # c_o = Symbol('carry')
-    # c_o = Q.MCX(a, b, c_o)
-    # b = Q.CX(a, b)
-    # c_o = Q.MCX(b, c, c_o)
-    # c = Q.CX(b, c)
-    # b = Q.CX(a, b)
-    # return c_o, c
 
 
 from .qtype import (  # noqa: F401, E402

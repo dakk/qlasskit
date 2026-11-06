@@ -29,15 +29,6 @@ from . import Compiler, CompilerException, ExpQMap
 class InternalCompiler(Compiler):
     """InternalCompiler translating an expression list to quantum circuit"""
 
-    # def is_symbol_referenced_in_remaining_exps(self, symbol):
-    #     """Return True if the symbol is referenced in remaining expressions"""
-    #     for sym, exp in self.remaining_exps:
-    #         if sym == symbol:
-    #             return True
-    #         if symbol in exp.free_symbols:
-    #             return True
-    #     return False
-
     def compile(  # noqa: C901
         self, name, args: Args, returns: Arg, exprs: BoolExpList, uncompute=True
     ) -> QCircuit:

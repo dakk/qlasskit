@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import ast
-import sys
 import unittest
 
 from parameterized import parameterized
@@ -25,13 +24,6 @@ class AddKind(ast.NodeTransformer):
     def visit_Constant(self, n):
         n.kind = None
         return n
-
-
-def add_kind(n):
-    if sys.version_info >= (3, 9):
-        return n
-
-    return AddKind().visit(n)
 
 
 class TestASTRewriter(unittest.TestCase):
@@ -50,7 +42,7 @@ class TestASTRewriter(unittest.TestCase):
         tree = ast.parse(code)
         new_tree = self.rewriter.visit(tree)
         expected_tree = ast.parse(expected_code)
-        self.assertEqual(ast.dump(add_kind(new_tree)), ast.dump(expected_tree))
+        self.assertEqual(ast.dump(new_tree), ast.dump(expected_tree))
 
     def test_exponentiation_with_zero(self):
         code = "a = b ** 0"
@@ -62,10 +54,9 @@ class TestASTRewriter(unittest.TestCase):
         self.assertTrue(isinstance(new_tree.body[0].value, ast.Constant))
         self.assertEqual(new_tree.body[0].value.value, 1)
 
-        if sys.version_info >= (3, 9):
-            expected_code = "a = 1"
-            expected_tree = ast.parse(expected_code)
-            self.assertEqual(ast.dump(add_kind(new_tree)), ast.dump(expected_tree))
+        expected_code = "a = 1"
+        expected_tree = ast.parse(expected_code)
+        self.assertEqual(ast.dump(new_tree), ast.dump(expected_tree))
 
 
 class TestASTConstantFolder(unittest.TestCase):
@@ -85,4 +76,4 @@ class TestASTConstantFolder(unittest.TestCase):
         tree = ast.parse(code)
         new_tree = self.rewriter.visit(tree)
         expected_tree = ast.parse(expected_code)
-        self.assertEqual(ast.dump(add_kind(new_tree)), ast.dump(expected_tree))
+        self.assertEqual(ast.dump(new_tree), ast.dump(expected_tree))

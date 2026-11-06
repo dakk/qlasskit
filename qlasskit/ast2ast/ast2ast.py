@@ -11,31 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import sys
-from ast import NodeTransformer
-
 from .astrewriter import ASTRewriter
 from .constantfolder import ConstantFolder
 from .replacemultitargetassign import ReplaceMultiTargetAssign
 from .replacetypeann import ReplaceTypeAnn
 
 
-class IndexReplacer(NodeTransformer):
-    """Replace Index with its content (for python < 3.9)"""
-
-    def generic_visit(self, node):
-        return super().generic_visit(node)
-
-    def visit_Index(self, node):
-        return self.visit(node.value)
-
-
 def ast2ast(a_tree):
     # print(ast.dump(a_tree))
-
-    # Replace indexes with its content if python < 3.9
-    if sys.version_info < (3, 9):
-        a_tree = IndexReplacer().visit(a_tree)
 
     # Fold constants
     a_tree = ConstantFolder().visit(a_tree)

@@ -119,9 +119,6 @@ class ASTRewriter(ast.NodeTransformer):
         self._uniqd += 1
         return f"{self._uniqd:x}"
 
-    def generic_visit(self, node):
-        return super().generic_visit(node)
-
     def visit_Subscript(self, node):  # noqa: C901
         # Replace L[a] with const a, to L[const]
         if isinstance(node.slice, ast.Name) and self.env.has_constant(node.slice.id):
