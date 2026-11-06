@@ -20,7 +20,7 @@ from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue, Not
 if sys.version_info < (3, 11):
     from typing_extensions import TypeAlias
 else:
-    from typing import TypeAlias
+    from typing import TypeAlias # novermin
 
 if sys.version_info >= (3, 9):
     from builtins import type as Type

@@ -14,6 +14,8 @@
 
 # from copy import deepcopy
 
+from typing import Optional
+
 from sympy import Symbol
 from sympy.logic import And, Not, Or, Xor
 from sympy.logic.boolalg import Boolean, BooleanFalse, BooleanTrue
@@ -75,7 +77,11 @@ class InternalCompiler(Compiler):
         return qc
 
     def compile_expr(  # noqa: C901
-        self, qc: QCircuitEnhanced, expr: Boolean, dest=None, sym: Symbol = None
+        self,
+        qc: QCircuitEnhanced,
+        expr: Boolean,
+        dest: Optional[int] = None,
+        sym: Symbol = None,
     ) -> int:
         """Compile a boolean expression, return the result qubit"""
 
@@ -129,7 +135,7 @@ class InternalCompiler(Compiler):
         else:
             raise CompilerException(expr)
 
-    def compile_quantum_gate(self, qc, expr, dest=None) -> int:
+    def compile_quantum_gate(self, qc, expr, dest: Optional[int] = None) -> int:
         # 1. Compile every argument
         erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))  # type: ignore
         gate = expr.__class__.__name__.lower()
@@ -145,7 +151,7 @@ class InternalCompiler(Compiler):
 
         raise Exception(f"Unknown gate: {gate}")
 
-    def compile_and(self, qc, expr, dest=None) -> int:
+    def compile_and(self, qc, expr, dest: Optional[int] = None) -> int:
         # 1. Compile every argument
         erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))
 
@@ -167,7 +173,7 @@ class InternalCompiler(Compiler):
 
         return dest
 
-    def compile_or(self, qc, expr, dest=None) -> int:
+    def compile_or(self, qc, expr, dest: Optional[int] = None) -> int:
         # TODO: this won't work on len(expr.args) > 2
 
         # 1. Compile every argument
@@ -195,7 +201,9 @@ class InternalCompiler(Compiler):
 
         return dest
 
-    def compile_not(self, qc, expr, dest=None, sym=None) -> int:
+    def compile_not(
+        self, qc: QCircuitEnhanced, expr, dest: Optional[int] = None, sym=None
+    ) -> int:
         # 0. Handle self-not (a = ~a)
         if (
             isinstance(expr.args[0], Symbol)
@@ -225,7 +233,9 @@ class InternalCompiler(Compiler):
 
             return dest
 
-    def compile_xor(self, qc, expr, dest=None) -> int:
+    def compile_xor(
+        self, qc: QCircuitEnhanced, expr, dest: Optional[int] = None
+    ) -> int:
         # 1. Get the destination qubit
         d = dest if dest is not None else qc.get_free_ancilla()
 
@@ -254,7 +264,7 @@ class InternalCompiler(Compiler):
         self.expqmap[expr] = d
         return d
 
-    def compile_symbol(self, qc, expr, dest=None, sym=None) -> int:
+    def compile_symbol(self, qc: QCircuitEnhanced, expr, dest=None, sym=None) -> int:
         # 1. If a qubit is mapped to another qubit (iff sym.name is a _ret)
         if sym is not None and sym.name.startswith("_ret"):
             # 1.1 Xor mapping to a new qubit if the expr is an input

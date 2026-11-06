@@ -57,7 +57,7 @@ def merge_expressions(exps: BoolExpList) -> BoolExpList:
 def apply_cse(exps: BoolExpList) -> BoolExpList:
     lsts = list(zip(*exps))
     repl, red = cse(list(lsts[1]))
-    res = repl + list(zip(lsts[0], red))
+    res: BoolExpList = repl + list(zip(lsts[0], red))
     return res
 
 

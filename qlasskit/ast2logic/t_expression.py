@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ast
-from typing import List, Tuple, get_args
+from typing import List, Tuple, cast, get_args
 
 from sympy import Symbol
 from sympy.logic import ITE, And, Not, Or, Xor, false, true
@@ -23,7 +23,7 @@ from . import Env, exceptions
 from .utils import safe_str
 
 
-def decompose_to_symbols(vlist, base, res=[]) -> List[Symbol]:
+def decompose_to_symbols(vlist, base, res: List = []) -> List[Symbol]:
     """Decompose exp to symbols"""
     if isinstance(vlist, list):
         i = 0
@@ -257,7 +257,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
                 if not hasattr(op_type, comp_name):
                     raise exceptions.OperationNotSupportedException(op_type, comp_name)
 
-                return getattr(op_type, comp_name)(tleft, tcomp)
+                return getattr(op_type, comp_name)(tleft, tcomp)  # type: ignore
 
         # Is | IsNot | In | NotIn
         raise exceptions.ExpressionNotHandledException(expr)
@@ -349,7 +349,7 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
                     f"int() takes exactly 1 argument ({len(expr.args)} given)"
                 )
 
-            (ta, te) = translate_expression(expr.args[0], env)
+            ta, te = translate_expression(expr.args[0], env)
             if ta.__name__[:4] == "Qint":
                 return (ta, te)
             elif ta.__name__[:6] == "Qfixed":
@@ -365,12 +365,12 @@ def translate_expression(expr, env: Env) -> TExp:  # noqa: C901
                     f"float() takes exactly 1 argument ({len(expr.args)} given)"
                 )
 
-            (ta, te) = translate_expression(expr.args[0], env)
+            ta, te = translate_expression(expr.args[0], env)
             if ta.__name__[:6] == "Qfixed":
                 return (ta, te)
             elif ta.__name__[:4] == "Qint":
                 tf = Qfixed.type_for_size(len(te))
-                return tf.fill((tf, te))
+                return cast(TExp, tf.fill((tf, te)))
             else:
                 raise Exception(f"float() accepts only Qfixed and Qint: {ta} given")
 

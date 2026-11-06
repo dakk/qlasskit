@@ -79,7 +79,7 @@ class QCircuitEnhanced(QCircuit):
 
         self.gates = result
 
-    def add_ancilla(self, name=None, is_free=True):
+    def add_ancilla(self, name=None, is_free=True) -> int:
         """Add an ancilla qubit"""
         i = self.add_qubit(name if name else f"anc_{len(self.ancilla_lst)}")
         self.ancilla_lst.add(i)
@@ -87,7 +87,7 @@ class QCircuitEnhanced(QCircuit):
             self.free_ancilla_lst.add(i)
         return i
 
-    def get_free_ancilla(self):
+    def get_free_ancilla(self) -> int:
         """Get the first free ancilla available"""
         if len(self.free_ancilla_lst) == 0:
             anc = self.add_ancilla(is_free=False)

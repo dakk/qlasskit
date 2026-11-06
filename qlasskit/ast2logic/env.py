@@ -21,7 +21,7 @@ from sympy.logic.boolalg import Boolean
 if sys.version_info < (3, 11):
     from typing_extensions import TypeAlias
 else:
-    from typing import TypeAlias
+    from typing import TypeAlias # novermin
 
 from ..types import BUILTIN_TYPES, Qint, Qtype  # noqa: F401, E402
 from . import exceptions

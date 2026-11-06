@@ -252,7 +252,7 @@ class QintImp(int, Qtype):
             if const % 2 == 0:
                 t = __mul_sizing(n, m)
                 res = cls.mul_even_const(t_num, const, t)
-                return t.crop(t.fill(res))
+                return cast(TExp, t.crop(t.fill(res)))
 
         # if n != m:
         #     raise Exception(f"Mul works only on same size Qint: {n} != {m}")
@@ -275,7 +275,7 @@ class QintImp(int, Qtype):
                 product[i + m] = carry
 
         t = __mul_sizing(n, m)
-        return t.crop(t.fill((t, product)))
+        return cast(TExp, t.crop(t.fill((t, product))))
 
     @classmethod
     def sub(cls, tleft: TExp, tright: TExp) -> TExp:
@@ -326,7 +326,10 @@ class QintImp(int, Qtype):
         tright_value = cast(QintImp, tright_qtype)
         if tright_value == 0:
             raise ZeroDivisionError("division by zero")
-        return cls._divide_generic_const_optimize(cls, tleft, tright_value)
+        return cast(
+            tuple[TExp, TExp],
+            cls._divide_generic_const_optimize(cls, tleft, tright_value),
+        )
 
     @staticmethod
     def _divide_generic_normalize_sizes(
@@ -381,7 +384,9 @@ class QintImp(int, Qtype):
 
         if cls.is_const(tleft):
             tleft_value = cast(Qtype, tleft[0]).from_bool(tleft[1])
-            if tleft_value == 0:
+
+            # TODO: check over a proper value
+            if tleft_value == 0:  # type: ignore
                 return (cls.const(0), cls.const(0))
 
         tleft, tright = cls._divide_generic_normalize_sizes(cls, tleft, tright)

@@ -95,6 +95,24 @@ jobs:
     - name: Run linters
       run: tox -e linters
 
+  vermin:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: pip install tox
+
+    - name: Run vermin
+      run: tox -e vermin
+
   # coverage:
   #   runs-on: ubuntu-24.04
   #   container:

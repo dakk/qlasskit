@@ -61,4 +61,4 @@ class Simon(QAlgorithm):
     def decode_output(
         self, istr: Union[str, int, List[bool]]
     ) -> Union[bool, Tuple, Qtype]:
-        return interpret_as_qtype(istr, self.f.args[0].ttype, len(self.f.args[0]))
+        return interpret_as_qtype(istr, self.f.args[0].ttype, len(self.f.args[0]))  # type: ignore

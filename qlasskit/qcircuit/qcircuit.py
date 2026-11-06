@@ -126,7 +126,7 @@ class QCircuit:
         elif isinstance(key, Symbol):
             self.qubit_map[key.name] = qubit
 
-    def __getitem__(self, key: Union[str, Symbol, int]):
+    def __getitem__(self, key: Union[str, Symbol, int]) -> int:
         """Return the qubit index given its name or index"""
         if isinstance(key, str):
             return self.qubit_map[key]
@@ -163,7 +163,7 @@ class QCircuit:
     def __iadd__(self, other: Union[gates.AppliedGate, "QCircuit"]):  # type: ignore
         """AugAssign between a qcircuit and a AppliedGate|QCircuit"""
         if isinstance(other, Tuple):  # type: ignore
-            self.append(other[0], other[1], other[2])
+            self.append(other[0], other[1], other[2])  # type: ignore
         elif isinstance(other, QCircuit):  # type: ignore
             self.append_circuit(other, list(range(other.num_qubits)))
         return self
@@ -198,7 +198,7 @@ class QCircuit:
         self.gates_computed.extend(ogates_computed)
         return self
 
-    def add_qubit(self, name=None):
+    def add_qubit(self, name=None) -> int:
         """Add a qubit to the circuit.
 
         Args:

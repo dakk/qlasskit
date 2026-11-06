@@ -15,7 +15,6 @@
 
 from typing import List, Any, Iterable, Union
 
-
 # def flatten(m: List[List[Any]]) -> List[Any]:
 #     return [item for row in m for item in row]
 

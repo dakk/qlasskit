@@ -25,7 +25,7 @@ class CirqExporter(QCircuitExporter):
 
         if mode == "gate":
 
-            class ExportedGate(cirq.Gate):
+            class ExportedGate(cirq.Gate):  # type: ignore
                 def init(self):
                     super(ExportedGate, self)
 

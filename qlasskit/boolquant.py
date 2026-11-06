@@ -16,7 +16,7 @@ from sympy import Function
 from sympy.logic.boolalg import Boolean
 
 
-class QuantumBooleanGate(Function, Boolean):
+class QuantumBooleanGate(Function, Boolean):  # type: ignore
     # TODO: add an eval method to be able to simplify H(H(a)) => a
 
     def build(name: str):

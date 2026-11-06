@@ -109,6 +109,6 @@ class Grover(QAlgorithm):
     def decode_output(
         self, istr: Union[str, int, List[bool]]
     ) -> Union[bool, Tuple, Qtype]:
-        return interpret_as_qtype(
+        return interpret_as_qtype(  # type: ignore
             istr, self.oracle.args[0].ttype, len(self.oracle.args[0])
         )

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from sympy import Symbol
 from sympy.logic.boolalg import Boolean
@@ -32,7 +32,7 @@ class Arg:
     def __len__(self) -> int:
         return len(self.bitvec)
 
-    def to_exp(self) -> List[Symbol]:
+    def to_exp(self) -> Union[Symbol, List[Symbol]]:
         if len(self) > 1:
             return list(map(Symbol, self.bitvec))
         return Symbol(self.bitvec[0])

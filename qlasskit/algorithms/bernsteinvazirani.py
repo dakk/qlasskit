@@ -15,12 +15,12 @@
 from typing import List, Tuple, Union
 
 from ..qcircuit import QCircuit
-from ..qlassfun import QlassF
+from ..qlassfun import QlassF, UnboundQlassf
 from ..types import Qtype, interpret_as_qtype
 from .qalgorithm import QAlgorithm
 
 
-def secret_oracle(isize, secret):
+def secret_oracle(isize: int, secret: int) -> Union[QlassF, UnboundQlassf]:
     """Create an oracle embedding a secret for Bernstein-Vazirani"""
     f = f"def oracle(x: Qint[{isize}]) -> bool:\n"
     f += f"  s=Qint{isize}({secret})\n"
@@ -78,5 +78,5 @@ class BernsteinVazirani(QAlgorithm):
     def decode_output(
         self, istr: Union[str, int, List[bool]]
     ) -> Union[Tuple[str, int], Qtype, str]:
-        return interpret_as_qtype(istr, self.f.args[0].ttype, len(self.f.args[0]))
+        return interpret_as_qtype(istr, self.f.args[0].ttype, len(self.f.args[0]))  # type: ignore
         # return istr[-len(self.f.args[0]) :][::-1]

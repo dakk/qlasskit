@@ -13,7 +13,7 @@
 # limitations under the License.
 # isort:skip_file
 
-from typing import Any, List, Union, Optional, get_args
+from typing import Any, List, Union, Optional, get_args, cast
 
 from sympy.logic import Not, Xor, And
 
@@ -126,7 +126,7 @@ def const_to_qtype(value: Any) -> TExp:
 def type_repr(typ) -> str:
     if hasattr(typ, "__name__"):
         if len(get_args(typ)) == 0:
-            return typ.__name__
+            return cast(str, typ.__name__)
 
         args = [type_repr(a) for a in get_args(typ)]
         return f"{typ.__name__}[{','.join(args)}]"
@@ -176,11 +176,11 @@ def interpret_as_qtype(
         else:
             return 1
 
-    def _interpret(out, qtype, out_len):
+    def _interpret(out, qtype, out_len) -> Any:
         if hasattr(qtype, "from_bool"):
-            return qtype.from_bool(out[0:out_len])
+            return qtype.from_bool(out[0:out_len])  # type: ignore
         elif qtype == bool:
-            return out[0]
+            return out[0]  # type: ignore
         else:  # Tuple
             idx_s = 0
             values = []

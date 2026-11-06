@@ -39,7 +39,7 @@ def parse_file(fpath: str) -> List[Tuple[str, QlassF]]:
 def parse_str(scode: str) -> List[Tuple[str, QlassF]]:
     """Given a string `scode` containing a script with qlassf definitions,
     returns a list of qlassf objects"""
-    (tfd, tfpath) = tempfile.mkstemp(prefix="qlassf_", suffix=".py", text=True)
+    tfd, tfpath = tempfile.mkstemp(prefix="qlassf_", suffix=".py", text=True)
 
     with open(tfpath, "w") as tf:
         tf.write(scode)

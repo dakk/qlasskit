@@ -40,6 +40,7 @@ def in_ipynb():
 
     return "ipykernel" in sys.modules
 
+
 def is_parameter_annotation(node):
     """Return True if an annotation looks like 'Parameter[...]'."""
     if node is None:
@@ -54,6 +55,7 @@ def is_parameter_annotation(node):
     elif isinstance(node, ast.Attribute) and node.attr == "Parameter":
         return True
     return False
+
 
 class UnboundQlassf:
     """Class representing a qlassf function with unbound parameters"""
@@ -96,7 +98,8 @@ class UnboundQlassf:
 
         # remove args annotated with Parameter[…]
         fun_ast.body[0].args.args = [
-            arg for arg in fun_ast.body[0].args.args
+            arg
+            for arg in fun_ast.body[0].args.args
             if not is_parameter_annotation(arg.annotation)
         ]
 
@@ -196,8 +199,8 @@ class QlassF(QCircuitWrapper):
     def decode_output(
         self, istr: Union[str, int, List[bool]]
     ) -> Union[bool, Tuple, Qtype]:
-        fcome = format_outcome(istr)[::-1]  # TODO: we need an endianess paramter
-        return interpret_as_qtype(fcome[::-1], self.returns.ttype, len(self.returns))
+        fcome = format_outcome(istr)  # TODO: we need an endianess paramter
+        return interpret_as_qtype(fcome, self.returns.ttype, len(self.returns))  # type: ignore
 
     def __add__(self, qf2) -> "QlassF":
         """Adds two qlassf and return the combination f + g = f(g())"""
@@ -304,7 +307,7 @@ class QlassF(QCircuitWrapper):
             exec(f, globals())
         original_f = eval(fun_ast.body[0].name) if isinstance(f, str) else f
 
-        def _do_translate(fun_ast, original_f):
+        def _do_translate(fun_ast, original_f) -> QlassF:
             # print(ast.dump(fun_ast, indent=4))
             fun = ast2ast(fun_ast.body[0])
             # print(ast.dump(fun, indent=4))

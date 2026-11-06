@@ -41,6 +41,26 @@ bqm = ["pyqubo==1.0.5"]
 py2bexp = "qlasskit.tools.py2bexp:main"
 py2qasm = "qlasskit.tools.py2qasm:main"
 
+[tool.mypy]
+python_version = "3.10"
+strict = false
+ignore_missing_imports = true
+check_untyped_defs = false #true
+disallow_incomplete_defs = false #true
+warn_redundant_casts = true
+# warn_unused_ignores = true # can't enable untile we are strict
+strict_equality = true
+extra_checks = true
+# no_implicit_reexport = true
+strict_bytes = true
+warn_unused_configs = true
+warn_return_any = true
+disallow_subclassing_any = true
+# disallow_any_generics = true
+disallow_untyped_decorators = true
+#disallow_untyped_calls = true
+disallow_untyped_defs = false #true
+
 [tool.setuptools.packages.find]
 include = [
     "qlasskit",

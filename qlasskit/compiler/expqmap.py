@@ -23,17 +23,17 @@ class ExpQMap:
     def __init__(self):
         self.exp_map: Dict[Boolean, int] = {}
 
-    def __contains__(self, exp):
+    def __contains__(self, exp) -> bool:
         return exp in self.exp_map
 
-    def __getitem__(self, exp):
+    def __getitem__(self, exp) -> int:
         return self.exp_map[exp]
 
-    def __setitem__(self, exp, qubit):
+    def __setitem__(self, exp: Boolean, qubit: int):
         self.remove([qubit])
         self.exp_map[exp] = qubit
 
-    def remove(self, qubits: List[int]):
+    def remove(self, qubits: List[int]) -> None:
         """Remove qubits from the mapping"""
         todel = []
         for exp in self.exp_map.keys():
