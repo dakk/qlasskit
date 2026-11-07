@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import ast
+import copy
 from typing import List, Tuple, cast, get_args
 
 from sympy import Symbol
@@ -52,6 +53,70 @@ class ExpressionTranslator(ast.NodeTransformer):
         binding = self.env[expr.id]
         return (binding.ttype, binding.to_exp())
 
+    @staticmethod
+    def __py_to_ast(v) -> ast.expr:
+        if isinstance(v, (list, tuple)):
+            return ast.List(elts=[ExpressionTranslator.__py_to_ast(x) for x in v])
+        return ast.Constant(value=v)
+
+    def __const_chain(self, node, slices) -> ast.expr:
+        """Build an IfExp chain over a constant: for slices (innermost
+        first), constant slices navigate the value, the first dynamic slice
+        becomes an IfExp(i == k, elem_k, ...) chain"""
+        if not slices:
+            return self.__py_to_ast(node)
+        s, rest = slices[0], slices[1:]
+        if isinstance(s, ast.Constant):
+            return self.__const_chain(node[s.value], rest)
+        n = len(node)
+        chain = self.__const_chain(node[n - 1], rest)
+        for k in reversed(range(n - 1)):
+            chain = ast.IfExp(
+                test=ast.Compare(
+                    left=copy.deepcopy(s),
+                    ops=[ast.Eq()],
+                    comparators=[ast.Constant(value=k)],
+                ),
+                body=self.__const_chain(node[k], rest),
+                orelse=chain,
+            )
+        return chain
+
+    @staticmethod
+    def __first_dim(ttype) -> int:
+        """First dimension of a type: BIT_SIZE for Qint-like, len(args) for Tuple"""
+        if hasattr(ttype, "BIT_SIZE"):
+            return ttype.BIT_SIZE
+        args = get_args(ttype)
+        return len(args) if args else 1
+
+    def __dyn_subscript_chain(self, expr: ast.Subscript) -> ast.IfExp:
+        """L[0] if i==0 else L[1] if i==1 ... else L[max] for a var idx (L[max] fallthrough)"""
+        if isinstance(expr.value, ast.Name):
+            vt = self.env[expr.value.id].ttype
+        else:
+            # nested subscript (m[i][j]): type of the subscripted value (the row)
+            vt = self.visit(expr.value)[0]
+        n = self.__first_dim(vt)
+
+        def access(k):
+            return ast.Subscript(
+                value=expr.value, slice=ast.Constant(value=k), ctx=ast.Load()
+            )
+
+        chain = access(n - 1)
+        for k in reversed(range(n - 1)):
+            chain = ast.IfExp(
+                test=ast.Compare(
+                    left=copy.deepcopy(expr.slice),
+                    ops=[ast.Eq()],
+                    comparators=[ast.Constant(value=k)],
+                ),
+                body=access(k),
+                orelse=chain,
+            )
+        return chain
+
     # Subscript: a[0][1]
     def visit_Subscript(self, expr: ast.Subscript):  # noqa: C901
         def unroll_subscripts(sub: ast.Subscript, st):
@@ -73,7 +138,35 @@ class ExpressionTranslator(ast.NodeTransformer):
 
         _sval = expr.slice  # type: ignore
 
+        # if the base of the subscript chain is a constant, unroll
+        base = expr.value
+        slices = []
+        while isinstance(base, ast.Subscript):
+            slices.append(base.slice)
+            base = base.value
+        slices.append(expr.slice)
+        slices.reverse()  # innermost first
+        if isinstance(base, ast.Name) and self.env.has_constant(base.id):
+            return self.visit(self.__const_chain(self.env.get_constant(base.id), slices))
+
         if not isinstance(_sval, ast.Constant):
+            # variable index: build L[0] if i==0 else L[1] if ... else L[max] as an IfExp
+            # chain, sized from the base type's first dimension, then translate it
+            return self.visit(self.__dyn_subscript_chain(expr))
+
+        if (
+            isinstance(expr.value, ast.Subscript)
+            and not isinstance(expr.value.slice, ast.Constant)
+        ):
+            # constant outer slice over a dynamic inner subscript (t[i][0]):
+            # translate the inner subscript first, then index into the result
+            vt, vexp = self.visit(expr.value)
+            if isinstance(vexp, list):
+                args = get_args(vt)
+                etype = args[_sval.value] if args and _sval.value < len(args) else bool
+                esize = etype.BIT_SIZE if hasattr(etype, "BIT_SIZE") else 1
+                elem = vexp[_sval.value * esize : (_sval.value + 1) * esize]
+                return (etype, elem if esize > 1 else elem[0])
             raise exceptions.ExpressionNotHandledException(expr)
 
         if isinstance(expr.value, ast.Name):
@@ -106,8 +199,16 @@ class ExpressionTranslator(ast.NodeTransformer):
                 inner_type,
                 [Symbol(f"{sn}.{i}") for i in range(inner_type.BIT_SIZE)],
             )
+        elif inner_type == bool:
+            return (bool, Symbol(sn))
         else:
-            return (inner_type, Symbol(sn))
+            # tuple element: collect its bits from the base binding's bitvec
+            bits = [
+                b
+                for b in self.env[sn.split(".")[0]].bitvec
+                if b.startswith(sn + ".")
+            ]
+            return (inner_type, [Symbol(b) for b in bits])
 
     # Boolop: and, or
     def visit_BoolOp(self, expr: ast.BoolOp):

@@ -15,7 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from sympy import Symbol
 from sympy.logic.boolalg import Boolean
@@ -37,11 +37,13 @@ class Env:
     bindings: List[Binding]
     types: List[TypeBinding]
     defs: List[LogicFun]
+    consts: Dict[str, Any]
 
     def __init__(self) -> None:
         self.bindings = []
         self.types = []
         self.defs = []
+        self.consts = {}
 
         for t in BUILTIN_TYPES:
             self.bind_type((t.__name__, t))  # type: ignore
@@ -106,6 +108,18 @@ class Env:
             return list(filter(lambda x: x[0] == fun_name, self.defs))[0]
         except:
             raise exceptions.UnboundException(fun_name, self)
+
+    def set_constant(self, name: str, value: Any) -> None:
+        self.consts[name] = value
+
+    def get_constant(self, name: str) -> Any:
+        return self.consts[name]
+
+    def has_constant(self, name: str) -> bool:
+        return name in self.consts
+
+    def remove_constant(self, name: str) -> None:
+        self.consts.pop(name, None)
 
     def bind(self, bb: Binding, rebind=False) -> None:
         if not rebind and bb.name in self:

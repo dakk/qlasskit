@@ -39,6 +39,12 @@ def __translate_assign(
 
     target = stmt.targets[0].id
 
+    # track python constants for constant-subscript unrolling
+    try:
+        env.set_constant(target, ast.literal_eval(stmt.value))
+    except Exception:
+        env.remove_constant(target)
+
     # If self reference, use a temp var a -> __a = rhs; a = __a
     if target in env:
         tval, val = translate_expression(stmt.value, env)  # TODO: typecheck
@@ -72,8 +78,7 @@ def __translate_assign(
 
 
 def __translate_augassign(stmt: ast.AugAssign, env: Env):
-    """Translate AugAssign (a += x) as Assign with a BinOp (a = a + x);
-    the self-reference temp is handled by __translate_assign."""
+    """Translate a += x to a = a + x"""
     if not isinstance(stmt.target, ast.Name):
         raise exceptions.StatementNotHandledException(
             stmt, "only name target supported"
@@ -83,10 +88,8 @@ def __translate_augassign(stmt: ast.AugAssign, env: Env):
     return __translate_assign(ast.Assign(targets=[stmt.target], value=value), env)
 
 
-
-
 def __rewrite_if(stmt: ast.If, env: Env) -> List[ast.stmt]:
-    """Rewrite if(c,t,e) into assigns with IfExp values, so: if c: d = x  else: d = y  becomes 
+    """Rewrite if(c,t,e) into assigns with IfExp values, so: if c: d = x  else: d = y  becomes
     _iftargN = c; d = x if _iftargN else d; d = d if _iftargN else y"""
     test_name = f"_iftarg{uuid4().hex}"
 
