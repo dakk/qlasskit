@@ -138,7 +138,6 @@ class ASTRewriter(ast.NodeTransformer):
     def __init__(self, env: Optional[Environment] = None, ret=None):
         self.env = Environment() if env is None else env
         self.ret = None
-        self._uniqd = 1
         self.__call_dispatch = {
             "range": self.__call_range,
             "len": self.__call_len,
@@ -150,12 +149,6 @@ class ASTRewriter(ast.NodeTransformer):
             "min": self.__call_minmax,
             "max": self.__call_minmax,
         }
-
-    @property
-    def uniqd(self):
-        """Return an unique identifier as str"""
-        self._uniqd += 1
-        return f"{self._uniqd:x}"
 
     def visit_Subscript(self, node: ast.Subscript):  # noqa: C901
         # Replace L[a] with const a, to L[const]

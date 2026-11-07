@@ -199,6 +199,11 @@ class ExpressionTranslator(ast.NodeTransformer):
 
         return (Tuple[tuple(tlts)], elts)  # type: ignore
 
+    # List
+    def visit_List(self, node: ast.List):
+        """Converts List to Tuple"""
+        return self.visit_Tuple(ast.Tuple(elts=node.elts, ctx=node.ctx))
+
     # Compare operator
     def visit_Compare(self, expr: ast.Compare):  # noqa: C901
         if len(expr.ops) != 1 or len(expr.comparators) != 1:
