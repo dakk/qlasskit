@@ -13,9 +13,9 @@ Qlasskit
 .. image:: https://img.shields.io/pypi/v/qlasskit
    :alt: PyPI - Version
    :target: https://pypi.org/project/qlasskit/
-.. image:: https://img.shields.io/badge/license-Apache_2.0-blue
-   :alt: License: Apache 2.0
-   :target: https://opensource.org/licenses/Apache-2.0
+.. image:: https://img.shields.io/badge/license-GPL_3.0-blue
+   :alt: License: GPL 3.0
+   :target: https://opensource.org/license/gpl-3.0
 .. image:: https://img.shields.io/badge/qlasskit-Discord-yellow?logo=discord&logoColor=f5f5f5
    :alt: Discord
    :target: https://discord.com/channels/764231928676089909/1210279373865754624
