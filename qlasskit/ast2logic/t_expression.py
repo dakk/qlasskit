@@ -47,6 +47,17 @@ def decompose_to_symbols(vlist, base, res: List = []) -> List[Symbol]:
 class ExpressionTranslator(ast.NodeTransformer):
     def __init__(self, env: Env):
         self.env = env
+        self.__call_dispatch = {
+            "range": self.__call_range,
+            "len": self.__call_len,
+            "sum": self.__call_sum,
+            "ord": self.__call_ord,
+            "chr": self.__call_chr,
+            "any": self.__call_anyall,
+            "all": self.__call_anyall,
+            "min": self.__call_minmax,
+            "max": self.__call_minmax,
+        }
 
     # Name reference
     def visit_Name(self, expr: ast.Name):
@@ -439,6 +450,111 @@ class ExpressionTranslator(ast.NodeTransformer):
         else:
             raise exceptions.ExpressionNotHandledException(expr)
 
+    def __unroll_arg(self, arg) -> List:
+        """Translate a call argument to a list of TExp (tuple/list literal,
+        constant, tuple-typed name or tuple subscript)"""
+        if isinstance(arg, (ast.Tuple, ast.List)):
+            return [self.visit(el) for el in arg.elts]
+        if isinstance(arg, ast.Name) and arg.id in self.env:
+            if self.env.has_constant(arg.id):
+                v = self.env.get_constant(arg.id)
+                vals = list(v) if isinstance(v, (list, tuple)) else [v]
+                return [self.visit(self.__py_to_ast(x)) for x in vals]
+            t = self.env[arg.id].ttype
+            if not hasattr(t, "BIT_SIZE") and get_args(t):
+                return [
+                    self.visit(
+                        ast.Subscript(
+                            value=arg, slice=ast.Constant(value=i), ctx=ast.Load()
+                        )
+                    )
+                    for i in range(len(get_args(t)))
+                ]
+        if (
+            isinstance(arg, ast.Subscript)
+            and isinstance(arg.value, ast.Name)
+            and isinstance(arg.slice, ast.Constant)
+            and arg.value.id in self.env
+        ):
+            t = self.env[arg.value.id].ttype
+            if not hasattr(t, "BIT_SIZE") and get_args(t):
+                inner = get_args(t)[arg.slice.value]
+                n = (
+                    len(get_args(inner))
+                    if get_args(inner)
+                    else getattr(inner, "BIT_SIZE", 1)
+                )
+                return [
+                    self.visit(
+                        ast.Subscript(
+                            value=arg, slice=ast.Constant(value=i), ctx=ast.Load()
+                        )
+                    )
+                    for i in range(n)
+                ]
+        return [self.visit(arg)]
+
+    def __call_range(self, node: ast.Call):
+        args = [ast.literal_eval(a) for a in node.args]
+        return self.visit(
+            ast.Tuple(elts=[ast.Constant(value=i) for i in range(*args)])
+        )
+
+    def __call_len(self, node: ast.Call):
+        if len(node.args) != 1:
+            raise Exception(f"len() takes exactly 1 argument ({len(node.args)} given)")
+        return const_to_qtype(len(self.__unroll_arg(node.args[0])))
+
+    def __call_sum(self, node: ast.Call):
+        if len(node.args) != 1:
+            raise Exception(f"sum() takes exactly 1 argument ({len(node.args)} given)")
+
+        def rec(lst):
+            if len(lst) == 1:
+                return lst[0]
+            return lst[0][0].add(lst[0], rec(lst[1:]))
+
+        return rec(self.__unroll_arg(node.args[0]))
+
+    def __call_anyall(self, node: ast.Call):
+        if len(node.args) != 1:
+            raise Exception(f"{node.func.id}() takes exactly 1 argument ({len(node.args)} given)")
+        op = Or if node.func.id == "any" else And
+        return (bool, op(*[a[1] for a in self.__unroll_arg(node.args[0])]))
+
+    def __call_ord(self, node: ast.Call):
+        if len(node.args) != 1:
+            raise Exception(f"ord() takes exactly 1 argument ({len(node.args)} given)")
+        return self.visit(node.args[0])
+
+    def __call_chr(self, node: ast.Call):
+        if len(node.args) != 1:
+            raise Exception(f"chr() takes exactly 1 argument ({len(node.args)} given)")
+        return self.visit(node.args[0])
+
+    def __call_minmax(self, node: ast.Call):
+        if len(node.args) == 1:
+            args = self.__unroll_arg(node.args[0])
+        else:
+            args = [self.visit(a) for a in node.args]
+        cmp = "gt" if node.func.id == "max" else "lte"
+
+        def rec(lst):
+            if len(lst) == 1:
+                return lst[0]
+            conds = [getattr(lst[0][0], cmp)(lst[0], x)[1] for x in lst[1:]]
+            cond = And(*conds)
+            t, v = lst[0]
+            _, v2 = rec(lst[1:])
+            if isinstance(v, list) or isinstance(v2, list):
+                # multi-bit elements: ITE elementwise
+                va = v if isinstance(v, list) else [v] * len(v2)
+                vb = v2 if isinstance(v2, list) else [v2] * len(va)
+                return (t, [ITE(cond, a, b) for a, b in zip(va, vb)])
+            return (t, ITE(cond, v, v2))
+
+        return rec(args)
+
     def __visit_Call_typecast(self, expr):
         if len(expr.args) != 1:
             raise Exception(
@@ -531,6 +647,10 @@ class ExpressionTranslator(ast.NodeTransformer):
 
         elif not hasattr(expr.func, "id"):
             raise exceptions.ExpressionNotHandledException(expr)
+
+        # Builtin functions
+        elif expr.func.id in self.__call_dispatch:
+            return self.__call_dispatch[expr.func.id](expr)
 
         # Typecast
         elif self.env.know_type(expr.func.id):

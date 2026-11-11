@@ -279,7 +279,19 @@ def __unroll_for(stmt: ast.For, env: Env) -> List[ast.stmt]:
         and isinstance(it.func, ast.Name)
         and it.func.id == "range"
     ):
-        args = [ast.literal_eval(a) for a in it.args]
+        args = []
+        for a in it.args:
+            if isinstance(a, ast.Constant):
+                args.append(a.value)
+            else:
+                # evaluate constant expression (e.g. len(a)-1) to a python int
+                _, v = translate_expression(a, env)
+                bits = v if isinstance(v, list) else [v]
+                val = 0
+                for i, b in enumerate(bits):
+                    if b is True or str(b) == "True":
+                        val |= 1 << i
+                args.append(val)
         it_vals: List = list(range(*args))
     else:
         it_vals = flatten(__unroll_arg(it, env))
