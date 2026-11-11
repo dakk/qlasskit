@@ -22,7 +22,14 @@ from sympy import Symbol
 from sympy.logic.boolalg import Boolean
 
 from ..types import TType, TypeErrorException
-from . import Binding, Env, decompose_to_symbols, exceptions, flatten, translate_expression
+from . import (
+    Binding,
+    Env,
+    decompose_to_symbols,
+    exceptions,
+    flatten,
+    translate_expression,
+)
 
 
 def _py_to_ast(v) -> ast.expr:
@@ -98,7 +105,9 @@ def __translate_assign(
     return res, env
 
 
-def __translate_augassign(stmt: ast.AugAssign, env: Env):
+def __translate_augassign(
+    stmt: ast.AugAssign, env: Env
+) -> Tuple[List[Tuple[str, Boolean]], Env]:
     """Translate a += x to a = a + x"""
     if not isinstance(stmt.target, ast.Name):
         raise exceptions.StatementNotHandledException(
@@ -234,8 +243,12 @@ def __unroll_arg(arg, env: Env) -> List:
     ):
         t = env[arg.value.id].ttype
         if not hasattr(t, "BIT_SIZE") and get_args(t):
-            inner = get_args(t)[arg.slice.value]
-            n = len(get_args(inner)) if get_args(inner) else getattr(inner, "BIT_SIZE", 1)
+            inner = get_args(t)[arg.slice.value]  # type: ignore
+            n = (
+                len(get_args(inner))
+                if get_args(inner)
+                else getattr(inner, "BIT_SIZE", 1)
+            )
             return [
                 ast.Subscript(
                     value=ast.Subscript(
@@ -252,11 +265,13 @@ def __unroll_arg(arg, env: Env) -> List:
 
 
 def __unroll_for(stmt: ast.For, env: Env) -> List[ast.stmt]:
-    """Unroll a for loop into straight-line statements: per iteration, 
-    assign the loop var to its constant value, then the body with the 
+    """Unroll a for loop into straight-line statements: per iteration,
+    assign the loop var to its constant value, then the body with the
     loop var replaced by that constant"""
     if not isinstance(stmt.target, ast.Name):
-        raise exceptions.StatementNotHandledException(stmt, "only name target supported")
+        raise exceptions.StatementNotHandledException(
+            stmt, "only name target supported"
+        )
 
     it = stmt.iter
     if (
@@ -271,7 +286,9 @@ def __unroll_for(stmt: ast.For, env: Env) -> List[ast.stmt]:
 
     rolls: List[ast.stmt] = []
     for i in it_vals:
-        _val = i if isinstance(i, (ast.Constant, ast.Subscript)) else ast.Constant(value=i)
+        _val = (
+            i if isinstance(i, (ast.Constant, ast.Subscript)) else ast.Constant(value=i)
+        )
         rolls.append(ast.Assign(targets=[stmt.target], value=_val))
         for b in stmt.body:
             rolls.append(NameValReplacer(stmt.target.id, _val).visit(copy.deepcopy(b)))
@@ -287,7 +304,9 @@ def __unroll_stmt(stmt, env: Env) -> List[ast.stmt]:
     return [stmt]
 
 
-def __translate_for(stmt: ast.For, env: Env, ret_type) -> Tuple[List[Tuple[str, Boolean]], Env]:
+def __translate_for(
+    stmt: ast.For, env: Env, ret_type
+) -> Tuple[List[Tuple[str, Boolean]], Env]:
     exps: List[Tuple[str, Boolean]] = []
     for s in __unroll_for(stmt, env):
         e, env = translate_statement(s, env, ret_type)

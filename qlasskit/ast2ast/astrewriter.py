@@ -14,11 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import ast
-import copy
 from dataclasses import dataclass
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
-from ..ast2logic import flatten
 from .constantfolder import ConstantFolder
 from .env import Environment
 

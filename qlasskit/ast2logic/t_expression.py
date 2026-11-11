@@ -86,7 +86,7 @@ class ExpressionTranslator(ast.NodeTransformer):
     def __first_dim(ttype) -> int:
         """First dimension of a type: BIT_SIZE for Qint-like, len(args) for Tuple"""
         if hasattr(ttype, "BIT_SIZE"):
-            return ttype.BIT_SIZE
+            return ttype.BIT_SIZE  # type: ignore
         args = get_args(ttype)
         return len(args) if args else 1
 
@@ -99,12 +99,12 @@ class ExpressionTranslator(ast.NodeTransformer):
             vt = self.visit(expr.value)[0]
         n = self.__first_dim(vt)
 
-        def access(k):
+        def access(k) -> ast.Subscript:
             return ast.Subscript(
                 value=expr.value, slice=ast.Constant(value=k), ctx=ast.Load()
             )
 
-        chain = access(n - 1)
+        chain: ast.IfExp | ast.Subscript = access(n - 1)
         for k in reversed(range(n - 1)):
             chain = ast.IfExp(
                 test=ast.Compare(
@@ -115,7 +115,7 @@ class ExpressionTranslator(ast.NodeTransformer):
                 body=access(k),
                 orelse=chain,
             )
-        return chain
+        return chain  # type: ignore
 
     # Subscript: a[0][1]
     def visit_Subscript(self, expr: ast.Subscript):  # noqa: C901
@@ -147,31 +147,35 @@ class ExpressionTranslator(ast.NodeTransformer):
         slices.append(expr.slice)
         slices.reverse()  # innermost first
         if isinstance(base, ast.Name) and self.env.has_constant(base.id):
-            return self.visit(self.__const_chain(self.env.get_constant(base.id), slices))
+            return self.visit(
+                self.__const_chain(self.env.get_constant(base.id), slices)
+            )
 
         if not isinstance(_sval, ast.Constant):
             # variable index: build L[0] if i==0 else L[1] if ... else L[max] as an IfExp
             # chain, sized from the base type's first dimension, then translate it
             return self.visit(self.__dyn_subscript_chain(expr))
 
-        if (
-            isinstance(expr.value, ast.Subscript)
-            and not isinstance(expr.value.slice, ast.Constant)
+        if isinstance(expr.value, ast.Subscript) and not isinstance(
+            expr.value.slice, ast.Constant
         ):
             # constant outer slice over a dynamic inner subscript (t[i][0]):
             # translate the inner subscript first, then index into the result
             vt, vexp = self.visit(expr.value)
             if isinstance(vexp, list):
                 args = get_args(vt)
-                etype = args[_sval.value] if args and _sval.value < len(args) else bool
+                if args and _sval.value < len(args):  # type: ignore
+                    etype = args[_sval.value]  # type: ignore
+                else:
+                    etype = bool
                 esize = etype.BIT_SIZE if hasattr(etype, "BIT_SIZE") else 1
-                elem = vexp[_sval.value * esize : (_sval.value + 1) * esize]
+                elem = vexp[_sval.value * esize : (_sval.value + 1) * esize]  # type: ignore
                 return (etype, elem if esize > 1 else elem[0])
             raise exceptions.ExpressionNotHandledException(expr)
 
         if isinstance(expr.value, (ast.Tuple, ast.List)):
             # constant tuple/list literal subscript: pick the element directly
-            return self.visit(expr.value.elts[_sval.value])
+            return self.visit(expr.value.elts[_sval.value])  # type: ignore
 
         if isinstance(expr.value, ast.Name):
             sn = f"{expr.value.id}.{safe_str(_sval.value)}"
@@ -208,9 +212,7 @@ class ExpressionTranslator(ast.NodeTransformer):
         else:
             # tuple element: collect its bits from the base binding's bitvec
             bits = [
-                b
-                for b in self.env[sn.split(".")[0]].bitvec
-                if b.startswith(sn + ".")
+                b for b in self.env[sn.split(".")[0]].bitvec if b.startswith(sn + ".")
             ]
             return (inner_type, [Symbol(b) for b in bits])
 
@@ -395,17 +397,17 @@ class ExpressionTranslator(ast.NodeTransformer):
         elif isinstance(expr.op, ast.Pow) and hasattr(tleft[0], "mul"):
             # Transform pow to multiplications
             if not isinstance(expr.right, ast.Constant) and not isinstance(
-                expr.right.value, int
+                expr.right.value, int  # type: ignore
             ):
                 raise exceptions.ExpressionNotHandledException(expr.right)
 
-            if expr.right.value > 0:
+            if expr.right.value > 0:  # type: ignore
                 result = tleft
-                for _ in range(expr.right.value - 1):
+                for _ in range(expr.right.value - 1):  # type: ignore
                     result = result[0].mul(result, tleft)
 
                 return result
-            elif expr.right.value == 0:
+            elif expr.right.value == 0:  # type: ignore
                 return const_to_qtype(1)
             else:
                 raise exceptions.ExpressionNotHandledException(expr.right)
