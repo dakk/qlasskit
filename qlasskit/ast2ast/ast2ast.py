@@ -15,7 +15,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import ast
 
-from .astrewriter import ASTRewriter
 from .constantfolder import ConstantFolder
 from .replacemultitargetassign import ReplaceMultiTargetAssign
 from .replacetypeann import ReplaceTypeAnn
@@ -32,9 +31,6 @@ def ast2ast(a_tree: ast.AST) -> ast.AST:
 
     # Replace multi-target assign
     a_tree = ReplaceMultiTargetAssign().visit(a_tree)
-
-    # Rewrite the ast
-    a_tree = ASTRewriter().visit(a_tree)
 
     # Fold constants again
     a_tree = ConstantFolder().visit(a_tree)

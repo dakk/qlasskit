@@ -15,5 +15,4 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from .ast2ast import ast2ast  # noqa: F401
-from .astrewriter import ASTRewriter  # noqa: F401
 from .constantfolder import ConstantFolder  # noqa: F401

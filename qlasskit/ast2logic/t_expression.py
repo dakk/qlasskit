@@ -61,6 +61,10 @@ class ExpressionTranslator(ast.NodeTransformer):
 
     # Name reference
     def visit_Name(self, expr: ast.Name):
+        # __ prefix is reserved for internal use
+        if expr.id.startswith("__") and expr.id not in self.env:
+            raise Exception("invalid name starting with __")
+
         binding = self.env[expr.id]
         return (binding.ttype, binding.to_exp())
 

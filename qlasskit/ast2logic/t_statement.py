@@ -67,6 +67,10 @@ def __translate_assign(
 
     target = stmt.targets[0].id
 
+    # __ prefix is reserved for internal use
+    if target.startswith("__"):
+        raise Exception("invalid name starting with __")
+
     # track python constants for constant-subscript unrolling
     try:
         env.set_constant(target, ast.literal_eval(stmt.value))
@@ -216,9 +220,9 @@ def __unroll_arg(arg, env: Env) -> List:
     """Transform a for-loop iterable to a list: Tuple literals, constants,
     tuple-typed names (a -> a[0], a[1], ...) and tuple subscripts (a[k] ->
     a[k][0], ...)"""
-    if isinstance(arg, ast.Tuple):
+    if isinstance(arg, (ast.Tuple, ast.List)):
         return arg.elts
-    if isinstance(arg, ast.Constant) and isinstance(arg.value, ast.Tuple):
+    if isinstance(arg, ast.Constant) and isinstance(arg.value, (ast.Tuple, ast.List)):
         return arg.value.elts
     if isinstance(arg, ast.Name) and arg.id in env and env.has_constant(arg.id):
         v = env.get_constant(arg.id)
@@ -299,7 +303,9 @@ def __unroll_for(stmt: ast.For, env: Env) -> List[ast.stmt]:
     rolls: List[ast.stmt] = []
     for i in it_vals:
         _val = (
-            i if isinstance(i, (ast.Constant, ast.Subscript)) else ast.Constant(value=i)
+            i
+            if isinstance(i, (ast.Constant, ast.Subscript, ast.Tuple, ast.List))
+            else ast.Constant(value=i)
         )
         rolls.append(ast.Assign(targets=[stmt.target], value=_val))
         for b in stmt.body:
@@ -378,6 +384,13 @@ def translate_statement(  # noqa: C901
 
     elif isinstance(stmt, ast.Assign):
         return __translate_assign(stmt, env)
+
+    elif isinstance(stmt, ast.AnnAssign):
+        if stmt.value is None or not isinstance(stmt.target, ast.Name):
+            raise exceptions.StatementNotHandledException(stmt)
+        return __translate_assign(
+            ast.Assign(targets=[stmt.target], value=stmt.value), env
+        )
 
     elif isinstance(stmt, ast.Return):
         return __translate_return(stmt, env, ret_type)
