@@ -23,87 +23,6 @@ from .constantfolder import ConstantFolder
 from .env import Environment
 
 
-def iterator_accessor(
-    n_name: str, i_name: str, i_max: int
-) -> Union[ast.Subscript, ast.IfExp]:
-    """Given a List `n_name`, an index `i_name` returns L[0] if i == 0 else L[1] if i == 1 ..."""
-    res: Union[ast.Subscript, ast.IfExp] = ast.Subscript(
-        value=ast.Name(id=n_name, ctx=ast.Load()),
-        slice=ast.Constant(value=0),
-        ctx=ast.Load(),
-    )
-    for i in range(1, i_max + 1):
-        cmp_i = ast.Compare(
-            left=ast.Name(id=i_name, ctx=ast.Load()),
-            ops=[ast.Eq()],
-            comparators=[ast.Constant(value=i)],
-        )
-        res = ast.IfExp(
-            test=cmp_i,
-            body=ast.Subscript(
-                value=ast.Name(id=n_name, ctx=ast.Load()),
-                slice=ast.Constant(value=i),
-                ctx=ast.Load(),
-            ),
-            orelse=res,
-        )
-
-    return res
-
-
-def iterator_accessor2(
-    n_name: str,
-    i_name: str,
-    i_max: int,
-    j_name: str,
-    j_max: int,
-) -> Union[ast.Subscript, ast.IfExp]:
-    """Given a List of List `n_name`, an index `i_name` and an optional index `j_name`,
-    returns L[0][0] if i == 0 and j == 0 else L[0][1] if i == 0 and j == 1 ..."""
-
-    def access_ij(i: int, j: int) -> ast.Subscript:
-        "Return [i][j] subscript of name"
-        return ast.Subscript(
-            value=ast.Subscript(
-                value=ast.Name(id=n_name, ctx=ast.Load()),
-                slice=ast.Constant(value=i),
-                ctx=ast.Load(),
-            ),
-            slice=ast.Constant(value=j),
-            ctx=ast.Load(),
-        )
-
-    res: Union[ast.Subscript, ast.IfExp] = access_ij(0, 0)
-
-    for i in range(i_max + 1):
-        for j in range(j_max + 1):
-            if i == 0 and j == 0:
-                continue
-
-            cmp_i = ast.Compare(
-                left=ast.Name(id=i_name, ctx=ast.Load()),
-                ops=[ast.Eq()],
-                comparators=[ast.Constant(value=i)],
-            )
-
-            cmp_j = ast.Compare(
-                left=ast.Name(id=j_name, ctx=ast.Load()),
-                ops=[ast.Eq()],
-                comparators=[ast.Constant(value=j)],
-            )
-
-            res = ast.IfExp(
-                test=ast.BoolOp(
-                    op=ast.And(),
-                    values=[cmp_i, cmp_j],
-                ),
-                body=access_ij(i, j),
-                orelse=res,
-            )
-
-    return res
-
-
 @dataclass
 class IsNamePresent(ast.NodeVisitor):
     """Check if a tree contains a specific name_id"""
@@ -114,20 +33,6 @@ class IsNamePresent(ast.NodeVisitor):
     def visit_Name(self, node: ast.Name):
         if node.id == self.name_id:
             self.present = True
-
-
-@dataclass
-class NameValReplacer(ast.NodeTransformer):
-    """Replace all Name with name_id with the given val"""
-
-    name_id: str
-    val: Any
-
-    def visit_Name(self, node: ast.Name):
-        if node.id == self.name_id:
-            return self.val
-
-        return node
 
 
 class ASTRewriter(ast.NodeTransformer):
@@ -172,8 +77,6 @@ class ASTRewriter(ast.NodeTransformer):
     def visit_FunctionDef(self, node):
         for x in node.args.args:
             self.env.set_type(x.arg, x.annotation)
-
-        self.ret = node.returns
 
         return super().generic_visit(node)
 
@@ -263,33 +166,6 @@ class ASTRewriter(ast.NodeTransformer):
             ):
                 return self.env.get_constant(arg.id).elts
         return [arg]
-
-    def visit_For(self, node: ast.For):
-        """Unroll for loops to single iterations"""
-        if not hasattr(node.target, "id"):
-            raise ValueError(node.target, "has no id")
-
-        iter = self.__unroll_arg(self.visit(node.iter))
-        rolls = []
-        iter = flatten(iter)
-
-        for i in iter:
-            if isinstance(i, ast.Constant) or isinstance(i, ast.Subscript):
-                _val = i
-            else:
-                _val = ast.Constant(value=i)
-            self.env.set_constant(node.target.id, _val)
-
-            tar_assign = self.visit(ast.Assign(targets=[node.target], value=_val))
-            rolls.extend(flatten([tar_assign]))
-
-            new_body = [
-                NameValReplacer(node.target.id, _val).visit(copy.deepcopy(b))
-                for b in node.body
-            ]
-            rolls.extend(flatten([self.visit(copy.deepcopy(b)) for b in new_body]))
-
-        return rolls
 
     def __call_range(self, node):
         node = ConstantFolder().visit(node)

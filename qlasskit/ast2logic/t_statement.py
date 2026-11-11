@@ -14,14 +14,35 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import ast
-from typing import List, Tuple
+import copy
+from typing import Any, List, Tuple, get_args
 from uuid import uuid4
 
 from sympy import Symbol
 from sympy.logic.boolalg import Boolean
 
 from ..types import TType, TypeErrorException
-from . import Binding, Env, decompose_to_symbols, exceptions, translate_expression
+from . import Binding, Env, decompose_to_symbols, exceptions, flatten, translate_expression
+
+
+def _py_to_ast(v) -> ast.expr:
+    """Convert a python constant (scalar/list/tuple) to an AST literal"""
+    if isinstance(v, (list, tuple)):
+        return ast.Tuple(elts=[_py_to_ast(x) for x in v])
+    return ast.Constant(value=v)
+
+
+class NameValReplacer(ast.NodeTransformer):
+    """Replace all Name with name_id with the given val"""
+
+    def __init__(self, name_id: str, val: Any):
+        self.name_id = name_id
+        self.val = val
+
+    def visit_Name(self, node):
+        if node.id == self.name_id:
+            return self.val
+        return node
 
 
 def __translate_assign(
@@ -116,7 +137,12 @@ def __rewrite_if(stmt: ast.If, env: Env) -> List[ast.stmt]:
         ast.Assign(targets=[ast.Name(id=test_name, ctx=ast.Store())], value=stmt.test)
     ]
 
+    # unroll nested for/if in the body first
+    body: List[ast.stmt] = []
     for b in stmt.body:
+        body.extend(__unroll_stmt(b, env))
+
+    for b in body:
         target = check_assign(as_assign(b))
         b = as_assign(b)
         orelse_inner = (
@@ -135,13 +161,10 @@ def __rewrite_if(stmt: ast.If, env: Env) -> List[ast.stmt]:
             )
         )
 
-    # flatten elif (nested If in orelse) by rewriting it first
+    # flatten nested for/if in orelse (elif) by unrolling/rewriting first
     orelse: List[ast.stmt] = []
     for b in stmt.orelse:
-        if isinstance(b, ast.If):
-            orelse.extend(__rewrite_if(b, env))
-        else:
-            orelse.append(b)
+        orelse.extend(__unroll_stmt(b, env))
 
     for b in orelse:
         b = as_assign(b)
@@ -172,9 +195,101 @@ def __translate_if(
     stmt: ast.If, env: Env, ret_type
 ) -> Tuple[List[Tuple[str, Boolean]], Env]:
     """Translate if/else by rewriting it to straight-line IfExp assigns
-    (see __rewrite_if) and translating those with the normal path."""
+    (see __rewrite_if) and translating those with the normal path"""
     exps: List[Tuple[str, Boolean]] = []
     for s in __rewrite_if(stmt, env):
+        e, env = translate_statement(s, env, ret_type)
+        exps.extend(e)
+    return exps, env
+
+
+def __unroll_arg(arg, env: Env) -> List:
+    """Transform a for-loop iterable to a list: Tuple literals, constants,
+    tuple-typed names (a -> a[0], a[1], ...) and tuple subscripts (a[k] ->
+    a[k][0], ...)"""
+    if isinstance(arg, ast.Tuple):
+        return arg.elts
+    if isinstance(arg, ast.Constant) and isinstance(arg.value, ast.Tuple):
+        return arg.value.elts
+    if isinstance(arg, ast.Name) and arg.id in env and env.has_constant(arg.id):
+        v = env.get_constant(arg.id)
+        vals = list(v) if isinstance(v, (list, tuple)) else [v]
+        return [_py_to_ast(x) for x in vals]
+    if isinstance(arg, ast.Name) and arg.id in env:
+        t = env[arg.id].ttype
+        if not hasattr(t, "BIT_SIZE") and get_args(t):
+            return [
+                ast.Subscript(
+                    value=ast.Name(id=arg.id, ctx=ast.Load()),
+                    slice=ast.Constant(value=i),
+                    ctx=ast.Load(),
+                )
+                for i in range(len(get_args(t)))
+            ]
+    if (
+        isinstance(arg, ast.Subscript)
+        and isinstance(arg.value, ast.Name)
+        and arg.value.id in env
+        and isinstance(arg.slice, ast.Constant)
+    ):
+        t = env[arg.value.id].ttype
+        if not hasattr(t, "BIT_SIZE") and get_args(t):
+            inner = get_args(t)[arg.slice.value]
+            n = len(get_args(inner)) if get_args(inner) else getattr(inner, "BIT_SIZE", 1)
+            return [
+                ast.Subscript(
+                    value=ast.Subscript(
+                        value=ast.Name(id=arg.value.id, ctx=ast.Load()),
+                        slice=ast.Constant(value=arg.slice.value),
+                        ctx=ast.Load(),
+                    ),
+                    slice=ast.Constant(value=i),
+                    ctx=ast.Load(),
+                )
+                for i in range(n)
+            ]
+    return [arg]
+
+
+def __unroll_for(stmt: ast.For, env: Env) -> List[ast.stmt]:
+    """Unroll a for loop into straight-line statements: per iteration, 
+    assign the loop var to its constant value, then the body with the 
+    loop var replaced by that constant"""
+    if not isinstance(stmt.target, ast.Name):
+        raise exceptions.StatementNotHandledException(stmt, "only name target supported")
+
+    it = stmt.iter
+    if (
+        isinstance(it, ast.Call)
+        and isinstance(it.func, ast.Name)
+        and it.func.id == "range"
+    ):
+        args = [ast.literal_eval(a) for a in it.args]
+        it_vals: List = list(range(*args))
+    else:
+        it_vals = flatten(__unroll_arg(it, env))
+
+    rolls: List[ast.stmt] = []
+    for i in it_vals:
+        _val = i if isinstance(i, (ast.Constant, ast.Subscript)) else ast.Constant(value=i)
+        rolls.append(ast.Assign(targets=[stmt.target], value=_val))
+        for b in stmt.body:
+            rolls.append(NameValReplacer(stmt.target.id, _val).visit(copy.deepcopy(b)))
+    return rolls
+
+
+def __unroll_stmt(stmt, env: Env) -> List[ast.stmt]:
+    """Unroll for/if statements into straight-line statements."""
+    if isinstance(stmt, ast.For):
+        return __unroll_for(stmt, env)
+    if isinstance(stmt, ast.If):
+        return __rewrite_if(stmt, env)
+    return [stmt]
+
+
+def __translate_for(stmt: ast.For, env: Env, ret_type) -> Tuple[List[Tuple[str, Boolean]], Env]:
+    exps: List[Tuple[str, Boolean]] = []
+    for s in __unroll_for(stmt, env):
         e, env = translate_statement(s, env, ret_type)
         exps.extend(e)
     return exps, env
@@ -226,6 +341,9 @@ def translate_statement(  # noqa: C901
 
     elif isinstance(stmt, ast.AugAssign):
         return __translate_augassign(stmt, env)
+
+    elif isinstance(stmt, ast.For):
+        return __translate_for(stmt, env, ret_type)
 
     elif isinstance(stmt, ast.Assign):
         return __translate_assign(stmt, env)

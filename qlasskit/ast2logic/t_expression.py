@@ -169,6 +169,10 @@ class ExpressionTranslator(ast.NodeTransformer):
                 return (etype, elem if esize > 1 else elem[0])
             raise exceptions.ExpressionNotHandledException(expr)
 
+        if isinstance(expr.value, (ast.Tuple, ast.List)):
+            # constant tuple/list literal subscript: pick the element directly
+            return self.visit(expr.value.elts[_sval.value])
+
         if isinstance(expr.value, ast.Name):
             sn = f"{expr.value.id}.{safe_str(_sval.value)}"
         else:
