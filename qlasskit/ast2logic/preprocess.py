@@ -13,9 +13,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""AST preprocessing passes, applied before translate_ast: constant folding,
+high-level type annotation replacement and multi-target assign expansion."""
 
 import ast
+import copy
 import operator
+from typing import Union
 
 
 class ConstantFolder(ast.NodeTransformer):
@@ -134,3 +138,145 @@ class ConstantFolder(ast.NodeTransformer):
         if isinstance(node.test, ast.Constant):
             return node.body if node.test.value else node.orelse
         return node
+
+
+class TypeAnnotationsReplacer(ast.NodeTransformer):
+    def visit_Subscript(self, ann: ast.Subscript):
+        if not isinstance(ann.value, ast.Name) or not hasattr(ann.slice, "elts"):
+            return ann
+
+        if ann.value.id == "Tuple":
+            _elts = ann.slice.elts
+            _ituple = ast.Tuple(elts=[self.visit(el) for el in _elts])
+
+            return ast.Subscript(
+                value=ast.Name(id="Tuple", ctx=ast.Load()),
+                slice=_ituple,
+            )
+
+        # Replace Qlist[T,n] with Tuple[(T,)*n]
+        elif ann.value.id == "Qlist":
+            _elts = ann.slice.elts
+            _ituple = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[1].value)
+
+            return ast.Subscript(
+                value=ast.Name(id="Tuple", ctx=ast.Load()),
+                slice=_ituple,
+            )
+
+        # Replace Qmatrix[T,n,m] with Tuple[(Tuple[(T,)*m],)*n]
+        elif ann.value.id == "Qmatrix":
+            _elts = ann.slice.elts
+            _ituple_row = ast.Tuple(elts=[copy.deepcopy(_elts[0])] * _elts[2].value)
+            _ituple = ast.Tuple(elts=[copy.deepcopy(_ituple_row)] * _elts[1].value)
+
+            return ast.Subscript(
+                value=ast.Name(id="Tuple", ctx=ast.Load()),
+                slice=_ituple,
+            )
+
+        return ann
+
+    def visit_Name(self, ann: ast.Name):
+        res_ann: Union[ast.Name, ast.Subscript]
+
+        # Replace QintX with Qint[X]
+        if ann.id[:4] == "Qint":
+            res_ann = ast.Subscript(
+                value=ast.Name(id="Qint", ctx=ast.Load()),
+                slice=ast.Constant(value=int(ann.id[4:])),
+            )
+
+        # Replace QfixedX with Qfixed[X]
+        elif ann.id[:6] == "Qfixed":
+            res_ann = ast.Subscript(
+                value=ast.Name(id="Qfixed", ctx=ast.Load()),
+                slice=ast.Constant(value=int(ann.id[6:])),
+            )
+
+        else:
+            res_ann = ann
+
+        return res_ann
+
+
+def _replace_types_annotations(ann, arg=None):
+    """Replaces type annotations, translating high level types"""
+    if ann is not None:
+        ann = TypeAnnotationsReplacer().visit(ann)
+
+    if arg is not None:
+        arg.annotation = ann
+        return arg
+    else:
+        return ann
+
+
+class ReplaceTypeAnn(ast.NodeTransformer):
+    def visit_AnnAssign(self, node: ast.AnnAssign):
+        node.annotation = _replace_types_annotations(node.annotation)
+        return node
+
+    def visit_FunctionDef(self, node: ast.FunctionDef):
+        node.args.args = [
+            _replace_types_annotations(x.annotation, arg=x) for x in node.args.args
+        ]
+
+        node.returns = _replace_types_annotations(node.returns)
+
+        return node
+
+
+class ReplaceMultiTargetAssign(ast.NodeTransformer):
+    def visit_Assign(self, node: ast.Assign):
+        if len(node.targets) != 1 or not hasattr(node.targets[0], "elts"):
+            return node
+
+        # Transform multi-target assign to single target assigns
+        if isinstance(node.value, ast.Name):
+            return [
+                self.visit(
+                    ast.Assign(
+                        targets=[ast.Name(id=node.targets[0].elts[i].id)],
+                        value=ast.Subscript(
+                            value=node.value, slice=ast.Constant(value=i)
+                        ),
+                    )
+                )
+                for i in range(len(node.targets[0].elts))
+            ]
+
+        _temptup = self.visit(
+            ast.Assign(targets=[ast.Name(id="_temptup")], value=node.value)
+        )
+
+        single_assigns = [
+            self.visit(
+                ast.Assign(
+                    targets=[ast.Name(id=node.targets[0].elts[i].id)],
+                    value=ast.Subscript(
+                        value=ast.Name(id="_temptup"), slice=ast.Constant(value=i)
+                    ),
+                )
+            )
+            for i in range(len(node.targets[0].elts))
+        ]
+
+        return [_temptup] + single_assigns
+
+
+def preprocess_ast(a_tree: ast.AST) -> ast.AST:
+    """Apply the preprocessing passes to the ast before translate_ast"""
+    # Fold constants
+    a_tree = ConstantFolder().visit(a_tree)
+
+    # Replace Type Annotations
+    a_tree = ReplaceTypeAnn().visit(a_tree)
+
+    # Replace multi-target assign
+    a_tree = ReplaceMultiTargetAssign().visit(a_tree)
+
+    # Fold constants again
+    a_tree = ConstantFolder().visit(a_tree)
+
+    return a_tree
