@@ -1,0 +1,172 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Binary Quadratic Model, Qubo & Ising "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Any qlassf function can be transformed to a binary quadratic model using the `to_bqm` function. In this example we create a generic function that factorize `num`, and we bind `num` with 15."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Vars: 14 \n",
+      "Interactions: 41\n"
+     ]
+    }
+   ],
+   "source": [
+    "from qlasskit import qlassf, Qint, Parameter\n",
+    "\n",
+    "\n",
+    "@qlassf\n",
+    "def test_factor_generic(num: Parameter[Qint[4]], a: Qint[3], b: Qint[3]) -> Qint[4]:\n",
+    "    return num - (a * b)\n",
+    "\n",
+    "\n",
+    "test_factor = test_factor_generic.bind(num=15)\n",
+    "bqm = test_factor.to_bqm()\n",
+    "\n",
+    "print(\"Vars:\", bqm.num_variables, \"\\nInteractions:\", bqm.num_interactions)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "A qlassf function can also be exported as a QUBO model using `to_bqm('qubo')` or as an Ising model using `to_bqm('ising')`."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\n",
+    "### Running on simulated sampler annealer"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now we can run a simulated sampler annealer to minimize this function; qlasskit offer a `decode_samples` helper function that translates sample result to the high level types of qlasskit."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{'a': 3, 'b': 5}\n"
+     ]
+    }
+   ],
+   "source": [
+    "import neal\n",
+    "from qlasskit.bqm import decode_samples\n",
+    "\n",
+    "sa = neal.SimulatedAnnealingSampler()\n",
+    "sampleset = sa.sample(bqm, num_reads=10)\n",
+    "decoded_samples = decode_samples(test_factor, sampleset)\n",
+    "best_sample = min(decoded_samples, key=lambda x: x.energy)\n",
+    "print(best_sample.sample)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The result is 5 and 3 as expected (since 5 times 3 is equal to 15)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Running on DWave annealer\n",
+    "\n",
+    "If we have a valid DWave account, we can run our problem on a real quantum annealer as follow:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "SolverFailureError",
+     "evalue": "Problem not accepted because user has insufficient remaining solver access time in project DEV.",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mSolverFailureError\u001b[0m                        Traceback (most recent call last)",
+      "Cell \u001b[0;32mIn[3], line 5\u001b[0m\n\u001b[1;32m      3\u001b[0m sampler \u001b[38;5;241m=\u001b[39m EmbeddingComposite(DWaveSampler())\n\u001b[1;32m      4\u001b[0m sampleset \u001b[38;5;241m=\u001b[39m sampler\u001b[38;5;241m.\u001b[39msample(bqm, num_reads\u001b[38;5;241m=\u001b[39m\u001b[38;5;241m10\u001b[39m)\n\u001b[0;32m----> 5\u001b[0m decoded_samples \u001b[38;5;241m=\u001b[39m \u001b[43mdecode_samples\u001b[49m\u001b[43m(\u001b[49m\u001b[43mtest_factor\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43msampleset\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m      6\u001b[0m best_sample \u001b[38;5;241m=\u001b[39m \u001b[38;5;28mmin\u001b[39m(decoded_samples, key\u001b[38;5;241m=\u001b[39m\u001b[38;5;28;01mlambda\u001b[39;00m x: x\u001b[38;5;241m.\u001b[39menergy)\n\u001b[1;32m      7\u001b[0m \u001b[38;5;28mprint\u001b[39m(best_sample\u001b[38;5;241m.\u001b[39msample)\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/qlasskit-0.1.18-py3.10.egg/qlasskit/bqm.py:142\u001b[0m, in \u001b[0;36mdecode_samples\u001b[0;34m(qf, sampleset)\u001b[0m\n\u001b[1;32m    140\u001b[0m \u001b[38;5;250m\u001b[39m\u001b[38;5;124;03m\"\"\"Get dimod sampleset and return an high level decoded solution\"\"\"\u001b[39;00m\n\u001b[1;32m    141\u001b[0m model \u001b[38;5;241m=\u001b[39m qf\u001b[38;5;241m.\u001b[39mto_bqm(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mpq_model\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n\u001b[0;32m--> 142\u001b[0m decoded \u001b[38;5;241m=\u001b[39m \u001b[43mmodel\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mdecode_sampleset\u001b[49m\u001b[43m(\u001b[49m\u001b[43msampleset\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m    144\u001b[0m new_dec \u001b[38;5;241m=\u001b[39m []\n\u001b[1;32m    145\u001b[0m \u001b[38;5;28;01mfor\u001b[39;00m el \u001b[38;5;129;01min\u001b[39;00m decoded:\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dimod/sampleset.py:1121\u001b[0m, in \u001b[0;36mSampleSet.record\u001b[0;34m(self)\u001b[0m\n\u001b[1;32m   1105\u001b[0m \u001b[38;5;129m@property\u001b[39m\n\u001b[1;32m   1106\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21mrecord\u001b[39m(\u001b[38;5;28mself\u001b[39m):\n\u001b[1;32m   1107\u001b[0m \u001b[38;5;250m    \u001b[39m\u001b[38;5;124;03m\"\"\":obj:`numpy.recarray` containing the samples, energies, number of occurences, and other sample data.\u001b[39;00m\n\u001b[1;32m   1108\u001b[0m \n\u001b[1;32m   1109\u001b[0m \u001b[38;5;124;03m    Examples:\u001b[39;00m\n\u001b[0;32m   (...)\u001b[0m\n\u001b[1;32m   1119\u001b[0m \n\u001b[1;32m   1120\u001b[0m \u001b[38;5;124;03m    \"\"\"\u001b[39;00m\n\u001b[0;32m-> 1121\u001b[0m     \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mresolve\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m   1122\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_record\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dimod/sampleset.py:1485\u001b[0m, in \u001b[0;36mSampleSet.resolve\u001b[0;34m(self)\u001b[0m\n\u001b[1;32m   1483\u001b[0m \u001b[38;5;66;03m# if it doesn't have the attribute then it is already resolved\u001b[39;00m\n\u001b[1;32m   1484\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mhasattr\u001b[39m(\u001b[38;5;28mself\u001b[39m, \u001b[38;5;124m'\u001b[39m\u001b[38;5;124m_future\u001b[39m\u001b[38;5;124m'\u001b[39m):\n\u001b[0;32m-> 1485\u001b[0m     samples \u001b[38;5;241m=\u001b[39m \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43m_result_hook\u001b[49m\u001b[43m(\u001b[49m\u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43m_future\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m   1486\u001b[0m     \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m\u001b[38;5;21m__init__\u001b[39m(samples\u001b[38;5;241m.\u001b[39mrecord, samples\u001b[38;5;241m.\u001b[39mvariables, samples\u001b[38;5;241m.\u001b[39minfo, samples\u001b[38;5;241m.\u001b[39mvartype)\n\u001b[1;32m   1487\u001b[0m     \u001b[38;5;28;01mdel\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_future\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/system/composites/embedding.py:284\u001b[0m, in \u001b[0;36mEmbeddingComposite.sample.<locals>.async_unembed\u001b[0;34m(response)\u001b[0m\n\u001b[1;32m    279\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21masync_unembed\u001b[39m(response):\n\u001b[1;32m    280\u001b[0m     \u001b[38;5;66;03m# unembed the sampleset aysnchronously.\u001b[39;00m\n\u001b[1;32m    282\u001b[0m     warninghandler\u001b[38;5;241m.\u001b[39mchain_break(response, embedding)\n\u001b[0;32m--> 284\u001b[0m     sampleset \u001b[38;5;241m=\u001b[39m \u001b[43munembed_sampleset\u001b[49m\u001b[43m(\u001b[49m\u001b[43mresponse\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43membedding\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43msource_bqm\u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[43mbqm\u001b[49m\u001b[43m,\u001b[49m\n\u001b[1;32m    285\u001b[0m \u001b[43m                                  \u001b[49m\u001b[43mchain_break_method\u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[43mchain_break_method\u001b[49m\u001b[43m,\u001b[49m\n\u001b[1;32m    286\u001b[0m \u001b[43m                                  \u001b[49m\u001b[43mchain_break_fraction\u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[43mchain_break_fraction\u001b[49m\u001b[43m,\u001b[49m\n\u001b[1;32m    287\u001b[0m \u001b[43m                                  \u001b[49m\u001b[43mreturn_embedding\u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[43mreturn_embedding\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m    289\u001b[0m     \u001b[38;5;28;01mif\u001b[39;00m return_embedding:\n\u001b[1;32m    290\u001b[0m         sampleset\u001b[38;5;241m.\u001b[39minfo[\u001b[38;5;124m'\u001b[39m\u001b[38;5;124membedding_context\u001b[39m\u001b[38;5;124m'\u001b[39m]\u001b[38;5;241m.\u001b[39mupdate(\n\u001b[1;32m    291\u001b[0m             embedding_parameters\u001b[38;5;241m=\u001b[39membedding_parameters,\n\u001b[1;32m    292\u001b[0m             chain_strength\u001b[38;5;241m=\u001b[39membedding\u001b[38;5;241m.\u001b[39mchain_strength)\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/embedding/transforms.py:606\u001b[0m, in \u001b[0;36munembed_sampleset\u001b[0;34m(target_sampleset, embedding, source_bqm, chain_break_method, chain_break_fraction, return_embedding)\u001b[0m\n\u001b[1;32m    603\u001b[0m \u001b[38;5;28;01mexcept\u001b[39;00m \u001b[38;5;167;01mKeyError\u001b[39;00m:\n\u001b[1;32m    604\u001b[0m     \u001b[38;5;28;01mraise\u001b[39;00m \u001b[38;5;167;01mValueError\u001b[39;00m(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mgiven bqm does not match the embedding\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n\u001b[0;32m--> 606\u001b[0m record \u001b[38;5;241m=\u001b[39m \u001b[43mtarget_sampleset\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mrecord\u001b[49m\n\u001b[1;32m    608\u001b[0m unembedded, idxs \u001b[38;5;241m=\u001b[39m chain_break_method(target_sampleset, chains)\n\u001b[1;32m    610\u001b[0m reserved \u001b[38;5;241m=\u001b[39m {\u001b[38;5;124m'\u001b[39m\u001b[38;5;124msample\u001b[39m\u001b[38;5;124m'\u001b[39m, \u001b[38;5;124m'\u001b[39m\u001b[38;5;124menergy\u001b[39m\u001b[38;5;124m'\u001b[39m}\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dimod/sampleset.py:1121\u001b[0m, in \u001b[0;36mSampleSet.record\u001b[0;34m(self)\u001b[0m\n\u001b[1;32m   1105\u001b[0m \u001b[38;5;129m@property\u001b[39m\n\u001b[1;32m   1106\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21mrecord\u001b[39m(\u001b[38;5;28mself\u001b[39m):\n\u001b[1;32m   1107\u001b[0m \u001b[38;5;250m    \u001b[39m\u001b[38;5;124;03m\"\"\":obj:`numpy.recarray` containing the samples, energies, number of occurences, and other sample data.\u001b[39;00m\n\u001b[1;32m   1108\u001b[0m \n\u001b[1;32m   1109\u001b[0m \u001b[38;5;124;03m    Examples:\u001b[39;00m\n\u001b[0;32m   (...)\u001b[0m\n\u001b[1;32m   1119\u001b[0m \n\u001b[1;32m   1120\u001b[0m \u001b[38;5;124;03m    \"\"\"\u001b[39;00m\n\u001b[0;32m-> 1121\u001b[0m     \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mresolve\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m   1122\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_record\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dimod/sampleset.py:1485\u001b[0m, in \u001b[0;36mSampleSet.resolve\u001b[0;34m(self)\u001b[0m\n\u001b[1;32m   1483\u001b[0m \u001b[38;5;66;03m# if it doesn't have the attribute then it is already resolved\u001b[39;00m\n\u001b[1;32m   1484\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mhasattr\u001b[39m(\u001b[38;5;28mself\u001b[39m, \u001b[38;5;124m'\u001b[39m\u001b[38;5;124m_future\u001b[39m\u001b[38;5;124m'\u001b[39m):\n\u001b[0;32m-> 1485\u001b[0m     samples \u001b[38;5;241m=\u001b[39m \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43m_result_hook\u001b[49m\u001b[43m(\u001b[49m\u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43m_future\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m   1486\u001b[0m     \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m\u001b[38;5;21m__init__\u001b[39m(samples\u001b[38;5;241m.\u001b[39mrecord, samples\u001b[38;5;241m.\u001b[39mvariables, samples\u001b[38;5;241m.\u001b[39minfo, samples\u001b[38;5;241m.\u001b[39mvartype)\n\u001b[1;32m   1487\u001b[0m     \u001b[38;5;28;01mdel\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_future\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/system/samplers/dwave_sampler.py:452\u001b[0m, in \u001b[0;36mDWaveSampler.sample.<locals>._hook\u001b[0;34m(computation)\u001b[0m\n\u001b[1;32m    450\u001b[0m \u001b[38;5;28;01mexcept\u001b[39;00m (SolverError, InvalidAPIResponseError) \u001b[38;5;28;01mas\u001b[39;00m exc:\n\u001b[1;32m    451\u001b[0m     \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mfailover:\n\u001b[0;32m--> 452\u001b[0m         \u001b[38;5;28;01mraise\u001b[39;00m exc\n\u001b[1;32m    453\u001b[0m     \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28misinstance\u001b[39m(exc, SolverAuthenticationError):\n\u001b[1;32m    454\u001b[0m         \u001b[38;5;28;01mraise\u001b[39;00m exc\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/system/samplers/dwave_sampler.py:439\u001b[0m, in \u001b[0;36mDWaveSampler.sample.<locals>._hook\u001b[0;34m(computation)\u001b[0m\n\u001b[1;32m    436\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m sampleset\n\u001b[1;32m    438\u001b[0m \u001b[38;5;28;01mtry\u001b[39;00m:\n\u001b[0;32m--> 439\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mresolve\u001b[49m\u001b[43m(\u001b[49m\u001b[43mcomputation\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m    441\u001b[0m \u001b[38;5;28;01mexcept\u001b[39;00m (ProblemUploadError, RequestTimeout, PollingTimeout) \u001b[38;5;28;01mas\u001b[39;00m exc:\n\u001b[1;32m    442\u001b[0m     \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mfailover:\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/system/samplers/dwave_sampler.py:429\u001b[0m, in \u001b[0;36mDWaveSampler.sample.<locals>._hook.<locals>.resolve\u001b[0;34m(computation)\u001b[0m\n\u001b[1;32m    427\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21mresolve\u001b[39m(computation):\n\u001b[1;32m    428\u001b[0m     sampleset \u001b[38;5;241m=\u001b[39m computation\u001b[38;5;241m.\u001b[39msampleset\n\u001b[0;32m--> 429\u001b[0m     \u001b[43msampleset\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mresolve\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m    431\u001b[0m     \u001b[38;5;28;01mif\u001b[39;00m warninghandler \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[1;32m    432\u001b[0m         warninghandler\u001b[38;5;241m.\u001b[39mtoo_few_samples(sampleset)\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dimod/sampleset.py:1485\u001b[0m, in \u001b[0;36mSampleSet.resolve\u001b[0;34m(self)\u001b[0m\n\u001b[1;32m   1483\u001b[0m \u001b[38;5;66;03m# if it doesn't have the attribute then it is already resolved\u001b[39;00m\n\u001b[1;32m   1484\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mhasattr\u001b[39m(\u001b[38;5;28mself\u001b[39m, \u001b[38;5;124m'\u001b[39m\u001b[38;5;124m_future\u001b[39m\u001b[38;5;124m'\u001b[39m):\n\u001b[0;32m-> 1485\u001b[0m     samples \u001b[38;5;241m=\u001b[39m \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43m_result_hook\u001b[49m\u001b[43m(\u001b[49m\u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43m_future\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m   1486\u001b[0m     \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m\u001b[38;5;21m__init__\u001b[39m(samples\u001b[38;5;241m.\u001b[39mrecord, samples\u001b[38;5;241m.\u001b[39mvariables, samples\u001b[38;5;241m.\u001b[39minfo, samples\u001b[38;5;241m.\u001b[39mvartype)\n\u001b[1;32m   1487\u001b[0m     \u001b[38;5;28;01mdel\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_future\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/cloud/computation.py:823\u001b[0m, in \u001b[0;36mFuture.sampleset.<locals>.<lambda>\u001b[0;34m(f)\u001b[0m\n\u001b[1;32m    818\u001b[0m \u001b[38;5;28;01mexcept\u001b[39;00m \u001b[38;5;167;01mImportError\u001b[39;00m:\n\u001b[1;32m    819\u001b[0m     \u001b[38;5;28;01mraise\u001b[39;00m \u001b[38;5;167;01mRuntimeError\u001b[39;00m(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mCan\u001b[39m\u001b[38;5;124m'\u001b[39m\u001b[38;5;124mt construct SampleSet without dimod. \u001b[39m\u001b[38;5;124m\"\u001b[39m\n\u001b[1;32m    820\u001b[0m                        \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mRe-install the library with \u001b[39m\u001b[38;5;124m'\u001b[39m\u001b[38;5;124mbqm\u001b[39m\u001b[38;5;124m'\u001b[39m\u001b[38;5;124m support.\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n\u001b[1;32m    822\u001b[0m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_sampleset \u001b[38;5;241m=\u001b[39m sampleset \u001b[38;5;241m=\u001b[39m dimod\u001b[38;5;241m.\u001b[39mSampleSet\u001b[38;5;241m.\u001b[39mfrom_future(\n\u001b[0;32m--> 823\u001b[0m     \u001b[38;5;28mself\u001b[39m, \u001b[38;5;28;01mlambda\u001b[39;00m f: \u001b[43mf\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mwait_sampleset\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m)\n\u001b[1;32m    825\u001b[0m \u001b[38;5;66;03m# propagate id to sampleset as well\u001b[39;00m\n\u001b[1;32m    826\u001b[0m \u001b[38;5;66;03m# note: this requires dimod>=0.8.21 (before that version SampleSet\u001b[39;00m\n\u001b[1;32m    827\u001b[0m \u001b[38;5;66;03m# had slots set which prevented dynamic addition of attributes).\u001b[39;00m\n\u001b[1;32m    828\u001b[0m sampleset\u001b[38;5;241m.\u001b[39mwait_id \u001b[38;5;241m=\u001b[39m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mwait_id\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/cloud/computation.py:755\u001b[0m, in \u001b[0;36mFuture.wait_sampleset\u001b[0;34m(self)\u001b[0m\n\u001b[1;32m    752\u001b[0m \u001b[38;5;250m\u001b[39m\u001b[38;5;124;03m\"\"\"Blocking sampleset getter.\"\"\"\u001b[39;00m\n\u001b[1;32m    754\u001b[0m \u001b[38;5;66;03m# blocking result get\u001b[39;00m\n\u001b[0;32m--> 755\u001b[0m result \u001b[38;5;241m=\u001b[39m \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43m_load_result\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m    757\u001b[0m \u001b[38;5;66;03m# common problem info: id/label\u001b[39;00m\n\u001b[1;32m    758\u001b[0m problem_info \u001b[38;5;241m=\u001b[39m \u001b[38;5;28mdict\u001b[39m(problem_id\u001b[38;5;241m=\u001b[39m\u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mid)\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/cloud/computation.py:893\u001b[0m, in \u001b[0;36mFuture._load_result\u001b[0;34m(self)\u001b[0m\n\u001b[1;32m    891\u001b[0m \u001b[38;5;66;03m# Check for other error conditions\u001b[39;00m\n\u001b[1;32m    892\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_exception \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[0;32m--> 893\u001b[0m     \u001b[38;5;28;01mraise\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_exception\n\u001b[1;32m    895\u001b[0m \u001b[38;5;66;03m# If someone else took care of this while we were waiting\u001b[39;00m\n\u001b[1;32m    896\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_result \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n",
+      "File \u001b[0;32m~/.pyenv/versions/3.10.13/envs/qlasskit_310-env/lib/python3.10/site-packages/dwave/cloud/client/base.py:1309\u001b[0m, in \u001b[0;36mClient._handle_problem_status\u001b[0;34m(self, message, future)\u001b[0m\n\u001b[1;32m   1307\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;124m'\u001b[39m\u001b[38;5;124merror_code\u001b[39m\u001b[38;5;124m'\u001b[39m \u001b[38;5;129;01min\u001b[39;00m message \u001b[38;5;129;01mand\u001b[39;00m \u001b[38;5;124m'\u001b[39m\u001b[38;5;124merror_msg\u001b[39m\u001b[38;5;124m'\u001b[39m \u001b[38;5;129;01min\u001b[39;00m message:\n\u001b[1;32m   1308\u001b[0m     logger\u001b[38;5;241m.\u001b[39mdebug(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mError response received: \u001b[39m\u001b[38;5;132;01m%r\u001b[39;00m\u001b[38;5;124m\"\u001b[39m, message)\n\u001b[0;32m-> 1309\u001b[0m     \u001b[38;5;28;01mraise\u001b[39;00m SolverFailureError(message[\u001b[38;5;124m'\u001b[39m\u001b[38;5;124merror_msg\u001b[39m\u001b[38;5;124m'\u001b[39m])\n\u001b[1;32m   1311\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;124m'\u001b[39m\u001b[38;5;124mstatus\u001b[39m\u001b[38;5;124m'\u001b[39m \u001b[38;5;129;01mnot\u001b[39;00m \u001b[38;5;129;01min\u001b[39;00m message:\n\u001b[1;32m   1312\u001b[0m     \u001b[38;5;28;01mraise\u001b[39;00m InvalidAPIResponseError(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124m'\u001b[39m\u001b[38;5;124mstatus\u001b[39m\u001b[38;5;124m'\u001b[39m\u001b[38;5;124m missing in problem description response\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n",
+      "\u001b[0;31mSolverFailureError\u001b[0m: Problem not accepted because user has insufficient remaining solver access time in project DEV."
+     ]
+    }
+   ],
+   "source": [
+    "from dwave.system import DWaveSampler, EmbeddingComposite\n",
+    "\n",
+    "sampler = EmbeddingComposite(DWaveSampler())\n",
+    "sampleset = sampler.sample(bqm, num_reads=10)\n",
+    "decoded_samples = decode_samples(test_factor, sampleset)\n",
+    "best_sample = min(decoded_samples, key=lambda x: x.energy)\n",
+    "print(best_sample.sample)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "qlasskit_310-env",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
