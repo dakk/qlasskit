@@ -13,7 +13,7 @@ authors = [
     {name = "Davide Gessa", email = "gessadavide@gmail.com"},
 ]
 dependencies = [
-    "sympy==1.12",
+    "sympy==1.14.0",
 ]
 classifiers = [
     "Programming Language :: Python",
