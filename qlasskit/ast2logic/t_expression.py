@@ -59,6 +59,17 @@ class ExpressionTranslator(ast.NodeTransformer):
             "max": self.__call_minmax,
         }
 
+        self.__binop_dispatch = {
+            ast.Add: "add",
+            ast.Sub: "sub",
+            ast.Mult: "mul",
+            ast.Mod: "mod",
+            ast.FloorDiv: "floor_div",
+            ast.BitXor: "bitwise_xor",
+            ast.BitAnd: "bitwise_and",
+            ast.BitOr: "bitwise_or",
+        }
+
     # Name reference
     def visit_Name(self, expr: ast.Name):
         # __ prefix is reserved for internal use
@@ -392,8 +403,7 @@ class ExpressionTranslator(ast.NodeTransformer):
 
     # Binop
     def visit_BinOp(self, expr: ast.BinOp):  # noqa: C901
-        # Sub | Mult | MatMult | Div | Mod | Pow | FloorDiv
-        # print(ast.dump(expr))
+        # Sub | Mult | MatMult | Div | Mod | Pow | FloorDiv | Xor | And | Or
         tleft = self.visit(expr.left)
         tright = self.visit(expr.right)
 
@@ -405,11 +415,7 @@ class ExpressionTranslator(ast.NodeTransformer):
             elif isinstance(expr.op, ast.BitOr):
                 return bool, Or(tleft[1], tright[1])
 
-        if isinstance(expr.op, ast.Add) and hasattr(tleft[0], "add"):
-            return tleft[0].add(tleft, tright)
-        elif isinstance(expr.op, ast.Sub) and hasattr(tleft[0], "sub"):
-            return tleft[0].sub(tleft, tright)
-        elif isinstance(expr.op, ast.Pow) and hasattr(tleft[0], "mul"):
+        if isinstance(expr.op, ast.Pow) and hasattr(tleft[0], "mul"):
             # Transform pow to multiplications
             if not isinstance(expr.right, ast.Constant) and not isinstance(
                 expr.right.value, int  # type: ignore
@@ -426,19 +432,6 @@ class ExpressionTranslator(ast.NodeTransformer):
                 return const_to_qtype(1)
             else:
                 raise exceptions.ExpressionNotHandledException(expr.right)
-
-        elif isinstance(expr.op, ast.Mult) and hasattr(tleft[0], "mul"):
-            return tleft[0].mul(tleft, tright)
-        elif isinstance(expr.op, ast.Mod):
-            return tleft[0].mod(tleft, tright)  # type: ignore
-        elif isinstance(expr.op, ast.FloorDiv) and hasattr(tleft[0], "floor_div"):
-            return tleft[0].floor_div(tleft, tright)
-        elif isinstance(expr.op, ast.BitXor) and hasattr(tleft[0], "bitwise_xor"):
-            return tleft[0].bitwise_xor(tleft, tright)
-        elif isinstance(expr.op, ast.BitAnd) and hasattr(tleft[0], "bitwise_and"):
-            return tright[0].bitwise_and(tleft, tright)  # type: ignore
-        elif isinstance(expr.op, ast.BitOr) and hasattr(tleft[0], "bitwise_or"):
-            return tleft[0].bitwise_or(tleft, tright)
         elif (
             isinstance(expr.op, ast.LShift)
             and hasattr(tleft[0], "shift_left")
@@ -452,7 +445,12 @@ class ExpressionTranslator(ast.NodeTransformer):
         ):
             return tleft[0].shift_right(tleft, expr.right.value)  # type: ignore
         else:
-            raise exceptions.ExpressionNotHandledException(expr)
+            mt = self.__binop_dispatch.get(type(expr.op))
+
+            if mt is not None and hasattr(tleft[0], mt):
+                return getattr(tleft[0], mt)(tleft, tright)
+            else:
+                raise exceptions.ExpressionNotHandledException(expr)
 
     def __unroll_arg(self, arg) -> List:
         """Translate a call argument to a list of TExp (tuple/list literal,
