@@ -23,6 +23,8 @@ from typing import Union
 
 
 class ConstantFolder(ast.NodeTransformer):
+    """Folds expression with constants to the result"""
+
     def __init__(self):
         self.builtin_funcs = {
             "abs": abs,

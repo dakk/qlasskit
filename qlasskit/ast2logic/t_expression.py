@@ -482,7 +482,7 @@ class ExpressionTranslator(ast.NodeTransformer):
         ):
             t = self.env[arg.value.id].ttype
             if not hasattr(t, "BIT_SIZE") and get_args(t):
-                inner = get_args(t)[arg.slice.value]
+                inner = get_args(t)[arg.slice.value]  # type: ignore
                 n = (
                     len(get_args(inner))
                     if get_args(inner)
@@ -500,9 +500,7 @@ class ExpressionTranslator(ast.NodeTransformer):
 
     def __call_range(self, node: ast.Call):
         args = [ast.literal_eval(a) for a in node.args]
-        return self.visit(
-            ast.Tuple(elts=[ast.Constant(value=i) for i in range(*args)])
-        )
+        return self.visit(ast.Tuple(elts=[ast.Constant(value=i) for i in range(*args)]))
 
     def __call_len(self, node: ast.Call):
         if len(node.args) != 1:
@@ -522,8 +520,11 @@ class ExpressionTranslator(ast.NodeTransformer):
 
     def __call_anyall(self, node: ast.Call):
         if len(node.args) != 1:
-            raise Exception(f"{node.func.id}() takes exactly 1 argument ({len(node.args)} given)")
-        op = Or if node.func.id == "any" else And
+            raise Exception(
+                f"{node.func.id}() takes exactly 1 "  # type: ignore
+                + f"argument ({len(node.args)} given)"
+            )
+        op = Or if node.func.id == "any" else And  # type: ignore
         return (bool, op(*[a[1] for a in self.__unroll_arg(node.args[0])]))
 
     def __call_ord(self, node: ast.Call):
@@ -541,7 +542,7 @@ class ExpressionTranslator(ast.NodeTransformer):
             args = self.__unroll_arg(node.args[0])
         else:
             args = [self.visit(a) for a in node.args]
-        cmp = "gt" if node.func.id == "max" else "lte"
+        cmp = "gt" if node.func.id == "max" else "lte"  # type: ignore
 
         def rec(lst):
             if len(lst) == 1:

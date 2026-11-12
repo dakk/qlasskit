@@ -31,7 +31,15 @@ from typing import (
 
 from sympy import Symbol
 
-from .ast2logic import Arg, Args, BoolExpList, LogicFun, flatten, preprocess_ast, translate_ast
+from .ast2logic import (
+    Arg,
+    Args,
+    BoolExpList,
+    LogicFun,
+    flatten,
+    preprocess_ast,
+    translate_ast,
+)
 from .boolopt import BoolOptimizerProfile, defaultOptimizer
 from .boolopt.bool_optimizer import merge_expressions
 from .boolquant import Q  # noqa: F403, F401

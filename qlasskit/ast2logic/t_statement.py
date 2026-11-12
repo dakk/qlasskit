@@ -296,7 +296,7 @@ def __unroll_for(stmt: ast.For, env: Env) -> List[ast.stmt]:
                     if b is True or str(b) == "True":
                         val |= 1 << i
                 args.append(val)
-        it_vals: List = list(range(*args))
+        it_vals: List = list(range(*args))  # type: ignore
     else:
         it_vals = flatten(__unroll_arg(it, env))
 
