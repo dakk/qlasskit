@@ -31,6 +31,15 @@ from . import Compiler, CompilerException, ExpQMap
 class InternalCompiler(Compiler):
     """InternalCompiler translating an expression list to quantum circuit"""
 
+    __expr_dispatch = {
+        Symbol: "compile_symbol",
+        Xor: "compile_xor",
+        Not: "compile_not",
+        And: "compile_and",
+        Or: "compile_or",
+        QuantumBooleanGate: "compile_quantum_gate",
+    }
+
     def compile(  # noqa: C901
         self,
         name: str,
@@ -74,7 +83,7 @@ class InternalCompiler(Compiler):
 
         return qc
 
-    def compile_expr(  # noqa: C901
+    def compile_expr(
         self,
         qc: QCircuitEnhanced,
         expr: Boolean,
@@ -82,7 +91,6 @@ class InternalCompiler(Compiler):
         sym: Symbol = None,
     ) -> int:
         """Compile a boolean expression, return the result qubit"""
-
         # 1. If we have a constant expression, create if needed and return a constant qubit
         if isinstance(expr, BooleanFalse):
             if "FALSE" not in qc:
@@ -94,10 +102,6 @@ class InternalCompiler(Compiler):
                 qc.x(qc["TRUE"])
             return qc["TRUE"]
 
-        # 2. If expr is a symbol
-        elif isinstance(expr, Symbol):
-            return self.compile_symbol(qc, expr, dest, sym)
-
         # 3. If expr is already been computed, return its index
         elif expr in self.expqmap:
             return self.expqmap[expr]
@@ -107,33 +111,18 @@ class InternalCompiler(Compiler):
 
         # (a & b) ^ (a ^ b) & c => MCX(a,b,new), MCX(b,c,new)
 
-        # End of speccial mappings section
-
-        # 5. If expr is a XOR,
-        elif isinstance(expr, Xor):
-            return self.compile_xor(qc, expr, dest)
-
-        # 6. If expr is a Not,
-        elif isinstance(expr, Not):
-            return self.compile_not(qc, expr, dest, sym)
-
-        # 7a. If expr is an And
-        elif isinstance(expr, And):
-            return self.compile_and(qc, expr, dest)
-
-        # 7b. If expr is an Or
-        elif isinstance(expr, Or):
-            return self.compile_or(qc, expr, dest)
-
-        # 8. If expr is a Hybrid Quantum-Boolean gate
-        elif isinstance(expr, QuantumBooleanGate):
-            return self.compile_quantum_gate(qc, expr, dest)
-
-        # 9. Other type of expressions are not allowed
         else:
+            # 5. Dispatch on the expression class
+            for cls, m in self.__expr_dispatch.items():
+                if isinstance(expr, cls):
+                    return getattr(self, m)(qc, expr, dest, sym)  # type: ignore
+
+            # 6. Other type of expressions are not allowed
             raise CompilerException(expr)
 
-    def compile_quantum_gate(self, qc, expr, dest: Optional[int] = None) -> int:
+    def compile_quantum_gate(
+        self, qc, expr, dest: Optional[int] = None, sym=None
+    ) -> int:
         # 1. Compile every argument
         erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))  # type: ignore
         gate = expr.__class__.__name__.lower()
@@ -149,7 +138,7 @@ class InternalCompiler(Compiler):
 
         raise Exception(f"Unknown gate: {gate}")
 
-    def compile_and(self, qc, expr, dest: Optional[int] = None) -> int:
+    def compile_and(self, qc, expr, dest: Optional[int] = None, sym=None) -> int:
         # 1. Compile every argument
         erets = list(map(lambda e: self.compile_expr(qc, e), expr.args))
 
@@ -171,7 +160,7 @@ class InternalCompiler(Compiler):
 
         return dest
 
-    def compile_or(self, qc, expr, dest: Optional[int] = None) -> int:
+    def compile_or(self, qc, expr, dest: Optional[int] = None, sym=None) -> int:
         # TODO: this won't work on len(expr.args) > 2
 
         # 1. Compile every argument
@@ -232,7 +221,7 @@ class InternalCompiler(Compiler):
             return dest
 
     def compile_xor(
-        self, qc: QCircuitEnhanced, expr, dest: Optional[int] = None
+        self, qc: QCircuitEnhanced, expr, dest: Optional[int] = None, sym=None
     ) -> int:
         # 1. Get the destination qubit
         d = dest if dest is not None else qc.get_free_ancilla()

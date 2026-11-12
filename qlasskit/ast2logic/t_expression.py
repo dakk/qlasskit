@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import ast
+import copy
 from typing import List, Tuple, cast, get_args
 
 from sympy import Symbol
@@ -46,11 +47,101 @@ def decompose_to_symbols(vlist, base, res: List = []) -> List[Symbol]:
 class ExpressionTranslator(ast.NodeTransformer):
     def __init__(self, env: Env):
         self.env = env
+        self.__call_dispatch = {
+            "range": self.__call_range,
+            "len": self.__call_len,
+            "sum": self.__call_sum,
+            "ord": self.__call_ord,
+            "chr": self.__call_chr,
+            "any": self.__call_anyall,
+            "all": self.__call_anyall,
+            "min": self.__call_minmax,
+            "max": self.__call_minmax,
+        }
+
+        self.__binop_dispatch = {
+            ast.Add: "add",
+            ast.Sub: "sub",
+            ast.Mult: "mul",
+            ast.Mod: "mod",
+            ast.FloorDiv: "floor_div",
+            ast.BitXor: "bitwise_xor",
+            ast.BitAnd: "bitwise_and",
+            ast.BitOr: "bitwise_or",
+        }
 
     # Name reference
     def visit_Name(self, expr: ast.Name):
+        # __ prefix is reserved for internal use
+        if expr.id.startswith("__") and expr.id not in self.env:
+            raise Exception("invalid name starting with __")
+
         binding = self.env[expr.id]
         return (binding.ttype, binding.to_exp())
+
+    @staticmethod
+    def __py_to_ast(v) -> ast.expr:
+        if isinstance(v, (list, tuple)):
+            return ast.List(elts=[ExpressionTranslator.__py_to_ast(x) for x in v])
+        return ast.Constant(value=v)
+
+    def __const_chain(self, node, slices) -> ast.expr:
+        """Build an IfExp chain over a constant: for slices (innermost
+        first), constant slices navigate the value, the first dynamic slice
+        becomes an IfExp(i == k, elem_k, ...) chain"""
+        if not slices:
+            return self.__py_to_ast(node)
+        s, rest = slices[0], slices[1:]
+        if isinstance(s, ast.Constant):
+            return self.__const_chain(node[s.value], rest)
+        n = len(node)
+        chain = self.__const_chain(node[n - 1], rest)
+        for k in reversed(range(n - 1)):
+            chain = ast.IfExp(
+                test=ast.Compare(
+                    left=copy.deepcopy(s),
+                    ops=[ast.Eq()],
+                    comparators=[ast.Constant(value=k)],
+                ),
+                body=self.__const_chain(node[k], rest),
+                orelse=chain,
+            )
+        return chain
+
+    @staticmethod
+    def __first_dim(ttype) -> int:
+        """First dimension of a type: BIT_SIZE for Qint-like, len(args) for Tuple"""
+        if hasattr(ttype, "BIT_SIZE"):
+            return ttype.BIT_SIZE  # type: ignore
+        args = get_args(ttype)
+        return len(args) if args else 1
+
+    def __dyn_subscript_chain(self, expr: ast.Subscript) -> ast.IfExp:
+        """L[0] if i==0 else L[1] if i==1 ... else L[max] for a var idx (L[max] fallthrough)"""
+        if isinstance(expr.value, ast.Name):
+            vt = self.env[expr.value.id].ttype
+        else:
+            # nested subscript (m[i][j]): type of the subscripted value (the row)
+            vt = self.visit(expr.value)[0]
+        n = self.__first_dim(vt)
+
+        def access(k) -> ast.Subscript:
+            return ast.Subscript(
+                value=expr.value, slice=ast.Constant(value=k), ctx=ast.Load()
+            )
+
+        chain: ast.IfExp | ast.Subscript = access(n - 1)
+        for k in reversed(range(n - 1)):
+            chain = ast.IfExp(
+                test=ast.Compare(
+                    left=copy.deepcopy(expr.slice),
+                    ops=[ast.Eq()],
+                    comparators=[ast.Constant(value=k)],
+                ),
+                body=access(k),
+                orelse=chain,
+            )
+        return chain  # type: ignore
 
     # Subscript: a[0][1]
     def visit_Subscript(self, expr: ast.Subscript):  # noqa: C901
@@ -73,8 +164,44 @@ class ExpressionTranslator(ast.NodeTransformer):
 
         _sval = expr.slice  # type: ignore
 
+        # if the base of the subscript chain is a constant, unroll
+        base = expr.value
+        slices = []
+        while isinstance(base, ast.Subscript):
+            slices.append(base.slice)
+            base = base.value
+        slices.append(expr.slice)
+        slices.reverse()  # innermost first
+        if isinstance(base, ast.Name) and self.env.has_constant(base.id):
+            return self.visit(
+                self.__const_chain(self.env.get_constant(base.id), slices)
+            )
+
         if not isinstance(_sval, ast.Constant):
+            # variable index: build L[0] if i==0 else L[1] if ... else L[max] as an IfExp
+            # chain, sized from the base type's first dimension, then translate it
+            return self.visit(self.__dyn_subscript_chain(expr))
+
+        if isinstance(expr.value, ast.Subscript) and not isinstance(
+            expr.value.slice, ast.Constant
+        ):
+            # constant outer slice over a dynamic inner subscript (t[i][0]):
+            # translate the inner subscript first, then index into the result
+            vt, vexp = self.visit(expr.value)
+            if isinstance(vexp, list):
+                args = get_args(vt)
+                if args and _sval.value < len(args):  # type: ignore
+                    etype = args[_sval.value]  # type: ignore
+                else:
+                    etype = bool
+                esize = etype.BIT_SIZE if hasattr(etype, "BIT_SIZE") else 1
+                elem = vexp[_sval.value * esize : (_sval.value + 1) * esize]  # type: ignore
+                return (etype, elem if esize > 1 else elem[0])
             raise exceptions.ExpressionNotHandledException(expr)
+
+        if isinstance(expr.value, (ast.Tuple, ast.List)):
+            # constant tuple/list literal subscript: pick the element directly
+            return self.visit(expr.value.elts[_sval.value])  # type: ignore
 
         if isinstance(expr.value, ast.Name):
             sn = f"{expr.value.id}.{safe_str(_sval.value)}"
@@ -106,8 +233,14 @@ class ExpressionTranslator(ast.NodeTransformer):
                 inner_type,
                 [Symbol(f"{sn}.{i}") for i in range(inner_type.BIT_SIZE)],
             )
+        elif inner_type == bool:
+            return (bool, Symbol(sn))
         else:
-            return (inner_type, Symbol(sn))
+            # tuple element: collect its bits from the base binding's bitvec
+            bits = [
+                b for b in self.env[sn.split(".")[0]].bitvec if b.startswith(sn + ".")
+            ]
+            return (inner_type, [Symbol(b) for b in bits])
 
     # Boolop: and, or
     def visit_BoolOp(self, expr: ast.BoolOp):
@@ -199,6 +332,11 @@ class ExpressionTranslator(ast.NodeTransformer):
 
         return (Tuple[tuple(tlts)], elts)  # type: ignore
 
+    # List
+    def visit_List(self, node: ast.List):
+        """Converts List to Tuple"""
+        return self.visit_Tuple(ast.Tuple(elts=node.elts, ctx=node.ctx))
+
     # Compare operator
     def visit_Compare(self, expr: ast.Compare):  # noqa: C901
         if len(expr.ops) != 1 or len(expr.comparators) != 1:
@@ -265,8 +403,7 @@ class ExpressionTranslator(ast.NodeTransformer):
 
     # Binop
     def visit_BinOp(self, expr: ast.BinOp):  # noqa: C901
-        # Sub | Mult | MatMult | Div | Mod | Pow | FloorDiv
-        # print(ast.dump(expr))
+        # Sub | Mult | MatMult | Div | Mod | Pow | FloorDiv | Xor | And | Or
         tleft = self.visit(expr.left)
         tright = self.visit(expr.right)
 
@@ -278,22 +415,23 @@ class ExpressionTranslator(ast.NodeTransformer):
             elif isinstance(expr.op, ast.BitOr):
                 return bool, Or(tleft[1], tright[1])
 
-        if isinstance(expr.op, ast.Add) and hasattr(tleft[0], "add"):
-            return tleft[0].add(tleft, tright)
-        elif isinstance(expr.op, ast.Sub) and hasattr(tleft[0], "sub"):
-            return tleft[0].sub(tleft, tright)
-        elif isinstance(expr.op, ast.Mult) and hasattr(tleft[0], "mul"):
-            return tleft[0].mul(tleft, tright)
-        elif isinstance(expr.op, ast.Mod):
-            return tleft[0].mod(tleft, tright)  # type: ignore
-        elif isinstance(expr.op, ast.FloorDiv) and hasattr(tleft[0], "floor_div"):
-            return tleft[0].floor_div(tleft, tright)
-        elif isinstance(expr.op, ast.BitXor) and hasattr(tleft[0], "bitwise_xor"):
-            return tleft[0].bitwise_xor(tleft, tright)
-        elif isinstance(expr.op, ast.BitAnd) and hasattr(tleft[0], "bitwise_and"):
-            return tright[0].bitwise_and(tleft, tright)  # type: ignore
-        elif isinstance(expr.op, ast.BitOr) and hasattr(tleft[0], "bitwise_or"):
-            return tleft[0].bitwise_or(tleft, tright)
+        if isinstance(expr.op, ast.Pow) and hasattr(tleft[0], "mul"):
+            # Transform pow to multiplications
+            if not isinstance(expr.right, ast.Constant) and not isinstance(
+                expr.right.value, int  # type: ignore
+            ):
+                raise exceptions.ExpressionNotHandledException(expr.right)
+
+            if expr.right.value > 0:  # type: ignore
+                result = tleft
+                for _ in range(expr.right.value - 1):  # type: ignore
+                    result = result[0].mul(result, tleft)
+
+                return result
+            elif expr.right.value == 0:  # type: ignore
+                return const_to_qtype(1)
+            else:
+                raise exceptions.ExpressionNotHandledException(expr.right)
         elif (
             isinstance(expr.op, ast.LShift)
             and hasattr(tleft[0], "shift_left")
@@ -307,7 +445,118 @@ class ExpressionTranslator(ast.NodeTransformer):
         ):
             return tleft[0].shift_right(tleft, expr.right.value)  # type: ignore
         else:
-            raise exceptions.ExpressionNotHandledException(expr)
+            mt = self.__binop_dispatch.get(type(expr.op))
+
+            if mt is not None and hasattr(tleft[0], mt):
+                return getattr(tleft[0], mt)(tleft, tright)
+            else:
+                raise exceptions.ExpressionNotHandledException(expr)
+
+    def __unroll_arg(self, arg) -> List:
+        """Translate a call argument to a list of TExp (tuple/list literal,
+        constant, tuple-typed name or tuple subscript)"""
+        if isinstance(arg, (ast.Tuple, ast.List)):
+            return [self.visit(el) for el in arg.elts]
+        if isinstance(arg, ast.Name) and arg.id in self.env:
+            if self.env.has_constant(arg.id):
+                v = self.env.get_constant(arg.id)
+                vals = list(v) if isinstance(v, (list, tuple)) else [v]
+                return [self.visit(self.__py_to_ast(x)) for x in vals]
+            t = self.env[arg.id].ttype
+            if not hasattr(t, "BIT_SIZE") and get_args(t):
+                return [
+                    self.visit(
+                        ast.Subscript(
+                            value=arg, slice=ast.Constant(value=i), ctx=ast.Load()
+                        )
+                    )
+                    for i in range(len(get_args(t)))
+                ]
+        if (
+            isinstance(arg, ast.Subscript)
+            and isinstance(arg.value, ast.Name)
+            and isinstance(arg.slice, ast.Constant)
+            and arg.value.id in self.env
+        ):
+            t = self.env[arg.value.id].ttype
+            if not hasattr(t, "BIT_SIZE") and get_args(t):
+                inner = get_args(t)[arg.slice.value]  # type: ignore
+                n = (
+                    len(get_args(inner))
+                    if get_args(inner)
+                    else getattr(inner, "BIT_SIZE", 1)
+                )
+                return [
+                    self.visit(
+                        ast.Subscript(
+                            value=arg, slice=ast.Constant(value=i), ctx=ast.Load()
+                        )
+                    )
+                    for i in range(n)
+                ]
+        return [self.visit(arg)]
+
+    def __call_range(self, node: ast.Call):
+        args = [ast.literal_eval(a) for a in node.args]
+        return self.visit(ast.Tuple(elts=[ast.Constant(value=i) for i in range(*args)]))
+
+    def __call_len(self, node: ast.Call):
+        if len(node.args) != 1:
+            raise Exception(f"len() takes exactly 1 argument ({len(node.args)} given)")
+        return const_to_qtype(len(self.__unroll_arg(node.args[0])))
+
+    def __call_sum(self, node: ast.Call):
+        if len(node.args) != 1:
+            raise Exception(f"sum() takes exactly 1 argument ({len(node.args)} given)")
+
+        def rec(lst):
+            if len(lst) == 1:
+                return lst[0]
+            return lst[0][0].add(lst[0], rec(lst[1:]))
+
+        return rec(self.__unroll_arg(node.args[0]))
+
+    def __call_anyall(self, node: ast.Call):
+        if len(node.args) != 1:
+            raise Exception(
+                f"{node.func.id}() takes exactly 1 "  # type: ignore
+                + f"argument ({len(node.args)} given)"
+            )
+        op = Or if node.func.id == "any" else And  # type: ignore
+        return (bool, op(*[a[1] for a in self.__unroll_arg(node.args[0])]))
+
+    def __call_ord(self, node: ast.Call):
+        if len(node.args) != 1:
+            raise Exception(f"ord() takes exactly 1 argument ({len(node.args)} given)")
+        return self.visit(node.args[0])
+
+    def __call_chr(self, node: ast.Call):
+        if len(node.args) != 1:
+            raise Exception(f"chr() takes exactly 1 argument ({len(node.args)} given)")
+        return self.visit(node.args[0])
+
+    def __call_minmax(self, node: ast.Call):
+        if len(node.args) == 1:
+            args = self.__unroll_arg(node.args[0])
+        else:
+            args = [self.visit(a) for a in node.args]
+        cmp = "gt" if node.func.id == "max" else "lte"  # type: ignore
+
+        def rec(lst):
+            if len(lst) == 1:
+                return lst[0]
+            conds = [getattr(lst[0][0], cmp)(lst[0], x)[1] for x in lst[1:]]
+            cond = And(*conds)
+            t, v = lst[0]
+            _, v2 = rec(lst[1:])
+            if isinstance(v, list) or isinstance(v2, list):
+                # multi-bit elements: ITE elementwise
+                va = v if isinstance(v, list) else [v] * len(v2)
+                vb = v2 if isinstance(v2, list) else [v2] * len(va)
+                return (t, [ITE(cond, a, b) for a, b in zip(va, vb)])
+            return (t, ITE(cond, v, v2))
+
+        return rec(args)
 
     def __visit_Call_typecast(self, expr):
         if len(expr.args) != 1:
@@ -402,9 +651,17 @@ class ExpressionTranslator(ast.NodeTransformer):
         elif not hasattr(expr.func, "id"):
             raise exceptions.ExpressionNotHandledException(expr)
 
+        # Builtin functions
+        elif expr.func.id in self.__call_dispatch:
+            return self.__call_dispatch[expr.func.id](expr)
+
         # Typecast
         elif self.env.know_type(expr.func.id):
             return self.__visit_Call_typecast(expr)
+
+        # Print
+        elif expr.func.id == "print":
+            return [], self.env
 
         # int()
         elif expr.func.id == "int":

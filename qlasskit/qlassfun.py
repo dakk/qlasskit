@@ -31,8 +31,15 @@ from typing import (
 
 from sympy import Symbol
 
-from .ast2ast import ast2ast
-from .ast2logic import Arg, Args, BoolExpList, LogicFun, flatten, translate_ast
+from .ast2logic import (
+    Arg,
+    Args,
+    BoolExpList,
+    LogicFun,
+    flatten,
+    preprocess_ast,
+    translate_ast,
+)
 from .boolopt import BoolOptimizerProfile, defaultOptimizer
 from .boolopt.bool_optimizer import merge_expressions
 from .boolquant import Q  # noqa: F403, F401
@@ -322,7 +329,7 @@ class QlassF(QCircuitWrapper):
 
         def _do_translate(fun_ast, original_f) -> QlassF:
             # print(ast.dump(fun_ast, indent=4))
-            fun = ast2ast(fun_ast.body[0])
+            fun = preprocess_ast(fun_ast.body[0])
             # print(ast.dump(fun, indent=4))
             fun_name, args, fun_ret, exps = translate_ast(fun, types, defs)
 
